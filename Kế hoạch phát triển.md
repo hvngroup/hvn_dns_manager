@@ -1,68 +1,83 @@
-# Implementation Plan: Asynchronous Queue System cho WHMCS DNS Suite
+# Kế hoạch Phát triển Module Quản lý DNS Bất đồng bộ
 
-Mục tiêu: Xây dựng hệ thống hàng đợi (queue) trung gian để ghi nhận các thay đổi bản ghi DNS vào cơ sở dữ liệu và đồng bộ ngầm thông qua cronjob, thay vì phải chờ phản hồi trực tiếp từ DirectAdmin API. Điều này giúp cải thiện đáng kể tốc độ phản hồi cho người dùng (UX) khi thao tác với module WHMCS DNS Suite.
+Dựa trên việc phân tích cấu trúc của WHMCS DNS Suite (phiên bản cũ) và tích hợp thêm yêu cầu **Kiến trúc Bất đồng bộ (Hàng đợi - Queue)**, dưới đây là tài liệu phác thảo tính năng cho một Module hoàn toàn mới. 
 
-## Trả lời các câu hỏi của bạn (Q&A)
+## 1. Tên Module Chính Thức
 
-**Q: Hãy kiểm tra lại mã nguồn tệp [class.dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php), tôi thấy đã được decoder bằng ionCube**
-> **A:** Vâng, đúng là file này đã được chạy qua bộ giải mã (`EasyToYou`). Tuy nhiên, bản thân công cụ giải mã không thể phục hồi lại 100% mã nguồn đối với một số hàm mấu chốt (những hàm chứa key bảo vệ `Protected ioncube.dk encoding key`). Ví dụ, các hàm thực thi cốt lõi như [addRecord()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#2726-2730), [deleteRecord()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#108-112), [checkDAConnection()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#1081-1085) bên trong file này hiện đang **rỗng tuếch (trống trơn nội dung)**. Do đó, PHP vẫn chạy dựa trên file mã hóa gốc `.so` ở tầng server, còn nội dung ta nhìn thấy bằng mắt thường trong file đã giải mã không có giá trị để chỉnh sửa (nếu bạn sửa, phần mềm giải mã cũng không thể biên dịch lại thành file mã hóa ban đầu).
-
-**Q: Việc này có cần can thiệp vào mã gốc của ứng dụng không?**
-> **A:** **Có, chúng ta BẮT BUỘC phải can thiệp (chỉnh sửa) mã gốc của ứng dụng (Core App Files)**. Cụ thể ở đây là các file [lib/Client/Controller.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/lib/Client/Controller.php) (nơi hứng yêu cầu submit form từ giao diện) và các file liên quan đến cấu hình hệ thống ban đầu ([dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/dnssuite.php) để lúc active tạo bảng database). 
-> 
-> *Best Practice (Phương pháp hay nhất)*: Do chúng ta không thể sửa vào thư viện lớp nội bộ ([class.dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php)), cách duy nhất và an toàn nhất là **chặn đứng (intercept)** yêu cầu của người dùng ngay tại tầng Route/Controller. Thay vì để Controller gọi lệnh [addRecord()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#2726-2730) của class nội bộ, chúng ta sẽ bắt nó gọi lệnh `insert_into_db_queue()` của chúng ta. Việc này đòi hỏi phải chỉnh sửa mã nguồn gốc của module.
-
-## Proposed Changes
-
-### Database Schema
-Cần tạo thêm một bảng mới để lưu trữ hàng đợi công việc. Sẽ được thực thi khi kích hoạt module hoặc thông qua một file update riêng.
-
-#### [NEW] `mod_dnssuite_sync_queue`
-Bảng lưu trữ thông tin về các tác vụ cần đồng bộ.
-*   [id](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#3237-3294) (INT, AUTO_INCREMENT, PRIMARY KEY)
-*   `domainid` (INT): ID của domain trong WHMCS (`tbldomains`).
-*   `action` (VARCHAR): Loại tác vụ (ví dụ: [addRecord](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#2726-2730), `updateRecord`, [deleteRecord](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php#108-112)).
-*   `record_type` (VARCHAR): Loại bản ghi DNS (A, AAAA, MX, CNAME, TXT, SRV, NS).
-*   `old_data` (TEXT): Dữ liệu cũ định dạng JSON (dùng khi update hoặc delete).
-*   `new_data` (TEXT): Dữ liệu mới định dạng JSON (dùng khi add hoặc update).
-*   [status](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.daapi.php#180-184) (VARCHAR): Trạng thái (`pending`, `syncing`, `complete`, `failed`).
-*   `fail_reason` (TEXT): Ghi nhận lý do lỗi nếu quá trình đồng bộ thất bại.
-*   `created_at` (DATETIME): Thời gian tạo.
-*   `updated_at` (DATETIME): Thời gian cập nhật cuối cùng.
+Tên module được thống nhất là: **HVN - DirectAdmin DNS Manager**.
+(Nhấn mạnh vào thương hiệu HVN Group, tích hợp trình quản lý DNS đồng bộ/bất đồng bộ tốc độ cao với máy chủ DirectAdmin).
 
 ---
-### Database Setup
 
-#### [MODIFY] [dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/dnssuite.php)
-*   **Mô tả**: Trong hàm [dnssuite_activate()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/dnssuite.php#36-162), thêm câu lệnh SQL PDO tạo bảng `mod_dnssuite_sync_queue`. Trong hàm [dnssuite_deactivate()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/dnssuite.php#162-182), thêm lệnh DROP bảng này. Đối với các hệ thống đang chạy, cần thêm logic tạo bảng ở [dnssuite_upgrade()](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/dnssuite.php#182-219) hoặc có một cơ chế tự động tạo nếu bảng chưa tồn tại.
+## 2. Kiến trúc Cốt lõi (Core Architecture)
 
----
-### Cronjob / Background Worker
+Khác với module cũ gọi API trực tiếp, hệ thống mới được quy định phải tuân thủ chuẩn luồng dữ liệu 4 bước khép kín và an toàn:
 
-#### [NEW] [cron.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/cron.php)
-*   **Mô tả**: Đây sẽ là file cronjob chạy nền định kỳ (ví dụ: mỗi 5 phút `*/5 * * * *`).
-*   **Hoạt động**:
-    1.  Mở kết nối CSDL WHMCS, truy vấn bảng `mod_dnssuite_sync_queue` tìm các record có [status](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.daapi.php#180-184) là `pending`. Gắn cờ (update) các record này thành `syncing` để tránh bị cron tiến trình khác xử lý trùng.
-    2.  Khởi tạo các Controller của WHMCS DNS Suite (giống như cách web đang làm) để lấy các tham số kết nối API.
-    3.  Thực hiện loop qua các record và gọi hàm update thực tế lên DirectAdmin (thông qua lớp gốc của hệ thống nếu có thể triệu gọi các hàm public, hoặc tái tạo các lời gọi API dựa trên cấu hình DirectAdmin đã lưu).
-    4.  Cập nhật trạng thái trong CSDL thành `complete` nếu phản hồi thành công, hoặc `failed` kèm `fail_reason` nếu thất bại.
+*   **Tầng Khách (Client Controller)**: Tiếp nhận chỉnh sửa DNS $\rightarrow$ Validate bảo mật $\rightarrow$ **Lưu ngay lập tức** vào DataBase (Bảng `queue_jobs`). KHÔNG gọi CURL nào ở đây.
+*   **Tầng Lưu trữ (Database)**: Một bảng đặc biệt đóng vai trò lưu lại "Lịch sử tác vụ" với các trạng thái: `PENDING` (Chờ xử lý), `SYNCING` (Đang chạy), `COMPLETE` (Xong), `FAILED` (Lỗi).
+*   **Tầng Xử lý nền (Background Worker / Cron)**: Một tiến trình Cronjob trên WHMCS Server (1-3 phút/lần) tự động lặp qua các queue `PENDING`, mở socket kết nối lên DirectAdmin, thực thi và tự động ghi log.
+*   **Tầng Đích (Root Server)**: DirectAdmin Node tiếp nhận API, thay đổi Zone File, Restart dịch vụ Named/Bind trên máy chủ. Đưa website thực tế vào hoạt động.
 
 ---
-### Giao diện và Interception
 
-#### [MODIFY] [lib/Client/Controller.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/lib/Client/Controller.php) (và các script Submit Ajax nếu có)
-*   **Mô tả**: Thay vì khi client/admin bấm nút Add/Edit/Delete Record, hệ thống chặn việc gọi trực tiếp các lệnh đồng bộ lên [class.dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php) và thay bằng lệnh đẩy dữ liệu vào `mod_dnssuite_sync_queue`.
-*   *Thách thức*: Phải phân tích cách hệ thống nhận POST request ở thời điểm hiện tại và điều chỉnh logic trả về "Đã đưa vào hàng đợi" (Added to Queue) xuống View của người dùng thay vì kết quả ngay lập tức.
+## 3. Danh sách Tính năng cần thiết (Feature List)
 
-#### [NEW] Giao diện "Sync Logs" (Log đồng bộ)
-*   Cần tạo một View/Template (bằng Smarty / HTML) để hiển thị bảng `mod_dnssuite_sync_queue`.
-*   **Client Area**: Thêm một Tab "Sync Logs" vào giao diện Quản lý DNS của người dùng, giới hạn chỉ hiển thị các bản ghi có `domainid` thuộc về họ.
-*   **Admin Area**: Thêm trang "System Sync Logs" liệt kê tất cả mọi hoạt động đồng bộ của toàn bộ người dùng.
+### 3.1. Dành cho Khách hàng (Client Area)
 
-## Verification Plan
+1. **Giao diện Editor DNS (Tức thời - Zero Latency)**: 
+   - Thêm / Sửa / Xóa các bản ghi tiêu chuẩn (A, AAAA, CNAME, MX, TXT, SRV, NS, CAA).
+   - Phản hồi lưu thành công từ giao diện chỉ tốn < 0.2 giây (do chạy DB lưu queue thay vì chờ API DA).
+2. **Theo dõi Tiến trình (Sync Tracker)**:
+   - Các bản ghi đang xử lý nền sẽ có icon "Đang xoay" (Spinner) hoặc badge `Syncing...` trên giao diện.
+   - Khi cronjob chạy xong, giao diện tự cập nhật thành biểu tượng "Tích xanh" `Live on Root`.
+3. **Quản lý Hướng (Redirect / URL Forwarding) Cấp Cao**:
+   - Hỗ trợ tạo chuyển hướng Standard (301, 302).
+   - Hỗ trợ Masked Redirect (Ẩn URL) sử dụng Connector thông minh (Mã hóa Hash bảo mật cao) trên host đích.
+   - **Tích hợp Tự động SSL (Let's Encrypt)**: Tận dụng tính năng của DirectAdmin để phát hành chứng chỉ Auto-SSL miễn phí cho các domain sử dụng dịch vụ NameServer. Nhờ đó, link chuyển hướng URL bằng HTTPS (`https://domain.com` chuyển sang nơi khác) sẽ không bị các trình duyệt hiện đại cảnh báo lỗi bảo mật rủi ro (Not Secure).
+4. **Quản lý Email (Email Forwarding / Catch-all)**:
+   - Tạo hộp thư chuyển tiếp và hộp thư dọn dẹp lỗi. Hệ thống cũng đẩy qua Hàng đợi Đồng bộ.
+5. **Nạp Mẫu (Load Template)**:
+   - Khách hàng có thể reset DNS về dạng gốc bằng 1 click dựa trên các Profile/Mẫu DNS mặc định cấu hình bởi Admin.
+6. **Client API DDNS (Dành cho Camera/Router gia đình)**:
+   - User được cấp một URL mật để cấu hình vào Router (VD Mikrotik/DrayTek). Khi IP IP tĩnh đổi, Router ném Get Request lên WHMCS $\rightarrow$ Cập nhật bản ghi A của DNS Queue $\rightarrow$ Đổi IP Server tự động.
+   - Đi kèm thuật toán **Anti-Brute Force** chống gọi API rác và Block IP xấu tự động.
+7. **Hỗ trợ Quản lý DNSSEC**:
+   - DirectAdmin **hỗ trợ rất tốt DNSSEC** nguyên bản (nếu được Enable trên Server DirectAdmin qua file `directadmin.conf`).
+   - Trong module **HVN - DirectAdmin DNS Manager**, ta có thể bổ sung API gọi lệnh `CMD_API_DNS_CONTROL?domain=xxx&action=dnssec` để:
+       * (1) **Nút Kích Hoạt/Vô Hiệu Hóa (Enable/Disable)**: Cho phép khách hàng tự bật hoặc tắt chế độ bảo mật DNSSEC trực tiếp từ giao diện WHMCS.
+       * (2) Tự động sinh `Generate Keys` ra chuỗi bảo mật DS Records cho tên miền khi bật.
+       * (3) Hiển thị thông số Key Tag, Algorithm, Digest Type, Digest ở Giao diện Khách để mang đi cấu hình tại nhà đăng ký.
+       * (4) Khóa Zone (Sign) tự động sau mỗi lần Record bị thay đổi. Gồm việc liên kết với Queue để sau khi Syncing Bảng DNS xong $\Rightarrow$ Tái kích hoạt chữ ký (Sign) trên DirectAdmin.
 
-Trong quá trình này, các bước xác thực sẽ được thực hiện bằng cách:
-1.  **Thiết lập Test:** Chạy trực tiếp một file PHP thử nghiệm để đảm bảo cấu trúc bảng được tạo chính xác khi Upgrade/Activate.
-2.  **Khả năng Override API:** Kiểm tra việc "bọc lót" phương thức POST hiện tại khi một record mới được tạo, đảm bảo nó lưu vào CSDL thay vì gọi API thực của [class.dnssuite.php](file:///Users/nguyenvuong/Desktop/Project/Ph%C3%A1t%20tri%E1%BB%83n%20module%20qu%E1%BA%A3n%20l%C3%BD%20DNS/whmcs-dnssuite-v1.25/whmcs_dnssuite/modules/addons/dnssuite/class/class.dnssuite.php).
-3.  **Cronjob Trigger:** Chạy file `cron.php` từ Terminal (ví dụ: `php cron.php`) và mô phỏng môi trường bị delay/timeout để xác minh tiến trình `pending` $\rightarrow$ `syncing` $\rightarrow$ `failed`/`complete` hoạt động đáng tin cậy. Dùng các URL API giả (mocked endpoints) nếu cần thiết để giả lập trạng thái API lagging.
-4.  **Kiểm tra giao diện:** Mở WHMCS Admin & Client UI để xem dữ liệu có nạp chính xác vào UI log hay không.
+### 3.2. Dành cho Quản trị viên (Admin Area)
+
+8. **Bảng Điều khiển Tổng và Đo lường (Dashboard & Metrics)**:
+   - Thống kê tỷ lệ Đồng bộ (Sync Pipeline): Số lượng tác vụ `PENDING`, `COMPLETE`, `FAILED` trong 24h qua.
+   - Thống kê Tình trạng Dịch vụ (Service Health): Tỷ lệ % Uptime hoặc Connection Error rate tới API DirectAdmin.
+   - Thống kê Tổng quan: Tổng số Domain đang quản lý, tổng số Bản ghi DNS hiện tại, Top 5 Domain có lượng bản ghi/thay đổi nhiều nhất.
+   - Cảnh báo nhanh màu đỏ nếu tỷ lệ `FAILED` tăng cao quá ngưỡng, biểu thị máy chủ DirectAdmin đang mất kết nối.
+9. **Quản lý Tên Miền Toàn Cục (Global Domain Management)**:
+   - Admin có quyền xem trực tiếp toàn bộ danh sách `Domains` đang kích hoạt dịch vụ DNS Suite trên Server.
+   - Khi nhấp vào 1 domain bất kỳ, Admin có quyền **truy cập vào giao diện Editor DNS (Giống như Client)** để có quyền Tạo / Sửa / Xóa bản ghi DNS, chuyển hướng, tắt/bật DNSSEC *thay cho* người dùng mà không cần Login As Client.
+10. **Lịch sử Đồng bộ (Global Sync Logs)**:
+   - Bảng DataTables cực nhạy để Admin dò tìm (Search/Filter) toàn bộ vết tích đổi DNS của mọi User trong mạng. 
+   - Xem chi tiết: *Domain nào? Thêm record gì? Lúc mấy giờ? IP người thao tác thế nào? Tại sao rớt kết nối?*
+11. **Công cụ Sửa Lỗi Tự động (One-Click Retry)**:
+    - Nút "Thử lại tất cả Lỗi" (Retry All Failed) gài lại trạng thái về `PENDING` để Cronjob tự làm lại khi DirectAdmin hoạt động bình thường trở lại. Không cần truy cập thủ công DA.
+12. **Zone Management**:
+    - Quản lý DNS Template chung cho toàn hệ thống để áp dụng khi User mới vừa mua Domain xong là đẩy template vào Queue lấy cấu hình chuẩn.
+13. **Tự động Gỡ Lỗi (Auto-healing Queue)**: 
+    - Nếu Cronjob gặp lỗi `Timeout` (VD kết nối chậm), thuật toán tự động tăng thời gian chờ (Exponential Backoff) để không đẩy dồn dập vào API của DA, bảo vệ máy chủ rễ không bị sập (DDoS nội bộ).
+14. **Tính toán Limit (Data Quota)**:
+    - Giới hạn khách hàng A chỉ được tạo tối đa X Record, Y Subdomain, Z Forwarders (dựa trên gói dịch vụ Hosting/Domain họ đã mua ở WHMCS). Tái ứng dụng Data Validation rất tốt từ bản v1.25.
+
+---
+
+## 4. Công nghệ Khuyên Dùng (Tech Stack)
+
+Để module hoạt động độc lập, nhẹ và bảo mật cao, không vướng vấn đề mã hóa (như bị block bởi IonCube):
+
+*   **Backend Framework**: PHP 7.4 - 8.2 (Tương thích chuẩn WHMCS 8.x Capsule Database).
+*   **Database**: WHMCS MySQL (Tạo các bảng có tiền tố `mod_swiftdns_...` để cô lập). Sử dụng Eloquent ORM của WHMCS (Capsule).
+*   **Frontend Template**: Smarty Engine kết hợp **Bootstrap 4/5** + Ajax. Sử dụng **Vue.js** hoặc **Alpine.js** dạng nhẹ (CDN) để làm các DataTables quản lý trạng thái Syncing/Complete real-time ở UI mà không cần tải lại trang.
+*   **DA Gateway (Giao tiếp)**: Viết lại class `HTTPSocket` của DA bằng **GuzzleHTTP** hoặc **cURL OOP hiện đại** để bắt Timeout chuẩn xác hơn và không rò rỉ bộ nhớ khi chạy Cron hàng nghìn lệnh.
