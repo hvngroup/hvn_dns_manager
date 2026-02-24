@@ -1,0 +1,9 @@
+
+ /* Make Select2 boxes match Bootstrap3 heights: */
+.select2-selection__rendered {
+  line-height: 58px !important;
+}
+
+.select2-selection {
+  height: 56px !important;
+}
