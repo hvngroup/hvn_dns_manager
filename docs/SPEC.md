@@ -728,6 +728,11 @@ CREATE TABLE mod_hvndns_schema_version (
 
 Đây là luồng quan trọng nhất, mô tả toàn bộ lifecycle từ lúc user nhấn "Save" đến khi DNS thực sự thay đổi trên server.
 
+**Ghi chú Cache Strategy (tham chiếu SETTINGS.md #68-70)**:
+Khi Client mở DNS Editor, hệ thống load records theo setting `fetch_from_ns_on_load`:
+- `false` (mặc định): Load từ `mod_hvndns_records` (< 50ms). Background refresh nếu cache > `cache_refresh_ttl`
+- `true`: Gọi DA API getZone() realtime (500-1500ms), so sánh + update DB, rồi render
+
 ```
 CLIENT BROWSER                  WHMCS SERVER                           DATABASE                        CRON WORKER                     DIRECTADMIN NODES
 ─────────────                   ────────────                           ────────                        ───────────                     ─────────────────
@@ -1780,27 +1785,31 @@ echo "0 4 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/cleanup.p
 
 ### 14.3. Module Settings (Admin Configurable)
 
-| Setting | Default | Mô tả |
-|---------|---------|--------|
-| `cron_interval` | 60 (giây) | Tần suất cron worker |
-| `job_timeout` | 30 (giây) | Timeout mỗi API call tới DA |
-| `max_retry_attempts` | 5 | Số lần retry trước khi PERMANENTLY_FAILED |
-| `stale_lock_timeout` | 300 (giây) | Thời gian tối đa 1 job ở trạng thái SYNCING |
-| `conflict_window` | 180 (giây) | Cửa sổ phát hiện xung đột (3 phút) |
-| `sync_poll_interval` | 5000 (ms) | Client-side poll frequency |
-| `ddns_rate_limit` | 60 (req/giờ) | DDNS rate limit per token |
-| `ddns_brute_threshold` | 10 | Số lần fail token trước khi block IP |
-| `ddns_block_duration` | 3600 (giây) | Thời gian block IP (1 giờ) |
-| `snapshot_retention` | 30 (bản) | Số snapshot giữ lại per domain |
-| `record_history_days` | 90 | Số ngày giữ record history |
-| `audit_trail_days` | 365 | Số ngày giữ audit trail (tối thiểu) |
-| `sync_log_days` | 90 | Số ngày giữ sync logs |
-| `drift_auto_fix` | false | Tự động push WHMCS → DA khi phát hiện drift |
-| `telegram_bot_token` | (empty) | Telegram Bot API token |
-| `telegram_chat_id` | (empty) | Telegram Chat/Group ID |
-| `alert_email` | (empty) | Email nhận alert (comma-separated) |
-| `alert_cooldown` | 900 (giây) | Khoảng cách giữa 2 alert cùng loại |
-| `client_rate_limit` | 30 (changes/phút) | Giới hạn thay đổi từ Client Area |
+Hệ thống có **96 settings** chia thành 19 nhóm. Chi tiết đầy đủ tại **SETTINGS.md**.
+
+Dưới đây là tóm tắt các nhóm:
+
+| Nhóm | Số lượng | Mô tả |
+|------|---------|-------|
+| Module Core | 8 | License, nameservers, default TTL |
+| Domain Policy | 7 | NS check, pre-registrar hook, grace period |
+| DNS Editor | 2 | Enable/disable, subdomain limit |
+| Record Permissions | 8 | Bật/tắt quyền sửa từng loại record |
+| Record Limits | 8 | Giới hạn số lượng từng loại record |
+| URL Redirect | 4 | Enable, masked, hash key, limit |
+| Email Forwarding | 5 | Enable, catch-all, alias/destination limits |
+| DDNS | 7 | Enable, rate limit, brute force config |
+| DNSSEC | 2 | Enable, auto re-sign |
+| SSL / Let's Encrypt | 4 | Auto-SSL, client trigger, renew days |
+| DNS Templates | 3 | Enable, user custom, limit |
+| Client Notification | 5 | Email notification cho client khi DNS thay đổi |
+| UI / Navigation | 4 | Menu visibility, order |
+| Performance & Cache | 5 | Fetch strategy, cache TTL, rate limit |
+| DA Provisioning | 2 | Web template, PHP enable |
+| Queue & Cron | 6 | Interval, timeout, retry, conflict window |
+| Webhook & Alert | 9 | Telegram, email, thresholds, cooldown |
+| Security | 4 | Sub-account restriction, retention policies |
+| Data Retention | 3 | Snapshot, queue, drift retention |
 
 ---
 

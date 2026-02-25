@@ -12,8 +12,8 @@ globs: **/*.php
 - Mã hóa password DA: `WHMCS\Security\Encryption::encode()` / `decode()`
 - Bảng `mod_hvndns_audit_trail` là APPEND-ONLY: CHỈ INSERT, KHÔNG UPDATE/DELETE
 
-## 18 bảng trong hệ thống (chi tiết tại docs/DB_SCHEMA.md)
-schema_version, servers, domains, records, queue, sync_logs, audit_trail,
+## 19 bảng trong hệ thống (chi tiết tại docs/DB_SCHEMA.md)
+schema_version, settings, servers, domains, records, queue, sync_logs, audit_trail,
 record_history, snapshots, templates, quota_plans, dnssec, ddns_tokens,
 redirects, email_forwards, drift_reports, ip_blacklist, notification_cooldowns
 

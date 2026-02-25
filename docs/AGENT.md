@@ -23,12 +23,13 @@ Khi nhận bất kỳ yêu cầu nào liên quan đến module này, Agent PHẢ
 
 1. **AGENT.md** (tệp này) — Quy tắc tối thượng, điều phối toàn bộ AI Agent
 2. **DB_SCHEMA.md** — Database schema chi tiết, định nghĩa cột, index strategy, retention policy
-3. **SPEC.md** — Thông số kỹ thuật, flow diagrams, kiến trúc hệ thống
-4. **API_REFERENCE.md** — Tham chiếu API: DirectAdmin API, Internal Ajax API, REST API, Error Codes
-5. **EPICS.md** — User stories, acceptance criteria, issue list
-6. **TEST_PLAN.md** — Kế hoạch kiểm thử, test cases, fixtures, checklists
-7. **WIREFRAME.md** — Phác thảo giao diện Client Area & Admin Area
-8. **PLAN.md** — Kế hoạch phát triển tổng thể, phân phase
+3. **API_REFERENCE.md** — Tham chiếu API: DirectAdmin API, Internal Ajax API, REST API, Error Codes
+4. **SETTINGS.md** — 96 Admin settings, validation rules, logic
+5. **SPEC.md** — Thông số kỹ thuật, flow diagrams, kiến trúc hệ thống
+6. **EPICS.md** — User stories, acceptance criteria, issue list
+7. **TEST_PLAN.md** — Kế hoạch kiểm thử, test cases, fixtures, checklists
+8. **WIREFRAME.md** — Phác thảo giao diện Client Area & Admin Area
+9. **PLAN.md** — Kế hoạch phát triển tổng thể, phân phase
 
 Nếu có mâu thuẫn giữa các tài liệu, thứ tự ưu tiên là: AGENT.md > DB_SCHEMA.md > API_REFERENCE.md > SPEC.md > EPICS.md > PLAN.md.
 
@@ -36,6 +37,9 @@ Nếu có mâu thuẫn giữa các tài liệu, thứ tự ưu tiên là: AGENT.
 - Khi code **database** (Model, migration, query) → tham chiếu **DB_SCHEMA.md** trước
 - Khi code **gọi API DirectAdmin** (DAGateway, parser) → tham chiếu **API_REFERENCE.md Phần A**
 - Khi code **Ajax endpoint** (Controller, response format) → tham chiếu **API_REFERENCE.md Phần B**
+- Khi code **settings/config** (SettingsHelper, validation, admin settings page) → tham chiếu **SETTINGS.md**
+- Khi code **permission check** (record type enable/disable, NS check) → tham chiếu **SETTINGS.md** Section 5-6
+- Khi code **limits enforcement** (per-type limits, 3-layer priority) → tham chiếu **SETTINGS.md** Section 7
 - Khi code **giao diện** (Smarty template, Alpine.js) → tham chiếu **WIREFRAME.md**
 - Khi code **luồng xử lý** (Service, Queue, Cron) → tham chiếu **SPEC.md**
 - Khi **viết test** → tham chiếu **TEST_PLAN.md** cho test cases, fixtures, naming convention
@@ -74,7 +78,7 @@ modules/addons/hvn_dns_manager/
 
 Agent KHÔNG ĐƯỢC tạo file hoặc thư mục ngoài cấu trúc trên trừ khi được yêu cầu rõ ràng.
 
-### 1.4. Danh sách 18 bảng Database (Quick Reference)
+### 1.4. Danh sách 19 bảng Database (Quick Reference)
 
 Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 
@@ -98,6 +102,7 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 | 16 | `mod_hvndns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
 | 17 | `mod_hvndns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
 | 18 | `mod_hvndns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
+| 19 | `mod_hvndns_settings` | Setting | Module config key-value | 96 settings |
 
 ---
 

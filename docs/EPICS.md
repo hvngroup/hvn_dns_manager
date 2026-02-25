@@ -267,6 +267,36 @@
 
 ---
 
+### Story 4.4 — Admin Settings Page
+**Là** admin, **tôi muốn** cấu hình toàn bộ module qua giao diện trực quan với các tab phân nhóm,
+**để** không cần sửa code hay DB khi thay đổi chính sách.
+
+| Issue | Mô tả | SP |
+|-------|--------|-----|
+| `ADMIN-015` | Tạo bảng `mod_hvndns_settings` + SettingsHelper class (get/set/getBool/getInt) | 2 |
+| `ADMIN-016` | Tạo trang Admin Settings với tab navigation (16 tabs) — render form từ settings config | 3 |
+| `ADMIN-017` | Ajax save settings + validation (NS không trống, TTL range, hash key min length...) | 2 |
+| `ADMIN-018` | Implement Record Permissions logic: filter allowed types trong DNS Editor dropdown + server-side enforce | 2 |
+| `ADMIN-019` | Implement Record Limits per-type: kiểm tra trước khi dispatch, kết hợp 3 lớp (Global → Quota Plan → Override) | 2 |
+| `ADMIN-020` | Implement Domain Policy: NS check logic (`disable_manage_wrong_ns`), pre-registrar hook, on-transfer hook | 3 |
+| `ADMIN-021` | Implement Client Notification: gửi email qua WHMCS mail system sau khi sync complete | 2 |
+| `ADMIN-022` | Implement Cache Strategy: `fetch_from_ns_on_load` + background refresh + `cache_refresh_ttl` | 2 |
+| `ADMIN-023` | Implement UI/Navigation hooks: `ClientAreaPrimaryNavbar`, sidebar link, domain service link, menu order | 1 |
+| `ADMIN-024` | Seed default settings values khi module activate lần đầu (96 settings với defaults từ SETTINGS.md) | 1 |
+
+**AC**:
+- Tất cả 96 settings có thể xem và sửa qua giao diện Admin
+- Settings lưu vào `mod_hvndns_settings`, đọc qua SettingsHelper
+- Validation chặn giá trị không hợp lệ trước khi lưu
+- Record Permissions ẩn record type bị tắt khỏi dropdown Client + chặn server-side
+- Record Limits enforce đúng thứ tự ưu tiên 3 lớp
+- NS check chặn Client sửa DNS khi NS chưa trỏ đúng
+- Client notification chỉ gửi sau sync complete (không gửi khi lưu queue)
+- Cache strategy hoạt động đúng theo setting
+- Menu items hiển thị/ẩn + đúng thứ tự theo settings
+
+---
+
 ## EPIC-05: Provisioning tự động (WHMCS Product Lifecycle) 🟢
 > *Tự động tạo/xóa zone DNS khi khách hàng mua/hủy dịch vụ trên WHMCS.*
 

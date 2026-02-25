@@ -1576,6 +1576,55 @@ Response 200:
 
 ---
 
+### B3.7. Settings Management
+```
+GET ?module=hvn_dns_manager&ajax=1&action=get_settings&group=core
+
+Response 200:
+{
+    "success": true,
+    "data": {
+        "group": "core",
+        "settings": {
+            "module_enabled": {"value": "1", "type": "boolean", "label": "Kích hoạt Module"},
+            "license_key": {"value": "hvndns-12345", "type": "string", "label": "License Key"},
+            "default_nameserver_1": {"value": "dns1.hvn.vn", "type": "string", "label": "Nameserver 1"},
+            "default_ttl": {"value": "3600", "type": "integer", "label": "TTL mặc định"}
+        }
+    }
+}
+```
+```
+POST ?module=hvn_dns_manager&ajax=1&action=save_settings
+
+{
+    "group": "core",
+    "settings": {
+        "default_ttl": "1800",
+        "default_nameserver_3": "dns3.hvn.vn"
+    }
+}
+
+Response 200:
+{
+    "success": true,
+    "data": {"updated": 2},
+    "message": "Đã lưu 2 cài đặt thành công."
+}
+
+Response 422 (Validation Error):
+{
+    "success": false,
+    "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "TTL phải trong khoảng 60–86400 giây.",
+        "field": "default_ttl"
+    }
+}
+```
+
+---
+
 ## B4. DDNS External Endpoint
 
 > **URL**: `/modules/addons/hvn_dns_manager/ddns.php`  

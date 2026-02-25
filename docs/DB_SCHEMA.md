@@ -15,6 +15,7 @@
 1. [Tổng quan ERD](#1-tổng-quan-erd)
 2. [Quy ước chung](#2-quy-ước-chung)
 3. [mod_hvndns_schema_version](#3-mod_hvndns_schema_version) — Quản lý phiên bản schema
+3B. [mod_hvndns_settings](#3b-mod_hvndns_settings) — Cấu hình module
 4. [mod_hvndns_servers](#4-mod_hvndns_servers) — Cấu hình DA Node
 5. [mod_hvndns_domains](#5-mod_hvndns_domains) — Tên miền khách hàng
 6. [mod_hvndns_records](#6-mod_hvndns_records) — Bản ghi DNS (Source of Truth)
@@ -82,13 +83,13 @@ Standalone tables (không có FK):
 │(DNS Templates)       │  │cooldowns (Alert Throttle)    │  │ip_blacklist         │
 └──────────────────────┘  └──────────────────────────────┘  └─────────────────────┘
 
-┌──────────────────────┐  ┌──────────────────────────────┐
-│mod_hvndns_quota_plans│  │mod_hvndns_schema_version     │
-│(Service Limits)      │  │(Migration Tracking)          │
-└──────────────────────┘  └──────────────────────────────┘
+┌──────────────────────┐  ┌──────────────────────────────┐  ┌─────────────────────┐
+│mod_hvndns_quota_plans│  │mod_hvndns_schema_version     │  │mod_hvndns_settings  │
+│(Service Limits)      │  │(Migration Tracking)          │  │(Module Config)      │
+└──────────────────────┘  └──────────────────────────────┘  └─────────────────────┘
 ```
 
-**Tổng cộng: 18 bảng**
+**Tổng cộng: 19 bảng**
 
 ---
 
@@ -172,6 +173,34 @@ CREATE TABLE mod_hvndns_schema_version (
     description     VARCHAR(255) NULL,
     executed_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE INDEX uniq_version (version)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+---
+
+## 3B. mod_hvndns_settings
+
+> **Mục đích**: Lưu trữ cấu hình module dạng key-value. Admin quản lý qua giao diện Settings. Chi tiết toàn bộ 96 settings tại SETTINGS.md.
+
+| # | Cột | Kiểu | Ràng buộc | Mô tả |
+|---|-----|------|-----------|-------|
+| 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID setting |
+| 2 | `setting_key` | VARCHAR(100) | 📌 REQD 🦄 UNIQ | Khóa setting. snake_case. VD: `default_ttl`, `enable_dnssec` |
+| 3 | `setting_val` | TEXT | NULL | Giá trị setting. String cho mọi type — cast khi đọc. NULL = chưa set (dùng default) |
+| 4 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo |
+| 5 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
+
+**Dung lượng**: ~96 rows (cố định).
+
+```sql
+CREATE TABLE mod_hvndns_settings (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    setting_key     VARCHAR(100) NOT NULL,
+    setting_val     TEXT NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE INDEX uniq_key (setting_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
@@ -648,8 +677,9 @@ CREATE TABLE mod_hvndns_snapshots (
 | 4 | `is_default` | TINYINT(1) | 📌 REQD DEFAULT `0` | Template mặc định? `1` = áp dụng tự động khi provision domain mới. CHỈ ĐƯỢC 1 template là default tại 1 thời điểm |
 | 5 | `records_data` | JSON | 📌 REQD | Danh sách records mẫu ở dạng JSON array. Hỗ trợ placeholder: `{{domain}}` = tên miền thực, `{{ip}}` = IP mặc định, `{{ns1}}`, `{{ns2}}`, `{{ns3}}` = nameserver. VD: `[{"type":"NS","name":"@","value":"{{ns1}}."},{"type":"A","name":"@","value":"{{ip}}"}]` |
 | 6 | `is_visible_client` | TINYINT(1) | 📌 REQD DEFAULT `1` | Client có thể thấy và chọn template này? `0` = chỉ Admin dùng (VD: template nội bộ) |
-| 7 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo |
-| 8 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
+| 7 | `created_by_user_id` | INT UNSIGNED | NULL | Client ID nếu template do user tự tạo (`enable_user_custom_templates = true` trong SETTINGS.md). `NULL` = template do Admin tạo (hiển thị cho tất cả). Có giá trị = chỉ hiển thị cho user đó |
+| 8 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo |
+| 9 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
 
 ```sql
 CREATE TABLE mod_hvndns_templates (
@@ -659,6 +689,7 @@ CREATE TABLE mod_hvndns_templates (
     is_default          TINYINT(1) NOT NULL DEFAULT 0,
     records_data        JSON NOT NULL,
     is_visible_client   TINYINT(1) NOT NULL DEFAULT 1,
+    created_by_user_id  INT UNSIGNED NULL,
     created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     

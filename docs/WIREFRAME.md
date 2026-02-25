@@ -4,8 +4,9 @@
 > **Phiên bản**: 1.0  
 > **Ngày tạo**: 25/02/2026  
 > **Dành cho**: Frontend Developer, UI/UX Designer, AI Agent  
-> **Framework**: Smarty Template + Bootstrap 5 + Alpine.js 3.x  
-> **Theme tương thích**: WHMCS Six / Twenty-One  
+> **Framework**: Smarty Template + Bootstrap 5 + Alpine.js 3.x
+> **Theme tương thích**: WHMCS Six / Twenty-One / Lagom WHMCS
+> **Màu chủ đạo**: Màu đỏ (#ea4544)
 
 ---
 
@@ -1177,52 +1178,19 @@ $alpine       Alpine.js reactive data
 
 ---
 
-## AD-12: Notification Settings
+## AD-12: Module Settings (Mở rộng)
 
-> **URL**: `?module=hvn_dns_manager&action=settings` (tab Notifications)
+> **URL**: `?module=hvn_dns_manager&action=settings`
+> **Mục đích**: Trang cấu hình tổng hợp — 96 settings chia theo tabs
 
-```
-╔═══════════════════════════════════════════════════════════════════════╗
-║  Sidebar │  Cài đặt Module                                          ║
-║          │  ══════════════                                           ║
-║          │                                                            ║
-║          │  [Chung] [Thông báo] [Cron] [Bảo trì]                    ║
-║          │           ═════════                                        ║
-║          │                                                            ║
-║          │  ── Telegram ──                                            ║
-║          │                                                            ║
-║          │  [✓] Bật thông báo Telegram                               ║
-║          │                                                            ║
-║          │  Bot Token *                                               ║
-║          │  [____________••••••••••____________]                       ║
-║          │                                                            ║
-║          │  Chat ID *                                                 ║
-║          │  [____________-1001234567890____________]                   ║
-║          │  ℹ️ Nhóm Telegram hoặc cá nhân                            ║
-║          │                                                            ║
-║          │  [📬 Gửi tin nhắn test]                                    ║
-║          │  ✅ Đã gửi thành công lúc 14:35!                          ║
-║          │                                                            ║
-║          │  ── Email ──                                               ║
-║          │                                                            ║
-║          │  [✓] Bật thông báo Email                                  ║
-║          │                                                            ║
-║          │  Danh sách email nhận:                                     ║
-║          │  [_admin@hvn.vn, devops@hvn.vn_]                          ║
-║          │  ℹ️ Nhiều email phân tách bằng dấu phẩy                   ║
-║          │                                                            ║
-║          │  ── Quy tắc cảnh báo ──                                   ║
-║          │                                                            ║
-║          │  [✓] Server fail ≥ [_5_] job liên tiếp   Cooldown: [_15_] phút ║
-║          │  [✓] Server mất kết nối ≥ [_3_] lần      Cooldown: [_15_] phút ║
-║          │  [✓] Queue tồn đọng > [_100_] jobs        Cooldown: [_30_] phút ║
-║          │  [✓] Job PERMANENTLY_FAILED               Cooldown: mỗi job    ║
-║          │  [✓] Drift detected                       Cooldown: [_24_] giờ ║
-║          │  [✓] SSL sắp hết hạn < [_7_] ngày        Cooldown: [_24_] giờ ║
-║          │                                                            ║
-║          │                              [💾 Lưu cài đặt]             ║
-╚═══════════════════════════════════════════════════════════════════════╝
-```
+Tab navigation:
+[Chung] [Domain Policy] [DNS Editor] [Limits] [Redirects] [Email]
+[DDNS] [DNSSEC] [SSL] [Templates] [Notifications] [UI] [Performance] [Queue] [Security]
+
+Mỗi tab hiển thị các settings tương ứng từ SETTINGS.md.
+Form fields: input text, checkbox, select dropdown.
+Nút [💾 Lưu cài đặt] ở cuối mỗi tab.
+Toast thông báo "Đã lưu thành công!" sau khi save.
 
 ---
 

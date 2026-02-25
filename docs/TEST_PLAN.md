@@ -449,6 +449,36 @@ tests/Unit/Helpers/DnsFormatHelperTest.php
 ├── test_ttl_to_human_readable                        3600 → "1h", 300 → "5m"
 ├── test_full_record_name                             name="mail", domain="example.com" → "mail.example.com"
 └── test_full_record_name_root                        name="@", domain="example.com" → "example.com"
+
+tests/Unit/Helpers/SettingsHelperTest.php
+├── test_get_returns_default_when_key_not_found         get('missing', 'default') → 'default'
+├── test_get_bool_casts_correctly                        '1' → true, '0' → false, '' → false
+├── test_get_int_casts_correctly                         '3600' → 3600
+├── test_set_creates_new_setting                         set('new_key', 'value') → row created
+├── test_set_updates_existing_setting                    set('existing', 'new') → value updated
+└── test_encrypted_settings_roundtrip                    telegram_bot_token encrypt → decrypt OK
+
+tests/Unit/Services/RecordPermissionTest.php
+├── test_allowed_type_passes                             allow_modify_a=1 + type A → pass
+├── test_disallowed_type_blocked                         allow_modify_ns=0 + type NS → RECORD_TYPE_DISABLED
+├── test_admin_bypasses_permission                       allow_modify_ns=0 + actor=admin → pass
+└── test_allowed_types_list_excludes_disabled             Dropdown chỉ chứa types được bật
+
+tests/Unit/Services/NsCheckTest.php
+├── test_ns_match_passes                                 domain NS = dns1.hvn.vn → pass
+├── test_ns_mismatch_blocks                              domain NS = ns1.other.com → NS_NOT_CONFIGURED
+├── test_ns_check_disabled_always_passes                  disable_manage_wrong_ns=0 → pass regardless
+├── test_ns_check_skip_method                             ns_check_method='skip' → pass
+└── test_partial_ns_match_passes                          domain có dns1 nhưng thiếu dns3 → pass (partial OK)
+
+tests/Integration/SettingsIntegrationTest.php
+├── test_per_type_limit_enforcement                      a_record_limit=5 + 5 A records → 6th blocked
+├── test_global_limit_vs_quota_plan_priority              Quota Plan limit < global → quota plan wins
+├── test_admin_override_beats_quota_plan                  Admin exception override → pass
+├── test_client_notification_sent_after_sync_complete     enable_client_notification=1 → email sent
+├── test_client_notification_not_sent_on_queue_only       Job pending → NO email yet
+├── test_fetch_from_ns_updates_db_on_drift                fetch_on_load=1 + DA has extra record → DB updated
+└── test_cache_refresh_ttl_triggers_background_fetch       cache expired → background DA fetch triggered
 ```
 
 **Tổng Unit Tests: ~120 test cases**
