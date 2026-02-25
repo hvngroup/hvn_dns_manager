@@ -20,33 +20,21 @@
 - **IP Address**: `160.187.146.54`
 - **Port**: `2222` (Mặc định)
 - **Username DA**: `admin`
-- **Password DA**: `[Mật khẩu admin DA 1]`
-- **SSL**: `[Enabled / Disabled]`
+- **Password DA**: `[Mật khẩu admin DA 1]` -> Liên hệ gửi pass riêng
+- **SSL**: `Enabled`
 
 ### Node 2 (Secondary Server)
-- **Hostname**: `dns2.hvn.vn`
-- **IP Address**: `[IP Server 2]`
-- **Port**: `2222`
-- **Username DA**: `admin`
-- **Password DA**: `[Mật khẩu admin DA 2]`
-- **SSL**: `[Enabled / Disabled]`
 
 ### Node 3 (Secondary Server)
-- **Hostname**: `dns3.hvn.vn`
-- **IP Address**: `[IP Server 3]`
-- **Port**: `2222`
-- **Username DA**: `admin`
-- **Password DA**: `[Mật khẩu admin DA 3]`
-- **SSL**: `[Enabled / Disabled]`
 
 ## 3. Tên miền & Dữ liệu Thử nghiệm
 
 Để test các trường hợp CRUD/Syncing, Conflict Resolution (Lỗi Cùng Thao Tác), Auto-provisioning... hãy chuẩn bị ít nhất 2 tên miền đã thêm vào WHMCS:
 
-- **Tên miền thử nghiệm 1** (Dành cho chức năng Add/Edit/Delete Records cơ bản): `hvn-test-1.com]`
+- **Tên miền thử nghiệm 1** (Dành cho chức năng Add/Edit/Delete Records cơ bản): `tkw.com]`
   - Map với WHMCS Service ID: `[Service ID 1]`
   - Trạng thái bắt buộc: `Active`
-- **Tên miền thử nghiệm 2** (Dành cho chức năng Test Chống Xung Đột/Rollback/Quota): `hvn-test-2.net]`
+- **Tên miền thử nghiệm 2** (Dành cho chức năng Test Chống Xung Đột/Rollback/Quota): `tkw.com]`
   - Map với WHMCS Service ID: `[Service ID 2]`
   - Trạng thái bắt buộc: `Active`
 
@@ -60,7 +48,8 @@ Khi khách hàng mua tên miền thử nghiệm (Test domain), cần trỏ domai
 - **Telegram Bot Token** (Cảnh báo Notification System): `[Token bot telegram]`
 - **Telegram Chat ID**: `[Chat ID hoặc ID Group nhận tin nhắn]`
 - **Thông tin Database MySQL/MariaDB của WHMCS** (Dành cho dev test migration SQL query bằng tay):
+  - Manager: `https://id.hvn.group/phpmyadmin` (Hoặc IP remote)
   - Host: `localhost` (Hoặc IP remote)
   - DB Name: `[Tên DB WHMCS, mặc định thường là *whmcs*]`
-  - User: `[User DB]`
-  - Pass: `[Pass DB]`
+  - User: `vuongnm`
+  - Pass: `1234`
