@@ -43,11 +43,11 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
    - Đi kèm thuật toán **Anti-Brute Force** chống gọi API rác và Block IP xấu tự động.
 7. **Hỗ trợ Quản lý DNSSEC**:
    - DirectAdmin **hỗ trợ rất tốt DNSSEC** nguyên bản (nếu được Enable trên Server DirectAdmin qua file `directadmin.conf`).
-   - Trong module **HVN - DirectAdmin DNS Manager**, ta có thể bổ sung API gọi lệnh `CMD_API_DNS_CONTROL?domain=xxx&action=dnssec` để:
-       * (1) **Nút Kích Hoạt/Vô Hiệu Hóa (Enable/Disable)**: Cho phép khách hàng tự bật hoặc tắt chế độ bảo mật DNSSEC trực tiếp từ giao diện WHMCS.
-       * (2) Tự động sinh `Generate Keys` ra chuỗi bảo mật DS Records cho tên miền khi bật.
-       * (3) Hiển thị thông số Key Tag, Algorithm, Digest Type, Digest ở Giao diện Khách để mang đi cấu hình tại nhà đăng ký.
-       * (4) Khóa Zone (Sign) tự động sau mỗi lần Record bị thay đổi. Gồm việc liên kết với Queue để sau khi Syncing Bảng DNS xong $\Rightarrow$ Tái kích hoạt chữ ký (Sign) trên DirectAdmin.
+   - Trong module **HVN - DirectAdmin DNS Manager**, tính năng này sẽ được đồng nhất luồng kiến trúc mạng Bất đồng bộ (Queue):
+       * (1) **Nút Kích Hoạt/Vô Hiệu Hóa (Enable/Disable)**: Giao diện cho phép khách hàng chọn Bật/Tắt chế độ bảo mật DNSSEC trực tiếp từ trang quản lý WHMCS. Lệnh này được đẩy vào **Database Queue** (như tạo Record thông thường) để Cronjob xử lý sau nhằm tránh tải nghẽn thay vì gọi API trực tiếp.
+       * (2) Khi Cronjob chạy nền và bắn lệnh Bật DNSSEC tới DirectAdmin thành công, tiến trình này tự động sinh `Generate Keys` tạo chuỗi thông số DS Records cho tên miền.
+       * (3) Hiển thị thông số Key Tag, Algorithm, Digest Type, Digest cập nhật ở Giao diện Khách để mang đi cấu hình tại nhà đăng ký.
+       * (4) Khóa Zone (Sign) tự động sau mỗi lần Record bị thay đổi. Việc này thực hiện ngầm bởi worker ở chặng cuối sau khi đồng bộ Bảng DNS xong.
 
 ### 3.2. Dành cho Quản trị viên (Admin Area)
 
