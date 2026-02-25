@@ -1,10 +1,6 @@
 ---
-trigger: always_on
----
-
----
-activation:
-  glob: "**/tests/**"
+trigger: glob
+globs: **/tests/**
 ---
 
 # Testing Rules

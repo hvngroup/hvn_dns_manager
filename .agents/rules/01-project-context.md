@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-activation: always
----
-
 # HVN DNS Manager — Project Context
 
 ## Thông tin dự án

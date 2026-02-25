@@ -1,5 +1,5 @@
 ---
-description: 
+description: Pre-release checklist
 ---
 
 # Pre-Release Checklist

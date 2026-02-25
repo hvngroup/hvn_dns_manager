@@ -1,13 +1,6 @@
 ---
-trigger: always_on
----
-
----
-activation:
-  glob:
-    - "**/*.tpl"
-    - "**/*.js"
-    - "**/assets/**"
+trigger: glob
+globs: **/*.tpl, **/*.js, **/assets/**
 ---
 
 # Frontend Rules

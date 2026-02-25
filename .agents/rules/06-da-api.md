@@ -1,10 +1,6 @@
 ---
-trigger: always_on
----
-
----
-activation:
-  glob: "**/Gateway/**"
+trigger: glob
+globs: **/Gateway/**
 ---
 
 # DirectAdmin API — Quy tắc khi code Gateway

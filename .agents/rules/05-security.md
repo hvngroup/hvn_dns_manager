@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-activation: always
----
-
 # Security Rules — Không Thỏa Hiệp
 
 ## Input Validation

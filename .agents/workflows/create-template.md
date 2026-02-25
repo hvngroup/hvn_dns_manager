@@ -1,5 +1,5 @@
 ---
-description: 
+description: Tạo Smarty template
 ---
 
 # Create Smarty Template

@@ -1,5 +1,5 @@
 ---
-description: 
+description: Tạo DB migration
 ---
 
 # Create Database Migration

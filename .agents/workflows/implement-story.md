@@ -1,5 +1,5 @@
 ---
-description: 
+description: Implement toàn bộ story
 ---
 
 # Implement Story

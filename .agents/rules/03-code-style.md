@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-activation: always
----
-
 # PHP Coding Conventions
 
 ## Naming

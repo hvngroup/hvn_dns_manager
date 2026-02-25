@@ -1,5 +1,5 @@
 ---
-description: 
+description: Implement 1 issue
 ---
 
 # Implement Issue

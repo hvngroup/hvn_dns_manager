@@ -1,5 +1,5 @@
 ---
-description: 
+description: Tạo Eloquent Model
 ---
 
 # Create Eloquent Model

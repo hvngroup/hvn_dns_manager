@@ -1,9 +1,6 @@
 ---
-trigger: always_on
----
-
----
-activation: always
+trigger: glob
+globs: **/*.php
 ---
 
 # Database Conventions

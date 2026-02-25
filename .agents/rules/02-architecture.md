@@ -2,10 +2,6 @@
 trigger: always_on
 ---
 
----
-activation: always
----
-
 # Kiến trúc Bất đồng bộ — Quy tắc Tuyệt đối
 
 ## Nguyên tắc Async-First
