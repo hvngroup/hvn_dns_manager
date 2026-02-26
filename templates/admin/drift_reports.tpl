@@ -54,75 +54,106 @@
                 </h2>
                 <div :id="'collapse' + domain.id" class="accordion-collapse collapse show" :aria-labelledby="'heading' + domain.id" data-bs-parent="#driftAccordion">
                     <div class="accordion-body hvn-p-0">
-                        <ul class="hvn-list-group hvn-list-group-flush">
-                            <!-- Loop qua từng Drift trong Domain -->
-                            <template x-for="(drift, dIdx) in domain.drifts" :key="drift.id">
-                                <li class="hvn-list-group-item hvn-p-4">
-                                    <div class="hvn-d-flex hvn-align-items-start">
-                                        <div class="hvn-me-3 hvn-mt-1">
-                                            <!-- Icon theo loại lỗi -->
-                                            <template x-if="drift.type === 'added_on_da'">
-                                                <i class="bi bi-patch-plus hvn-text-info fs-3" title="Có trên DA, không có trên WHMCS"></i>
-                                            </template>
-                                            <template x-if="drift.type === 'missing_on_da'">
-                                                <i class="bi bi-patch-minus hvn-text-danger fs-3" title="Có trên WHMCS, thiếu trên DA"></i>
-                                            </template>
-                                            <template x-if="drift.type === 'modified'">
-                                                <i class="bi bi-patch-exclamation hvn-text-warning fs-3" title="Dữ liệu không khớp"></i>
-                                            </template>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-2">
-                                                <h6 class="hvn-mb-0 hvn-fw-bold">
-                                                    <span class="hvn-badge hvn-bg-secondary hvn-me-2" x-text="drift.type"></span>
-                                                    <span class="font-monospace" x-text="drift.record_type + ' ' + drift.record_name"></span>
-                                                </h6>
-                                            </div>
-                                            
-                                            <div class="hvn-row g-3 hvn-mb-3 font-monospace small">
-                                                <div class="hvn-col-md-6">
-                                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
-                                                        <div class="hvn-card-header hvn-py-1 bg-transparent hvn-border-bottom-0 hvn-text-muted hvn-fw-bold"><i class="bi bi-database"></i> WHMCS (Truth)</div>
-                                                        <div class="hvn-card-body hvn-py-2 text-break" x-html="formatRecord(drift.whmcs_val)"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="hvn-col-md-6">
-                                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
-                                                        <div class="hvn-card-header hvn-py-1 bg-transparent hvn-border-bottom-0 hvn-text-muted hvn-fw-bold"><i class="bi bi-server"></i> DirectAdmin</div>
-                                                        <div class="hvn-card-body hvn-py-2 text-break" x-text="drift.da_val || '(Không tồn tại)'"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="btn-group btn-group-sm">
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle hvn-mb-0 font-monospace" style="font-size: 12px;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="hvn-ps-3" style="width: 200px;">Loại lỗi</th>
+                                        <th><i class="bi bi-database hvn-text-primary"></i> WHMCS DB</th>
+                                        <th><i class="bi bi-server hvn-text-secondary"></i> DirectAdmin</th>
+                                        <th class="hvn-text-end hvn-pe-3" style="width: 260px;">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop qua từng Drift trong Domain -->
+                                    <template x-for="(drift, dIdx) in domain.drifts" :key="drift.id">
+                                        <tr>
+                                            <!-- Cột 1: Loại lỗi -->
+                                            <td class="hvn-ps-3">
                                                 <template x-if="drift.type === 'added_on_da'">
-                                                    <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
-                                                </template>
-                                                <template x-if="drift.type === 'added_on_da'">
-                                                    <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_da')"><i class="bi bi-trash"></i> Xóa trên DA</button>
-                                                </template>
-
-                                                <template x-if="drift.type === 'missing_on_da'">
-                                                    <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
+                                                    <span class="hvn-badge hvn-bg-info hvn-text-dark">
+                                                        <i class="bi bi-patch-plus"></i> added_on_da
+                                                    </span>
                                                 </template>
                                                 <template x-if="drift.type === 'missing_on_da'">
-                                                    <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_whmcs')"><i class="bi bi-trash"></i> Xóa trong WHMCS</button>
-                                                </template>
-
-                                                <template x-if="drift.type === 'modified'">
-                                                    <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
+                                                    <span class="hvn-badge hvn-bg-danger">
+                                                        <i class="bi bi-patch-minus"></i> missing_on_da
+                                                    </span>
                                                 </template>
                                                 <template x-if="drift.type === 'modified'">
-                                                    <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
+                                                    <span class="hvn-badge hvn-bg-warning hvn-text-dark">
+                                                        <i class="bi bi-patch-exclamation"></i> modified
+                                                    </span>
                                                 </template>
+                                                <div class="hvn-mt-1 hvn-fw-bold" x-text="drift.record_type + ' ' + drift.record_name"></div>
+                                            </td>
 
-                                                <button class="hvn-btn btn-outline-secondary" @click="resolve(domain, drift, 'ignore')"><i class="bi bi-eye-slash"></i> Bỏ qua</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </template>
-                        </ul>
+                                            <!-- Cột 2: WHMCS DB -->
+                                            <td class="text-break" style="max-width: 220px;">
+                                                <template x-if="drift.whmcs_val">
+                                                    <span x-html="formatRecord(drift.whmcs_val)"></span>
+                                                </template>
+                                                <template x-if="!drift.whmcs_val">
+                                                    <span class="hvn-text-muted fst-italic">(Không tồn tại)</span>
+                                                </template>
+                                            </td>
+
+                                            <!-- Cột 3: DirectAdmin -->
+                                            <td class="text-break" style="max-width: 220px;">
+                                                <template x-if="drift.da_val">
+                                                    <span x-text="drift.da_val"></span>
+                                                </template>
+                                                <template x-if="!drift.da_val">
+                                                    <span class="hvn-text-muted fst-italic">(Không tồn tại)</span>
+                                                </template>
+                                            </td>
+
+                                            <!-- Cột 4: Hành động -->
+                                            <td class="hvn-text-end hvn-pe-3">
+                                                <div class="btn-group btn-group-sm">
+                                                    <template x-if="drift.type === 'added_on_da'">
+                                                        <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')" title="Lấy về WHMCS">
+                                                            <i class="bi bi-box-arrow-in-down"></i> Pull
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="drift.type === 'added_on_da'">
+                                                        <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_da')" title="Xóa trên DA">
+                                                            <i class="bi bi-trash"></i> Xóa DA
+                                                        </button>
+                                                    </template>
+
+                                                    <template x-if="drift.type === 'missing_on_da'">
+                                                        <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')" title="Đẩy lên DA">
+                                                            <i class="bi bi-box-arrow-up"></i> Push
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="drift.type === 'missing_on_da'">
+                                                        <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_whmcs')" title="Xóa trong WHMCS">
+                                                            <i class="bi bi-trash"></i> Xóa WHMCS
+                                                        </button>
+                                                    </template>
+
+                                                    <template x-if="drift.type === 'modified'">
+                                                        <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')" title="Ghi đè bằng dữ liệu DA">
+                                                            <i class="bi bi-box-arrow-in-down"></i> Pull
+                                                        </button>
+                                                    </template>
+                                                    <template x-if="drift.type === 'modified'">
+                                                        <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')" title="Ghi đè DA bằng dữ liệu WHMCS">
+                                                            <i class="bi bi-box-arrow-up"></i> Push
+                                                        </button>
+                                                    </template>
+
+                                                    <button class="hvn-btn btn-outline-secondary" @click="resolve(domain, drift, 'ignore')" title="Bỏ qua lần này">
+                                                        <i class="bi bi-eye-slash"></i> Bỏ qua
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
