@@ -53,3 +53,7 @@ Khi khách hàng mua tên miền thử nghiệm (Test domain), cần trỏ domai
   - DB Name: `[Tên DB WHMCS, mặc định thường là *whmcs*]`
   - User: `vuongnm`
   - Pass: `1234`
+
+
+Namecheap sanbox
+vuongnm / Vuongnm@0502 / API Key 
