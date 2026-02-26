@@ -50,6 +50,15 @@
                 .hvn-admin-layout, .hvn-admin-layout * {
                     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
                 }
+                .hvn-admin-layout {
+                    font-size: 15px !important;
+                }
+                .hvn-admin-layout .small, .hvn-admin-layout small {
+                    font-size: 0.875em !important;
+                }
+                .hvn-admin-layout h1, .hvn-admin-layout h2, .hvn-admin-layout h3, .hvn-admin-layout h4, .hvn-admin-layout h5, .hvn-admin-layout h6 {
+                    font-weight: 600;
+                }
             </style>
             
             <!-- Alpine JS -->
