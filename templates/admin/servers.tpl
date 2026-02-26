@@ -47,18 +47,21 @@
                             <div class="hvn-col-md-5 hvn-border-start hvn-border-end hvn-px-4">
                                 <template x-if="server.is_active && server.status !== 'offline'">
                                     <div>
-                                        <div class="hvn-row hvn-text-center hvn-mb-1">
-                                            <div class="col">
-                                                <div class="hvn-fw-bold"><span x-text="server.uptime"></span>%</div>
-                                                <div class="small hvn-text-muted">Uptime</div>
+                                        <div class="hvn-row hvn-text-center hvn-mb-1 mt-2">
+                                            <div class="col border-end">
+                                                <i class="bi bi-activity hvn-text-primary hvn-fs-4 hvn-d-block mb-1"></i>
+                                                <div class="hvn-fw-bold hvn-fs-5"><span x-text="server.uptime"></span>%</div>
+                                                <div class="hvn-text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Uptime</div>
+                                            </div>
+                                            <div class="col border-end">
+                                                <i class="bi bi-speedometer2 hvn-text-info hvn-fs-4 hvn-d-block mb-1"></i>
+                                                <div class="hvn-fw-bold hvn-fs-5"><span x-text="server.latency"></span>ms</div>
+                                                <div class="hvn-text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Avg Latency</div>
                                             </div>
                                             <div class="col">
-                                                <div class="hvn-fw-bold"><span x-text="server.latency"></span>ms</div>
-                                                <div class="small hvn-text-muted">Avg Latency</div>
-                                            </div>
-                                            <div class="col">
-                                                <div class="hvn-fw-bold hvn-text-success"><span x-text="server.last_ok"></span></div>
-                                                <div class="small hvn-text-muted">Last OK</div>
+                                                <i class="bi bi-shield-check hvn-text-success hvn-fs-4 hvn-d-block mb-1"></i>
+                                                <div class="hvn-fw-bold hvn-text-success hvn-fs-5"><span x-text="server.last_ok"></span></div>
+                                                <div class="hvn-text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Last OK</div>
                                             </div>
                                         </div>
                                         <hr class="my-2">

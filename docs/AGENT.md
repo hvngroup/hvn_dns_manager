@@ -940,6 +940,7 @@ Agent PHẢI tuân thủ checklist sau trước khi sinh code:
 □ Nếu gọi DA API → tuân thủ format trong API_REFERENCE.md (arression, trailing dot, TXT quoting)?
 □ Nếu trả JSON response → tuân thủ format chuẩn (API_REFERENCE.md B5)?
 □ Nếu code có thể test → test case tương ứng đã có trong TEST_PLAN.md?
+□ SAU KHI HOÀN THÀNH → tạo git commit theo quy tắc Section 5.5 (BẮT BUỘC)
 ```
 
 ### 4.2. Khi nhận yêu cầu sửa code
@@ -951,6 +952,7 @@ Agent PHẢI tuân thủ checklist sau trước khi sinh code:
 □ Nếu phát hiện bug/vi phạm convention → CẢNH BÁO người dùng trước khi sửa
 □ Mọi thay đổi phải backward compatible (không break existing data)
 □ Cập nhật migration version nếu thay đổi DB schema
+□ SAU KHI HOÀN THÀNH → tạo git commit theo quy tắc Section 5.5 (BẮT BUỘC)
 ```
 
 ### 4.3. Khi tạo Database Migration
@@ -1210,6 +1212,110 @@ Bước 3: Hỏi người dùng muốn implement Story nào trước
 Bước 4: KHÔNG tự ý implement toàn bộ Epic cùng lúc
          (quá nhiều code, dễ sai, khó review)
 ```
+
+### 5.5. Git Commit — Quy tắc BẮT BUỘC sau mỗi Task
+
+> **NGUYÊN TẮC**: Mỗi khi hoàn thành một task có thay đổi file (implement, fix bug, cập nhật tài liệu, refactor, tạo migration, sửa template...), Agent PHẢI đề xuất câu lệnh git commit để người dùng lưu lại thay đổi.
+
+#### Phạm vi áp dụng
+
+| Loại thay đổi | Có cần commit? |
+|--------------|:--------------:|
+| Implement issue / story mới | ✅ BẮT BUỘC |
+| Fix bug | ✅ BẮT BUỘC |
+| Cập nhật tài liệu (docs/) | ✅ BẮT BUỘC |
+| Tạo / sửa template Smarty | ✅ BẮT BUỘC |
+| Tạo / sửa migration | ✅ BẮT BUỘC |
+| Refactor / cải tiến code | ✅ BẮT BUỘC |
+| Chỉ đọc code, phân tích, không sửa file | ❌ Không cần |
+
+#### Format commit message (Conventional Commits)
+
+```
+<type>(<scope>): <mô tả ngắn gọn bằng tiếng Việt hoặc tiếng Anh>
+
+[body — tùy chọn]
+[footer — tùy chọn, VD: Closes #ISSUE-ID]
+```
+
+**Các `type` hợp lệ:**
+
+| Type | Khi nào dùng |
+|------|--------------|
+| `feat` | Thêm tính năng mới |
+| `fix` | Sửa bug |
+| `docs` | Cập nhật tài liệu (AGENT.md, SPEC.md, v.v.) |
+| `refactor` | Cải tiến code, không thêm tính năng/không fix bug |
+| `style` | Thay đổi CSS/template thuần giao diện |
+| `test` | Thêm hoặc sửa test |
+| `chore` | Cấu hình, build, dependency (không ảnh hưởng code chính) |
+| `db` | Tạo/sửa migration, thay đổi schema |
+
+**Các `scope` phổ biến:**
+
+| Scope | Mô tả |
+|-------|-------|
+| `queue` | QueueManager, QueueJob, Cron Worker |
+| `dns` | DnsRecord, DnsRecordService, Validator |
+| `server` | Server model, DAGateway, ServerRegistry |
+| `client` | Client Area Controller, Template |
+| `admin` | Admin Area Controller, Template |
+| `auth` | Security, Permission, FeatureGate |
+| `migration` | Migration files |
+| `settings` | SettingsHelper, Admin Settings |
+| `docs` | Documentation files |
+| `hooks` | WHMCS hooks |
+
+**Ví dụ commit message hợp lệ:**
+
+```bash
+# Implement tính năng mới
+git commit -m "feat(queue): implement QueueManager::dispatch() với Primary-only Push"
+
+# Sửa bug
+git commit -m "fix(dns): sửa lỗi trailing dot bị thiếu khi gửi CNAME lên DA"
+
+# Cập nhật tài liệu
+git commit -m "docs(docs): cập nhật AGENT.md bổ sung quy tắc git commit"
+
+# Tạo migration
+git commit -m "db(migration): tạo v1_0_0 initial schema 19 bảng"
+
+# Tạo template
+git commit -m "style(client): tạo dns_editor.tpl với Alpine.js integration"
+
+# Refactor
+git commit -m "refactor(server): tách ServerRegistry thành class độc lập"
+```
+
+#### Quy trình Agent thực hiện commit
+
+```
+Sau khi hoàn thành task:
+
+1. Agent tổng kết các file đã thay đổi
+2. Agent đề xuất câu lệnh git add + git commit phù hợp
+3. Người dùng review và chạy lệnh
+
+Ví dụ Agent đề xuất:
+─────────────────────────────────────────
+✅ Task hoàn thành. Các file đã thay đổi:
+  - app/Services/QueueManager.php   (MỚI)
+  - app/Models/QueueJob.php          (MỚI)
+  - app/Migration/versions/v1_0_0.php (MỚI)
+
+Đề xuất commit:
+  git add app/Services/QueueManager.php app/Models/QueueJob.php app/Migration/versions/v1_0_0.php
+  git commit -m "feat(queue): implement QueueManager và QueueJob model (QUEUE-001)"
+─────────────────────────────────────────
+```
+
+#### Lưu ý
+
+- **KHÔNG** tự chạy `git commit` — chỉ **đề xuất** lệnh cho người dùng
+- Nếu task sửa nhiều concerns khác nhau → tách thành nhiều commit nhỏ
+- Luôn đề cập Issue ID liên quan trong commit message nếu có (VD: `Closes QUEUE-001`)
+- Commit message PHẢI ngắn gọn, rõ ràng, không quá 72 ký tự trên dòng đầu
 
 ### 5.4. Khi phát hiện vấn đề
 
