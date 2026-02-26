@@ -1,7 +1,7 @@
 <div class="hvn-dns-admin hvn-templates" x-data="templateManager()">
     <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-file-text"></i> Quản lý DNS Template</h2>
-        <button class="hvn-btn hvn-btn-primary" @click="openModal()"><i class="bi bi-plus-lg"></i> Tạo Template</button>
+        <a href="{$modulelink}&action=template_edit" class="hvn-btn hvn-btn-primary"><i class="bi bi-plus-lg"></i> Tạo Template</a>
     </div>
 
     <div class="hvn-row">
@@ -26,7 +26,7 @@
                         </div>
                         
                         <div class="btn-group w-100">
-                            <button class="hvn-btn btn-sm hvn-btn-outline-primary" @click="openModal(tpl)"><i class="bi bi-pencil"></i> Sửa</button>
+                            <a :href="'{$modulelink}&action=template_edit&id=' + tpl.id" class="hvn-btn btn-sm hvn-btn-outline-primary"><i class="bi bi-pencil"></i> Sửa</a>
                             <button class="hvn-btn btn-sm btn-outline-secondary" @click="cloneTemplate(tpl)"><i class="bi bi-stickies"></i> Clone</button>
                             <template x-if="!tpl.is_default">
                                 <button class="hvn-btn btn-sm btn-outline-success" @click="setDefault(tpl)"><i class="bi bi-star"></i> Set Default</button>
@@ -41,115 +41,7 @@
         </template>
     </div>
 
-    <!-- Custom Alpine Backdrop -->
-    <div x-show="isOpen" x-transition.opacity 
-         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
 
-    <!-- Modal Edit/Create Template -->
-    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" tabindex="-1" aria-hidden="true" x-show="isOpen" x-transition.opacity>
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header hvn-bg-light">
-                    <h5 class="modal-title"><i class="bi bi-file-earmark-code"></i> <span x-text="isEdit ? 'Sửa Template: ' + form.name : 'Tạo Template mới'"></span></h5>
-                    <button type="button" class="btn-close" @click="closeModal()"></button>
-                </div>
-                <div class="modal-body hvn-p-0">
-                    <div class="hvn-row g-0">
-                        <!-- Left Panel: Settings -->
-                        <div class="hvn-col-md-4 hvn-border-end hvn-bg-light hvn-p-4 h-100">
-                            <div class="hvn-mb-3">
-                                <label class="form-label hvn-fw-bold">Tên Template <span class="hvn-text-danger">*</span></label>
-                                <input type="text" class="hvn-form-control" x-model="form.name" placeholder="VD: Google Workspace" required>
-                            </div>
-                            <div class="hvn-mb-3">
-                                <label class="form-label hvn-fw-bold">Mô tả hiển thị</label>
-                                <textarea class="hvn-form-control" rows="3" x-model="form.description" placeholder="Mô tả cho client hiểu mục đích của mẫu này..."></textarea>
-                            </div>
-                            <div class="hvn-mb-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="tplVisible" x-model="form.is_visible">
-                                    <label class="form-check-label" for="tplVisible">Hiển thị cho Khách hàng chọn</label>
-                                </div>
-                            </div>
-
-                            <div class="hvn-card border-info hvn-bg-info-subtle bg-opacity-10 hvn-mt-4">
-                                <div class="hvn-card-header bg-transparent border-info hvn-text-info hvn-fw-bold hvn-py-2"><i class="bi bi-info-circle"></i> Placeholders hỗ trợ</div>
-                                <div class="hvn-card-body hvn-py-2 small font-monospace">
-                                    <ul class="list-unstyled hvn-mb-0">
-                                        <li><code>{literal}{{domain}}{/literal}</code> - Tên miền thực (VD: shop.vn)</li>
-                                        <li><code>{literal}{{ip}}{/literal}</code> - IP mặc định của Server</li>
-                                        <li><code>{literal}{{ns1}}{/literal}</code> - Primary Nameserver</li>
-                                        <li><code>{literal}{{ns2}}{/literal}</code> - Secondary Nameserver</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Panel: Records Editor -->
-                        <div class="hvn-col-md-8 hvn-p-4 hvn-bg-white">
-                            <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-3">
-                                <h6 class="hvn-mb-0 hvn-fw-bold">Bản ghi trong Template (<span x-text="form.records.length"></span>)</h6>
-                                <button class="hvn-btn btn-sm hvn-btn-outline-primary" @click="addEmptyRecord()"><i class="bi bi-plus-circle"></i> Thêm record</button>
-                            </div>
-
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-bordered align-middle hvn-mb-0 font-monospace" style="font-size: 12px">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th width="12%">Loại</th>
-                                            <th width="20%">Tên (Name)</th>
-                                            <th width="50%">Giá trị (Value) / Priority</th>
-                                            <th width="12%">TTL</th>
-                                            <th width="6%" class="hvn-text-center"><i class="bi bi-trash"></i></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template x-for="(rec, idx) in form.records" :key="idx">
-                                            <tr>
-                                                <td>
-                                                    <select class="hvn-form-select hvn-form-select-sm font-monospace" x-model="rec.type">
-                                                        <option value="A">A</option><option value="CNAME">CNAME</option>
-                                                        <option value="MX">MX</option><option value="TXT">TXT</option>
-                                                        <option value="NS">NS</option><option value="SRV">SRV</option>
-                                                    </select>
-                                                </td>
-                                                <td><input type="text" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.name" placeholder="@ hoặc www"></td>
-                                                <td>
-                                                    <div class="hvn-d-flex">
-                                                        <input type="text" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.value" placeholder="Giá trị...">
-                                                        <template x-if="rec.type === 'MX' || rec.type === 'SRV'">
-                                                            <input type="number" class="hvn-form-control hvn-form-control-sm font-monospace hvn-ms-1" style="width: 60px;" x-model="rec.prio" placeholder="Pri" title="Priority">
-                                                        </template>
-                                                    </div>
-                                                </td>
-                                                <td><input type="number" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.ttl"></td>
-                                                <td class="hvn-text-center">
-                                                    <button class="hvn-btn btn-sm btn-outline-danger hvn-border-0" @click="removeRecord(idx)"><i class="bi bi-x-lg"></i></button>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                        <template x-if="form.records.length === 0">
-                                            <tr>
-                                                <td colspan="5" class="hvn-text-center hvn-py-4 hvn-text-muted fst-italic">
-                                                    Chưa có bản ghi nào. Click "Thêm record" để bắt đầu.
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer hvn-bg-light">
-                    <button type="button" class="hvn-btn btn-outline-secondary" @click="closeModal()">Hủy</button>
-                    <button type="button" class="hvn-btn hvn-btn-primary" @click="saveTemplate()">
-                        <i class="bi bi-save"></i> <span x-text="isEdit ? 'Lưu thay đổi' : 'Tạo Template'"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -178,51 +70,6 @@ document.addEventListener('alpine:init', () => {
                 is_visible: false, records_count: 4, records: []
             }
         ],
-        isOpen: false,
-        isEdit: false,
-        form: { id: null, name: '', description: '', is_visible: true, records: [] },
-
-        openModal(tpl = null) {
-            this.isEdit = !!tpl;
-            if(tpl) {
-                // deep copy
-                this.form = JSON.parse(JSON.stringify(tpl));
-                // fill dummy records if empty for demo
-                if(this.form.records.length === 0) this.addEmptyRecord();
-            } else {
-                this.form = { id: Date.now(), name: '', description: '', is_visible: true, records: [] };
-                this.addEmptyRecord();
-            }
-            this.isOpen = true;
-        },
-
-        closeModal() {
-            this.isOpen = false;
-        },
-
-        addEmptyRecord() {
-            this.form.records.push({ type: 'A', name: '', value: '', ttl: 3600, prio: 10 });
-        },
-
-        removeRecord(idx) {
-            this.form.records.splice(idx, 1);
-        },
-
-        saveTemplate() {
-            if(!this.form.name) return alert('Vui lòng điền tên Template');
-            this.form.records_count = this.form.records.length;
-            
-            if(this.isEdit) {
-                const idx = this.templates.findIndex(t => t.id === this.form.id);
-                if(idx > -1) this.templates[idx] = JSON.parse(JSON.stringify(this.form));
-            } else {
-                this.form.is_default = false;
-                this.templates.push(JSON.parse(JSON.stringify(this.form)));
-            }
-            alert('Lưu mẫu DNS thành công!');
-            this.closeModal();
-        },
-
         cloneTemplate(tpl) {
             let clone = JSON.parse(JSON.stringify(tpl));
             clone.id = Date.now();

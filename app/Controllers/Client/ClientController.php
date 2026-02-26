@@ -16,6 +16,10 @@ class ClientController
      */
     public function dispatch($action, $params)
     {
+        if ($action === 'record_edit') {
+            return $this->showRecordEdit($params);
+        }
+
         $domainId = isset($_REQUEST['domain_id']) ? (int)$_REQUEST['domain_id'] : 0;
 
         if ($domainId > 0) {
@@ -23,6 +27,43 @@ class ClientController
         }
 
         return $this->showDomainList($params);
+    }
+
+    /**
+     * Màn hình record edit riêng rẽ
+     */
+    private function showRecordEdit($params)
+    {
+        $serviceId = $params['serviceid'];
+        $domainId = isset($_REQUEST['domain_id']) ? (int)$_REQUEST['domain_id'] : 1;
+        $recordId = isset($_REQUEST['record_id']) ? (int)$_REQUEST['record_id'] : 0;
+        
+        $domainInfo = ['id' => $domainId, 'domain' => 'example.com'];
+        $recordJson = 'null';
+        
+        if ($recordId > 0) {
+            // Mock editing existing record
+            $mockRecord = [
+                'id' => $recordId, 'type' => 'A', 'name' => '@', 'value' => '103.45.67.89', 
+                'ttl' => 3600, 'priority' => 10, 'weight' => 0, 'port' => 443
+            ];
+            $recordJson = json_encode($mockRecord);
+        }
+
+        return [
+            'pagetitle' => ($recordId ? 'Sửa' : 'Thêm') . ' Bản ghi DNS',
+            'breadcrumb' => [
+                'clientarea.php?action=productdetails&id=' . $serviceId => 'Dịch vụ',
+                'clientarea.php?action=productdetails&id=' . $serviceId . '&modop=custom&a=dns_manager&domain_id=' . $domainId => 'DNS Editor',
+                '#' => 'Bản ghi',
+            ],
+            'templatefile' => 'templates/client/record_edit',
+            'requirelogin' => true,
+            'vars' => [
+                'domain' => $domainInfo,
+                'recordJson' => $recordJson,
+            ]
+        ];
     }
 
     /**

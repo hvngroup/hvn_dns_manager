@@ -1,7 +1,7 @@
 <div class="hvn-dns-admin hvn-servers" x-data="serverManager()">
     <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-server"></i> Quản lý Server DirectAdmin</h2>
-        <button class="hvn-btn hvn-btn-primary" @click="openModal()"><i class="bi bi-plus-lg"></i> Thêm Server</button>
+        <a href="{$modulelink}&action=server_edit" class="hvn-btn hvn-btn-primary"><i class="bi bi-plus-lg"></i> Thêm Server</a>
     </div>
 
     <div class="hvn-row">
@@ -96,9 +96,9 @@
                                 <button class="hvn-btn btn-sm btn-outline-info hvn-mb-1 w-100 text-start" @click="testConnection(server)">
                                     <i class="bi bi-plug"></i> Test Connection
                                 </button>
-                                <button class="hvn-btn btn-sm hvn-btn-outline-primary hvn-mb-1 w-100 text-start" @click="openModal(server)">
+                                <a :href="'{$modulelink}&action=server_edit&id=' + server.id" class="hvn-btn btn-sm hvn-btn-outline-primary hvn-mb-1 w-100 text-start hvn-d-block text-decoration-none">
                                     <i class="bi bi-pencil"></i> Sửa cấu hình
-                                </button>
+                                </a>
                                 <template x-if="server.is_active">
                                     <button class="hvn-btn btn-sm btn-outline-danger w-100 text-start" @click="toggleStatus(server)">
                                         <i class="bi bi-pause-fill"></i> Vô hiệu hóa (Disable)
@@ -126,7 +126,7 @@
         <i class="bi bi-info-circle-fill"></i> <strong>Ghi chú:</strong> Disable server sẽ dừng nhận queue jobs (nếu là primary của zone). Job PENDING hiện tại đang gán cho server này sẽ chuyển sang CANCELLED hoặc gán lại (re-assign) cho server khác tùy cấu hình.
     </div>
 
-    {include file="./partials/server_modal.tpl"}
+
 </div>
 
 <script>
@@ -155,9 +155,7 @@ document.addEventListener('alpine:init', () => {
             }
         ],
 
-        openModal(server = null) {
-            window.dispatchEvent(new CustomEvent('open-server-modal', { detail: { server } }));
-        },
+
 
         testConnection(server) {
             // Mock API Call

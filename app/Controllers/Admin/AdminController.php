@@ -18,7 +18,9 @@ class AdminController
         $validActions = [
             'servers', 'domains', 'dns_editor', 'sync_logs', 
             'audit_trail', 'templates', 'quota_plans', 
-            'drift_reports', 'bulk', 'settings'
+            'drift_reports', 'bulk', 'settings',
+            'server_edit', 'quota_plan_edit', 'template_edit',
+            'drift_settings', 'audit_detail', 'snapshot_rollback'
         ];
 
         if (in_array($action, $validActions)) {

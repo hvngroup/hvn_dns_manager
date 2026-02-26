@@ -3,7 +3,7 @@
         <h2><i class="bi bi-arrow-left-right"></i> Báo cáo Lệch Dữ liệu (Drift Reports)</h2>
         <div>
             <button class="hvn-btn hvn-btn-outline-primary hvn-me-2" @click="runScan()"><i class="bi bi-search"></i> Quét thủ công</button>
-            <button class="hvn-btn hvn-btn-primary" @click="openSettings()"><i class="bi bi-gear"></i> Cài đặt Auto-fix</button>
+            <a href="{$modulelink}&action=drift_settings" class="hvn-btn hvn-btn-primary"><i class="bi bi-gear"></i> Cài đặt Auto-fix</a>
         </div>
     </div>
 
@@ -129,46 +129,7 @@
         </template>
     </div>
 
-    <!-- Custom Alpine Backdrop -->
-    <div x-show="isOpen" x-transition.opacity 
-         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
 
-    <!-- Auto Fix Settings Modal -->
-    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
-         tabindex="-1" aria-hidden="true" @click.self="isOpen = false" x-show="isOpen" x-transition.opacity>
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header hvn-bg-light">
-                    <h5 class="modal-title"><i class="bi bi-gear"></i> Cài đặt Drift Auto-fix</h5>
-                    <button type="button" class="btn-close" @click="isOpen = false"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="hvn-text-muted small hvn-mb-4">Drift Detection quét dữ liệu Zone từ DirectAdmin mỗi đêm (cron) và so sánh với database WHMCS. Nếu có khác biệt, hệ thống xử lý thế nào?</p>
-                    
-                    <div class="form-check form-switch fs-5 hvn-mb-3">
-                        <input class="form-check-input" type="checkbox" id="autoFixToggle" x-model="autoFixEnabled">
-                        <label class="form-check-label" for="autoFixToggle">Tự động đẩy WHMCS → DA</label>
-                    </div>
-                    
-                    <div class="alert alert-info border-info hvn-mt-3" x-show="autoFixEnabled">
-                        <i class="bi bi-info-circle-fill"></i> Hệ thống sẽ <strong class="hvn-text-danger">Ghi đè</strong> mọi dữ liệu bị lệch trên DA bằng dữ liệu định quy chuẩn trên WHMCS.
-                        <ul class="hvn-mb-0 hvn-mt-2">
-                            <li>Xóa các record có trên DA nhưng không có trên WHMCS</li>
-                            <li>Sửa giá trị trên DA thành giá trị trên WHMCS</li>
-                            <li>Tạo record trên DA nếu WHMCS có DA chưa có</li>
-                        </ul>
-                    </div>
-                    <div class="alert alert-secondary hvn-mt-3" x-show="!autoFixEnabled">
-                        Hệ thống chỉ cảnh báo email và tạo báo cáo tại trang này. Quản trị viên phải xử lý thủ công.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="hvn-btn btn-outline-secondary" @click="isOpen = false">Đóng</button>
-                    <button type="button" class="hvn-btn hvn-btn-primary" @click="saveAutoFix()"><i class="bi bi-save"></i> Lưu cài đặt</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -176,8 +137,6 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('driftManager', () => ({
         filterStatus: 'pending',
-        autoFixEnabled: false,
-        isOpen: false,
         domains: [
             {
                 id: 1, name: 'example.com', status: 'pending',
@@ -225,14 +184,7 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        openSettings() {
-            this.isOpen = true;
-        },
 
-        saveAutoFix() {
-            alert('Đã lưu cấu hình Drift Auto-fix!');
-            this.isOpen = false;
-        },
 
         runScan() {
             const btn = event.currentTarget;

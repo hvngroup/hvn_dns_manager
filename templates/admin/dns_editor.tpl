@@ -22,7 +22,7 @@
         <div class="hvn-card-body hvn-py-2 hvn-px-3 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
             <div class="btn-group">
                 <button class="hvn-btn hvn-btn-primary" @click="openAddModal()"><i class="bi bi-plus-lg"></i> Thêm bản ghi</button>
-                <button class="hvn-btn btn-outline-secondary" @click="openRollbackModal()" title="Khôi phục Zone từ Snapshot"><i class="bi bi-skip-backward-fill"></i> Rollback</button>
+                <a href="?module=hvn_dns_manager&action=snapshot_rollback&domain={$domain.domain}" class="hvn-btn btn-outline-secondary" title="Khôi phục Zone từ Snapshot"><i class="bi bi-skip-backward-fill"></i> Rollback</a>
                 <button class="hvn-btn btn-outline-secondary" onclick="alert('Đang tạo Snapshot thủ công...')" title="Tạo ngay 1 bản lưu trạng thái hiện tại"><i class="bi bi-camera-fill"></i> Snapshot</button>
                 <a href="?module=hvn_dns_manager&action=audit_trail&domain={$domain.domain}" class="hvn-btn btn-outline-secondary" title="Xem lịch sử thay đổi của tên miền này"><i class="bi bi-clipboard2-data"></i> History</a>
             </div>
@@ -108,8 +108,7 @@
     <!-- Modals -->
     <!-- Reuse Record Modal logic from Client -->
     {include file="../client/partials/record_modal.tpl" }
-    <!-- Rollback Modal -->
-    {include file="./partials/rollback_modal.tpl" }
+
 </div>
 
 <script>
@@ -146,9 +145,6 @@ document.addEventListener('alpine:init', () => {
         },
         toggleLock(record) {
             alert(`Đã ${record.is_locked ? 'KHÓA' : 'MỞ KHÓA' } bản ghi: Client không thể chỉnh sửa bản ghi bị khóa.`);
-        },
-        openRollbackModal() {
-            window.dispatchEvent(new CustomEvent('open-rollback-modal'));
         }
     }));
 });

@@ -15,9 +15,9 @@
         
         <input type="text" class="form-control form-control-sm d-inline-block w-auto ms-2" placeholder="Tìm kiếm..." x-model="searchQuery">
     </div>
-    <button class="btn btn-primary btn-sm" @click="openAddModal()">
+    <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=record_edit&domain_id=' + domainId" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg"></i> Thêm bản ghi
-    </button>
+    </a>
 </div>
 
 <div class="table-responsive">
@@ -77,7 +77,7 @@
                         </template>
                         <template x-if="!record.is_system && !record.is_locked && !record.pending_delete">
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary" @click="openEditModal(record)" title="Sửa"><i class="bi bi-pencil"></i></button>
+                                <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=record_edit&domain_id=' + domainId + '&record_id=' + record.id" class="btn btn-outline-secondary" title="Sửa"><i class="bi bi-pencil"></i></a>
                                 <button class="btn btn-outline-danger" @click="deleteRecord(record)" title="Xóa"><i class="bi bi-trash"></i></button>
                             </div>
                         </template>

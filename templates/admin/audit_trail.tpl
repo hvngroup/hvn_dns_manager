@@ -73,7 +73,7 @@
                     </thead>
                     <tbody>
                         <template x-for="log in logs" :key="log.id">
-                            <tr @click="openModal(log)" style="cursor: pointer;">
+                            <tr @click="window.location.href='{$modulelink}&action=audit_detail&id=' + log.id" style="cursor: pointer;">
                                 <td class="hvn-ps-3 hvn-text-muted font-monospace small" x-text="log.time"></td>
                                 <td>
                                     <template x-if="log.actorType === 'client'"><span class="hvn-badge hvn-bg-primary hvn-rounded-pill"><i class="bi bi-person"></i> <span x-text="log.actorName"></span></span></template>
@@ -110,109 +110,13 @@
         </div>
     </div>
 
-    <!-- Custom Alpine Backdrop -->
-    <div x-show="isOpen" x-transition.opacity 
-         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
 
-    <!-- Audit Detail Modal -->
-    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
-         tabindex="-1" aria-hidden="true" @click.self="closeModal()" x-show="isOpen" x-transition.opacity>
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content" x-show="selectedLog">
-                <template x-if="selectedLog">
-                    <div>
-                        <div class="modal-header hvn-bg-dark hvn-text-white">
-                            <h5 class="modal-title"><i class="bi bi-shield-lock"></i> Audit Entry #<span x-text="selectedLog.id"></span></h5>
-                            <button type="button" class="btn-close btn-close-white" @click="closeModal()" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body font-monospace hvn-p-4 hvn-bg-light" style="font-size: 0.9rem;">
-                            
-                            <table class="table table-sm table-borderless">
-                                <tbody>
-                                    <tr>
-                                        <td class="hvn-text-muted" width="150">Actor:</td>
-                                        <td class="hvn-fw-bold fs-5 hvn-text-primary" x-text="selectedLog.actorFull"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="hvn-text-muted">Context:</td>
-                                        <td x-text="selectedLog.context"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="hvn-text-muted">Domain:</td>
-                                        <td class="hvn-fw-bold" x-text="selectedLog.domain"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="hvn-text-muted">Action:</td>
-                                        <td class="hvn-fw-bold hvn-bg-warning-subtle d-inline-block hvn-px-2 hvn-rounded hvn-text-dark" x-text="selectedLog.action"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="hvn-text-muted hvn-pt-3">Target:</td>
-                                        <td class="hvn-pt-3" x-text="selectedLog.target"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="hvn-card hvn-border-0 hvn-shadow-sm my-3">
-                                <div class="hvn-card-header hvn-bg-white"><strong>Payload Dữ liệu</strong></div>
-                                <div class="hvn-card-body hvn-p-0">
-                                    <table class="table table-bordered hvn-mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th width="50%" class="hvn-text-danger">Giá trị cũ (Old Data)</th>
-                                                <th width="50%" class="hvn-text-success">Giá trị mới (New Data)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="hvn-p-3 text-break hvn-bg-danger-subtle bg-opacity-10 hvn-text-danger" style="white-space: pre-wrap;" x-text="selectedLog.oldVal"></td>
-                                                <td class="hvn-p-3 text-break hvn-bg-success-subtle bg-opacity-10 hvn-text-success hvn-fw-bold" style="white-space: pre-wrap;" x-text="selectedLog.newVal"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <table class="table table-sm table-borderless hvn-mt-3 hvn-text-muted">
-                                <tbody>
-                                    <tr>
-                                        <td width="150">IP Address:</td>
-                                        <td x-text="selectedLog.ip"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>User Agent:</td>
-                                        <td class="text-break" x-text="selectedLog.ua"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Session / Token:</td>
-                                        <td x-text="selectedLog.session"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Ghi chú (Notes):</td>
-                                        <td class="fst-italic hvn-text-dark" x-text="selectedLog.notes"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Timestamp:</td>
-                                        <td class="hvn-fw-bold hvn-text-dark" x-text="selectedLog.timeLong"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="hvn-btn btn-secondary" @click="closeModal()">Đóng</button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('auditTrailData', () => ({
-        isOpen: false,
         logs: [
             {
                 id: 89201, time: '25/02, 14:32', actorType: 'client', actorName: 'Lê C', domain: 'myblog.net', 
@@ -247,16 +151,7 @@ document.addEventListener('alpine:init', () => {
                 notes: 'DDNS IP automatically updated by router.', timeLong: '25/02/2026 14:25:32'
             }
         ],
-        selectedLog: null,
 
-        openModal(log) {
-            this.selectedLog = log;
-            this.isOpen = true;
-        },
-
-        closeModal() {
-            this.isOpen = false;
-        }
     }));
 });
 {/literal}

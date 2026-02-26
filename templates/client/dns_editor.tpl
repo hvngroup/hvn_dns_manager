@@ -112,7 +112,7 @@
     </div>
     
     <!-- Modals -->
-    {include file="./partials/record_modal.tpl"}
+    {include file="./partials/toast.tpl"}
     
     <!-- Alpine JS logic initialization -->
     <script>
@@ -148,6 +148,18 @@
                 },
                 // Additional methods for add/edit/delete will go here in JS file
             }));
+        document.addEventListener('alpine:initialized', () => {
+            if (Alpine.$data(document.querySelector('.hvn-dns-client'))) {
+                const data = Alpine.$data(document.querySelector('.hvn-dns-client'));
+                data.deleteRecord = function(record) {
+                    if(confirm(`Bạn có chắc muốn xóa bản ghi: ${record.name} ${record.type}?`)) {
+                        window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đã Xóa', msg: `Bản ghi ${record.name} đang được xóa...`, type: 'danger' } }));
+                    }
+                };
+                data.retryRecord = function(id) {
+                    window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' } }));
+                }
+            }
         });
     </script>
 </div>
