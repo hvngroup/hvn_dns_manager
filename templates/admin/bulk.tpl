@@ -18,21 +18,21 @@
                 <div class="card-header bg-light fw-bold py-3"><i class="bi bi-tools"></i> Chọn thao tác</div>
                 <div class="list-group list-group-flush rounded-bottom">
                     <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" 
-                            :class="{'active bg-primary border-primary': operation === 'change_ip'}" 
+                            :class="{ 'active bg-primary border-primary': operation === 'change_ip' }" 
                             @click="operation = 'change_ip'; resetState()">
                         <i class="bi bi-input-cursor-text fs-4 me-3"></i>
                         <div>
                             <div class="fw-bold">Thay đổi IP hàng loạt</div>
-                            <small class="opacity-75" :class="{'text-white': operation === 'change_ip'}">Thay thế IP cũ bằng IP mới trên mọi domain</small>
+                            <small class="opacity-75" :class="{ 'text-white': operation === 'change_ip' }">Thay thế IP cũ bằng IP mới trên mọi domain</small>
                         </div>
                     </button>
                     <button class="list-group-item list-group-item-action py-3 d-flex align-items-center" 
-                            :class="{'active bg-primary border-primary': operation === 'apply_template'}" 
+                            :class="{ 'active bg-primary border-primary': operation === 'apply_template' }" 
                             @click="operation = 'apply_template'; resetState()">
                         <i class="bi bi-file-earmark-code fs-4 me-3"></i>
                         <div>
                             <div class="fw-bold">Áp dụng Template hàng loạt</div>
-                            <small class="opacity-75" :class="{'text-white': operation === 'apply_template'}">Ghi đè DNS template lên các domain đã chọn</small>
+                            <small class="opacity-75" :class="{ 'text-white': operation === 'apply_template' }">Ghi đè DNS template lên các domain đã chọn</small>
                         </div>
                     </button>
                 </div>
@@ -185,6 +185,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('bulkManager', () => ({
         operation: 'change_ip',
@@ -279,4 +280,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

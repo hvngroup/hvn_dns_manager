@@ -32,7 +32,7 @@
                 
                 <div class="mb-4">
                     <template x-for="snap in snapshots" :key="snap.id">
-                        <div class="form-check p-2 border rounded mb-2" :class="{'bg-light border-primary': selectedSnapshot == snap.id}">
+                        <div class="form-check p-2 border rounded mb-2" :class="{ 'bg-light border-primary': selectedSnapshot == snap.id}">
                             <input class="form-check-input ms-1 mt-2" type="radio" name="snapshotId" :id="'snap_'+snap.id" :value="snap.id" x-model="selectedSnapshot">
                             <label class="form-check-label ms-2 d-block w-100" :for="'snap_'+snap.id">
                                 <strong x-text="snap.date"></strong> &mdash; <span x-text="snap.type"></span>

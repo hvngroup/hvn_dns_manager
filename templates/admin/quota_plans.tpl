@@ -163,6 +163,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('quotaPlansManager', () => ({
         plans: [
@@ -220,4 +221,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

@@ -123,7 +123,7 @@
 
                     <!-- Test Connection Result Area -->
                     <template x-if="testStatus !== null">
-                        <div class="card mb-3" :class="{'border-info': testStatus === 'loading', 'border-success': testStatus === 'success', 'border-danger': testStatus === 'error'}">
+                        <div class="card mb-3" :class="{ 'border-info': testStatus === 'loading', 'border-success': testStatus === 'success', 'border-danger': testStatus === 'error' }">
                             <div class="card-header bg-transparent py-2 d-flex justify-content-between align-items-center">
                                 <strong><i class="bi bi-plug"></i> Kết quả Test Connection:</strong>
                                 <button type="button" class="btn-close" style="font-size: 0.5rem;" @click="testStatus = null"></button>

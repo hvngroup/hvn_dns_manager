@@ -8,7 +8,7 @@
         <!-- Loop Template Items -->
         <template x-for="tpl in templates" :key="tpl.id">
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm h-100 border-0" :class="{'border-primary border-start border-4': tpl.is_default, 'bg-light': !tpl.is_visible}">
+                <div class="card shadow-sm h-100 border-0" :class="{ 'border-primary border-start border-4': tpl.is_default, 'bg-light': !tpl.is_visible}">
                     <div class="card-body position-relative">
                         <template x-if="tpl.is_default">
                             <span class="position-absolute top-0 end-0 badge bg-primary m-2" style="font-size: 0.7rem;"><i class="bi bi-star-fill text-warning"></i> DEFAULT</span>
@@ -149,6 +149,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('templateManager', () => ({
         templates: [
@@ -248,4 +249,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

@@ -167,6 +167,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('driftManager', () => ({
         filterStatus: 'pending',
@@ -249,4 +250,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

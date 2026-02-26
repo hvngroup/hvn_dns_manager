@@ -60,7 +60,7 @@
                 </thead>
                 <tbody>
                     <template x-for="record in filteredRecords" :key="record.id">
-                        <tr :class="{'table-secondary opacity-75': record.pending_delete}">
+                        <tr :class="{ 'table-secondary opacity-75': record.pending_delete}">
                             <td class="ps-3">
                                 <span class="badge bg-secondary" x-text="record.type"></span>
                             </td>
@@ -107,16 +107,17 @@
 
     <!-- Modals -->
     <!-- Reuse Record Modal logic from Client -->
-    {include file="../client/partials/record_modal.tpl"}
+    {include file="../client/partials/record_modal.tpl" }
     <!-- Rollback Modal -->
-    {include file="./partials/rollback_modal.tpl"}
+    {include file="./partials/rollback_modal.tpl" }
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('adminDnsEditor', () => ({
         searchQuery: '',
-        records: {$recordsJson|default:'[]'}, // Passed from Controller
+        records: {$recordsJson|default:'[]' }, // Passed from Controller
 
         get filteredRecords() {
             if(this.searchQuery === '') return this.records;
@@ -144,11 +145,12 @@ document.addEventListener('alpine:init', () => {
             }
         },
         toggleLock(record) {
-            alert(`Đã ${record.is_locked ? 'KHÓA' : 'MỞ KHÓA'} bản ghi: Client không thể chỉnh sửa bản ghi bị khóa.`);
+            alert(`Đã ${record.is_locked ? 'KHÓA' : 'MỞ KHÓA' } bản ghi: Client không thể chỉnh sửa bản ghi bị khóa.`);
         },
         openRollbackModal() {
             window.dispatchEvent(new CustomEvent('open-rollback-modal'));
         }
     }));
 });
+{/literal}
 </script>

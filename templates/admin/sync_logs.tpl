@@ -75,7 +75,7 @@
                             </thead>
                             <tbody>
                                 <template x-for="log in logs" :key="log.id">
-                                    <tr @click="selectLog(log)" style="cursor: pointer;" :class="{'table-active': selectedLog && selectedLog.id === log.id}">
+                                    <tr @click="selectLog(log)" style="cursor: pointer;" :class="{ 'table-active': selectedLog && selectedLog.id === log.id}">
                                         <td class="ps-3" x-text="log.time"></td>
                                         <td><a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" x-text="log.domain" @click.stop></a></td>
                                         <td>
@@ -140,7 +140,7 @@
                                 <div class="col-4 text-muted fw-bold">Server:</div>
                                 <div class="col-8" x-text="selectedLog.serverFull"></div>
                             </div>
-                            <div class="row border-bottom pb-2 mb-2" :class="{'bg-danger-subtle': selectedLog.status === 'failed'}">
+                            <div class="row border-bottom pb-2 mb-2" :class="{ 'bg-danger-subtle': selectedLog.status === 'failed' }">
                                 <div class="col-4 text-muted fw-bold">Status:</div>
                                 <div class="col-8 fw-bold">
                                     <span x-text="selectedLog.status.toUpperCase()"></span>
@@ -194,13 +194,14 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('syncLogsData', () => ({
         logs: [
             {
                 id: 4521, time: '14:32', domain: 'myblog.net', action: 'DELETE_RECORD', details: 'A @ 1.2.3.4', 
                 server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null,
-                payload: '{"type":"A","name":"@","value":"1.2.3.4"}',
+                payload: '{ "type":"A","name":"@","value":"1.2.3.4" }',
                 serverFull: 'dns3.hvn.vn (103.xx.xx.12:2222)', attempt: '3/5',
                 errorMsg: 'Connection timed out after 15000ms', nextRetry: '14:48 (16 phút)',
                 batchId: 'abc-123-def (syncing)', actor: 'Client #1236 (Lê C) [118.70.xx.xx]',
@@ -209,7 +210,7 @@ document.addEventListener('alpine:init', () => {
             {
                 id: 4520, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
                 server: 'dns1.hvn.vn', status: 'complete', error_brief: '', ms: 89,
-                payload: '{"type":"A","name":"mail","value":"10.0.0.1"}',
+                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
                 serverFull: 'dns1.hvn.vn (103.xx.xx.10:2222)', attempt: '1/5',
                 errorMsg: '', nextRetry: '',
                 batchId: 'xyz-987-abc (complete)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
@@ -218,7 +219,7 @@ document.addEventListener('alpine:init', () => {
             {
                 id: 4519, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
                 server: 'dns2.hvn.vn', status: 'complete', error_brief: '', ms: 92,
-                payload: '{"type":"A","name":"mail","value":"10.0.0.1"}',
+                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
                 serverFull: 'dns2.hvn.vn (103.xx.xx.11:2222)', attempt: '1/5',
                 errorMsg: '', nextRetry: '',
                 batchId: 'xyz-987-abc (complete)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
@@ -227,7 +228,7 @@ document.addEventListener('alpine:init', () => {
             {
                 id: 4518, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
                 server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null,
-                payload: '{"type":"A","name":"mail","value":"10.0.0.1"}',
+                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
                 serverFull: 'dns3.hvn.vn (103.xx.xx.12:2222)', attempt: '1/5',
                 errorMsg: 'Connection timed out after 15000ms', nextRetry: '14:35',
                 batchId: 'xyz-987-abc (syncing)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
@@ -260,4 +261,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

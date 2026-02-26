@@ -8,7 +8,7 @@
         <!-- Loop qua các server -->
         <template x-for="server in servers" :key="server.id">
             <div class="col-12 mb-3">
-                <div class="card shadow-sm border-0" :class="{'border-start border-4 border-success': server.status === 'online' && server.is_active, 'border-start border-4 border-danger': server.status === 'offline' && server.is_active, 'border-start border-4 border-secondary opacity-75': !server.is_active}">
+                <div class="card shadow-sm border-0" :class="{ 'border-start border-4 border-success': server.status === 'online' && server.is_active, 'border-start border-4 border-danger': server.status === 'offline' && server.is_active, 'border-start border-4 border-secondary opacity-75': !server.is_active }">
                     <div class="card-body">
                         <div class="row align-items-center">
                             <!-- Server Info Info -->
@@ -130,6 +130,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('serverManager', () => ({
         servers: [
@@ -182,4 +183,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

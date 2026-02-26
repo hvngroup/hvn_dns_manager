@@ -146,11 +146,11 @@
             </div>
             <nav aria-label="Page navigation" x-show="totalPages > 1">
                 <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item" :class="{'disabled': currentPage === 1}">
+                    <li class="page-item" :class="{ 'disabled': currentPage === 1}">
                         <a class="page-link" href="#" @click.prevent="goToPage(currentPage - 1)">&laquo;</a>
                     </li>
                     <li class="page-item active"><a class="page-link" href="#" x-text="currentPage"></a></li>
-                    <li class="page-item" :class="{'disabled': currentPage === totalPages}">
+                    <li class="page-item" :class="{ 'disabled': currentPage === totalPages}">
                         <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">&raquo;</a>
                     </li>
                 </ul>
@@ -160,6 +160,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('domainList', () => ({
         loading: false,
@@ -214,4 +215,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

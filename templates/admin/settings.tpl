@@ -208,6 +208,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('settingsManager', () => ({
         activeTab: 'license',
@@ -265,6 +266,7 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>
 
 <style>

@@ -204,6 +204,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('auditTrailData', () => ({
         logs: [
@@ -227,7 +228,7 @@ document.addEventListener('alpine:init', () => {
                 id: 89199, time: '25/02, 14:28', actorType: 'system', actorName: 'Cron', domain: 'test.org', 
                 action: 'enable_dnssec', details_brief: 'DNSSEC on', ip: 'WHMCS Server',
                 actorFull: 'System Automation', context: 'cron_hook', target: 'Domain test.org Setting',
-                oldVal: '{"dnssec_enabled": false}', newVal: '{"dnssec_enabled": true}',
+                oldVal: '{ "dnssec_enabled": false}', newVal: '{ "dnssec_enabled": true}',
                 ua: 'WHMCS/8.8.0 CLI', session: 'cron',
                 notes: 'Auto enabled via hook AddonActivation', timeLong: '25/02/2026 14:28:00'
             },
@@ -248,4 +249,5 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
+{/literal}
 </script>

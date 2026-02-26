@@ -27,15 +27,15 @@
                 <div class="card-body">
                     <div class="row text-center mb-4">
                         <div class="col-4 border-end">
-                            <div class="display-6 text-success fw-bold">{$dashboard.stats.complete|default:'1,247'}</div>
+                            <div class="display-6 text-success fw-bold">{$dashboard.stats.complete|default:'1,247' }</div>
                             <div class="text-muted text-uppercase small">Complete</div>
                         </div>
                         <div class="col-4 border-end">
-                            <div class="display-6 text-warning fw-bold">{$dashboard.stats.pending|default:'23'}</div>
+                            <div class="display-6 text-warning fw-bold">{$dashboard.stats.pending|default:'23' }</div>
                             <div class="text-muted text-uppercase small">Pending</div>
                         </div>
                         <div class="col-4">
-                            <div class="display-6 text-danger fw-bold">{$dashboard.stats.failed|default:'12'}</div>
+                            <div class="display-6 text-danger fw-bold">{$dashboard.stats.failed|default:'12' }</div>
                             <div class="text-muted text-uppercase small">Failed</div>
                         </div>
                     </div>
@@ -56,11 +56,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
                         <span><i class="bi bi-globe"></i> Domains:</span>
-                        <span class="fw-bold">{$dashboard.stats.domains|default:'342'}</span>
+                        <span class="fw-bold">{$dashboard.stats.domains|default:'342' }</span>
                     </div>
                     <div class="d-flex justify-content-between border-bottom pb-3 mb-3">
                         <span><i class="bi bi-card-list"></i> Records:</span>
-                        <span class="fw-bold">{$dashboard.stats.records|default:'6,840'}</span>
+                        <span class="fw-bold">{$dashboard.stats.records|default:'6,840' }</span>
                     </div>
                     
                     <h6 class="text-muted small text-uppercase">Top thay đổi 7 ngày</h6>
@@ -103,9 +103,9 @@
                     <div class="list-group-item py-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <h6 class="mb-0">
-                                {if $srv.status == 'online'}
+                                {if $srv.status == 'online' }
                                     <span class="text-success" title="Online">🟢</span>
-                                {elseif $srv.status == 'offline'}
+                                {elseif $srv.status == 'offline' }
                                     <span class="text-danger" title="Offline">🔴</span>
                                 {else}
                                     <span class="text-warning" title="Warning">🟡</span>
@@ -115,7 +115,7 @@
                                     <span class="badge bg-primary ms-1" style="font-size: 0.65em">PRI</span>
                                 {/if}
                             </h6>
-                            {if $srv.status == 'offline'}
+                            {if $srv.status == 'offline' }
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-secondary" onclick="alert('Đang Test lỗi kết nối server...')">Test</button>
                                     <button class="btn btn-outline-danger" onclick="alert('Đã vô hiệu hóa server.')">Disable</button>
@@ -123,7 +123,7 @@
                             {/if}
                         </div>
                         <div class="d-flex justify-content-between text-muted small">
-                            <span>{$srv.uptime|default:'99.9'}% &bull; {$srv.latency|default:'45'}ms avg</span>
+                            <span>{$srv.uptime|default:'99.9' }% &bull; {$srv.latency|default:'45' }ms avg</span>
                             {if $srv.pending > 0}
                                 <span><i class="bi bi-clock"></i> {$srv.pending} pending</span>
                             {elseif $srv.failed > 0}
@@ -132,7 +132,7 @@
                                 <span class="text-success"><i class="bi bi-check-circle"></i> Clear</span>
                             {/if}
                         </div>
-                        {if $srv.status == 'offline'}
+                        {if $srv.status == 'offline' }
                             <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle-fill"></i> Timeout (Failed 7 times)</div>
                         {/if}
                     </div>
@@ -185,17 +185,17 @@
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush font-monospace small">
                         {foreach from=$dashboard.recentActivity item=log}
-                            <li class="list-group-item py-2 border-start border-4 border-{if $log.status == 'complete'}success{elseif $log.status == 'failed'}danger{else}warning{/if}">
+                            <li class="list-group-item py-2 border-start border-4 border-{if $log.status == 'complete' }success{elseif $log.status == 'failed' }danger{else}warning{/if}">
                                 <div class="d-flex w-100 justify-content-between">
                                     <span>
                                         <span class="text-muted pe-2">{$log.time}</span>
-                                        {if $log.status == 'complete'}✅{elseif $log.status == 'failed'}❌{else}⚠️{/if} 
+                                        {if $log.status == 'complete' }✅{elseif $log.status == 'failed' }❌{else}⚠️{/if} 
                                         <strong>{$log.action}</strong>
                                     </span>
                                     <a href="?module=hvn_dns_manager&action=domains&search={$log.domain}">{$log.domain}</a>
                                 </div>
                                 <div class="text-muted ps-5 pt-1">
-                                    &rarr; {$log.server} <span class="badge {if $log.status == 'complete'}bg-success-subtle text-success{elseif $log.status == 'failed'}bg-danger-subtle text-danger{else}bg-warning-subtle text-warning{/if} fw-normal ms-1">{$log.status_text}</span>
+                                    &rarr; {$log.server} <span class="badge {if $log.status == 'complete' }bg-success-subtle text-success{elseif $log.status == 'failed' }bg-danger-subtle text-danger{else}bg-warning-subtle text-warning{/if} fw-normal ms-1">{$log.status_text}</span>
                                 </div>
                             </li>
                         {foreachelse}
@@ -240,6 +240,7 @@
 </div>
 
 <script>
+{literal}
 document.addEventListener('DOMContentLoaded', function() {
     // Render Mock Sparkline Chart
     const ctx = document.getElementById('syncChart');
@@ -282,4 +283,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+{/literal}
 </script>
