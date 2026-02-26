@@ -630,7 +630,250 @@ Mọi Ajax response PHẢI tuân theo format sau:
 }
 ```
 
-### 3.6. Logging Convention
+### 3.6. Smarty Template Conventions
+
+#### Quy tắc Delimiter — Tránh conflict Smarty vs JS/Alpine/CSS
+
+Smarty engine parse TẤT CẢ `{ }` thành Smarty tags. Khi viết template có chứa JavaScript, Alpine.js, hoặc CSS inline → PHẢI bọc `{literal}...{/literal}`.
+
+**NGUYÊN TẮC: Khi nào cần `{literal}`?**
+
+| Context | Cần `{literal}`? | Ví dụ |
+|---------|:---:|--------|
+| Smarty variable | ❌ | `{$domain.name}` |
+| Smarty function | ❌ | `{include file="..."}` |
+| Smarty modifier | ❌ | `{$var\|escape:'htmlall'}` |
+| `<script>` block | ✅ BẮT BUỘC | `<script>{literal}...{/literal}</script>` |
+| `<style>` block | ✅ BẮT BUỘC | `<style>{literal}...{/literal}</style>` |
+| Alpine.js `x-data` | ✅ BẮT BUỘC | `x-data="{literal}{ open: false }{/literal}"` |
+| Alpine.js `:class` object | ✅ BẮT BUỘC | `:class="{literal}{ 'active': val }{/literal}"` |
+| Alpine.js `x-on` simple | ❌ (no curly) | `x-on:click="open = true"` |
+| Alpine.js `@click` simple | ❌ (no curly) | `@click="count++"` |
+| CSS inline `style="..."` | ❌ (no curly) | `style="color: red"` |
+| HTML attribute no braces | ❌ | `class="btn btn-primary"` |
+
+**CẤM tuyệt đối:**
+```smarty
+{* ❌ SAI — Smarty parse { open: false } thành Smarty tag → LỖI *}
+<div x-data="{ open: false }"></div>
+<script>
+    const obj = { key: 'value' };
+</script>
+<style>
+    .card { padding: 10px; }
+</style>
+
+{* ✅ ĐÚNG — Bọc {literal} cho mọi JS/Alpine object/CSS block *}
+<div x-data="{literal}{ open: false }{/literal}"></div>
+<script>
+{literal}
+    const obj = { key: 'value' };
+{/literal}
+</script>
+<style>
+{literal}
+    .card { padding: 10px; }
+{/literal}
+</style>
+```
+
+**Kỹ thuật kết hợp Smarty variable TRONG block `{literal}`:**
+
+Khi cần truyền Smarty variable vào JavaScript, KHÔNG đặt Smarty variable bên trong `{literal}` (sẽ không được parse). Thay vào đó:
+
+```smarty
+{* ── Cách 1: Data attribute — RECOMMEND ── *}
+<div id="dns-editor" data-domain-id="{$domain.id}" data-domain-name="{$domain.name|escape:'htmlall'}" data-base-url="{$moduleUrl}"></div>
+<script>
+{literal}
+    // Đọc data từ HTML attribute
+    const el = document.getElementById('dns-editor');
+    const domainId = el.dataset.domainId;
+    const domainName = el.dataset.domainName;
+    const baseUrl = el.dataset.baseUrl;
+{/literal}
+</script>
+
+{* ── Cách 2: Script variable trước {literal} block ── *}
+<script>
+    var HVNDNS_CONFIG = {
+        domainId: {$domain.id},
+        domainName: '{$domain.name|escape:'javascript'}',
+        baseUrl: '{$moduleUrl}',
+        csrfToken: '{$token}'
+    };
+</script>
+<script>
+{literal}
+    // Sử dụng HVNDNS_CONFIG.domainId trong code
+    console.log(HVNDNS_CONFIG.domainId);
+{/literal}
+</script>
+
+{* ── Cách 3: Alpine.js x-data đọc từ attribute ── *}
+<div x-data="dnsEditor()" data-config="{$configJson|escape:'htmlall'}"></div>
+<script>
+{literal}
+    function dnsEditor() {
+        return {
+            config: JSON.parse(this.$el.dataset.config),
+            init() {
+                console.log(this.config.domainId);
+            }
+        };
+    }
+{/literal}
+</script>
+```
+
+**Quy tắc Smarty modifiers & escaping:**
+```smarty
+{* ── HTML context (mặc định) ── *}
+{$record.value|escape:'htmlall'}
+
+{* ── JavaScript context ── *}
+var name = '{$domain.name|escape:'javascript'}';
+
+{* ── URL context ── *}
+<a href="?action=edit&id={$record.id|escape:'url'}">Sửa</a>
+
+{* ── Không escape (trusted data, đã sanitize server-side) ── *}
+{$trustedHtml nofilter}
+{* ⚠️ CHỈ dùng khi data đã sanitize 100% ở Controller *}
+```
+
+**Cấu trúc template file chuẩn:**
+```smarty
+{* 
+ * File: templates/client/dns_editor.tpl
+ * Màn hình: CL-02 DNS Editor
+ * Variables từ Controller:
+ *   $domain      - Object domain
+ *   $records     - Array of records
+ *   $quota       - {current: int, limit: int}
+ *   $moduleUrl   - Base URL module assets
+ *   $token       - CSRF token
+ *}
+
+{* ── 1. Include CSS module (không cần {literal} vì file external) ── *}
+<link rel="stylesheet" href="{$moduleUrl}/assets/css/hvndns.css">
+
+{* ── 2. HTML markup với Smarty variables ── *}
+<div x-data="dnsEditor()">
+    <h2>{$domain.domain|escape:'htmlall'}</h2>
+    
+    {* Include partial *}
+    {include file="client/partials/quota_bar.tpl" current=$quota.current limit=$quota.limit}
+    
+    {* Loop records *}
+    {foreach from=$records item=record}
+        <div class="record-row">
+            <span>{$record.type|escape:'htmlall'}</span>
+            <span>{$record.name|escape:'htmlall'}</span>
+            <span>{$record.value|escape:'htmlall'}</span>
+        </div>
+    {/foreach}
+</div>
+
+{* ── 3. Truyền data cho JS qua config object ── *}
+<script>
+    var HVNDNS = {
+        domainId: {$domain.id|intval},
+        baseUrl: '{$moduleUrl|escape:'javascript'}',
+        token: '{$token|escape:'javascript'}',
+        records: {$recordsJson nofilter}
+    };
+</script>
+
+{* ── 4. Alpine.js / JS code bọc {literal} ── *}
+<script>
+{literal}
+    function dnsEditor() {
+        return {
+            records: HVNDNS.records,
+            loading: false,
+            
+            async addRecord(formData) {
+                this.loading = true;
+                const res = await fetch(HVNDNS.baseUrl + '&action=add_record', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': HVNDNS.token
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                this.loading = false;
+            }
+        };
+    }
+{/literal}
+</script>
+```
+
+**Include & Partials:**
+```smarty
+{* ── Include partial với params ── *}
+{include file="client/partials/sync_badge.tpl" status=$record.sync_status}
+
+{* ── Partial file: partials/sync_badge.tpl ── *}
+{if $status == 'complete'}
+    <span class="badge bg-success">Live</span>
+{elseif $status == 'syncing'}
+    <span class="badge bg-warning">
+         <i class="bi bi-arrow-repeat spin"></i> Syncing
+    </span>
+{elseif $status == 'pending'}
+    <span class="badge bg-secondary">Pending</span>
+{elseif $status == 'failed'}
+    <span class="badge bg-danger">Failed</span>
+{/if}
+
+{* ── Conditional include ── *}
+{if $tabs.dnssec}
+    {include file="client/partials/tab_dnssec.tpl"}
+{/if}
+```
+
+**Smarty functions thường dùng:**
+```smarty
+{* Biến *}
+{$variable}
+{$array.key}
+{$object->property}
+
+{* Gán biến *}
+{assign var="fullName" value="{$record.name}.{$domain.domain}"}
+
+{* Điều kiện *}
+{if $record.is_system}...{elseif $record.is_locked}...{else}...{/if}
+
+{* Vòng lặp *}
+{foreach from=$records item=record key=index}
+    {$record.name} — Index: {$index}
+    {if $record@first}Đầu tiên{/if}
+    {if $record@last}Cuối cùng{/if}
+{foreachelse}
+    Không có bản ghi nào.
+{/foreach}
+
+{* Modifiers *}
+{$var|escape:'htmlall'}          — HTML escape
+{$var|escape:'javascript'}       — JS string escape  
+{$var|escape:'url'}              — URL encode
+{$var|truncate:50:'...'}         — Cắt chuỗi
+{$var|date_format:'%d/%m/%Y'}    — Format ngày
+{$var|default:'N/A'}             — Giá trị mặc định
+{$var|intval}                    — Cast integer
+{$var|count}                     — Đếm array
+{$var|upper}                     — Uppercase
+{$var|lower}                     — Lowercase
+{$var|nl2br}                     — Newline → <br>
+{$var|strip_tags}                — Xóa HTML tags
+```
+
+### 3.7. Logging Convention
 
 ```php
 // SỬ DỤNG Monolog qua WHMCS

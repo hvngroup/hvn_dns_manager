@@ -905,6 +905,9 @@ const API = RealAPI; // Gọi Ajax endpoint thật
 
 ## 8. Quy tắc Prototype Code
 
+### 8.0. Smarty + Alpine.js
+**Smarty + Alpine.js:** Mọi template PHẢI tuân thủ Smarty delimiter rules trong AGENT.md Section 3.6. Alpine.js `x-data` object, `:class` object, `<script>` block, `<style>` block PHẢI bọc `{literal}...{/literal}`. Truyền Smarty variable vào JS qua `data-*` attribute hoặc config object TRƯỚC `{literal}` block.
+
 ### 8.1. Code giữ lại cho Production
 
 ```
