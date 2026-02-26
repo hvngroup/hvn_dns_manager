@@ -18,11 +18,15 @@
     {/if}
 
     <div class="hvn-row hvn-mb-4">
-        <!-- Sync Pipeline -->
         <div class="hvn-col-md-8">
             <div class="hvn-card h-100 hvn-shadow-sm hvn-border-0">
-                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0">
-                    <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-activity"></i> Sync Pipeline &mdash; 24 giờ qua</h5>
+                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                    <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-activity"></i> Sync Pipeline</h5>
+                    <div class="hvn-d-flex hvn-gap-1" id="syncChartFilter">
+                        <button class="hvn-btn hvn-btn-sm hvn-btn-blue" data-days="7" onclick="syncChartSetRange(7)">7 ngày</button>
+                        <button class="hvn-btn hvn-btn-sm hvn-btn-outline-blue" data-days="15" onclick="syncChartSetRange(15)">15 ngày</button>
+                        <button class="hvn-btn hvn-btn-sm hvn-btn-outline-blue" data-days="30" onclick="syncChartSetRange(30)">30 ngày</button>
+                    </div>
                 </div>
                 <div class="hvn-card-body">
                     <div class="hvn-row hvn-text-center hvn-mb-4">
@@ -39,8 +43,7 @@
                             <div class="hvn-text-muted text-uppercase small">Failed</div>
                         </div>
                     </div>
-                    <!-- Mock Sparkline Chart -->
-                    <div style="height: 100px;">
+                    <div style="height: 140px;">
                         <canvas id="syncChart"></canvas>
                     </div>
                 </div>
@@ -242,46 +245,143 @@
 <script>
 {literal}
 document.addEventListener('DOMContentLoaded', function() {
-    // Render Mock Sparkline Chart
-    const ctx = document.getElementById('syncChart');
-    if (ctx && typeof Chart !== 'undefined') {
-        new Chart(ctx, {
+    var syncChartInstance = null;
+
+    // Generate last N days labels (dd/mm)
+    function genLabels(days) {
+        var labels = [];
+        var now = new Date();
+        for (var i = days - 1; i >= 0; i--) {
+            var d = new Date(now);
+            d.setDate(d.getDate() - i);
+            labels.push((d.getDate() < 10 ? '0' : '') + d.getDate() + '/' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1));
+        }
+        return labels;
+    }
+
+    // Mock 30-day data (complete / failed / pending)
+    var allData30 = {
+        complete: [85,92,74,110,98,120,135,88,76,95,102,89,115,130,142,98,87,105,118,125,97,88,110,132,145,120,98,115,88,95],
+        failed:   [3, 2, 5, 1, 4, 0, 2, 6, 3, 2, 1, 4, 2, 0, 3, 5, 2, 1, 3, 2, 4, 1, 2, 0, 3, 2, 5, 1, 6, 4],
+        pending:  [8, 5, 9, 6, 3, 7, 4, 10,5, 8, 6, 7, 5, 4, 6, 8, 9, 5, 7, 4, 6, 9, 5, 3, 7, 6, 4, 8, 5, 7]
+    };
+
+    function getSlice(days) {
+        return {
+            labels: genLabels(days),
+            complete: allData30.complete.slice(-days),
+            failed:   allData30.failed.slice(-days),
+            pending:  allData30.pending.slice(-days)
+        };
+    }
+
+    function renderChart(days) {
+        var ctx = document.getElementById('syncChart');
+        if (!ctx || typeof Chart === 'undefined') return;
+
+        var d = getSlice(days);
+
+        if (syncChartInstance) {
+            syncChartInstance.data.labels = d.labels;
+            syncChartInstance.data.datasets[0].data = d.complete;
+            syncChartInstance.data.datasets[1].data = d.failed;
+            syncChartInstance.data.datasets[2].data = d.pending;
+            syncChartInstance.update();
+            return;
+        }
+
+        syncChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['0h','1h','2h','3h','4h','5h','6h','7h','8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h','23h'],
-                datasets: [{
-                    label: 'Sync Jobs',
-                    data: [12, 19, 15, 8, 5, 2, 4, 30, 45, 60, 50, 40, 45, 55, 65, 80, 90, 75, 40, 30, 25, 20, 15, 10],
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
+                labels: d.labels,
+                datasets: [
+                    {
+                        label: 'Complete',
+                        data: d.complete,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25,135,84,0.12)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointHoverRadius: 4
+                    },
+                    {
+                        label: 'Failed',
+                        data: d.failed,
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220,53,69,0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointHoverRadius: 4
+                    },
+                    {
+                        label: 'Pending',
+                        data: d.pending,
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255,193,7,0.1)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointHoverRadius: 4
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { boxWidth: 12, font: { size: 11 }, padding: 8 }
+                    },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
+                        callbacks: {
+                            title: function(items) { return 'Ngày ' + items[0].label; }
+                        }
                     }
                 },
                 scales: {
-                    x: { display: false },
-                    y: { display: false, min: 0 }
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 10 }, maxRotation: 0, maxTicksLimit: 10 }
+                    },
+                    y: {
+                        display: true,
+                        min: 0,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { font: { size: 10 }, maxTicksLimit: 5 }
+                    }
                 },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                }
+                interaction: { mode: 'nearest', axis: 'x', intersect: false }
             }
         });
     }
+
+    // Filter button handler
+    window.syncChartSetRange = function(days) {
+        renderChart(days);
+        // Update active button state
+        var btns = document.querySelectorAll('#syncChartFilter button');
+        btns.forEach(function(btn) {
+            var d = parseInt(btn.getAttribute('data-days'));
+            if (d === days) {
+                btn.className = btn.className.replace('hvn-btn-outline-blue', 'hvn-btn-blue');
+            } else {
+                btn.className = btn.className.replace('hvn-btn-blue', 'hvn-btn-outline-blue');
+            }
+        });
+    };
+
+    // Init with 7 days
+    renderChart(7);
 });
 {/literal}
 </script>
