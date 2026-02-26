@@ -13,6 +13,31 @@ if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
 
+// Simple internal autoloader for HvnGroup\DnsManager namespace
+spl_autoload_register(function ($class) {
+    $prefix = 'HvnGroup\\DnsManager\\';
+    $base_dir = __DIR__ . '/app/';
+
+    // Does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    // Get the relative class name
+    $relative_class = substr($class, $len);
+
+    // Replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+
+    // If the file exists, require it
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
 use HvnGroup\DnsManager\Controllers\Client\ClientController;
 use HvnGroup\DnsManager\Controllers\Admin\AdminController;
 
