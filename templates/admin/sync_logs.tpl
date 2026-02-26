@@ -55,142 +55,71 @@
         </div>
     </div>
 
-    <div class="hvn-row">
-        <!-- Main Table -->
-        <div class="hvn-col-md-8">
-            <div class="hvn-card hvn-shadow-sm hvn-border-0">
-                <div class="hvn-card-body hvn-p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle hvn-mb-0 font-monospace text-sm" style="font-size: 12px">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="hvn-ps-3">Thời gian</th>
-                                    <th>Domain</th>
-                                    <th>Action</th>
-                                    <th>Server</th>
-                                    <th>Status</th>
-                                    <th>ms</th>
-                                    <th class="hvn-text-end hvn-pe-3"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template x-for="log in logs" :key="log.id">
-                                    <tr @click="selectLog(log)" style="cursor: pointer;" :class="{ 'table-active': selectedLog && selectedLog.id === log.id}">
-                                        <td class="hvn-ps-3" x-text="log.time"></td>
-                                        <td><a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" x-text="log.domain" @click.stop></a></td>
-                                        <td>
-                                            <div class="hvn-fw-bold" x-text="log.action"></div>
-                                            <div class="small hvn-text-muted" x-text="log.details"></div>
-                                        </td>
-                                        <td x-text="log.server"></td>
-                                        <td>
-                                            <template x-if="log.status === 'complete'"><span class="hvn-badge hvn-bg-success">✅</span></template>
-                                            <template x-if="log.status === 'failed'"><span class="hvn-badge hvn-bg-danger">❌</span></template>
-                                            <template x-if="log.status === 'pending'"><span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡</span></template>
-                                            <div class="small hvn-text-muted" x-text="log.error_brief"></div>
-                                        </td>
-                                        <td x-text="log.ms || '--'"></td>
-                                        <td class="hvn-text-end hvn-pe-3">
-                                            <template x-if="log.status === 'failed'">
-                                                <button class="hvn-btn btn-sm btn-outline-warning" @click.stop="retryJob(log)"><i class="bi bi-arrow-repeat"></i></button>
-                                            </template>
-                                            <button class="hvn-btn btn-sm btn-light border"><i class="bi bi-search"></i></button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <nav class="hvn-mt-3">
-                <ul class="pagination pagination-sm hvn-justify-content-end">
-                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-            </nav>
-        </div>
-        
-        <!-- Detail Panel -->
-        <div class="hvn-col-md-4">
-            <div class="hvn-card hvn-shadow-sm hvn-border-0 sticky-top" style="top: 20px;">
-                <div class="hvn-card-header hvn-bg-white hvn-pt-3">
-                    <h6 class="hvn-mb-0 hvn-text-primary"><i class="bi bi-info-circle"></i> Chi tiết Job #<span x-text="selectedLog ? selectedLog.id : '---'"></span></h6>
-                </div>
-                <div class="hvn-card-body hvn-bg-light hvn-p-3" style="font-size: 12px;" x-show="selectedLog">
-                    <template x-if="selectedLog">
-                        <div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Domain:</div>
-                                <div class="hvn-col-8 font-monospace hvn-text-primary hvn-fw-bold"><a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + selectedLog.domain" x-text="selectedLog.domain"></a></div>
-                            </div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Action:</div>
-                                <div class="hvn-col-8 font-monospace" x-text="selectedLog.action"></div>
-                            </div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Payload:</div>
-                                <div class="hvn-col-8 text-wrap text-break font-monospace hvn-bg-white border hvn-p-1 hvn-rounded" x-text="selectedLog.payload"></div>
-                            </div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Server:</div>
-                                <div class="hvn-col-8" x-text="selectedLog.serverFull"></div>
-                            </div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2" :class="{ 'hvn-bg-danger-subtle': selectedLog.status === 'failed' }">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Status:</div>
-                                <div class="hvn-col-8 hvn-fw-bold">
-                                    <span x-text="selectedLog.status.toUpperCase()"></span>
-                                    <span class="hvn-text-muted hvn-fw-normal"> (Attempt <span x-text="selectedLog.attempt"></span>)</span>
-                                </div>
-                            </div>
-                            <template x-if="selectedLog.status === 'failed'">
-                                <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2 hvn-bg-danger-subtle">
-                                    <div class="hvn-col-4 hvn-text-danger hvn-fw-bold">Error:</div>
-                                    <div class="hvn-col-8 hvn-text-danger font-monospace text-break" x-text="selectedLog.errorMsg"></div>
-                                </div>
-                            </template>
-                            <template x-if="selectedLog.status === 'failed'">
-                                <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                    <div class="hvn-col-4 hvn-text-warning hvn-fw-bold">Next retry:</div>
-                                    <div class="hvn-col-8" x-text="selectedLog.nextRetry"></div>
-                                </div>
-                            </template>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Batch:</div>
-                                <div class="hvn-col-8 font-monospace hvn-text-muted" x-text="selectedLog.batchId"></div>
-                            </div>
-                            <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Actor:</div>
-                                <div class="hvn-col-8" x-text="selectedLog.actor"></div>
-                            </div>
-                            <div class="hvn-row hvn-mb-3">
-                                <div class="hvn-col-4 hvn-text-muted hvn-fw-bold">Created:</div>
-                                <div class="hvn-col-8" x-text="selectedLog.created"></div>
-                            </div>
-
-                            <div class="d-grid gahvn-p-2">
-                                <template x-if="selectedLog.status === 'failed' || selectedLog.status === 'pending'">
-                                    <button class="hvn-btn hvn-btn-warning btn-sm" @click="retryJob(selectedLog)"><i class="bi bi-arrow-repeat"></i> Thử lại ngay (Retry)</button>
-                                </template>
-                                <template x-if="selectedLog.status === 'failed' || selectedLog.status === 'pending'">
-                                    <button class="hvn-btn btn-outline-danger btn-sm" @click="alert('Đã hủy Job.')"><i class="bi bi-x-circle"></i> Hủy (Cancel Job)</button>
-                                </template>
-                                <button class="hvn-btn btn-outline-secondary btn-sm" @click="copyDebug(selectedLog)"><i class="bi bi-clipboard"></i> Copy Debug Info</button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-                <div class="hvn-card-body hvn-text-center hvn-text-muted" x-show="!selectedLog">
-                    <i class="bi bi-hand-index fs-1 hvn-mt-4 hvn-mb-2 hvn-d-block"></i>
-                    Ấn vào một bản ghi bên trái để xem chi tiết
-                </div>
+    <!-- Main Table (full-width) -->
+    <div class="hvn-card hvn-shadow-sm hvn-border-0">
+        <div class="hvn-card-body hvn-p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle hvn-mb-0 font-monospace" style="font-size: 12px">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="hvn-ps-3">ID</th>
+                            <th>Thời gian</th>
+                            <th>Domain</th>
+                            <th>Action</th>
+                            <th>Server</th>
+                            <th>Status</th>
+                            <th>ms</th>
+                            <th class="hvn-text-end hvn-pe-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="log in logs" :key="log.id">
+                            <tr>
+                                <td class="hvn-ps-3 hvn-text-muted" x-text="'#' + log.id"></td>
+                                <td x-text="log.time"></td>
+                                <td>
+                                    <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" x-text="log.domain"></a>
+                                </td>
+                                <td>
+                                    <div class="hvn-fw-bold" x-text="log.action"></div>
+                                    <div class="small hvn-text-muted" x-text="log.details"></div>
+                                </td>
+                                <td x-text="log.server"></td>
+                                <td>
+                                    <template x-if="log.status === 'complete'"><span class="hvn-badge hvn-bg-success">✅ Complete</span></template>
+                                    <template x-if="log.status === 'failed'"><span class="hvn-badge hvn-bg-danger">❌ Failed</span></template>
+                                    <template x-if="log.status === 'pending'"><span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡 Pending</span></template>
+                                    <div class="small hvn-text-danger" x-text="log.error_brief"></div>
+                                </td>
+                                <td x-text="log.ms || '--'"></td>
+                                <td class="hvn-text-end hvn-pe-3">
+                                    <template x-if="log.status === 'failed'">
+                                        <button class="hvn-btn btn-sm btn-outline-warning hvn-me-1" @click="retryJob(log)">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </template>
+                                    <a :href="'?module=hvn_dns_manager&action=sync_log_detail&id=' + log.id"
+                                       class="hvn-btn btn-sm btn-light border text-decoration-none">
+                                        <i class="bi bi-search"></i> Chi tiết
+                                    </a>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+    <nav class="hvn-mt-3">
+        <ul class="pagination pagination-sm hvn-justify-content-end">
+            <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
 </div>
 
 <script>
@@ -199,47 +128,22 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('syncLogsData', () => ({
         logs: [
             {
-                id: 4521, time: '14:32', domain: 'myblog.net', action: 'DELETE_RECORD', details: 'A @ 1.2.3.4', 
-                server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null,
-                payload: '{ "type":"A","name":"@","value":"1.2.3.4" }',
-                serverFull: 'dns3.hvn.vn (103.xx.xx.12:2222)', attempt: '3/5',
-                errorMsg: 'Connection timed out after 15000ms', nextRetry: '14:48 (16 phút)',
-                batchId: 'abc-123-def (syncing)', actor: 'Client #1236 (Lê C) [118.70.xx.xx]',
-                created: '25/02/2026 14:30:15'
+                id: 4521, time: '14:32', domain: 'myblog.net', action: 'DELETE_RECORD', details: 'A @ 1.2.3.4',
+                server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null
             },
             {
-                id: 4520, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
-                server: 'dns1.hvn.vn', status: 'complete', error_brief: '', ms: 89,
-                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
-                serverFull: 'dns1.hvn.vn (103.xx.xx.10:2222)', attempt: '1/5',
-                errorMsg: '', nextRetry: '',
-                batchId: 'xyz-987-abc (complete)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
-                created: '25/02/2026 14:31:00'
+                id: 4520, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail',
+                server: 'dns1.hvn.vn', status: 'complete', error_brief: '', ms: 89
             },
             {
-                id: 4519, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
-                server: 'dns2.hvn.vn', status: 'complete', error_brief: '', ms: 92,
-                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
-                serverFull: 'dns2.hvn.vn (103.xx.xx.11:2222)', attempt: '1/5',
-                errorMsg: '', nextRetry: '',
-                batchId: 'xyz-987-abc (complete)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
-                created: '25/02/2026 14:31:00'
+                id: 4519, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail',
+                server: 'dns2.hvn.vn', status: 'complete', error_brief: '', ms: 92
             },
             {
-                id: 4518, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail', 
-                server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null,
-                payload: '{ "type":"A","name":"mail","value":"10.0.0.1" }',
-                serverFull: 'dns3.hvn.vn (103.xx.xx.12:2222)', attempt: '1/5',
-                errorMsg: 'Connection timed out after 15000ms', nextRetry: '14:35',
-                batchId: 'xyz-987-abc (syncing)', actor: 'Client #1235 (Trần B) [1.1.1.1]',
-                created: '25/02/2026 14:31:00'
+                id: 4518, time: '14:31', domain: 'shop.vn', action: 'ADD_RECORD', details: 'A mail',
+                server: 'dns3.hvn.vn', status: 'failed', error_brief: 'tmout', ms: null
             }
         ],
-        selectedLog: null,
-
-        selectLog(log) {
-            this.selectedLog = log;
-        },
 
         retryJob(log) {
             alert(`Đang thử gửi lại Job #${log.id} tới server ${log.server}...`);
@@ -249,15 +153,7 @@ document.addEventListener('alpine:init', () => {
                 log.status = 'complete';
                 log.error_brief = '';
                 log.ms = Math.floor(Math.random() * 100) + 30;
-                log.errorMsg = '';
             }, 1000);
-        },
-
-        copyDebug(log) {
-            const data = JSON.stringify(log, null, 2);
-            navigator.clipboard.writeText(data).then(() => {
-                alert('Đã copy debug info vào Clipboard.');
-            });
         }
     }));
 });
