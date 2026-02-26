@@ -41,8 +41,8 @@
 
         <!-- Main Content Area -->
         <div class="col-md-9 col-lg-10">
-            <!-- Include Scoped Bootstrap utilities, Google Fonts & Icons inline for Prototype rendering reliably -->
-            <link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_admin.css">
+            <!-- Include Custom Pure CSS Utilities, Google Fonts & Icons inline for Prototype rendering reliably -->
+            <link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
             <style>
