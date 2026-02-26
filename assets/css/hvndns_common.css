@@ -433,6 +433,8 @@
 .hvn-border-0      { border: 0 !important; }
 .hvn-border-top    { border-top: 1px solid var(--hvn-border-color) !important; }
 .hvn-border-bottom { border-bottom: 1px solid var(--hvn-border-color) !important; }
+.hvn-border-top-0    { border-top: 0 !important; }
+.hvn-border-bottom-0 { border-bottom: 0 !important; }
 .hvn-border-start  { border-left: 1px solid var(--hvn-border-color) !important; }
 .hvn-border-end    { border-right: 1px solid var(--hvn-border-color) !important; }
 
@@ -512,6 +514,22 @@
     vertical-align: baseline;
     border-radius: var(--hvn-border-radius);
 }
+/* --- Background utilities (standalone hvn- classes) --- */
+.hvn-bg-white          { background-color: #fff !important; }
+.hvn-bg-light          { background-color: var(--hvn-light) !important; }
+.hvn-bg-primary        { background-color: var(--hvn-primary) !important; }
+.hvn-bg-blue           { background-color: var(--hvn-blue) !important; }
+.hvn-bg-success        { background-color: var(--hvn-success) !important; }
+.hvn-bg-danger         { background-color: var(--hvn-danger) !important; }
+.hvn-bg-warning        { background-color: var(--hvn-warning) !important; }
+.hvn-bg-info           { background-color: var(--hvn-info) !important; }
+.hvn-bg-dark           { background-color: var(--hvn-dark) !important; }
+.hvn-bg-success-subtle { background-color: #d1e7dd !important; }
+.hvn-bg-danger-subtle  { background-color: #f8d7da !important; }
+.hvn-bg-warning-subtle { background-color: #fff3cd !important; }
+.hvn-bg-info-subtle    { background-color: #cff4fc !important; }
+.hvn-bg-transparent    { background-color: transparent !important; }
+
 .hvn-badge.hvn-bg-warning,
 .badge.bg-warning,
 .badge.bg-light { color: #000; }
