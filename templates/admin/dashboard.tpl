@@ -185,7 +185,7 @@
                 <div class="hvn-card-body hvn-p-0">
                     <ul class="hvn-list-group hvn-list-group-flush font-monospace small">
                         {foreach from=$dashboard.recentActivity item=log}
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-4 border-{if $log.status == 'complete' }success{elseif $log.status == 'failed' }danger{else}warning{/if}">
+                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start border-{if $log.status == 'complete' }success{elseif $log.status == 'failed' }danger{else}warning{/if}">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span>
                                         <span class="hvn-text-muted hvn-pe-2">{$log.time}</span>
@@ -199,7 +199,7 @@
                                 </div>
                             </li>
                         {foreachelse}
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-4 hvn-border-danger">
+                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-danger">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:32</span> ❌ <strong>DELETE_RECORD</strong></span>
                                     <a href="#">myblog.net</a>
@@ -207,21 +207,21 @@
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns3.hvn.vn <span class="hvn-badge hvn-bg-danger-subtle hvn-text-danger hvn-fw-normal hvn-ms-1">timeout</span></div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1.hvn.vn <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">primary complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-4 hvn-border-success">
+                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-success">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:31</span> ✅ <strong>ADD_RECORD</strong></span>
                                     <a href="#">shop.vn</a>
                                 </div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-4 hvn-border-success">
+                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-success">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:30</span> ✅ <strong>EDIT_RECORD</strong></span>
                                     <a href="#">example.com</a>
                                 </div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-4 hvn-border-warning">
+                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-warning">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:28</span> ⚠️ <strong>ENABLE_DNSSEC</strong></span>
                                     <a href="#">test.org</a>

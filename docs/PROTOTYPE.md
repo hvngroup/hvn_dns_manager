@@ -53,7 +53,7 @@ UI-First: Giao diện chạy THẬT trong WHMCS, data GIẢ từ mock
 
 **API giả**: Ajax endpoints trả JSON cứng (hardcoded hoặc đọc từ mock DB) — UI hoạt động hoàn chỉnh nhưng không gọi DirectAdmin, không chạy Queue.
 
-**Tương tác giả**: Bấm "Thêm record" → modal mở → submit → fake success response → record xuất hiện với badge Pending → tự chuyển sang Live sau 3 giây (simulate sync). Toàn bộ bằng Alpine.js client-side.
+**Tương tác giả**: Bấm "Thêm record" → chuyển tải trang chỉnh sửa → submit → fake success response → record xuất hiện với badge Pending → tự chuyển sang Live sau 3 giây (simulate sync). Toàn bộ bằng Alpine.js client-side.
 
 ### 1.2. Timeline (Với AI Tool hỗ trợ)
 
@@ -418,13 +418,14 @@ templates/client/
 ├── dns_editor.tpl           ← CL-02: DNS Editor (màn chính + tabs container)
 ├── partials/
 │   ├── record_table.tpl     ← Bảng records (tách riêng để reuse admin)
-│   ├── record_modal.tpl     ← CL-03: Modal Add/Edit Record
+│   ├── record_edit.tpl      ← CL-03: Page Add/Edit Record
 │   ├── tab_redirects.tpl    ← CL-04: Tab Redirects
 │   ├── tab_email.tpl        ← CL-05: Tab Email Forwarding
 │   ├── tab_dnssec.tpl       ← CL-06: Tab DNSSEC
 │   ├── tab_ddns.tpl         ← CL-07: Tab DDNS
 │   ├── tab_templates.tpl    ← CL-08: Load Template Dialog
 │   ├── sync_badge.tpl       ← Component: Status badge (reusable)
+│   ├── toast.tpl            ← Component: Toast thông báo
 │   └── quota_bar.tpl        ← Component: Usage bar (reusable)
 │
 assets/
@@ -433,7 +434,6 @@ assets/
 ├── js/
 │   ├── dns-editor.js        ← Alpine.js: DNS Editor logic
 │   ├── sync-tracker.js      ← Alpine.js: Polling simulation
-│   ├── record-modal.js      ← Alpine.js: Add/Edit modal logic
 │   ├── mock-api.js          ← Mock: Fake API responses cho prototype
 │   └── notifications.js     ← Toast notification helper
 ```
@@ -478,13 +478,13 @@ assets/
 #### CL-03: Modal Add/Edit Record
 
 ```
-□ Modal mở khi click "Thêm bản ghi" hoặc icon ✏️
+□ Chuyển sang trang form khi click "Thêm bản ghi" hoặc icon ✏️
 □ Dropdown type: chỉ hiện allowed types + mô tả helper cho mỗi type
 □ Fields động: Priority/Weight/Port hiện khi chọn MX hoặc SRV
 □ Helper text thay đổi theo type (A → "Địa chỉ IPv4", CNAME → "Tên miền đích")
 □ TTL dropdown: 1 phút, 5 phút, 30 phút, 1 giờ (default), 12 giờ, 24 giờ, Tùy chỉnh
 □ Validation hiện real-time (Alpine.js): IP format, FQDN, TTL range
-□ Submit: nút chuyển spinner → fake success → modal đóng
+□ Submit: nút chuyển spinner → fake success → redirect về danh sách
 □ Record mới xuất hiện trong bảng với badge 🟡 Pending
 □ Sau 3 giây → badge tự chuyển 🟢 Live (simulate sync)
 □ Toast: "✅ Đã lưu! Bản ghi đang được đồng bộ..."
@@ -558,7 +558,7 @@ assets/
 templates/admin/
 ├── dashboard.tpl             ← AD-01: Dashboard
 ├── server_list.tpl           ← AD-02: Server Management
-├── server_modal.tpl          ← AD-03: Modal Add/Edit Server
+├── server_edit.tpl           ← AD-03: Page Add/Edit Server
 ├── domain_list.tpl           ← AD-04: Global Domain List
 ├── dns_editor_admin.tpl      ← AD-05: Admin DNS Editor
 ├── sync_logs.tpl             ← AD-06: Sync Logs
@@ -606,7 +606,7 @@ assets/js/
 □ Card đỏ (server 3): backoff info, error message, [Reset Backoff]
 □ Nút [Test Connection]: fake loading 2s → fake result (success hoặc fail)
 □ Nút [Disable]: confirm → card chuyển xám + badge "Disabled"
-□ Nút [+ Thêm Server] → modal AD-03
+□ Nút [+ Thêm Server] → chuyển trang AD-03
 ```
 
 #### AD-03: Modal Add/Edit Server
@@ -617,7 +617,7 @@ assets/js/
 □ Max concurrent input
 □ Notes textarea
 □ Nút [Test Connection]: inline result box (version, latency, zones, DNSSEC)
-□ Nút [Lưu Server]: fake save → modal đóng → server xuất hiện trong list
+□ Nút [Lưu Server]: fake save → navigate về danh sách → server xuất hiện trong list
 ```
 
 #### AD-04: Global Domain List
@@ -683,7 +683,7 @@ assets/js/
 □ Bảng 3 plans: tên, records, subdomains, redirects, email, DDNS, DNSSEC, SSL
 □ ∞ hiện cho giá trị 0 (unlimited)
 □ ✅/❌ hiện cho boolean features
-□ Click [Sửa] → modal form
+□ Click [Sửa] → form riêng biệt
 ```
 
 #### AD-10: Drift Reports

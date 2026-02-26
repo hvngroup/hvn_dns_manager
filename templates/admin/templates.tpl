@@ -8,7 +8,7 @@
         <!-- Loop Template Items -->
         <template x-for="tpl in templates" :key="tpl.id">
             <div class="hvn-col-md-6 col-lhvn-g-4 hvn-mb-4">
-                <div class="hvn-card hvn-shadow-sm h-100 hvn-border-0" :class="{ 'hvn-border-primary hvn-border-start hvn-border-4': tpl.is_default, 'hvn-bg-light': !tpl.is_visible}">
+                <div class="hvn-card hvn-shadow-sm h-100 hvn-border-0" :class="{ 'hvn-border-primary hvn-border-start': tpl.is_default, 'hvn-bg-light': !tpl.is_visible}">
                     <div class="hvn-card-body position-relative">
                         <template x-if="tpl.is_default">
                             <span class="position-absolute tohvn-p-0 end-0 badge hvn-bg-primary hvn-m-2" style="font-size: 0.7rem;"><i class="bi bi-star-fill hvn-text-warning"></i> DEFAULT</span>

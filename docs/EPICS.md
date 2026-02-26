@@ -178,7 +178,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `CLIENT-006` | Form **Thêm Record**: modal popup với các trường Name, Type (dropdown), Value, TTL (mặc định 3600), Priority (hiện khi MX/SRV). Submit qua Ajax | 3 |
+| `CLIENT-006` | Form **Thêm/Sửa Record**: trang giao diện riêng biệt với các trường Name, Type (dropdown), Value, TTL (mặc định 3600), Priority (hiện khi MX/SRV). Submit qua Ajax | 3 |
 | `CLIENT-007` | **Validation phía server** trước khi lưu queue: kiểm tra format IP (cho A/AAAA), FQDN (cho CNAME/MX/NS), syntax TXT/SPF, giá trị Priority hợp lệ, SRV format (priority weight port target) | 3 |
 | `CLIENT-008` | **Validation chống xung đột**: không cho tạo CNAME trùng name với record A đã có (vi phạm RFC), cảnh báo duplicate MX cùng priority | 2 |
 | `CLIENT-009` | Luồng lưu: Validate OK → Lưu `mod_hvndns_records` → Gọi `QueueManager::dispatch('ADD', $payload)` → Trả JSON success cho UI → UI hiển thị record mới với badge `Pending` | 2 |

@@ -8,7 +8,7 @@
         <!-- Loop qua các server -->
         <template x-for="server in servers" :key="server.id">
             <div class="hvn-col-12 hvn-mb-3">
-                <div class="hvn-card hvn-shadow-sm hvn-border-0" :class="{ 'hvn-border-start hvn-border-4 hvn-border-success': server.status === 'online' && server.is_active, 'hvn-border-start hvn-border-4 hvn-border-danger': server.status === 'offline' && server.is_active, 'hvn-border-start hvn-border-4 border-secondary opacity-75': !server.is_active }">
+                <div class="hvn-card hvn-shadow-sm hvn-border-0" :class="{ 'hvn-border-start hvn-border-success': server.status === 'online' && server.is_active, 'hvn-border-start hvn-border-danger': server.status === 'offline' && server.is_active, 'hvn-border-start border-secondary opacity-75': !server.is_active }">
                     <div class="hvn-card-body">
                         <div class="hvn-row hvn-align-items-center">
                             <!-- Server Info Info -->

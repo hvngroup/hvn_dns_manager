@@ -15,7 +15,7 @@
 **Client Area (Khách hàng)**
 1. [CL-01: Danh sách Domain](#cl-01-danh-sách-domain)
 2. [CL-02: DNS Editor — Màn hình chính](#cl-02-dns-editor--màn-hình-chính)
-3. [CL-03: Modal Thêm/Sửa Record](#cl-03-modal-thêmsửa-record)
+3. [CL-03: Trang Thêm/Sửa Record](#cl-03-trang-thêmsửa-record)
 4. [CL-04: Tab Redirects](#cl-04-tab-redirects)
 5. [CL-05: Tab Email Forwarding](#cl-05-tab-email-forwarding)
 6. [CL-06: Tab DNSSEC](#cl-06-tab-dnssec)
@@ -25,7 +25,7 @@
 **Admin Area (Quản trị viên)**
 9. [AD-01: Dashboard](#ad-01-dashboard)
 10. [AD-02: Server Management](#ad-02-server-management)
-11. [AD-03: Modal Thêm/Sửa Server](#ad-03-modal-thêmsửa-server)
+11. [AD-03: Trang Thêm/Sửa Server](#ad-03-trang-thêmsửa-server)
 12. [AD-04: Global Domain List](#ad-04-global-domain-list)
 13. [AD-05: Admin DNS Editor](#ad-05-admin-dns-editor)
 14. [AD-06: Sync Logs](#ad-06-sync-logs)
@@ -227,10 +227,10 @@ $alpine       Alpine.js reactive data
 
 ---
 
-## CL-03: Modal Thêm/Sửa Record
+## CL-03: Trang Thêm/Sửa Record
 
 > **Trigger**: Click `[+ Thêm bản ghi]` hoặc `[✏️]` trên bảng  
-> **Kiểu**: Custom Modal (overlay CSS thuần, không chuyển trang)
+> **Kiểu**: Trang giao diện riêng (`record_edit.tpl`)
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -297,7 +297,7 @@ $alpine       Alpine.js reactive data
 - Chọn type → helper text thay đổi (VD: A → "Địa chỉ IPv4", CNAME → "Tên miền đích (FQDN)")
 - Trường Priority/Weight/Port chỉ hiện khi MX hoặc SRV
 - Validation real-time (Alpine.js): kiểm tra format ngay khi user rời khỏi field
-- Khi submit: nút `[💾 Lưu]` chuyển thành spinner → success toast → modal tự đóng → record xuất hiện trong bảng với badge 🟡 Pending
+- Khi submit: nút `[💾 Lưu]` chuyển thành spinner → success toast → chuyển hướng về trang danh sách → record xuất hiện trong bảng với badge 🟡 Pending
 
 **Khi Sửa (Edit Mode)**:
 - Title đổi thành: "Sửa bản ghi DNS"
@@ -739,7 +739,7 @@ $alpine       Alpine.js reactive data
 
 ---
 
-## AD-03: Modal Thêm/Sửa Server
+## AD-03: Trang Thêm/Sửa Server
 
 ```
 ┌────────────────────────────────────────────────────────┐

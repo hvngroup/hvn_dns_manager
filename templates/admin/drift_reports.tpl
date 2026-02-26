@@ -28,7 +28,7 @@
 
     <!-- Cảnh báo nếu có drift -->
     <template x-if="driftedDomains.length > 0 && filterStatus !== 'resolved'">
-        <div class="alert alert-warning hvn-border-warning hvn-border-start hvn-border-4 hvn-shadow-sm hvn-mb-4">
+        <div class="alert alert-warning hvn-border-warning hvn-border-start hvn-shadow-sm hvn-mb-4">
             <h5 class="alert-heading hvn-text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill"></i> Phát hiện <span x-text="driftedDomains.length"></span> domain có dữ liệu sai lệch!</h5>
             <p class="hvn-mb-0">Dữ liệu trên WHMCS (được coi là Source of Truth) đang khác biệt so với dữ liệu thực tế trên DirectAdmin Server.</p>
         </div>
