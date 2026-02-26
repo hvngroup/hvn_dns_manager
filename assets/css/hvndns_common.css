@@ -223,13 +223,6 @@
 .hvn-g-5, .hvn-gx-5 { --hvn-gutter-x: 3rem; }
 .hvn-g-5, .hvn-gy-5 { --hvn-gutter-y: 3rem; }
 
-/* Un-prefixed gutter aliases (used in some templates) */
-.g-0 { --hvn-gutter-x: 0; --hvn-gutter-y: 0; }
-.g-1 { --hvn-gutter-x: 0.25rem; --hvn-gutter-y: 0.25rem; }
-.g-2 { --hvn-gutter-x: 0.5rem; --hvn-gutter-y: 0.5rem; }
-.g-3 { --hvn-gutter-x: 1rem; --hvn-gutter-y: 1rem; }
-.g-4 { --hvn-gutter-x: 1.5rem; --hvn-gutter-y: 1.5rem; }
-.g-5 { --hvn-gutter-x: 3rem; --hvn-gutter-y: 3rem; }
 
 
 /* =======================================================================
@@ -242,12 +235,6 @@
 .hvn-d-flex         { display: flex !important; }
 .hvn-d-inline-flex  { display: inline-flex !important; }
 
-/* Un-prefixed aliases (still in some templates) */
-.d-none         { display: none !important; }
-.d-block        { display: block !important; }
-.d-inline-block { display: inline-block !important; }
-.d-flex         { display: flex !important; }
-.d-inline-flex  { display: inline-flex !important; }
 
 /* =======================================================================
    5. FLEXBOX UTILITIES
@@ -281,13 +268,6 @@
 .hvn-gap-3 { gap: 1rem !important; }
 .hvn-gap-4 { gap: 1.5rem !important; }
 
-/* Un-prefixed flex aliases */
-.justify-content-between { justify-content: space-between !important; }
-.justify-content-center  { justify-content: center !important; }
-.justify-content-end     { justify-content: flex-end !important; }
-.align-items-center      { align-items: center !important; }
-.align-items-start       { align-items: flex-start !important; }
-.align-items-end         { align-items: flex-end !important; }
 
 /* =======================================================================
    6. SPACING (Margin & Padding)
@@ -340,20 +320,6 @@
 .hvn-me-4 { margin-right: 1.5rem !important; }
 .hvn-me-auto { margin-right: auto !important; }
 
-/* Un-prefixed margin aliases */
-.mb-0 { margin-bottom: 0 !important; }
-.mb-1 { margin-bottom: 0.25rem !important; }
-.mb-2 { margin-bottom: 0.5rem !important; }
-.mb-3 { margin-bottom: 1rem !important; }
-.mb-4 { margin-bottom: 1.5rem !important; }
-.mt-1 { margin-top: 0.25rem !important; }
-.mt-2 { margin-top: 0.5rem !important; }
-.mt-3 { margin-top: 1rem !important; }
-.mt-4 { margin-top: 1.5rem !important; }
-.ms-1 { margin-left: 0.25rem !important; }
-.ms-2 { margin-left: 0.5rem !important; }
-.me-1 { margin-right: 0.25rem !important; }
-.me-2 { margin-right: 0.5rem !important; }
 
 /* --- Padding --- */
 .hvn-p-0  { padding: 0 !important; }
@@ -399,15 +365,6 @@
 .hvn-pe-3 { padding-right: 1rem !important; }
 .hvn-pe-4 { padding-right: 1.5rem !important; }
 
-/* Un-prefixed padding aliases */
-.pb-2 { padding-bottom: 0.5rem !important; }
-.pb-3 { padding-bottom: 1rem !important; }
-.pt-3 { padding-top: 1rem !important; }
-.pt-0 { padding-top: 0 !important; }
-.pb-0 { padding-bottom: 0 !important; }
-.pe-2 { padding-right: 0.5rem !important; }
-.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-.p-0  { padding: 0 !important; }
 
 /* =======================================================================
    7. SIZING UTILITIES
@@ -450,23 +407,6 @@
 .hvn-fs-5 { font-size: 20px !important; }
 .hvn-fs-6 { font-size: 16px !important; }
 
-/* Un-prefixed text aliases */
-.text-start     { text-align: left !important; }
-.text-end       { text-align: right !important; }
-.text-center    { text-align: center !important; }
-.text-uppercase { text-transform: uppercase !important; }
-.text-lowercase { text-transform: lowercase !important; }
-.text-nowrap    { white-space: nowrap !important; }
-.text-truncate  { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.text-decoration-none { text-decoration: none !important; }
-.fw-bold        { font-weight: 700 !important; }
-.fw-semibold    { font-weight: 600 !important; }
-.fw-medium      { font-weight: 500 !important; }
-.fw-normal      { font-weight: 400 !important; }
-.small          { font-size: 12px !important; }
-.font-monospace { font-family: var(--hvn-font-monospace) !important; }
-.display-6      { font-size: 36px; font-weight: 300; line-height: 1.2; }
-.list-unstyled  { padding-left: 0; list-style: none; }
 
 /* =======================================================================
    9. COLORS (Text & Background)
@@ -483,47 +423,6 @@
 .hvn-text-muted     { color: var(--hvn-secondary) !important; }
 .hvn-text-white     { color: #fff !important; }
 
-/* Un-prefixed text color aliases */
-.text-primary   { color: var(--hvn-primary) !important; }
-.text-secondary { color: var(--hvn-secondary) !important; }
-.text-success   { color: var(--hvn-success) !important; }
-.text-danger    { color: var(--hvn-danger) !important; }
-.text-warning   { color: var(--hvn-warning) !important; }
-.text-info      { color: var(--hvn-info) !important; }
-.text-dark      { color: var(--hvn-dark) !important; }
-.text-muted     { color: var(--hvn-secondary) !important; }
-.text-white     { color: #fff !important; }
-
-/* Background colors */
-.hvn-bg-primary   { background-color: var(--hvn-primary) !important; }
-.hvn-bg-secondary { background-color: var(--hvn-secondary) !important; }
-.hvn-bg-success   { background-color: var(--hvn-success) !important; }
-.hvn-bg-danger    { background-color: var(--hvn-danger) !important; }
-.hvn-bg-warning   { background-color: var(--hvn-warning) !important; }
-.hvn-bg-info      { background-color: var(--hvn-info) !important; }
-.hvn-bg-dark      { background-color: var(--hvn-dark) !important; }
-.hvn-bg-light     { background-color: var(--hvn-light) !important; }
-.hvn-bg-white     { background-color: #fff !important; }
-.hvn-bg-transparent { background-color: transparent !important; }
-
-/* Subtle backgrounds */
-.hvn-bg-success-subtle { background-color: #d1e7dd !important; }
-.hvn-bg-danger-subtle  { background-color: #f8d7da !important; }
-.hvn-bg-warning-subtle { background-color: #fff3cd !important; }
-.hvn-bg-info-subtle    { background-color: #cff4fc !important; }
-.hvn-bg-primary-subtle { background-color: #fce4e4 !important; }
-
-/* Un-prefixed bg aliases */
-.bg-white   { background-color: #fff !important; }
-.bg-light   { background-color: var(--hvn-light) !important; }
-.bg-primary { background-color: var(--hvn-primary) !important; }
-.bg-success { background-color: var(--hvn-success) !important; }
-.bg-danger  { background-color: var(--hvn-danger) !important; }
-.bg-warning { background-color: var(--hvn-warning) !important; }
-.bg-info    { background-color: var(--hvn-info) !important; }
-.bg-success-subtle { background-color: #d1e7dd !important; }
-.bg-danger-subtle  { background-color: #f8d7da !important; }
-.bg-warning-subtle { background-color: #fff3cd !important; }
 
 /* =======================================================================
    10. BORDERS & SHADOWS
@@ -559,33 +458,6 @@
 .hvn-shadow-lg { box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; }
 .hvn-shadow-none { box-shadow: none !important; }
 
-/* Un-prefixed border aliases */
-.border        { border: 1px solid var(--hvn-border-color) !important; }
-.border-0      { border: 0 !important; }
-.border-top    { border-top: 1px solid var(--hvn-border-color) !important; }
-.border-bottom { border-bottom: 1px solid var(--hvn-border-color) !important; }
-.border-start  { border-left: 1px solid var(--hvn-border-color) !important; }
-.border-end    { border-right: 1px solid var(--hvn-border-color) !important; }
-.border-success { border-color: var(--hvn-success) !important; }
-.border-danger  { border-color: var(--hvn-danger) !important; }
-.border-warning { border-color: var(--hvn-warning) !important; }
-.border-4       { border-width: 4px !important; }
-.shadow-sm      { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
-.border-bottom-0 { border-bottom: 0 !important; }
-.border-top-0    { border-top: 0 !important; }
-
-/* Opacity */
-.hvn-opacity-25 { opacity: 0.25 !important; }
-.hvn-opacity-50 { opacity: 0.5 !important; }
-.hvn-opacity-75 { opacity: 0.75 !important; }
-.opacity-50     { opacity: 0.5 !important; }
-
-/* Position */
-.hvn-position-relative { position: relative !important; }
-.hvn-position-absolute { position: absolute !important; }
-.hvn-position-static   { position: static !important; }
-.hvn-overflow-hidden { overflow: hidden !important; }
-.hvn-overflow-auto   { overflow: auto !important; }
 
 /* =======================================================================
    11. COMPONENTS — Card
@@ -642,20 +514,6 @@
 .badge.bg-warning,
 .badge.bg-light { color: #000; }
 
-/* Un-prefixed badge alias */
-.badge {
-    display: inline-block;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: var(--hvn-border-radius);
-}
-.badge.bg-light { color: var(--hvn-dark); background-color: var(--hvn-light) !important; }
 
 /* =======================================================================
    13. COMPONENTS — Alert
@@ -712,12 +570,6 @@
     border-color: var(--hvn-primary);
 }
 
-/* Un-prefixed list-group aliases */
-.list-group       { display: flex; flex-direction: column; padding-left: 0; margin-bottom: 0; }
-.list-group-flush { border-radius: 0; }
-.list-group-item  { position: relative; display: block; padding: 0.5rem 1rem; border: 1px solid var(--hvn-border-color); }
-.list-group-flush > .list-group-item { border-width: 0 0 1px; }
-.list-group-flush > .list-group-item:last-child { border-bottom-width: 0; }
 
 /* =======================================================================
    15. COMPONENTS — Progress
@@ -793,29 +645,6 @@
 .hvn-btn-outline-warning   { color: var(--hvn-warning); border-color: var(--hvn-warning); background-color: transparent; }
 .hvn-btn-outline-warning:hover { color: #000; background-color: var(--hvn-warning); }
 
-/* Un-prefixed button aliases (still in some templates) */
-.btn-sm   { padding: 4px 8px; font-size: 13px; border-radius: var(--hvn-border-radius-sm); }
-.btn-lg   { padding: 8px 16px; font-size: 18px; border-radius: var(--hvn-border-radius-lg); }
-.btn-light { color: #000; background-color: var(--hvn-light); border-color: var(--hvn-light); }
-.btn-light:hover { background-color: #e2e6ea; border-color: #dae0e5; }
-.btn-outline-info      { color: var(--hvn-info); border-color: var(--hvn-info); background-color: transparent; }
-.btn-outline-info:hover { color: #000; background-color: var(--hvn-info); }
-.btn-outline-secondary { color: var(--hvn-secondary); border-color: var(--hvn-secondary); background-color: transparent; }
-.btn-outline-secondary:hover { color: #fff; background-color: var(--hvn-secondary); }
-.btn-outline-danger    { color: var(--hvn-danger); border-color: var(--hvn-danger); background-color: transparent; }
-.btn-outline-danger:hover { color: #fff; background-color: var(--hvn-danger); }
-.btn-outline-success   { color: var(--hvn-success); border-color: var(--hvn-success); background-color: transparent; }
-.btn-outline-success:hover { color: #fff; background-color: var(--hvn-success); }
-
-/* Button group */
-.btn-group     { position: relative; display: inline-flex; vertical-align: middle; }
-.btn-group-sm > .hvn-btn, .btn-group-sm > .btn { padding: 4px 8px; font-size: 13px; }
-.btn-group > .hvn-btn:not(:first-child),
-.btn-group > .btn:not(:first-child) { margin-left: -1px; }
-.btn-group > .hvn-btn:not(:last-child):not(.dropdown-toggle),
-.btn-group > .btn:not(:last-child):not(.dropdown-toggle) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
-.btn-group > .hvn-btn:not(:first-child),
-.btn-group > .btn:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 
 /* =======================================================================
    17. COMPONENTS — Form Controls
@@ -862,18 +691,6 @@
     font-weight: 500;
 }
 
-/* Un-prefixed form aliases */
-.form-control { display: block; width: 100%; padding: 6px 12px; font-size: 14px; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
-.form-control:focus { border-color: #f29a99; outline: 0; box-shadow: 0 0 0 4px rgba(234, 69, 68, 0.25); }
-.form-select  { display: block; width: 100%; padding: 6px 36px 6px 12px; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
-.form-label   { margin-bottom: 8px; font-weight: 500; }
-.form-check   { display: block; min-height: 24px; padding-left: 24px; margin-bottom: 2px; }
-.form-check-label { cursor: pointer; }
-.form-check-input { flex-shrink: 0; width: 16px; height: 16px; margin-top: 4px; vertical-align: top; }
-.form-text    { margin-top: 4px; font-size: 12px; color: var(--hvn-secondary); }
-.input-group  { position: relative; display: flex; flex-wrap: wrap; align-items: stretch; width: 100%; }
-.input-group > .form-control,
-.input-group > .form-select { position: relative; flex: 1 1 auto; width: 1%; min-width: 0; }
 
 /* =======================================================================
    18. COMPONENTS — Spinner
@@ -1326,3 +1143,216 @@
     white-space: nowrap !important;
     border: 0 !important;
 }
+
+/* =======================================================================
+   SCOPED ALIASES — Các class thông dụng được scope vào .hvn-wrapper
+   để tránh conflict với WHMCS CSS global.
+   Chỉ có hiệu lực bên trong <div class="hvn-wrapper"> hoặc .hvn-admin-layout
+   ======================================================================= */
+
+/* --- Display --- */
+.hvn-wrapper .d-none,         .hvn-admin-layout .d-none         { display: none !important; }
+.hvn-wrapper .d-block,        .hvn-admin-layout .d-block        { display: block !important; }
+.hvn-wrapper .d-inline-block, .hvn-admin-layout .d-inline-block { display: inline-block !important; }
+.hvn-wrapper .d-flex,         .hvn-admin-layout .d-flex         { display: flex !important; }
+.hvn-wrapper .d-inline-flex,  .hvn-admin-layout .d-inline-flex  { display: inline-flex !important; }
+
+/* --- Flexbox --- */
+.hvn-wrapper .justify-content-start,   .hvn-admin-layout .justify-content-start   { justify-content: flex-start !important; }
+.hvn-wrapper .justify-content-end,     .hvn-admin-layout .justify-content-end     { justify-content: flex-end !important; }
+.hvn-wrapper .justify-content-center,  .hvn-admin-layout .justify-content-center  { justify-content: center !important; }
+.hvn-wrapper .justify-content-between, .hvn-admin-layout .justify-content-between { justify-content: space-between !important; }
+.hvn-wrapper .justify-content-around,  .hvn-admin-layout .justify-content-around  { justify-content: space-around !important; }
+.hvn-wrapper .align-items-start,   .hvn-admin-layout .align-items-start   { align-items: flex-start !important; }
+.hvn-wrapper .align-items-end,     .hvn-admin-layout .align-items-end     { align-items: flex-end !important; }
+.hvn-wrapper .align-items-center,  .hvn-admin-layout .align-items-center  { align-items: center !important; }
+.hvn-wrapper .align-items-baseline,.hvn-admin-layout .align-items-baseline{ align-items: baseline !important; }
+.hvn-wrapper .flex-wrap,   .hvn-admin-layout .flex-wrap   { flex-wrap: wrap !important; }
+.hvn-wrapper .flex-nowrap, .hvn-admin-layout .flex-nowrap { flex-wrap: nowrap !important; }
+.hvn-wrapper .flex-grow-1, .hvn-admin-layout .flex-grow-1 { flex-grow: 1 !important; }
+.hvn-wrapper .flex-shrink-0,.hvn-admin-layout .flex-shrink-0{ flex-shrink: 0 !important; }
+.hvn-wrapper .gap-1, .hvn-admin-layout .gap-1 { gap: 0.25rem !important; }
+.hvn-wrapper .gap-2, .hvn-admin-layout .gap-2 { gap: 0.5rem !important; }
+.hvn-wrapper .gap-3, .hvn-admin-layout .gap-3 { gap: 1rem !important; }
+.hvn-wrapper .gap-4, .hvn-admin-layout .gap-4 { gap: 1.5rem !important; }
+
+/* --- Margin --- */
+.hvn-wrapper .mb-0, .hvn-admin-layout .mb-0 { margin-bottom: 0 !important; }
+.hvn-wrapper .mb-1, .hvn-admin-layout .mb-1 { margin-bottom: 0.25rem !important; }
+.hvn-wrapper .mb-2, .hvn-admin-layout .mb-2 { margin-bottom: 0.5rem !important; }
+.hvn-wrapper .mb-3, .hvn-admin-layout .mb-3 { margin-bottom: 1rem !important; }
+.hvn-wrapper .mb-4, .hvn-admin-layout .mb-4 { margin-bottom: 1.5rem !important; }
+.hvn-wrapper .mt-0, .hvn-admin-layout .mt-0 { margin-top: 0 !important; }
+.hvn-wrapper .mt-1, .hvn-admin-layout .mt-1 { margin-top: 0.25rem !important; }
+.hvn-wrapper .mt-2, .hvn-admin-layout .mt-2 { margin-top: 0.5rem !important; }
+.hvn-wrapper .mt-3, .hvn-admin-layout .mt-3 { margin-top: 1rem !important; }
+.hvn-wrapper .mt-4, .hvn-admin-layout .mt-4 { margin-top: 1.5rem !important; }
+.hvn-wrapper .ms-0, .hvn-admin-layout .ms-0 { margin-left: 0 !important; }
+.hvn-wrapper .ms-1, .hvn-admin-layout .ms-1 { margin-left: 0.25rem !important; }
+.hvn-wrapper .ms-2, .hvn-admin-layout .ms-2 { margin-left: 0.5rem !important; }
+.hvn-wrapper .ms-3, .hvn-admin-layout .ms-3 { margin-left: 1rem !important; }
+.hvn-wrapper .ms-auto, .hvn-admin-layout .ms-auto { margin-left: auto !important; }
+.hvn-wrapper .me-0, .hvn-admin-layout .me-0 { margin-right: 0 !important; }
+.hvn-wrapper .me-1, .hvn-admin-layout .me-1 { margin-right: 0.25rem !important; }
+.hvn-wrapper .me-2, .hvn-admin-layout .me-2 { margin-right: 0.5rem !important; }
+.hvn-wrapper .me-3, .hvn-admin-layout .me-3 { margin-right: 1rem !important; }
+.hvn-wrapper .me-auto, .hvn-admin-layout .me-auto { margin-right: auto !important; }
+.hvn-wrapper .mx-auto, .hvn-admin-layout .mx-auto { margin-left: auto !important; margin-right: auto !important; }
+.hvn-wrapper .my-2, .hvn-admin-layout .my-2 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+.hvn-wrapper .my-3, .hvn-admin-layout .my-3 { margin-top: 1rem !important; margin-bottom: 1rem !important; }
+
+/* --- Padding --- */
+.hvn-wrapper .p-0, .hvn-admin-layout .p-0 { padding: 0 !important; }
+.hvn-wrapper .p-1, .hvn-admin-layout .p-1 { padding: 0.25rem !important; }
+.hvn-wrapper .p-2, .hvn-admin-layout .p-2 { padding: 0.5rem !important; }
+.hvn-wrapper .p-3, .hvn-admin-layout .p-3 { padding: 1rem !important; }
+.hvn-wrapper .p-4, .hvn-admin-layout .p-4 { padding: 1.5rem !important; }
+.hvn-wrapper .pb-0, .hvn-admin-layout .pb-0 { padding-bottom: 0 !important; }
+.hvn-wrapper .pb-2, .hvn-admin-layout .pb-2 { padding-bottom: 0.5rem !important; }
+.hvn-wrapper .pb-3, .hvn-admin-layout .pb-3 { padding-bottom: 1rem !important; }
+.hvn-wrapper .pt-0, .hvn-admin-layout .pt-0 { padding-top: 0 !important; }
+.hvn-wrapper .pt-2, .hvn-admin-layout .pt-2 { padding-top: 0.5rem !important; }
+.hvn-wrapper .pt-3, .hvn-admin-layout .pt-3 { padding-top: 1rem !important; }
+.hvn-wrapper .pe-2, .hvn-admin-layout .pe-2 { padding-right: 0.5rem !important; }
+.hvn-wrapper .pe-3, .hvn-admin-layout .pe-3 { padding-right: 1rem !important; }
+.hvn-wrapper .ps-2, .hvn-admin-layout .ps-2 { padding-left: 0.5rem !important; }
+.hvn-wrapper .ps-3, .hvn-admin-layout .ps-3 { padding-left: 1rem !important; }
+.hvn-wrapper .py-1, .hvn-admin-layout .py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+.hvn-wrapper .py-2, .hvn-admin-layout .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.hvn-wrapper .py-3, .hvn-admin-layout .py-3 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+.hvn-wrapper .px-2, .hvn-admin-layout .px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+.hvn-wrapper .px-3, .hvn-admin-layout .px-3 { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+/* --- Gutters --- */
+.hvn-wrapper .g-0, .hvn-admin-layout .g-0 { --hvn-gutter-x: 0; --hvn-gutter-y: 0; }
+.hvn-wrapper .g-1, .hvn-admin-layout .g-1 { --hvn-gutter-x: 0.25rem; --hvn-gutter-y: 0.25rem; }
+.hvn-wrapper .g-2, .hvn-admin-layout .g-2 { --hvn-gutter-x: 0.5rem; --hvn-gutter-y: 0.5rem; }
+.hvn-wrapper .g-3, .hvn-admin-layout .g-3 { --hvn-gutter-x: 1rem; --hvn-gutter-y: 1rem; }
+.hvn-wrapper .g-4, .hvn-admin-layout .g-4 { --hvn-gutter-x: 1.5rem; --hvn-gutter-y: 1.5rem; }
+
+/* --- Sizing --- */
+.hvn-wrapper .w-25,  .hvn-admin-layout .w-25  { width: 25% !important; }
+.hvn-wrapper .w-50,  .hvn-admin-layout .w-50  { width: 50% !important; }
+.hvn-wrapper .w-75,  .hvn-admin-layout .w-75  { width: 75% !important; }
+.hvn-wrapper .w-100, .hvn-admin-layout .w-100 { width: 100% !important; }
+.hvn-wrapper .w-auto,.hvn-admin-layout .w-auto { width: auto !important; }
+.hvn-wrapper .h-100, .hvn-admin-layout .h-100 { height: 100% !important; }
+.hvn-wrapper .mw-100,.hvn-admin-layout .mw-100 { max-width: 100% !important; }
+
+/* --- Typography --- */
+.hvn-wrapper .text-start,          .hvn-admin-layout .text-start          { text-align: left !important; }
+.hvn-wrapper .text-end,            .hvn-admin-layout .text-end            { text-align: right !important; }
+.hvn-wrapper .text-center,         .hvn-admin-layout .text-center         { text-align: center !important; }
+.hvn-wrapper .text-uppercase,      .hvn-admin-layout .text-uppercase      { text-transform: uppercase !important; }
+.hvn-wrapper .text-lowercase,      .hvn-admin-layout .text-lowercase      { text-transform: lowercase !important; }
+.hvn-wrapper .text-nowrap,         .hvn-admin-layout .text-nowrap         { white-space: nowrap !important; }
+.hvn-wrapper .text-truncate,       .hvn-admin-layout .text-truncate       { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hvn-wrapper .text-decoration-none,.hvn-admin-layout .text-decoration-none{ text-decoration: none !important; }
+.hvn-wrapper .text-break,          .hvn-admin-layout .text-break          { word-wrap: break-word !important; word-break: break-word !important; }
+.hvn-wrapper .fw-bold,    .hvn-admin-layout .fw-bold    { font-weight: 700 !important; }
+.hvn-wrapper .fw-semibold,.hvn-admin-layout .fw-semibold { font-weight: 600 !important; }
+.hvn-wrapper .fw-medium,  .hvn-admin-layout .fw-medium  { font-weight: 500 !important; }
+.hvn-wrapper .fw-normal,  .hvn-admin-layout .fw-normal  { font-weight: 400 !important; }
+.hvn-wrapper .small,      .hvn-admin-layout .small       { font-size: 12px !important; }
+.hvn-wrapper .font-monospace, .hvn-admin-layout .font-monospace { font-family: var(--hvn-font-monospace) !important; }
+.hvn-wrapper .list-unstyled,  .hvn-admin-layout .list-unstyled  { padding-left: 0; list-style: none; }
+.hvn-wrapper .align-middle,   .hvn-admin-layout .align-middle   { vertical-align: middle !important; }
+
+/* --- Text Colors --- */
+.hvn-wrapper .text-primary,   .hvn-admin-layout .text-primary   { color: var(--hvn-primary) !important; }
+.hvn-wrapper .text-secondary, .hvn-admin-layout .text-secondary  { color: var(--hvn-secondary) !important; }
+.hvn-wrapper .text-success,   .hvn-admin-layout .text-success   { color: var(--hvn-success) !important; }
+.hvn-wrapper .text-danger,    .hvn-admin-layout .text-danger    { color: var(--hvn-danger) !important; }
+.hvn-wrapper .text-warning,   .hvn-admin-layout .text-warning   { color: var(--hvn-warning) !important; }
+.hvn-wrapper .text-info,      .hvn-admin-layout .text-info      { color: var(--hvn-info) !important; }
+.hvn-wrapper .text-dark,      .hvn-admin-layout .text-dark      { color: var(--hvn-dark) !important; }
+.hvn-wrapper .text-muted,     .hvn-admin-layout .text-muted     { color: var(--hvn-secondary) !important; }
+.hvn-wrapper .text-white,     .hvn-admin-layout .text-white     { color: #fff !important; }
+
+/* --- Background Colors --- */
+.hvn-wrapper .bg-white,          .hvn-admin-layout .bg-white          { background-color: #fff !important; }
+.hvn-wrapper .bg-light,          .hvn-admin-layout .bg-light          { background-color: var(--hvn-light) !important; }
+.hvn-wrapper .bg-primary,        .hvn-admin-layout .bg-primary        { background-color: var(--hvn-primary) !important; }
+.hvn-wrapper .bg-success,        .hvn-admin-layout .bg-success        { background-color: var(--hvn-success) !important; }
+.hvn-wrapper .bg-danger,         .hvn-admin-layout .bg-danger         { background-color: var(--hvn-danger) !important; }
+.hvn-wrapper .bg-warning,        .hvn-admin-layout .bg-warning        { background-color: var(--hvn-warning) !important; }
+.hvn-wrapper .bg-info,           .hvn-admin-layout .bg-info           { background-color: var(--hvn-info) !important; }
+.hvn-wrapper .bg-success-subtle, .hvn-admin-layout .bg-success-subtle { background-color: #d1e7dd !important; }
+.hvn-wrapper .bg-danger-subtle,  .hvn-admin-layout .bg-danger-subtle  { background-color: #f8d7da !important; }
+.hvn-wrapper .bg-warning-subtle, .hvn-admin-layout .bg-warning-subtle { background-color: #fff3cd !important; }
+
+/* --- Borders & Shadows --- */
+.hvn-wrapper .border,         .hvn-admin-layout .border         { border: 1px solid var(--hvn-border-color) !important; }
+.hvn-wrapper .border-0,       .hvn-admin-layout .border-0       { border: 0 !important; }
+.hvn-wrapper .border-top,     .hvn-admin-layout .border-top     { border-top: 1px solid var(--hvn-border-color) !important; }
+.hvn-wrapper .border-bottom,  .hvn-admin-layout .border-bottom  { border-bottom: 1px solid var(--hvn-border-color) !important; }
+.hvn-wrapper .border-start,   .hvn-admin-layout .border-start   { border-left: 1px solid var(--hvn-border-color) !important; }
+.hvn-wrapper .border-end,     .hvn-admin-layout .border-end     { border-right: 1px solid var(--hvn-border-color) !important; }
+.hvn-wrapper .border-success, .hvn-admin-layout .border-success { border-color: var(--hvn-success) !important; }
+.hvn-wrapper .border-danger,  .hvn-admin-layout .border-danger  { border-color: var(--hvn-danger) !important; }
+.hvn-wrapper .border-warning, .hvn-admin-layout .border-warning { border-color: var(--hvn-warning) !important; }
+.hvn-wrapper .border-4,         .hvn-admin-layout .border-4         { border-width: 4px !important; }
+.hvn-wrapper .border-bottom-0,  .hvn-admin-layout .border-bottom-0  { border-bottom: 0 !important; }
+.hvn-wrapper .border-top-0,     .hvn-admin-layout .border-top-0     { border-top: 0 !important; }
+.hvn-wrapper .rounded,    .hvn-admin-layout .rounded    { border-radius: var(--hvn-border-radius) !important; }
+.hvn-wrapper .rounded-pill,.hvn-admin-layout .rounded-pill { border-radius: var(--hvn-border-radius-pill) !important; }
+.hvn-wrapper .shadow-sm,  .hvn-admin-layout .shadow-sm  { box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important; }
+
+/* --- Position & Overflow --- */
+.hvn-wrapper .position-relative, .hvn-admin-layout .position-relative { position: relative !important; }
+.hvn-wrapper .position-absolute, .hvn-admin-layout .position-absolute { position: absolute !important; }
+.hvn-wrapper .overflow-hidden,   .hvn-admin-layout .overflow-hidden   { overflow: hidden !important; }
+.hvn-wrapper .overflow-auto,     .hvn-admin-layout .overflow-auto     { overflow: auto !important; }
+.hvn-wrapper .opacity-50,        .hvn-admin-layout .opacity-50        { opacity: 0.5 !important; }
+
+/* --- Components: Badge --- */
+.hvn-wrapper .badge, .hvn-admin-layout .badge {
+    display: inline-block; padding: 4px 8px; font-size: 12px; font-weight: 700;
+    line-height: 1; color: #fff; text-align: center; white-space: nowrap;
+    vertical-align: baseline; border-radius: var(--hvn-border-radius);
+}
+.hvn-wrapper .badge.bg-light,   .hvn-admin-layout .badge.bg-light   { color: var(--hvn-dark); background-color: var(--hvn-light) !important; }
+.hvn-wrapper .badge.bg-warning, .hvn-admin-layout .badge.bg-warning { color: #000; }
+
+/* --- Components: List Group --- */
+.hvn-wrapper .list-group       { display: flex; flex-direction: column; padding-left: 0; margin-bottom: 0; }
+.hvn-wrapper .list-group-flush { border-radius: 0; }
+.hvn-wrapper .list-group-item  { position: relative; display: block; padding: 0.5rem 1rem; border: 1px solid var(--hvn-border-color); }
+.hvn-wrapper .list-group-flush > .list-group-item { border-width: 0 0 1px; }
+.hvn-wrapper .list-group-flush > .list-group-item:last-child { border-bottom-width: 0; }
+
+/* --- Components: Table helpers --- */
+.hvn-wrapper .table-responsive,    .hvn-admin-layout .table-responsive    { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.hvn-wrapper .table-sm > :not(caption) > * > *, .hvn-admin-layout .table-sm > :not(caption) > * > * { padding: 0.25rem !important; }
+.hvn-wrapper .table-light > thead, .hvn-admin-layout .table-light > thead { background-color: #f8f9fa; color: #495057; }
+.hvn-wrapper .table-hover > tbody > tr:hover > *, .hvn-admin-layout .table-hover > tbody > tr:hover > * { background-color: rgba(0,0,0,0.04); }
+
+/* --- Form helpers (scoped) --- */
+.hvn-wrapper .form-label, .hvn-admin-layout .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 14px; }
+.hvn-wrapper .form-text,  .hvn-admin-layout .form-text  { display: block; margin-top: 0.25rem; font-size: 12px; color: var(--hvn-secondary); }
+.hvn-wrapper .form-check, .hvn-admin-layout .form-check {
+    display: block; min-height: 1.5rem; padding-left: 1.5em; margin-bottom: 0.125rem;
+}
+.hvn-wrapper .form-check-input, .hvn-admin-layout .form-check-input {
+    float: left; margin-left: -1.5em; width: 1em; height: 1em; margin-top: 0.25em;
+    vertical-align: top; appearance: none; background-color: #fff;
+    background-repeat: no-repeat; background-position: center; background-size: contain;
+    border: 1px solid rgba(0,0,0,0.25); border-radius: 0.25em;
+}
+.hvn-wrapper .form-check-input[type=radio], .hvn-admin-layout .form-check-input[type=radio] { border-radius: 50%; }
+.hvn-wrapper .form-check-input:checked, .hvn-admin-layout .form-check-input:checked { background-color: var(--hvn-primary); border-color: var(--hvn-primary); }
+.hvn-wrapper .form-check-label, .hvn-admin-layout .form-check-label { cursor: pointer; }
+.hvn-wrapper .form-switch, .hvn-admin-layout .form-switch { padding-left: 2.5em; }
+.hvn-wrapper .form-switch .form-check-input, .hvn-admin-layout .form-switch .form-check-input {
+    width: 2em; margin-left: -2.5em; border-radius: 2em;
+}
+.hvn-wrapper .form-switch .form-check-input:checked, .hvn-admin-layout .form-switch .form-check-input:checked {
+    background-color: var(--hvn-primary); border-color: var(--hvn-primary);
+}
+
+/* --- Buttons (scoped) --- */
+.hvn-wrapper .btn-sm,   .hvn-admin-layout .btn-sm   { padding: 4px 8px; font-size: 13px; border-radius: var(--hvn-border-radius-sm); }
+.hvn-wrapper .btn-lg,   .hvn-admin-layout .btn-lg   { padding: 8px 16px; font-size: 18px; border-radius: var(--hvn-border-radius-lg); }
+.hvn-wrapper .btn-light,.hvn-admin-layout .btn-light { color: #000; background-color: var(--hvn-light); border-color: var(--hvn-light); }
+.hvn-wrapper .btn-light:hover, .hvn-admin-layout .btn-light:hover { background-color: #e2e6ea; }
+
