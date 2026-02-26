@@ -1,23 +1,23 @@
 <div class="hvn-dns-admin hvn-drift-reports" x-data="driftManager()">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-arrow-left-right"></i> Báo cáo Lệch Dữ liệu (Drift Reports)</h2>
         <div>
-            <button class="btn btn-outline-primary me-2" @click="runScan()"><i class="bi bi-search"></i> Quét thủ công</button>
-            <button class="btn btn-primary" @click="openSettings()"><i class="bi bi-gear"></i> Cài đặt Auto-fix</button>
+            <button class="hvn-btn hvn-btn-outline-primary hvn-me-2" @click="runScan()"><i class="bi bi-search"></i> Quét thủ công</button>
+            <button class="hvn-btn hvn-btn-primary" @click="openSettings()"><i class="bi bi-gear"></i> Cài đặt Auto-fix</button>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body bg-light rounded d-flex justify-content-between align-items-center">
+    <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4">
+        <div class="hvn-card-body hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
             <div>
-                <span class="text-muted"><i class="bi bi-clock-history"></i> Lần quét gần nhất:</span> 
+                <span class="hvn-text-muted"><i class="bi bi-clock-history"></i> Lần quét gần nhất:</span> 
                 <strong>25/02/2026 02:15</strong>
-                <span class="mx-3 text-muted">|</span>
-                <span class="text-muted">Kế tiếp:</span>
+                <span class="mx-3 hvn-text-muted">|</span>
+                <span class="hvn-text-muted">Kế tiếp:</span>
                 <strong>26/02/2026 02:00</strong>
             </div>
             <div>
-                <select class="form-select form-select-sm d-inline-block w-auto" x-model="filterStatus">
+                <select class="hvn-form-select hvn-form-select-sm d-inline-block w-auto" x-model="filterStatus">
                     <option value="all">Tất cả báo cáo</option>
                     <option value="pending">Chỉ hiện sự cố (Pending)</option>
                     <option value="resolved">Đã xử lý (Resolved)</option>
@@ -28,15 +28,15 @@
 
     <!-- Cảnh báo nếu có drift -->
     <template x-if="driftedDomains.length > 0 && filterStatus !== 'resolved'">
-        <div class="alert alert-warning border-warning border-start border-4 shadow-sm mb-4">
-            <h5 class="alert-heading text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill"></i> Phát hiện <span x-text="driftedDomains.length"></span> domain có dữ liệu sai lệch!</h5>
-            <p class="mb-0">Dữ liệu trên WHMCS (được coi là Source of Truth) đang khác biệt so với dữ liệu thực tế trên DirectAdmin Server.</p>
+        <div class="alert alert-warning hvn-border-warning hvn-border-start hvn-border-4 hvn-shadow-sm hvn-mb-4">
+            <h5 class="alert-heading hvn-text-warning-emphasis"><i class="bi bi-exclamation-triangle-fill"></i> Phát hiện <span x-text="driftedDomains.length"></span> domain có dữ liệu sai lệch!</h5>
+            <p class="hvn-mb-0">Dữ liệu trên WHMCS (được coi là Source of Truth) đang khác biệt so với dữ liệu thực tế trên DirectAdmin Server.</p>
         </div>
     </template>
     
     <template x-if="driftedDomains.length === 0 || (filterStatus === 'pending' && driftedDomains.length === 0)">
-        <div class="text-center py-5 text-muted">
-            <i class="bi bi-shield-check display-1 text-success mb-3 opacity-50"></i>
+        <div class="hvn-text-center py-5 hvn-text-muted">
+            <i class="bi bi-shield-check display-1 hvn-text-success hvn-mb-3 opacity-50"></i>
             <h4>Đồng bộ hoàn hảo</h4>
             <p>Không phát hiện sự sai lệch dữ liệu nào giữa WHMCS và DirectAdmin.</p>
         </div>
@@ -45,78 +45,78 @@
     <!-- Danh sách Domain bị lệch -->
     <div class="accordion" id="driftAccordion">
         <template x-for="(domain, idx) in filteredDomains" :key="domain.id">
-            <div class="accordion-item mb-3 border-0 shadow-sm rounded overflow-hidden">
+            <div class="accordion-item hvn-mb-3 hvn-border-0 hvn-shadow-sm hvn-rounded overflow-hidden">
                 <h2 class="accordion-header" :id="'heading' + domain.id">
-                    <button class="accordion-button bg-white text-dark fw-bold border-bottom" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + domain.id" aria-expanded="true" :aria-controls="'collapse' + domain.id">
-                        <span class="fs-5 me-2" x-text="domain.name"></span> 
-                        <span class="badge bg-danger rounded-pill" x-text="domain.drifts.length + ' bản ghi lệch'"></span>
+                    <button class="accordion-button hvn-bg-white hvn-text-dark hvn-fw-bold hvn-border-bottom" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + domain.id" aria-expanded="true" :aria-controls="'collapse' + domain.id">
+                        <span class="fs-5 hvn-me-2" x-text="domain.name"></span> 
+                        <span class="hvn-badge hvn-bg-danger hvn-rounded-pill" x-text="domain.drifts.length + ' bản ghi lệch'"></span>
                     </button>
                 </h2>
                 <div :id="'collapse' + domain.id" class="accordion-collapse collapse show" :aria-labelledby="'heading' + domain.id" data-bs-parent="#driftAccordion">
-                    <div class="accordion-body p-0">
-                        <ul class="list-group list-group-flush">
+                    <div class="accordion-body hvn-p-0">
+                        <ul class="hvn-list-group hvn-list-group-flush">
                             <!-- Loop qua từng Drift trong Domain -->
                             <template x-for="(drift, dIdx) in domain.drifts" :key="drift.id">
-                                <li class="list-group-item p-4">
-                                    <div class="d-flex align-items-start">
-                                        <div class="me-3 mt-1">
+                                <li class="hvn-list-group-item hvn-p-4">
+                                    <div class="hvn-d-flex hvn-align-items-start">
+                                        <div class="hvn-me-3 hvn-mt-1">
                                             <!-- Icon theo loại lỗi -->
                                             <template x-if="drift.type === 'added_on_da'">
-                                                <i class="bi bi-patch-plus text-info fs-3" title="Có trên DA, không có trên WHMCS"></i>
+                                                <i class="bi bi-patch-plus hvn-text-info fs-3" title="Có trên DA, không có trên WHMCS"></i>
                                             </template>
                                             <template x-if="drift.type === 'missing_on_da'">
-                                                <i class="bi bi-patch-minus text-danger fs-3" title="Có trên WHMCS, thiếu trên DA"></i>
+                                                <i class="bi bi-patch-minus hvn-text-danger fs-3" title="Có trên WHMCS, thiếu trên DA"></i>
                                             </template>
                                             <template x-if="drift.type === 'modified'">
-                                                <i class="bi bi-patch-exclamation text-warning fs-3" title="Dữ liệu không khớp"></i>
+                                                <i class="bi bi-patch-exclamation hvn-text-warning fs-3" title="Dữ liệu không khớp"></i>
                                             </template>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h6 class="mb-0 fw-bold">
-                                                    <span class="badge bg-secondary me-2" x-text="drift.type"></span>
+                                            <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-2">
+                                                <h6 class="hvn-mb-0 hvn-fw-bold">
+                                                    <span class="hvn-badge hvn-bg-secondary hvn-me-2" x-text="drift.type"></span>
                                                     <span class="font-monospace" x-text="drift.record_type + ' ' + drift.record_name"></span>
                                                 </h6>
                                             </div>
                                             
-                                            <div class="row g-3 mb-3 font-monospace small">
-                                                <div class="col-md-6">
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-header py-1 bg-transparent border-bottom-0 text-muted fw-bold"><i class="bi bi-database"></i> WHMCS (Truth)</div>
-                                                        <div class="card-body py-2 text-break" x-html="formatRecord(drift.whmcs_val)"></div>
+                                            <div class="hvn-row g-3 hvn-mb-3 font-monospace small">
+                                                <div class="hvn-col-md-6">
+                                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
+                                                        <div class="hvn-card-header hvn-py-1 bg-transparent hvn-border-bottom-0 hvn-text-muted hvn-fw-bold"><i class="bi bi-database"></i> WHMCS (Truth)</div>
+                                                        <div class="hvn-card-body hvn-py-2 text-break" x-html="formatRecord(drift.whmcs_val)"></div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="card border-0 bg-light">
-                                                        <div class="card-header py-1 bg-transparent border-bottom-0 text-muted fw-bold"><i class="bi bi-server"></i> DirectAdmin</div>
-                                                        <div class="card-body py-2 text-break" x-text="drift.da_val || '(Không tồn tại)'"></div>
+                                                <div class="hvn-col-md-6">
+                                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
+                                                        <div class="hvn-card-header hvn-py-1 bg-transparent hvn-border-bottom-0 hvn-text-muted hvn-fw-bold"><i class="bi bi-server"></i> DirectAdmin</div>
+                                                        <div class="hvn-card-body hvn-py-2 text-break" x-text="drift.da_val || '(Không tồn tại)'"></div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="btn-group btn-group-sm">
                                                 <template x-if="drift.type === 'added_on_da'">
-                                                    <button class="btn btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
+                                                    <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
                                                 </template>
                                                 <template x-if="drift.type === 'added_on_da'">
-                                                    <button class="btn btn-outline-danger" @click="resolve(domain, drift, 'delete_da')"><i class="bi bi-trash"></i> Xóa trên DA</button>
+                                                    <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_da')"><i class="bi bi-trash"></i> Xóa trên DA</button>
                                                 </template>
 
                                                 <template x-if="drift.type === 'missing_on_da'">
-                                                    <button class="btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
+                                                    <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
                                                 </template>
                                                 <template x-if="drift.type === 'missing_on_da'">
-                                                    <button class="btn btn-outline-danger" @click="resolve(domain, drift, 'delete_whmcs')"><i class="bi bi-trash"></i> Xóa trong WHMCS</button>
+                                                    <button class="hvn-btn btn-outline-danger" @click="resolve(domain, drift, 'delete_whmcs')"><i class="bi bi-trash"></i> Xóa trong WHMCS</button>
                                                 </template>
 
                                                 <template x-if="drift.type === 'modified'">
-                                                    <button class="btn btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
+                                                    <button class="hvn-btn hvn-btn-outline-primary" @click="resolve(domain, drift, 'pull')"><i class="bi bi-box-arrow-in-down"></i> Pull DA → WHMCS</button>
                                                 </template>
                                                 <template x-if="drift.type === 'modified'">
-                                                    <button class="btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
+                                                    <button class="hvn-btn btn-outline-success" @click="resolve(domain, drift, 'push')"><i class="bi bi-box-arrow-up"></i> Push WHMCS → DA</button>
                                                 </template>
 
-                                                <button class="btn btn-outline-secondary" @click="resolve(domain, drift, 'ignore')"><i class="bi bi-eye-slash"></i> Bỏ qua</button>
+                                                <button class="hvn-btn btn-outline-secondary" @click="resolve(domain, drift, 'ignore')"><i class="bi bi-eye-slash"></i> Bỏ qua</button>
                                             </div>
                                         </div>
                                     </div>
@@ -133,33 +133,33 @@
     <div class="modal fade" id="autoFixModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-light">
+                <div class="modal-header hvn-bg-light">
                     <h5 class="modal-title"><i class="bi bi-gear"></i> Cài đặt Drift Auto-fix</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="text-muted small mb-4">Drift Detection quét dữ liệu Zone từ DirectAdmin mỗi đêm (cron) và so sánh với database WHMCS. Nếu có khác biệt, hệ thống xử lý thế nào?</p>
+                    <p class="hvn-text-muted small hvn-mb-4">Drift Detection quét dữ liệu Zone từ DirectAdmin mỗi đêm (cron) và so sánh với database WHMCS. Nếu có khác biệt, hệ thống xử lý thế nào?</p>
                     
-                    <div class="form-check form-switch fs-5 mb-3">
+                    <div class="form-check form-switch fs-5 hvn-mb-3">
                         <input class="form-check-input" type="checkbox" id="autoFixToggle" x-model="autoFixEnabled">
                         <label class="form-check-label" for="autoFixToggle">Tự động đẩy WHMCS → DA</label>
                     </div>
                     
-                    <div class="alert alert-info border-info mt-3" x-show="autoFixEnabled">
-                        <i class="bi bi-info-circle-fill"></i> Hệ thống sẽ <strong class="text-danger">Ghi đè</strong> mọi dữ liệu bị lệch trên DA bằng dữ liệu định quy chuẩn trên WHMCS.
-                        <ul class="mb-0 mt-2">
+                    <div class="alert alert-info border-info hvn-mt-3" x-show="autoFixEnabled">
+                        <i class="bi bi-info-circle-fill"></i> Hệ thống sẽ <strong class="hvn-text-danger">Ghi đè</strong> mọi dữ liệu bị lệch trên DA bằng dữ liệu định quy chuẩn trên WHMCS.
+                        <ul class="hvn-mb-0 hvn-mt-2">
                             <li>Xóa các record có trên DA nhưng không có trên WHMCS</li>
                             <li>Sửa giá trị trên DA thành giá trị trên WHMCS</li>
                             <li>Tạo record trên DA nếu WHMCS có DA chưa có</li>
                         </ul>
                     </div>
-                    <div class="alert alert-secondary mt-3" x-show="!autoFixEnabled">
+                    <div class="alert alert-secondary hvn-mt-3" x-show="!autoFixEnabled">
                         Hệ thống chỉ cảnh báo email và tạo báo cáo tại trang này. Quản trị viên phải xử lý thủ công.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" @click="saveAutoFix()"><i class="bi bi-save"></i> Lưu cài đặt</button>
+                    <button type="button" class="hvn-btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="hvn-btn hvn-btn-primary" @click="saveAutoFix()"><i class="bi bi-save"></i> Lưu cài đặt</button>
                 </div>
             </div>
         </div>
@@ -206,7 +206,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         formatRecord(val) {
-            if (!val) return '<span class="text-muted fst-italic">(Không tồn tại)</span>';
+            if (!val) return '<span class="hvn-text-muted fst-italic">(Không tồn tại)</span>';
             // highlight differences could go here
             return val;
         },
@@ -239,7 +239,7 @@ document.addEventListener('alpine:init', () => {
         runScan() {
             const btn = event.currentTarget;
             let originalContent = btn.innerHTML;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Đang quét...';
+            btn.innerHTML = '<span class="hvn-spinner-border hvn-spinner-border-sm" aria-hidden="true"></span> Đang quét...';
             btn.disabled = true;
 
             setTimeout(() => {

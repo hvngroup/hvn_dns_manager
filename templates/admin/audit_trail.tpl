@@ -1,22 +1,22 @@
 <div class="hvn-dns-admin hvn-audit-trail" x-data="auditTrailData()">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-shield-check"></i> Nhật ký Kiểm toán (Audit Trail)</h2>
         <div>
-            <button class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
-            <button class="btn btn-outline-danger ms-1"><i class="bi bi-file-pdf"></i> Export PDF</button>
+            <button class="hvn-btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
+            <button class="hvn-btn btn-outline-danger hvn-ms-1"><i class="bi bi-file-pdf"></i> Export PDF</button>
         </div>
     </div>
 
-    <div class="alert alert-info py-2">
+    <div class="alert alert-info hvn-py-2">
         <i class="bi bi-lock-fill"></i> Log Audit Trail là <strong>append-only</strong> (chỉ thêm, không được phép sửa/xóa) nhằm đảm bảo tính toàn vẹn của dữ liệu theo chuẩn bảo mật.
     </div>
 
     <!-- Toolbar Filters -->
-    <div class="card shadow-sm border-0 mb-4 bg-light">
-        <div class="card-body py-3">
-            <div class="row g-2 align-items-center mb-2">
-                <div class="col-md-3">
-                    <select class="form-select">
+    <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4 hvn-bg-light">
+        <div class="hvn-card-body hvn-py-3">
+            <div class="hvn-row g-2 hvn-align-items-center hvn-mb-2">
+                <div class="hvn-col-md-3">
+                    <select class="hvn-form-select">
                         <option value="">Tất cả Actor (Người thực hiện)</option>
                         <option value="client">Khách hàng</option>
                         <option value="admin">Quản trị viên (Admin)</option>
@@ -24,8 +24,8 @@
                         <option value="api">API / DDNS</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select">
+                <div class="hvn-col-md-3">
+                    <select class="hvn-form-select">
                         <option value="">Tất cả Action</option>
                         <option value="add_record">Thêm bản ghi</option>
                         <option value="edit_record">Sửa bản ghi</option>
@@ -35,35 +35,35 @@
                         <option value="rollback">Rollback Zone</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Tên miền (VD: myblog.net)...">
+                <div class="hvn-col-md-3">
+                    <input type="text" class="hvn-form-control" placeholder="Tên miền (VD: myblog.net)...">
                 </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control" placeholder="Địa chỉ IP...">
+                <div class="hvn-col-md-3">
+                    <input type="text" class="hvn-form-control" placeholder="Địa chỉ IP...">
                 </div>
             </div>
-            <div class="row g-2 align-items-center">
-                <div class="col-md-4 d-flex align-items-center">
-                    <span class="me-2 text-muted fw-bold">Từ:</span> <input type="date" class="form-control form-control-sm">
+            <div class="hvn-row g-2 hvn-align-items-center">
+                <div class="hvn-col-md-4 hvn-d-flex hvn-align-items-center">
+                    <span class="hvn-me-2 hvn-text-muted hvn-fw-bold">Từ:</span> <input type="date" class="hvn-form-control hvn-form-control-sm">
                 </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    <span class="me-2 text-muted fw-bold">Đến:</span> <input type="date" class="form-control form-control-sm">
+                <div class="hvn-col-md-4 hvn-d-flex hvn-align-items-center">
+                    <span class="hvn-me-2 hvn-text-muted hvn-fw-bold">Đến:</span> <input type="date" class="hvn-form-control hvn-form-control-sm">
                 </div>
-                <div class="col-md-4 text-end">
-                    <button class="btn btn-primary"><i class="bi bi-funnel"></i> Lọc dữ liệu</button>
+                <div class="hvn-col-md-4 hvn-text-end">
+                    <button class="hvn-btn hvn-btn-primary"><i class="bi bi-funnel"></i> Lọc dữ liệu</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Main Table -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
+    <div class="hvn-card hvn-shadow-sm hvn-border-0">
+        <div class="hvn-card-body hvn-p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 text-sm">
+                <table class="table table-hover align-middle hvn-mb-0 text-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th class="ps-3">Thời gian</th>
+                            <th class="hvn-ps-3">Thời gian</th>
                             <th>Ai (Actor)</th>
                             <th>Domain</th>
                             <th>Hành động</th>
@@ -74,19 +74,19 @@
                     <tbody>
                         <template x-for="log in logs" :key="log.id">
                             <tr @click="openModal(log)" style="cursor: pointer;">
-                                <td class="ps-3 text-muted font-monospace small" x-text="log.time"></td>
+                                <td class="hvn-ps-3 hvn-text-muted font-monospace small" x-text="log.time"></td>
                                 <td>
-                                    <template x-if="log.actorType === 'client'"><span class="badge bg-primary rounded-pill"><i class="bi bi-person"></i> <span x-text="log.actorName"></span></span></template>
-                                    <template x-if="log.actorType === 'admin'"><span class="badge bg-danger rounded-pill"><i class="bi bi-wrench"></i> <span x-text="log.actorName"></span></span></template>
-                                    <template x-if="log.actorType === 'system'"><span class="badge bg-secondary rounded-pill"><i class="bi bi-robot"></i> <span x-text="log.actorName"></span></span></template>
-                                    <template x-if="log.actorType === 'api'"><span class="badge bg-info text-dark rounded-pill"><i class="bi bi-plug"></i> <span x-text="log.actorName"></span></span></template>
+                                    <template x-if="log.actorType === 'client'"><span class="hvn-badge hvn-bg-primary hvn-rounded-pill"><i class="bi bi-person"></i> <span x-text="log.actorName"></span></span></template>
+                                    <template x-if="log.actorType === 'admin'"><span class="hvn-badge hvn-bg-danger hvn-rounded-pill"><i class="bi bi-wrench"></i> <span x-text="log.actorName"></span></span></template>
+                                    <template x-if="log.actorType === 'system'"><span class="hvn-badge hvn-bg-secondary hvn-rounded-pill"><i class="bi bi-robot"></i> <span x-text="log.actorName"></span></span></template>
+                                    <template x-if="log.actorType === 'api'"><span class="hvn-badge hvn-bg-info hvn-text-dark hvn-rounded-pill"><i class="bi bi-plug"></i> <span x-text="log.actorName"></span></span></template>
                                 </td>
-                                <td><a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" class="font-monospace text-decoration-none fw-bold" x-text="log.domain" @click.stop></a></td>
+                                <td><a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" class="font-monospace text-decoration-none hvn-fw-bold" x-text="log.domain" @click.stop></a></td>
                                 <td>
-                                    <span class="fw-bold font-monospace bg-light p-1 rounded border" x-text="log.action"></span>
+                                    <span class="hvn-fw-bold font-monospace hvn-bg-light hvn-p-1 hvn-rounded border" x-text="log.action"></span>
                                 </td>
                                 <td class="small" x-text="log.details_brief"></td>
-                                <td class="font-monospace text-muted small" x-text="log.ip"></td>
+                                <td class="font-monospace hvn-text-muted small" x-text="log.ip"></td>
                             </tr>
                         </template>
                     </tbody>
@@ -94,12 +94,12 @@
             </div>
         </div>
         
-        <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
-            <div class="text-muted small">
+        <div class="hvn-card-footer hvn-bg-white hvn-py-3 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+            <div class="hvn-text-muted small">
                 Hiển thị 10 / 5,234 log
             </div>
             <nav aria-label="Page navigation">
-                <ul class="pagination pagination-sm mb-0">
+                <ul class="pagination pagination-sm hvn-mb-0">
                     <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
                     <li class="page-item active"><a class="page-link" href="#">1</a></li>
                     <li class="page-item"><a class="page-link" href="#">2</a></li>
@@ -116,58 +116,58 @@
             <div class="modal-content" x-show="selectedLog">
                 <template x-if="selectedLog">
                     <div>
-                        <div class="modal-header bg-dark text-white">
+                        <div class="modal-header hvn-bg-dark hvn-text-white">
                             <h5 class="modal-title"><i class="bi bi-shield-lock"></i> Audit Entry #<span x-text="selectedLog.id"></span></h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body font-monospace p-4 bg-light" style="font-size: 0.9rem;">
+                        <div class="modal-body font-monospace hvn-p-4 hvn-bg-light" style="font-size: 0.9rem;">
                             
                             <table class="table table-sm table-borderless">
                                 <tbody>
                                     <tr>
-                                        <td class="text-muted" width="150">Actor:</td>
-                                        <td class="fw-bold fs-5 text-primary" x-text="selectedLog.actorFull"></td>
+                                        <td class="hvn-text-muted" width="150">Actor:</td>
+                                        <td class="hvn-fw-bold fs-5 hvn-text-primary" x-text="selectedLog.actorFull"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Context:</td>
+                                        <td class="hvn-text-muted">Context:</td>
                                         <td x-text="selectedLog.context"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Domain:</td>
-                                        <td class="fw-bold" x-text="selectedLog.domain"></td>
+                                        <td class="hvn-text-muted">Domain:</td>
+                                        <td class="hvn-fw-bold" x-text="selectedLog.domain"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted">Action:</td>
-                                        <td class="fw-bold bg-warning-subtle d-inline-block px-2 rounded text-dark" x-text="selectedLog.action"></td>
+                                        <td class="hvn-text-muted">Action:</td>
+                                        <td class="hvn-fw-bold hvn-bg-warning-subtle d-inline-block hvn-px-2 hvn-rounded hvn-text-dark" x-text="selectedLog.action"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-muted pt-3">Target:</td>
-                                        <td class="pt-3" x-text="selectedLog.target"></td>
+                                        <td class="hvn-text-muted hvn-pt-3">Target:</td>
+                                        <td class="hvn-pt-3" x-text="selectedLog.target"></td>
                                     </tr>
                                 </tbody>
                             </table>
 
-                            <div class="card border-0 shadow-sm my-3">
-                                <div class="card-header bg-white"><strong>Payload Dữ liệu</strong></div>
-                                <div class="card-body p-0">
-                                    <table class="table table-bordered mb-0">
+                            <div class="hvn-card hvn-border-0 hvn-shadow-sm my-3">
+                                <div class="hvn-card-header hvn-bg-white"><strong>Payload Dữ liệu</strong></div>
+                                <div class="hvn-card-body hvn-p-0">
+                                    <table class="table table-bordered hvn-mb-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th width="50%" class="text-danger">Giá trị cũ (Old Data)</th>
-                                                <th width="50%" class="text-success">Giá trị mới (New Data)</th>
+                                                <th width="50%" class="hvn-text-danger">Giá trị cũ (Old Data)</th>
+                                                <th width="50%" class="hvn-text-success">Giá trị mới (New Data)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td class="p-3 text-break bg-danger-subtle bg-opacity-10 text-danger" style="white-space: pre-wrap;" x-text="selectedLog.oldVal"></td>
-                                                <td class="p-3 text-break bg-success-subtle bg-opacity-10 text-success fw-bold" style="white-space: pre-wrap;" x-text="selectedLog.newVal"></td>
+                                                <td class="hvn-p-3 text-break hvn-bg-danger-subtle bg-opacity-10 hvn-text-danger" style="white-space: pre-wrap;" x-text="selectedLog.oldVal"></td>
+                                                <td class="hvn-p-3 text-break hvn-bg-success-subtle bg-opacity-10 hvn-text-success hvn-fw-bold" style="white-space: pre-wrap;" x-text="selectedLog.newVal"></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
 
-                            <table class="table table-sm table-borderless mt-3 text-muted">
+                            <table class="table table-sm table-borderless hvn-mt-3 hvn-text-muted">
                                 <tbody>
                                     <tr>
                                         <td width="150">IP Address:</td>
@@ -183,18 +183,18 @@
                                     </tr>
                                     <tr>
                                         <td>Ghi chú (Notes):</td>
-                                        <td class="fst-italic text-dark" x-text="selectedLog.notes"></td>
+                                        <td class="fst-italic hvn-text-dark" x-text="selectedLog.notes"></td>
                                     </tr>
                                     <tr>
                                         <td>Timestamp:</td>
-                                        <td class="fw-bold text-dark" x-text="selectedLog.timeLong"></td>
+                                        <td class="hvn-fw-bold hvn-text-dark" x-text="selectedLog.timeLong"></td>
                                     </tr>
                                 </tbody>
                             </table>
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="hvn-btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                         </div>
                     </div>
                 </template>

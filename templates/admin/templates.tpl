@@ -1,38 +1,38 @@
 <div class="hvn-dns-admin hvn-templates" x-data="templateManager()">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-file-text"></i> Quản lý DNS Template</h2>
-        <button class="btn btn-primary" @click="openModal()"><i class="bi bi-plus-lg"></i> Tạo Template</button>
+        <button class="hvn-btn hvn-btn-primary" @click="openModal()"><i class="bi bi-plus-lg"></i> Tạo Template</button>
     </div>
 
-    <div class="row">
+    <div class="hvn-row">
         <!-- Loop Template Items -->
         <template x-for="tpl in templates" :key="tpl.id">
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm h-100 border-0" :class="{ 'border-primary border-start border-4': tpl.is_default, 'bg-light': !tpl.is_visible}">
-                    <div class="card-body position-relative">
+            <div class="hvn-col-md-6 col-lhvn-g-4 hvn-mb-4">
+                <div class="hvn-card hvn-shadow-sm h-100 hvn-border-0" :class="{ 'hvn-border-primary hvn-border-start hvn-border-4': tpl.is_default, 'hvn-bg-light': !tpl.is_visible}">
+                    <div class="hvn-card-body position-relative">
                         <template x-if="tpl.is_default">
-                            <span class="position-absolute top-0 end-0 badge bg-primary m-2" style="font-size: 0.7rem;"><i class="bi bi-star-fill text-warning"></i> DEFAULT</span>
+                            <span class="position-absolute tohvn-p-0 end-0 badge hvn-bg-primary hvn-m-2" style="font-size: 0.7rem;"><i class="bi bi-star-fill hvn-text-warning"></i> DEFAULT</span>
                         </template>
                         
-                        <h5 class="card-title text-primary fw-bold" x-text="tpl.name"></h5>
-                        <p class="card-text text-muted small mb-3" style="min-height: 40px;" x-text="tpl.description"></p>
+                        <h5 class="card-title hvn-text-primary hvn-fw-bold" x-text="tpl.name"></h5>
+                        <p class="card-text hvn-text-muted small hvn-mb-3" style="min-height: 40px;" x-text="tpl.description"></p>
                         
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge bg-secondary"><span x-text="tpl.records_count"></span> bản ghi</span>
-                            <span class="small" :class="tpl.is_visible ? 'text-success' : 'text-danger'">
+                        <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-3">
+                            <span class="hvn-badge hvn-bg-secondary"><span x-text="tpl.records_count"></span> bản ghi</span>
+                            <span class="small" :class="tpl.is_visible ? 'hvn-text-success' : 'hvn-text-danger'">
                                 <i class="bi" :class="tpl.is_visible ? 'bi-eye-fill' : 'bi-eye-slash-fill'"></i>
                                 <span x-text="tpl.is_visible ? 'Hiển thị Client' : 'Ẩn với Client'"></span>
                             </span>
                         </div>
                         
                         <div class="btn-group w-100">
-                            <button class="btn btn-sm btn-outline-primary" @click="openModal(tpl)"><i class="bi bi-pencil"></i> Sửa</button>
-                            <button class="btn btn-sm btn-outline-secondary" @click="cloneTemplate(tpl)"><i class="bi bi-stickies"></i> Clone</button>
+                            <button class="hvn-btn btn-sm hvn-btn-outline-primary" @click="openModal(tpl)"><i class="bi bi-pencil"></i> Sửa</button>
+                            <button class="hvn-btn btn-sm btn-outline-secondary" @click="cloneTemplate(tpl)"><i class="bi bi-stickies"></i> Clone</button>
                             <template x-if="!tpl.is_default">
-                                <button class="btn btn-sm btn-outline-success" @click="setDefault(tpl)"><i class="bi bi-star"></i> Set Default</button>
+                                <button class="hvn-btn btn-sm btn-outline-success" @click="setDefault(tpl)"><i class="bi bi-star"></i> Set Default</button>
                             </template>
                             <template x-if="!tpl.is_default">
-                                <button class="btn btn-sm btn-outline-danger" @click="deleteTemplate(tpl)"><i class="bi bi-trash"></i></button>
+                                <button class="hvn-btn btn-sm btn-outline-danger" @click="deleteTemplate(tpl)"><i class="bi bi-trash"></i></button>
                             </template>
                         </div>
                     </div>
@@ -45,33 +45,33 @@
     <div class="modal fade" id="templateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header bg-light">
+                <div class="modal-header hvn-bg-light">
                     <h5 class="modal-title"><i class="bi bi-file-earmark-code"></i> <span x-text="isEdit ? 'Sửa Template: ' + form.name : 'Tạo Template mới'"></span></h5>
                     <button type="button" class="btn-close" @click="closeModal()"></button>
                 </div>
-                <div class="modal-body p-0">
-                    <div class="row g-0">
+                <div class="modal-body hvn-p-0">
+                    <div class="hvn-row g-0">
                         <!-- Left Panel: Settings -->
-                        <div class="col-md-4 border-end bg-light p-4 h-100">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Tên Template <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" x-model="form.name" placeholder="VD: Google Workspace" required>
+                        <div class="hvn-col-md-4 hvn-border-end hvn-bg-light hvn-p-4 h-100">
+                            <div class="hvn-mb-3">
+                                <label class="form-label hvn-fw-bold">Tên Template <span class="hvn-text-danger">*</span></label>
+                                <input type="text" class="hvn-form-control" x-model="form.name" placeholder="VD: Google Workspace" required>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Mô tả hiển thị</label>
-                                <textarea class="form-control" rows="3" x-model="form.description" placeholder="Mô tả cho client hiểu mục đích của mẫu này..."></textarea>
+                            <div class="hvn-mb-3">
+                                <label class="form-label hvn-fw-bold">Mô tả hiển thị</label>
+                                <textarea class="hvn-form-control" rows="3" x-model="form.description" placeholder="Mô tả cho client hiểu mục đích của mẫu này..."></textarea>
                             </div>
-                            <div class="mb-4">
+                            <div class="hvn-mb-4">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="tplVisible" x-model="form.is_visible">
                                     <label class="form-check-label" for="tplVisible">Hiển thị cho Khách hàng chọn</label>
                                 </div>
                             </div>
 
-                            <div class="card border-info bg-info-subtle bg-opacity-10 mt-4">
-                                <div class="card-header bg-transparent border-info text-info fw-bold py-2"><i class="bi bi-info-circle"></i> Placeholders hỗ trợ</div>
-                                <div class="card-body py-2 small font-monospace">
-                                    <ul class="list-unstyled mb-0">
+                            <div class="hvn-card border-info hvn-bg-info-subtle bg-opacity-10 hvn-mt-4">
+                                <div class="hvn-card-header bg-transparent border-info hvn-text-info hvn-fw-bold hvn-py-2"><i class="bi bi-info-circle"></i> Placeholders hỗ trợ</div>
+                                <div class="hvn-card-body hvn-py-2 small font-monospace">
+                                    <ul class="list-unstyled hvn-mb-0">
                                         <li><code>{literal}{{domain}}{/literal}</code> - Tên miền thực (VD: shop.vn)</li>
                                         <li><code>{literal}{{ip}}{/literal}</code> - IP mặc định của Server</li>
                                         <li><code>{literal}{{ns1}}{/literal}</code> - Primary Nameserver</li>
@@ -82,51 +82,51 @@
                         </div>
 
                         <!-- Right Panel: Records Editor -->
-                        <div class="col-md-8 p-4 bg-white">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="mb-0 fw-bold">Bản ghi trong Template (<span x-text="form.records.length"></span>)</h6>
-                                <button class="btn btn-sm btn-outline-primary" @click="addEmptyRecord()"><i class="bi bi-plus-circle"></i> Thêm record</button>
+                        <div class="hvn-col-md-8 hvn-p-4 hvn-bg-white">
+                            <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-3">
+                                <h6 class="hvn-mb-0 hvn-fw-bold">Bản ghi trong Template (<span x-text="form.records.length"></span>)</h6>
+                                <button class="hvn-btn btn-sm hvn-btn-outline-primary" @click="addEmptyRecord()"><i class="bi bi-plus-circle"></i> Thêm record</button>
                             </div>
 
                             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-bordered align-middle mb-0 font-monospace" style="font-size: 0.85rem">
+                                <table class="table table-sm table-bordered align-middle hvn-mb-0 font-monospace" style="font-size: 0.85rem">
                                     <thead class="table-light sticky-top">
                                         <tr>
                                             <th width="12%">Loại</th>
                                             <th width="20%">Tên (Name)</th>
                                             <th width="50%">Giá trị (Value) / Priority</th>
                                             <th width="12%">TTL</th>
-                                            <th width="6%" class="text-center"><i class="bi bi-trash"></i></th>
+                                            <th width="6%" class="hvn-text-center"><i class="bi bi-trash"></i></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <template x-for="(rec, idx) in form.records" :key="idx">
                                             <tr>
                                                 <td>
-                                                    <select class="form-select form-select-sm font-monospace" x-model="rec.type">
+                                                    <select class="hvn-form-select hvn-form-select-sm font-monospace" x-model="rec.type">
                                                         <option value="A">A</option><option value="CNAME">CNAME</option>
                                                         <option value="MX">MX</option><option value="TXT">TXT</option>
                                                         <option value="NS">NS</option><option value="SRV">SRV</option>
                                                     </select>
                                                 </td>
-                                                <td><input type="text" class="form-control form-control-sm font-monospace" x-model="rec.name" placeholder="@ hoặc www"></td>
+                                                <td><input type="text" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.name" placeholder="@ hoặc www"></td>
                                                 <td>
-                                                    <div class="d-flex">
-                                                        <input type="text" class="form-control form-control-sm font-monospace" x-model="rec.value" placeholder="Giá trị...">
+                                                    <div class="hvn-d-flex">
+                                                        <input type="text" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.value" placeholder="Giá trị...">
                                                         <template x-if="rec.type === 'MX' || rec.type === 'SRV'">
-                                                            <input type="number" class="form-control form-control-sm font-monospace ms-1" style="width: 60px;" x-model="rec.prio" placeholder="Pri" title="Priority">
+                                                            <input type="number" class="hvn-form-control hvn-form-control-sm font-monospace hvn-ms-1" style="width: 60px;" x-model="rec.prio" placeholder="Pri" title="Priority">
                                                         </template>
                                                     </div>
                                                 </td>
-                                                <td><input type="number" class="form-control form-control-sm font-monospace" x-model="rec.ttl"></td>
-                                                <td class="text-center">
-                                                    <button class="btn btn-sm btn-outline-danger border-0" @click="removeRecord(idx)"><i class="bi bi-x-lg"></i></button>
+                                                <td><input type="number" class="hvn-form-control hvn-form-control-sm font-monospace" x-model="rec.ttl"></td>
+                                                <td class="hvn-text-center">
+                                                    <button class="hvn-btn btn-sm btn-outline-danger hvn-border-0" @click="removeRecord(idx)"><i class="bi bi-x-lg"></i></button>
                                                 </td>
                                             </tr>
                                         </template>
                                         <template x-if="form.records.length === 0">
                                             <tr>
-                                                <td colspan="5" class="text-center py-4 text-muted fst-italic">
+                                                <td colspan="5" class="hvn-text-center hvn-py-4 hvn-text-muted fst-italic">
                                                     Chưa có bản ghi nào. Click "Thêm record" để bắt đầu.
                                                 </td>
                                             </tr>
@@ -137,9 +137,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary" @click="closeModal()">Hủy</button>
-                    <button type="button" class="btn btn-primary" @click="saveTemplate()">
+                <div class="modal-footer hvn-bg-light">
+                    <button type="button" class="hvn-btn btn-outline-secondary" @click="closeModal()">Hủy</button>
+                    <button type="button" class="hvn-btn hvn-btn-primary" @click="saveTemplate()">
                         <i class="bi bi-save"></i> <span x-text="isEdit ? 'Lưu thay đổi' : 'Tạo Template'"></span>
                     </button>
                 </div>

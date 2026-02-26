@@ -1,46 +1,46 @@
-<div class="hvn-admin-layout container-fluid px-0">
-    <div class="row g-4">
+<div class="hvn-admin-layout hvn-container-fluid hvn-px-0">
+    <div class="hvn-row hvn-g-4">
         <!-- Sidebar Navigation -->
-        <div class="col-md-3 col-lg-2">
-            <div class="list-group list-group-flush rounded shadow-sm border-0 mb-4 sticky-top" style="top: 20px;">
-                <div class="list-group-item bg-dark text-white fw-bold py-3 text-center">
+        <div class="hvn-col-md-3 col-lg-2">
+            <div class="hvn-list-group hvn-list-group-flush hvn-rounded hvn-shadow-sm hvn-border-0 hvn-mb-4 sticky-top" style="top: 20px;">
+                <div class="hvn-list-group-item hvn-bg-dark hvn-text-white hvn-fw-bold hvn-py-3 hvn-text-center">
                     <i class="bi bi-hdd-network"></i> HVN DNS Manager
                 </div>
-                <a href="{$modulelink}&action=dashboard" class="list-group-item list-group-item-action {if $action == 'dashboard' || $action == '' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                <a href="{$modulelink}&action=dashboard" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'dashboard' || $action == '' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-speedometer2 hvn-me-2"></i> Dashboard
                 </a>
-                <a href="{$modulelink}&action=servers" class="list-group-item list-group-item-action {if $action == 'servers' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-server me-2"></i> Servers
+                <a href="{$modulelink}&action=servers" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'servers' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-server hvn-me-2"></i> Servers
                 </a>
-                <a href="{$modulelink}&action=domains" class="list-group-item list-group-item-action {if $action == 'domains' || $action == 'dns_editor' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-globe me-2"></i> Domains
+                <a href="{$modulelink}&action=domains" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'domains' || $action == 'dns_editor' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-globe hvn-me-2"></i> Domains
                 </a>
-                <a href="{$modulelink}&action=sync_logs" class="list-group-item list-group-item-action {if $action == 'sync_logs' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-journals me-2"></i> Sync Logs
+                <a href="{$modulelink}&action=sync_logs" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'sync_logs' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-journals hvn-me-2"></i> Sync Logs
                 </a>
-                <a href="{$modulelink}&action=audit_trail" class="list-group-item list-group-item-action {if $action == 'audit_trail' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-shield-lock me-2"></i> Audit Trail
+                <a href="{$modulelink}&action=audit_trail" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'audit_trail' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-shield-lock hvn-me-2"></i> Audit Trail
                 </a>
-                <a href="{$modulelink}&action=templates" class="list-group-item list-group-item-action {if $action == 'templates' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-file-text me-2"></i> Templates
+                <a href="{$modulelink}&action=templates" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'templates' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-file-text hvn-me-2"></i> Templates
                 </a>
-                <a href="{$modulelink}&action=quota_plans" class="list-group-item list-group-item-action {if $action == 'quota_plans' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-box-seam me-2"></i> Quota Plans
+                <a href="{$modulelink}&action=quota_plans" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'quota_plans' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-box-seam hvn-me-2"></i> Quota Plans
                 </a>
-                <a href="{$modulelink}&action=drift_reports" class="list-group-item list-group-item-action {if $action == 'drift_reports' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-arrow-left-right me-2"></i> Drift Reports
+                <a href="{$modulelink}&action=drift_reports" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'drift_reports' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-arrow-left-right hvn-me-2"></i> Drift Reports
                 </a>
-                <a href="{$modulelink}&action=bulk" class="list-group-item list-group-item-action {if $action == 'bulk' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-lightning-charge me-2"></i> Bulk Operations
+                <a href="{$modulelink}&action=bulk" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'bulk' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-lightning-charge hvn-me-2"></i> Bulk Operations
                 </a>
-                <a href="{$modulelink}&action=settings" class="list-group-item list-group-item-action {if $action == 'settings' }active border-primary border-start border-4 fw-bold{/if}">
-                    <i class="bi bi-gear me-2"></i> Settings
+                <a href="{$modulelink}&action=settings" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'settings' }active hvn-border-primary hvn-border-start hvn-border-4 hvn-fw-bold{/if}">
+                    <i class="bi bi-gear hvn-me-2"></i> Settings
                 </a>
             </div>
         </div>
 
         <!-- Main Content Area -->
-        <div class="col-md-9 col-lg-10">
+        <div class="hvn-col-md-9 col-lg-10">
             <!-- Include Custom Pure CSS Utilities, Google Fonts & Icons inline for Prototype rendering reliably -->
             <link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
