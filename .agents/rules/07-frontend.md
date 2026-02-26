@@ -7,7 +7,7 @@ globs: **/*.tpl, **/*.js, **/assets/**
 
 ## Tech Stack
 - Template Engine: Smarty (WHMCS built-in)
-- CSS: Bootstrap 5.3.x (CDN)
+- CSS: Native CSS (WHMCS) + Pure CSS (KHÔNG DÙNG Bootstrap 5 hay CDN ngoài)
 - JS Reactivity: Alpine.js 3.x (CDN + local fallback)
 - DataTables: DataTables.net 1.13.x (CDN)
 - Charts (Admin): Chart.js 4.x (CDN)

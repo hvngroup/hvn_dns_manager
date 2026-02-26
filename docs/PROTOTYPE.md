@@ -101,11 +101,11 @@ Tổng: ~23 giờ làm việc (4–5 ngày)
 | Component | Library | Ghi chú |
 |-----------|---------|---------|
 | Template Engine | Smarty (WHMCS built-in) | Templates viết lần này GIỮ NGUYÊN cho production |
-| CSS | Custom `hvndns.css` + Bootstrap 5.3 CDN | CSS riêng, KHÔNG phụ thuộc WHMCS theme |
+| CSS | Custom `hvndns.css` (Pure CSS) | CSS riêng, KHÔNG phụ thuộc WHMCS theme, KHÔNG dùng Bootstrap |
 | JS Reactivity | Alpine.js 3.x CDN | Interactions, polling simulation, state management |
 | DataTables | DataTables.net 1.13.x CDN | Admin tables (Sync Logs, Audit Trail, Domains) |
 | Charts | Chart.js 4.x CDN | Admin Dashboard metrics |
-| Icons | Bootstrap Icons 1.11.x CDN | Status badges, action buttons |
+| Icons | Native WHMCS Icons / FontAwesome | Status badges, action buttons |
 | Fonts | System fonts (WHMCS native) | Không thêm custom fonts |
 
 ### 2.2. AI Tools cho Acceleration
@@ -1070,8 +1070,8 @@ AD-12 Settings:
 □ CSS riêng hoạt động với WHMCS Six theme
 □ Không conflict với CSS WHMCS native
 □ Alpine.js không conflict với WHMCS jQuery
-□ Bootstrap 5 CDN load thành công
-□ Tất cả CDN (Alpine, DataTables, Chart.js, Bootstrap Icons) load OK
+□ CSS Native load thành công, không dùng Framework CDN
+□ Tất cả JS CDN (Alpine, DataTables, Chart.js) load OK
 □ Responsive: Desktop (1920px), Laptop (1366px), Tablet (768px), Mobile (375px)
 □ Toast notifications hiển thị đúng vị trí
 □ Loading spinners smooth

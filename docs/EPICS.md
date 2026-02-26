@@ -163,7 +163,7 @@
 | `CLIENT-002` | DataTable hỗ trợ filter theo Type (A, AAAA, CNAME, MX, TXT, SRV, NS, CAA), search theo Name/Value | 2 |
 | `CLIENT-003` | Mỗi record hiển thị **Sync Status Badge**: 🟢 `Live` / 🔄 `Syncing` / 🟡 `Pending` / 🔴 `Failed` — dựa trên status của job | 2 |
 | `CLIENT-004` | Tích hợp Alpine.js cho reactive UI: khi status thay đổi (poll Ajax mỗi 5 giây), badge tự cập nhật không cần reload trang | 3 |
-| `CLIENT-005` | Responsive layout: hoạt động tốt trên mobile (Bootstrap 5 grid collapse) | 1 |
+| `CLIENT-005` | Responsive layout: hoạt động tốt trên mobile (Native CSS, Pure CSS Grid/Flex) | 1 |
 
 **AC**:
 - Trang load xong trong < 1 giây cho domain có 50 records

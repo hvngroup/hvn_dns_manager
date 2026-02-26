@@ -12,7 +12,7 @@
 - **Nền tảng**: WHMCS 8.x Addon Module
 - **Ngôn ngữ**: PHP 7.4+ (target PHP 8.1)
 - **Database**: MySQL/MariaDB qua WHMCS Eloquent ORM (Capsule)
-- **Frontend**: Smarty Template + Bootstrap 5 + Alpine.js 3.x
+- **Frontend**: Smarty Template + Native CSS (WHMCS) + Pure CSS + Alpine.js 3.x
 - **Kiến trúc cốt lõi**: Queue-based Async (Bất đồng bộ qua hàng đợi)
 - **Tiền tố DB**: `mod_hvndns_`
 - **Namespace gốc**: `HvnGroup\DnsManager`

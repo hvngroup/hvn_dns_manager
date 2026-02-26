@@ -100,7 +100,7 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
 *   **Backend Framework**: PHP 7.4 - 8.2 (Tương thích chuẩn WHMCS 8.x Capsule Database).
 *   **Database Management (Tiền tố `mod_hvndns_`)**: Sử dụng WHMCS Hook `AfterModuleActivate` / `AfterModuleUpgrade` để thiết lập hệ thống tự tạo bảng CSDL chuyên nghiệp, quản lý các bản cập nhật qua `version_tracking` schema thay cho cách dump SQL chay. (Thống nhất tiền tố `mod_hvndns_` cho khớp với tên module HVN).
 *   **Hệ thống Logging (WHMCS Monolog)**: Nghiêm cấm tạo file `.txt` tự ghi log. Tận dụng thư viện chuẩn **Monolog** đã có sẵn tích hợp trong lõi WHMCS (`Log\Log`) cho Queue Worker để ghi nhật ký `info`, `warning`, `error`, tiện cho việc xuất file Audit và debug.
-*   **Frontend Template**: Smarty Engine kết hợp **Bootstrap 4/5** + Ajax. Sử dụng **Vue.js** hoặc **Alpine.js** dạng nhẹ (CDN) để làm các DataTables quản lý trạng thái Syncing/Complete real-time ở UI mà không cần tải lại trang.
+*   **Frontend Template**: Smarty Engine kết hợp **CSS Native (WHMCS) + Pure CSS** (Không dùng CDN Framework ngoài để tránh xung đột). Sử dụng **Vue.js** hoặc **Alpine.js** dạng nhẹ (CDN) để làm các DataTables quản lý trạng thái Syncing/Complete real-time ở UI mà không cần tải lại trang.
 *   **DA Gateway (Giao tiếp)**: Viết lại class `HTTPSocket` của DA bằng **GuzzleHTTP** hoặc **cURL OOP hiện đại** để bắt Timeout chuẩn xác hơn và không rò rỉ bộ nhớ khi chạy Cron hàng nghìn lệnh.
 
 ---

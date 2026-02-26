@@ -4,7 +4,7 @@
 > **Phiên bản**: 1.0  
 > **Ngày tạo**: 25/02/2026  
 > **Dành cho**: Frontend Developer, UI/UX Designer, AI Agent  
-> **Framework**: Smarty Template + Bootstrap 5 + Alpine.js 3.x
+> **Framework**: Smarty Template + Native CSS (WHMCS) + Pure CSS + Alpine.js 3.x
 > **Theme tương thích**: WHMCS Six / Twenty-One / Lagom WHMCS
 > **Màu chủ đạo**: Màu đỏ (#ea4544)
 
@@ -230,7 +230,7 @@ $alpine       Alpine.js reactive data
 ## CL-03: Modal Thêm/Sửa Record
 
 > **Trigger**: Click `[+ Thêm bản ghi]` hoặc `[✏️]` trên bảng  
-> **Kiểu**: Bootstrap Modal (overlay, không chuyển trang)
+> **Kiểu**: Custom Modal (overlay CSS thuần, không chuyển trang)
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -1277,7 +1277,7 @@ Một tab độc lập ở vị trí đầu tiên để khai báo key và trạn
 
 ## A. Bảng màu Status Badge
 
-| Trạng thái | Badge | Màu Bootstrap | CSS Class |
+| Trạng thái | Badge | Màu sắc | CSS Class |
 |------------|-------|---------------|-----------|
 | Live / Complete | 🟢 | `success` | `badge bg-success` |
 | Pending | 🟡 | `warning` | `badge bg-warning text-dark` |
@@ -1302,7 +1302,7 @@ Bảng records trên mobile: cột TTL và Actions ẩn, swipe để xem. Hoặc
 
 | Yêu cầu | Cách thực hiện |
 |---------|---------------|
-| Contrast ratio ≥ 4.5:1 | Dùng Bootstrap 5 default colors |
+| Contrast ratio ≥ 4.5:1 | Dùng WHMCS Native / Custom colors |
 | Keyboard navigation | Tab order đúng, focus visible |
 | Screen reader | `aria-label` cho icon buttons, `sr-only` cho badge text |
 | Form labels | Mọi input có `<label>` tường minh |

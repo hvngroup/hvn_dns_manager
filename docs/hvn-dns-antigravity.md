@@ -73,7 +73,7 @@ activation: always
 - **Nền tảng**: WHMCS 8.x Addon Module
 - **Ngôn ngữ**: PHP 7.4+ (target PHP 8.1)
 - **Database**: MySQL/MariaDB qua WHMCS Eloquent ORM (Capsule)
-- **Frontend**: Smarty Template + Bootstrap 5 + Alpine.js 3.x
+- **Frontend**: Smarty Template + Native CSS (WHMCS) + Pure CSS + Alpine.js 3.x
 - **Namespace gốc**: `HvnGroup\DnsManager`
 - **Tiền tố DB**: `mod_hvndns_`
 
@@ -334,7 +334,7 @@ activation:
 
 ## Tech Stack
 - Template Engine: Smarty (WHMCS built-in)
-- CSS: Bootstrap 5.3.x (CDN)
+- CSS: Native CSS (WHMCS) + Pure CSS (Không Bootstrap)
 - JS Reactivity: Alpine.js 3.x (CDN + local fallback)
 - DataTables: DataTables.net 1.13.x (CDN)
 - Charts (Admin): Chart.js 4.x (CDN)
@@ -693,7 +693,7 @@ User chỉ định màn hình (VD: CL-02, AD-01)
 2. **Tạo file .tpl** tại `templates/client/` hoặc `templates/admin/`
 
 3. **Quy tắc**:
-   - Bootstrap 5 grid system
+   - CSS Grid / Flexbox (Pure CSS)
    - Escape dynamic data: `{$var|escape:'htmlall'}`
    - CSRF token trong forms
    - Alpine.js cho reactivity (x-data, x-show, x-on)

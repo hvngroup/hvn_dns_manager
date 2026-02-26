@@ -1581,10 +1581,10 @@ Request arrives at ddns.php
 
 | Component | Library | Version | CDN / Bundled |
 |-----------|---------|---------|--------------|
-| CSS Framework | Bootstrap | 5.3.x | CDN |
+| CSS Framework | Native CSS + Pure CSS | N/A | Bundled |
 | JS Reactivity | Alpine.js | 3.x | CDN + local fallback |
 | DataTables | DataTables.net | 1.13.x | CDN |
-| Icons | Bootstrap Icons | 1.11.x | CDN |
+| Icons | WHMCS Native Icons | N/A | N/A |
 | Charts (Admin) | Chart.js | 4.x | CDN |
 | Template Engine | Smarty | WHMCS built-in | Bundled |
 
