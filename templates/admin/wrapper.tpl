@@ -1,7 +1,31 @@
-<div class="hvn-admin-layout hvn-container-fluid hvn-px-0">
+<!-- Include Custom Pure CSS Utilities, Google Fonts & Icons -->
+<link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+{literal}
+    .hvn-admin-layout, .hvn-admin-layout * {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    }
+    .hvn-admin-layout {
+        font-size: 15px !important;
+    }
+    .hvn-admin-layout .small, .hvn-admin-layout small {
+        font-size: 0.875em !important;
+    }
+    .hvn-admin-layout h1, .hvn-admin-layout h2, .hvn-admin-layout h3, .hvn-admin-layout h4, .hvn-admin-layout h5, .hvn-admin-layout h6 {
+        font-weight: 600;
+    }
+{/literal}
+</style>
+
+<!-- Alpine JS -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<div class="hvn-wrapper hvn-admin-layout hvn-container-fluid hvn-px-0">
     <div class="hvn-row hvn-g-4">
         <!-- Sidebar Navigation -->
-        <div class="hvn-col-md-3 col-lg-2">
+        <div class="hvn-col-md-3 hvn-col-lg-2">
             <div class="hvn-list-group hvn-list-group-flush hvn-rounded hvn-shadow-sm hvn-border-0 hvn-mb-4 sticky-top" style="top: 20px;">
                 <div class="hvn-list-group-item hvn-bg-dark hvn-text-white hvn-fw-bold hvn-py-3 hvn-text-center">
                     <i class="bi bi-hdd-network"></i> HVN DNS Manager
@@ -40,28 +64,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="hvn-col-md-9 col-lg-10">
-            <!-- Include Custom Pure CSS Utilities, Google Fonts & Icons inline for Prototype rendering reliably -->
-            <link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-            <style>
-                .hvn-admin-layout, .hvn-admin-layout * {
-                    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-                }
-                .hvn-admin-layout {
-                    font-size: 15px !important;
-                }
-                .hvn-admin-layout .small, .hvn-admin-layout small {
-                    font-size: 0.875em !important;
-                }
-                .hvn-admin-layout h1, .hvn-admin-layout h2, .hvn-admin-layout h3, .hvn-admin-layout h4, .hvn-admin-layout h5, .hvn-admin-layout h6 {
-                    font-weight: 600;
-                }
-            </style>
-            
-            <!-- Alpine JS -->
-            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <div class="hvn-col-md-9 hvn-col-lg-10">
 
             <!-- Render The Body Template -->
             {include file="`$template_name`.tpl" }
