@@ -99,37 +99,37 @@
 
 /* Desktop Grid (md/lg) */
 @media (min-width: 768px) {
-    .hvn-col-md { flex-grow: 1; flex-shrink: 0; flex-basis: 0%; }
-    .hvn-col-md-auto { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: auto; }
-    .hvn-col-md-1 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 8.33333333%; }
-    .hvn-col-md-2 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 16.66666667%; }
-    .hvn-col-md-3 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 25%; }
-    .hvn-col-md-4 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 33.33333333%; }
-    .hvn-col-md-5 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 41.66666667%; }
-    .hvn-col-md-6 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 50%; }
-    .hvn-col-md-7 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 58.33333333%; }
-    .hvn-col-md-8 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 66.66666667%; }
-    .hvn-col-md-9 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 75%; }
-    .hvn-col-md-10 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 83.33333333%; }
-    .hvn-col-md-11 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 91.66666667%; }
-    .hvn-col-md-12 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 100%; }
+    .hvn-col-md { flex-grow: 1; flex-shrink: 0; flex-basis: 0%; max-width: 100%; }
+    .hvn-col-md-auto { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: auto; max-width: 100%; }
+    .hvn-col-md-1 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 8.33333333%; max-width: 8.33333333%; }
+    .hvn-col-md-2 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 16.66666667%; max-width: 16.66666667%; }
+    .hvn-col-md-3 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 25%; max-width: 25%; }
+    .hvn-col-md-4 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 33.33333333%; max-width: 33.33333333%; }
+    .hvn-col-md-5 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 41.66666667%; max-width: 41.66666667%; }
+    .hvn-col-md-6 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 50%; max-width: 50%; }
+    .hvn-col-md-7 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 58.33333333%; max-width: 58.33333333%; }
+    .hvn-col-md-8 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 66.66666667%; max-width: 66.66666667%; }
+    .hvn-col-md-9 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 75%; max-width: 75%; }
+    .hvn-col-md-10 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 83.33333333%; max-width: 83.33333333%; }
+    .hvn-col-md-11 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 91.66666667%; max-width: 91.66666667%; }
+    .hvn-col-md-12 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 100%; max-width: 100%; }
 }
 
 @media (min-width: 992px) {
-    .hvn-col-lg { flex-grow: 1; flex-shrink: 0; flex-basis: 0%; }
-    .hvn-col-lg-auto { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: auto; }
-    .hvn-col-lg-1 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 8.33333333%; }
-    .hvn-col-lg-2 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 16.66666667%; }
-    .hvn-col-lg-3 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 25%; }
-    .hvn-col-lg-4 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 33.33333333%; }
-    .hvn-col-lg-5 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 41.66666667%; }
-    .hvn-col-lg-6 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 50%; }
-    .hvn-col-lg-7 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 58.33333333%; }
-    .hvn-col-lg-8 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 66.66666667%; }
-    .hvn-col-lg-9 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 75%; }
-    .hvn-col-lg-10 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 83.33333333%; }
-    .hvn-col-lg-11 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 91.66666667%; }
-    .hvn-col-lg-12 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 100%; }
+    .hvn-col-lg { flex-grow: 1; flex-shrink: 0; flex-basis: 0%; max-width: 100%; }
+    .hvn-col-lg-auto { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: auto; max-width: 100%; }
+    .hvn-col-lg-1 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 8.33333333%; max-width: 8.33333333%; }
+    .hvn-col-lg-2 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 16.66666667%; max-width: 16.66666667%; }
+    .hvn-col-lg-3 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 25%; max-width: 25%; }
+    .hvn-col-lg-4 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 33.33333333%; max-width: 33.33333333%; }
+    .hvn-col-lg-5 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 41.66666667%; max-width: 41.66666667%; }
+    .hvn-col-lg-6 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 50%; max-width: 50%; }
+    .hvn-col-lg-7 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 58.33333333%; max-width: 58.33333333%; }
+    .hvn-col-lg-8 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 66.66666667%; max-width: 66.66666667%; }
+    .hvn-col-lg-9 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 75%; max-width: 75%; }
+    .hvn-col-lg-10 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 83.33333333%; max-width: 83.33333333%; }
+    .hvn-col-lg-11 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 91.66666667%; max-width: 91.66666667%; }
+    .hvn-col-lg-12 { flex-grow: 0; flex-shrink: 0; flex-basis: auto; width: 100%; max-width: 100%; }
 }
 
 /* Khoảng cách cho Grid (Gutters G) */
