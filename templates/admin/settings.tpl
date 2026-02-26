@@ -330,23 +330,9 @@
                             <div class="tab-pane fade hvn-p-4" id="pane-limits" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-1"><i class="bi bi-bar-chart-steps hvn-text-secondary"></i> Record Limits — Giới hạn Số lượng</h5>
                                 <div class="small hvn-text-muted hvn-mb-4">Ưu tiên: Admin Override &gt; Quota Plan &gt; Global Settings. <code>0</code> = unlimited.</div>
-                                <div class="hvn-row g-3">
-                                    <template x-for="rec in recordTypes" :key="rec.key">
-                                        <div class="hvn-col-md-6 hvn-col-lg-4">
-                                            <div class="hvn-card hvn-border-0 hvn-shadow-sm">
-                                                <div class="hvn-card-body hvn-py-2 hvn-px-3">
-                                                    <label class="form-label hvn-fw-bold hvn-mb-1" x-text="rec.label + ' Limit'"></label>
-                                                    <div class="hvn-input-group">
-                                                        <input type="number" class="hvn-form-control" min="-1" :x-model="'s.' + rec.key + '_record_limit'">
-                                                        <span class="hvn-input-group-text small" x-text="rec.label"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
 
-                                <!-- Static fallback (Alpine x-for with dynamic model doesn't work easily, use static) -->
+                                <!-- Static record limit inputs -->
+
                                 <div class="hvn-row g-3 hvn-mt-1">
                                     <div class="hvn-col-md-6 hvn-col-lg-4">
                                         <label class="form-label hvn-fw-bold hvn-mb-1">A <code class="hvn-text-muted small">a_record_limit</code></label>
