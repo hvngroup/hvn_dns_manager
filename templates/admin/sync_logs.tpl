@@ -61,7 +61,7 @@
             <div class="hvn-card hvn-shadow-sm hvn-border-0">
                 <div class="hvn-card-body hvn-p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle hvn-mb-0 font-monospace text-sm" style="font-size: 0.85rem">
+                        <table class="table table-hover align-middle hvn-mb-0 font-monospace text-sm" style="font-size: 12px">
                             <thead class="table-light">
                                 <tr>
                                     <th class="hvn-ps-3">Thời gian</th>
@@ -121,7 +121,7 @@
                 <div class="hvn-card-header hvn-bg-white hvn-pt-3">
                     <h6 class="hvn-mb-0 hvn-text-primary"><i class="bi bi-info-circle"></i> Chi tiết Job #<span x-text="selectedLog ? selectedLog.id : '---'"></span></h6>
                 </div>
-                <div class="hvn-card-body hvn-bg-light hvn-p-3" style="font-size: 0.85rem;" x-show="selectedLog">
+                <div class="hvn-card-body hvn-bg-light hvn-p-3" style="font-size: 12px;" x-show="selectedLog">
                     <template x-if="selectedLog">
                         <div>
                             <div class="hvn-row hvn-border-bottom hvn-pb-2 hvn-mb-2">

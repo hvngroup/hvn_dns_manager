@@ -89,7 +89,7 @@
                             </div>
 
                             <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-bordered align-middle hvn-mb-0 font-monospace" style="font-size: 0.85rem">
+                                <table class="table table-sm table-bordered align-middle hvn-mb-0 font-monospace" style="font-size: 12px">
                                     <thead class="table-light sticky-top">
                                         <tr>
                                             <th width="12%">Loại</th>
