@@ -397,7 +397,7 @@
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center" :class="{'opacity-50': !s.enable_url_redirect}">
+                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center" :class="{literal}{'opacity-50': !s.enable_url_redirect}{/literal}">
                                     <div>
                                         <div class="hvn-fw-bold">Bật Masked URL Forwarding <code class="hvn-text-muted small">enable_masked_redirect</code></div>
                                         <div class="small hvn-text-muted">Cần enable_url_redirect = true. Ẩn URL đích sau iframe.</div>
