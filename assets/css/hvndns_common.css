@@ -570,6 +570,7 @@
     color: var(--hvn-dark);
     background-color: rgba(234, 69, 68, 0.1);
     border-color: var(--hvn-primary);
+    border-width: 0 0 0 1px;
 }
 
 
