@@ -15,9 +15,9 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
 
 *   **Tầng Khách (Client Controller)**: Tiếp nhận chỉnh sửa DNS $\rightarrow$ Validate bảo mật $\rightarrow$ **Lưu ngay lập tức** vào DataBase (Bảng `queue_jobs`). KHÔNG gọi CURL nào ở đây.
 *   **Tầng Lưu trữ (Database)**: Một bảng đặc biệt đóng vai trò lưu lại "Lịch sử tác vụ" với các trạng thái: `PENDING` (Chờ xử lý), `SYNCING` (Đang chạy), `COMPLETE` (Xong), `FAILED` (Lỗi). Sử dụng Core DB của WHMCS.
-*   **Tầng Load Balancer (Định tuyến Node DA)**: Hệ thống ghi nhận Domain A thuộc Node cấu hình nào (VD: `dns1.hvn.vn` hay `dns2.hvn.vn`) để chọn đúng IP/Mật khẩu API khi tiến hành chạy Cron.
-*   **Tầng Xử lý nền (Background Worker / Cron)**: Một tiến trình Cronjob trên WHMCS Server (1-3 phút/lần) tự động lặp qua các queue `PENDING`, mở socket kết nối lên đích DirectAdmin đã được định tuyến, thực thi và tự động ghi log.
-*   **Tầng Đích (Root Server)**: DirectAdmin Node tiếp nhận API, thay đổi Zone File, Restart dịch vụ Named/Bind trên máy chủ. Đưa website thực tế vào hoạt động.
+*   **Tầng Định tuyến (Primary Routing)**: Hệ thống xác định Primary Server của cụm DirectAdmin để đẩy Queue. Chỉ đẩy lệnh (Push) duy nhất 1 lần tới Server này.
+*   **Tầng Xử lý nền (Background Worker / Cron)**: Một tiến trình Cronjob trên WHMCS Server (1-3 phút/lần) tự động lặp qua các queue `PENDING`, mở socket kết nối lên Primary Server đã cấu hình, thực thi và tự động ghi log.
+*   **Tầng Đích (DA Cluster)**: Primary Server tiếp nhận API, thay đổi Zone File. Sau đó DA Cluster sẽ tự động đồng bộ sang các Secondary Servers thông qua cơ chế AXFR/IXFR ngầm.
 
 ---
 
@@ -74,9 +74,10 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
 
 ### 3.3. Các Tính năng Quản trị Cấp cao & Bảo mật (Enterprise Standards)
 
-15. **Multi-Server Management (Kiến trúc Fan-out Đồng bộ 3 Node)**:
-    - Module quản lý đồng thời cấu hình của 3 Server DirectAdmin (`dns1.hvn.vn`, `dns2.hvn.vn`, `dns3.hvn.vn`).
-    - **Áp dụng Cách A (Module đẩy trực tiếp)**: Khi có 1 thay đổi bản ghi DNS, Queue sẽ tạo ra 3 sub-jobs độc lập (hoặc 1 Job nhưng lặp gọi 3 API). Module sẽ chủ động đẩy lệnh cập nhật trực tiếp tới cả Primary (`dns1`) lẫn Secondary (`dns2`, `dns3`). Ưu điểm: Hệ thống WHMCS kiểm soát hoàn toàn trạng thái thành công/thất bại của từng node, ghi log rõ ràng từng IP server và cho phép nút Retry chạy lại chính xác trên Server bị trượt.
+15. **Multi-Server Management (Kiến trúc Primary-Only Push)**:
+    - Module cấu hình quản lý danh sách Server DirectAdmin (gồm Primary và Secondary).
+    - **Áp dụng Kiến trúc Push một chạm**: Khi có thay đổi bản ghi DNS, Queue sẽ chỉ tạo ra 1 job duy nhất đẩy lệnh cập nhật trực tiếp tới Primary Server (`dns1`). Sau khi Primary nhận lệnh thành công, DA Cluster sẽ tự động đồng bộ dữ liệu sang các Secondary Servers (`dns2`, `dns3`) thông qua giao thức AXFR/IXFR.
+    - **Ưu điểm**: Giảm 2/3 tải cho WHMCS Cron Worker, Queue nhỏ hơn 3 lần, sync logs ít hơn 3 lần, đơn giản hóa trạng thái thành công/thất bại và loại bỏ sự phức tạp của việc retry trên nhiều servers.
 16. **Hệ thống Webhook / Monitor Notifications**:
     - Khi tỷ lệ `FAILED` của Cronjob quét qua ngưỡng cảnh báo (VD: 5 lệnh fail liên tiếp), module tự động đẩy thông báo qua qua **Telegram Bot / Slack** hoặc **Email Admin** để SysAdmin ứng cứu ngay.
 17. **Audit Trail (Nhật ký Thay đổi Chéo)**:

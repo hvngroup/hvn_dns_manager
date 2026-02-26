@@ -136,11 +136,10 @@ Mọi thao tác thay đổi DNS PHẢI đi qua hàng đợi (Queue). KHÔNG BAO 
 ### Ngoại lệ duy nhất
 `DAGateway::testConnection()` được gọi từ Admin Controller khi bấm nút "Test Connection" — đây là hành động diagnostic có chủ đích.
 
-## Fan-out Multi-Server
-- `QueueManager::dispatch()` LUÔN query `ServerRegistry::getActiveServers()`
-- Tạo N sub-jobs độc lập (1 job/server) với cùng `batch_id` (UUID v4)
-- Mỗi sub-job có `server_id` riêng, `status` riêng, retry riêng
-- KHÔNG hardcode số lượng server, KHÔNG giả định số server cố định
+## Primary-only Push
+- `QueueManager::dispatch()` từ danh sách server active, chỉ tạo 1 job cho Primary Server
+- Các Secondary Server sẽ được đồng bộ tự động qua cơ chế của DA Cluster (AXFR/IXFR)
+- Không tạo sub-job cho các server phụ
 
 ## WHMCS là Source of Truth
 - Database WHMCS (`mod_hvndns_records`) là nguồn dữ liệu chính thức

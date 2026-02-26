@@ -173,7 +173,7 @@ Luồng khi `create_on_preregistrar = true`:
 ```
 1. Client đặt hàng domain trên WHMCS
 2. WHMCS trigger hook PreRegistrarRegisterDomain
-3. Module tạo zone trên DA (dns1/2/3) → zone hoạt động
+3. Module tạo zone trên DA (Primary) → zone hoạt động
 4. WHMCS gửi lệnh đăng ký tới Registrar
 5. Registrar gửi EPP create tới Registry
 6. Registry kiểm tra NS → zone tồn tại → ACCEPT ✅

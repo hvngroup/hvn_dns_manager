@@ -590,7 +590,7 @@ tests/Integration/DnsRecordServiceTest.php
 TEST: test_create_record_full_flow
     1. Gọi DnsRecordService::createRecord(A, mail, 1.2.3.4)
     2. Assert: record in mod_hvndns_records
-    3. Assert: queue jobs created (fan-out)
+    3. Assert: queue job created for Primary server
     4. Assert: audit_trail entry exists
     5. Assert: record_history entry with change_type='created'
 
@@ -837,7 +837,7 @@ tests/Security/DataLeakageTest.php
 | Admin Sync Logs (10K rows, server-side DataTable) | < 1s | 2s | Ajax with pagination |
 | DDNS endpoint response | < 100ms | 200ms | cURL benchmark |
 | Sync status poll (Ajax) | < 100ms | 200ms | Simple DB query |
-| Queue dispatch (fan-out 3 servers) | < 50ms | 100ms | 3 DB inserts |
+| Queue dispatch (Primary server) | < 50ms | 100ms | 1 DB insert |
 
 ### 7.2. Load Tests
 
@@ -992,10 +992,8 @@ SCENARIO: Admin quản lý hệ thống
 □ Activity feed cập nhật real-time
 
 SCENARIO: Admin xử lý sự cố server
-□ Disable 1 server → thấy badge thay đổi
-□ Job mới chỉ fan-out ra 2 server (không phải 3)
-□ Enable lại server → fan-out trở về 3
-□ Retry All Failed → jobs quay lại PENDING
+□ Job mới không gửi tới server đã disable
+□ Enable lại server → tự động nhận job (nếu là Primary)led → jobs quay lại PENDING
 
 SCENARIO: Admin sửa DNS thay client
 □ Mở Global Domains → tìm domain khách
@@ -1026,7 +1024,7 @@ SCENARIO: Admin rollback zone
 | 02 | QUEUE-012..015 | Unit | Exponential Backoff formula + per-server | P1 |
 | 03 | CLIENT-001..005 | E2E/UAT | DNS Editor page load, responsive, Alpine.js reactive | P0 |
 | 03 | CLIENT-006..012 | Unit + Integration | Validator (50 cases) + CRUD flow + rate limit | P0 |
-| 03 | CLIENT-013..016 | Integration | Sync Tracker polling + status aggregate | P1 |
+| 03 | CLIENT-013..016 | Integration | Sync Tracker polling + job status | P1 |
 | 04 | ADMIN-001..005 | Integration + UAT | Server CRUD + Test Connection | P0 |
 | 04 | ADMIN-006..009 | Integration + UAT | Global Domains + Admin DNS Editor | P1 |
 | 04 | ADMIN-010..014 | Integration | Sync Logs DataTable + Retry + Export | P1 |

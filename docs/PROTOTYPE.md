@@ -238,7 +238,7 @@ Phân bố status:
 
 Phân bố batch:
 - Mỗi batch có 3 sub-jobs (1 per server)
-- Batch "partial": 2 COMPLETE + 1 FAILED → demo "Syncing 2/3"
+- Batch "syncing": 1 job đang SYNCING → demo "Syncing"
 - Batch "all complete": 3 COMPLETE → demo "Live on all servers"
 
 Phân bố thời gian:
@@ -467,7 +467,7 @@ assets/
 □ Records pending_delete hiện mờ + "Deleting..."
 □ Sync badges phản ánh mock queue status:
   - Records có batch all COMPLETE → 🟢 Live
-  - Records có batch partial → 🔄 Syncing (2/3)
+  - Records có batch syncing → 🔄 Syncing
   - Records có batch all PENDING → 🟡 Pending
   - Records có batch FAILED → 🔴 Failed + [Retry]
 □ Pagination: 10 records/page, navigation buttons
@@ -840,12 +840,10 @@ const MockAPI = {
             data: {
                 batch_id: batchId,
                 status: state,
-                total: 3,
-                complete: state === 'complete' ? 3 : state === 'syncing' ? 1 : 0,
+                total: 1,
+                complete: state === 'complete' ? 1 : state === 'syncing' ? 1 : 0,
                 servers: [
-                    { hostname: 'dns1.hvn.vn', status: state === 'pending' ? 'pending' : 'complete' },
-                    { hostname: 'dns2.hvn.vn', status: state === 'complete' ? 'complete' : 'syncing' },
-                    { hostname: 'dns3.hvn.vn', status: state === 'complete' ? 'complete' : 'pending' },
+                    { hostname: 'dns1.hvn.vn', status: state === 'complete' ? 'complete' : 'syncing', info: state === 'complete' ? '' : 'Đang xử lý...' }
                 ]
             }
         };
@@ -965,7 +963,7 @@ CL-02 DNS Editor:
 □ System records (NS): icon 🔒, không có nút sửa/xóa
 □ Locked records: icon 🔒 + tooltip
 □ Pending delete records: mờ + "Deleting..."
-□ Sync badges đúng trạng thái (Live, Syncing 2/3, Pending, Failed)
+□ Sync badges đúng trạng thái (Live, Syncing, Pending, Failed)
 □ Pagination hoạt động
 □ Responsive: table scroll trên mobile
 

@@ -219,8 +219,8 @@ CREATE TABLE mod_hvndns_settings (
 | 5 | `username` | VARCHAR(100) | 📌 REQD | Tên đăng nhập DA API. Yêu cầu level Admin hoặc Reseller để có quyền quản lý DNS Zone |
 | 6 | `password_enc` | TEXT | 📌 REQD 🔒 ENC | Mật khẩu DA đã mã hóa bằng `WHMCS\Security\Encryption::encode()`. Giải mã bằng `::decode()` chỉ tại thời điểm Cron Worker kết nối. KHÔNG BAO GIỜ log hoặc hiển thị plaintext |
 | 7 | `use_ssl` | TINYINT(1) | 📌 REQD DEFAULT `1` | Sử dụng HTTPS khi gọi API? `1` = HTTPS (khuyến nghị), `0` = HTTP. Nếu `1`, base URL = `https://{ip}:{port}` |
-| 8 | `role` | ENUM('primary', 'secondary') | 📌 REQD DEFAULT `'secondary'` | Vai trò trong cụm DNS. `primary` = server chính (dùng cho Drift Detection — chỉ cần query 1 server primary). `secondary` = bản sao. Fan-out gửi tới TẤT CẢ server không phân biệt role |
-| 9 | `is_active` | TINYINT(1) | 📌 REQD DEFAULT `1` 📋 IDX | Server có đang hoạt động? `1` = active (nhận job mới), `0` = disabled (bảo trì — job mới không fan-out tới server này, job cũ PENDING chuyển CANCELLED) |
+| 8 | `role` | ENUM('primary', 'secondary') | 📌 REQD DEFAULT `'secondary'` | Vai trò trong cụm DNS. `primary` = server chính xử lý API Queue và cho Drift Detection. `secondary` = bản sao (được đồng bộ tự động bởi DA Cluster thông qua AXFR/IXFR), WHMCS KHÔNG push Queue tới server này |
+| 9 | `is_active` | TINYINT(1) | 📌 REQD DEFAULT `1` 📋 IDX | Server có đang hoạt động? `1` = active. Thông thường chỉ có Primary Server là active để nhận queue jobs |
 | 10 | `max_concurrent` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `50` | Số job tối đa mà Cron Worker được phép xử lý cho server này trong 1 chu kỳ cron. Tránh quá tải API DirectAdmin |
 | 11 | `backoff_until` | DATETIME | NULL 📋 IDX | Thời điểm hết thời gian chờ backoff. Nếu `NOW() < backoff_until` → Worker bỏ qua toàn bộ job của server này. `NULL` = server bình thường, không đang backoff |
 | 12 | `backoff_count` | TINYINT UNSIGNED | 📌 REQD DEFAULT `0` | Số lần fail liên tiếp gần đây (dùng tính Exponential Backoff). Reset về `0` khi có job thành công |
@@ -387,9 +387,9 @@ CREATE TABLE mod_hvndns_records (
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID job nội bộ |
-| 2 | `batch_id` | CHAR(36) | 📌 REQD 📋 IDX | UUID v4 nhóm các sub-jobs cùng 1 lệnh dispatch. Khi fan-out ra 3 server, cả 3 job có cùng `batch_id`. Dùng để tính aggregate status (3/3 complete?) và cho Client poll sync status |
+| 2 | `batch_id` | CHAR(36) | 📌 REQD 📋 IDX | UUID v4 của lệnh dispatch. Với kiến trúc Primary-only, batch thường chỉ gồm 1 job cho Primary Server. Dùng cho Client poll sync status |
 | 3 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id`. Domain mà job này tác động. Dùng để group jobs theo domain |
-| 4 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_servers.id`. Server đích mà job này sẽ gửi API tới. Mỗi sub-job trong batch nhắm vào 1 server khác nhau |
+| 4 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_servers.id`. Server đích mà job này sẽ gửi API tới (luôn là Primary Server) |
 | 5 | `action` | ENUM('ADD_RECORD', 'EDIT_RECORD', 'DELETE_RECORD', 'CREATE_ZONE', 'DELETE_ZONE', 'CREATE_REDIRECT', 'EDIT_REDIRECT', 'DELETE_REDIRECT', 'CREATE_EMAIL_FWD', 'DELETE_EMAIL_FWD', 'ENABLE_DNSSEC', 'DISABLE_DNSSEC', 'RESIGN_ZONE', 'REQUEST_SSL', 'RENEW_SSL') | 📌 REQD | Loại tác vụ cần thực thi. Mỗi action tương ứng 1 DA API command. Worker sử dụng `DACommandMap` để map action → API endpoint + parameters |
 | 6 | `payload` | JSON | 📌 REQD | Dữ liệu chi tiết cho tác vụ ở dạng JSON. Cấu trúc khác nhau tùy action — xem SPEC.md Section 4.2 "Payload JSON format". VD ADD_RECORD: `{"record_id":123, "type":"A", "name":"mail", "value":"103.1.2.3", "ttl":3600}`. VD EDIT_RECORD: `{"record_id":123, "old_value":"1.2.3.4", "new_value":"5.6.7.8", ...}` |
 | 7 | `status` | ENUM('PENDING', 'SYNCING', 'COMPLETE', 'FAILED', 'CANCELLED', 'PERMANENTLY_FAILED') | 📌 REQD DEFAULT `'PENDING'` 📋 IDX | Trạng thái job: `PENDING` = chờ Worker xử lý; `SYNCING` = Worker đang xử lý (row locked); `COMPLETE` = DA xác nhận thành công; `FAILED` = lỗi, sẽ retry nếu còn attempts; `CANCELLED` = bị hủy bởi Conflict Resolution hoặc Admin; `PERMANENTLY_FAILED` = hết retry hoặc lỗi non-retryable (auth fail, zone not found) |
@@ -1007,7 +1007,7 @@ CREATE TABLE mod_hvndns_notification_cooldowns (
 | domains | `idx_status` | status | INDEX | Filter theo trạng thái |
 | records | `idx_domain_type` | domain_id, type | COMPOSITE | Lọc records theo domain + type |
 | records | `idx_domain_name` | domain_id, name | COMPOSITE | Lookup record cụ thể |
-| **queue** | **`idx_worker_pickup`** | **status, next_retry_at, priority, scheduled_at** | **COMPOSITE** | **🔴 CRITICAL — Worker query chính** |
+| **queue** | **`idx_worker_pickup`** | **status, next_retry_at, priority, scheduled_at** | **COMPOSITE** | **🔴 CRITICAL — Worker query chính. `batch_id`: UUID v4 tạo bởi `QueueManager::dispatch()`. Nhóm job của Primary server. Dùng để tính aggregate status.** |
 | queue | `idx_batch` | batch_id | INDEX | Aggregate status |
 | queue | `idx_domain_status` | domain_id, status | COMPOSITE | Dashboard per domain |
 | queue | `idx_server_status` | server_id, status | COMPOSITE | Dashboard per server |

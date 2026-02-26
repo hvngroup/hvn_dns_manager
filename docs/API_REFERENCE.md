@@ -951,10 +951,8 @@ Response 200:
                 "pending_delete": false,
                 "sync_status": "complete",
                 "sync_detail": {
-                    "total": 3,
-                    "complete": 3,
-                    "pending": 0,
-                    "failed": 0
+                    "server": "dns1.hvn.vn",
+                    "error": null
                 }
             }
         ],
@@ -969,8 +967,8 @@ Response 200:
 
 | Field | Mô tả |
 |-------|-------|
-| `sync_status` | Aggregate status: `complete`, `syncing`, `pending`, `partial`, `failed` |
-| `sync_detail` | Chi tiết per-server count. CHỈ hiện hostname, KHÔNG hiện IP |
+| `sync_status` | Status của job: `complete`, `syncing`, `pending`, `failed` |
+| `sync_detail` | Chi tiết tiến trình trên Primary Server. CHỈ hiện hostname, KHÔNG hiện IP |
 | `is_system` | `true` → Client không thể sửa/xóa (NS, SOA) |
 | `is_locked` | `true` → Admin đã lock, Client không thể sửa/xóa |
 
@@ -1122,21 +1120,16 @@ Response 200:
     "data": {
         "batch_id": "550e8400-e29b-41d4-a716-446655440000",
         "status": "syncing",
-        "total": 3,
-        "complete": 2,
-        "pending": 0,
-        "syncing": 1,
-        "failed": 0,
-        "servers": [
-            {"hostname": "dns1.hvn.vn", "status": "complete"},
-            {"hostname": "dns2.hvn.vn", "status": "complete"},
-            {"hostname": "dns3.hvn.vn", "status": "syncing", "info": "Đang xử lý..."}
-        ]
+        "server": {
+            "hostname": "dns1.hvn.vn", 
+            "status": "syncing", 
+            "info": "Đang xử lý..."
+        }
     }
 }
 ```
 
-**⚠️ Bảo mật**: Field `servers[].hostname` CHỈ hiện hostname, KHÔNG có IP, port, hoặc bất kỳ server detail nào.
+**⚠️ Bảo mật**: Field `server.hostname` CHỈ hiện hostname, KHÔNG có IP, port, hoặc bất kỳ server detail nào.
 
 ---
 
@@ -1150,9 +1143,9 @@ Response 200:
     "success": true,
     "data": {
         "records": {
-            "456": {"status": "complete", "complete": 3, "total": 3},
-            "789": {"status": "syncing", "complete": 2, "total": 3},
-            "790": {"status": "pending", "complete": 0, "total": 3}
+            "456": {"status": "complete", "server": "dns1.hvn.vn"},
+            "789": {"status": "syncing", "server": "dns1.hvn.vn"},
+            "790": {"status": "pending", "server": "dns1.hvn.vn"}
         },
         "has_pending": true
     }

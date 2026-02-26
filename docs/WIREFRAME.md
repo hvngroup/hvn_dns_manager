@@ -117,7 +117,7 @@ $alpine       Alpine.js reactive data
 
 **Hành vi**:
 - Click `[Quản lý DNS →]` → chuyển tới CL-02 (DNS Editor)
-- Badge trạng thái lấy từ aggregate sync status (nếu có job PENDING/SYNCING → 🟡)
+- Badge trạng thái lấy từ sync status của job (nếu job PENDING/SYNCING → 🟡 hoặc 🔄)
 - Nút `[Copy tất cả]` copy 3 nameserver vào clipboard
 
 ---
@@ -167,7 +167,7 @@ $alpine       Alpine.js reactive data
 ║  │  │ A   │ @        │ 103.45.67.89       │ 3600  │ 🟢Live │ [✏️] │ │   ║
 ║  │  │     │          │                    │       │        │ [🗑️] │ │   ║
 ║  │  ├─────┼──────────┼────────────────────┼───────┼────────┼──────┤ │   ║
-║  │  │ A   │ mail     │ 103.45.67.90       │ 3600  │🔄2/3   │ [✏️] │ │   ║
+║  │  │ A   │ mail     │ 103.45.67.90       │ 3600  │🔄Sync  │ [✏️] │ │   ║
 ║  │  │     │          │                    │       │Syncing │ [🗑️] │ │   ║
 ║  │  ├─────┼──────────┼────────────────────┼───────┼────────┼──────┤ │   ║
 ║  │  │ A   │ www      │ 103.45.67.89       │ 3600  │ 🟡     │ [✏️] │ │   ║
@@ -214,7 +214,7 @@ $alpine       Alpine.js reactive data
 - Cột **TTL**: Hiện dạng thân thiện: `1h` (3600), `5m` (300), `24h` (86400)
 - Cột **Trạng thái** (Alpine.js reactive):
   - 🟢 `Live` — Đã đồng bộ tất cả server
-  - 🔄 `Syncing (2/3)` — Đang đồng bộ, hiện số server đã xong
+  - 🔄 `Syncing` — Đang đồng bộ tới Primary Server
   - 🟡 `Pending` — Chờ xử lý
   - 🔴 `Failed` + nút `[Retry]` nhỏ — Client có thể retry 1 lần
   - ⟳ Spinner animation khi Syncing
@@ -669,6 +669,8 @@ $alpine       Alpine.js reactive data
 ║                         │  │                                             │   ║
 ║                         │  │  14:32  ❌ DELETE_RECORD  myblog.net        │   ║
 ║                         │  │         → dns3.hvn.vn  timeout              │   ║
+║                         │  │         → dns1 primary complete             │   ║
+║                         │  │         → dns1 primary complete             │   ║
 ║                         │  │  14:31  ✅ ADD_RECORD     shop.vn           │   ║
 ║                         │  │         → dns1,dns2,dns3  complete          │   ║
 ║                         │  │  14:30  ✅ EDIT_RECORD    example.com       │   ║
@@ -730,7 +732,7 @@ $alpine       Alpine.js reactive data
 ║          │  │    [🔄 Reset Backoff]                               │  ║
 ║          │  └─────────────────────────────────────────────────────┘  ║
 ║          │                                                            ║
-║          │  Ghi chú: Disable server sẽ dừng fan-out job mới tới      ║
+║          │  Ghi chú: Disable server sẽ dừng nhận queue jobs (nếu primary) ║
 ║          │  server đó. Job PENDING hiện tại sẽ chuyển CANCELLED.     ║
 ╚═══════════════════════════════════════════════════════════════════════╝
 ```
@@ -954,7 +956,7 @@ $alpine       Alpine.js reactive data
 ║          │  │  Status:      FAILED (attempt 3/5)                        │  ║
 ║          │  │  Error:       Connection timed out after 15000ms          │  ║
 ║          │  │  Next retry:  14:48 (16 phút)                            │  ║
-║          │  │  Batch:       abc-123-def (2/3 complete)                  │  ║
+║          │  │  Batch:       abc-123-def (syncing)                       │  ║
 ║          │  │  Actor:       Client #1236 (Lê C) from 118.70.xx.xx     │  ║
 ║          │  │  Created:     25/02/2026 14:30:15                        │  ║
 ║          │  │                                                            │  ║

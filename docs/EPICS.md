@@ -57,7 +57,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `FOUND-006` | Tạo bảng `mod_hvndns_servers` — Lưu thông tin kết nối các DA Node (hostname, IP, port, user, encrypted password, role, is_active, max_concurrent_jobs) | 2 |
+| `FOUND-006` | Tạo bảng `mod_hvndns_servers` — Lưu thông tin kết nối các DA Node (chỉ Primary server nhận API từ WHMCS, Secondary tự đồng bộ nhờ DA Cluster) | 2 |
 | `FOUND-007` | Tạo bảng `mod_hvndns_domains` — Mapping domain ↔ WHMCS service_id ↔ server_id, trạng thái active/suspended | 2 |
 | `FOUND-008` | Tạo bảng `mod_hvndns_records` — Bản ghi DNS local (domain_id, type, name, value, ttl, priority) làm source of truth | 2 |
 | `FOUND-009` | Tạo bảng `mod_hvndns_queue` — Hàng đợi tác vụ (domain_id, server_id, action, payload JSON, status ENUM, attempts, scheduled_at, completed_at, error_message) | 3 |
@@ -102,14 +102,13 @@
 | Issue | Mô tả | SP |
 |-------|--------|-----|
 | `QUEUE-001` | Viết class `QueueManager` với method `dispatch($domainId, $action, $payload)`: validate input → tạo 1 row `PENDING` trong `mod_hvndns_queue` → return `job_id` | 2 |
-| `QUEUE-002` | Implement logic **Fan-out**: khi dispatch, tự query tất cả server `is_active = 1` → tạo N sub-jobs (1 job/server) cùng `batch_id` | 3 |
-| `QUEUE-003` | Method `getStatus($batchId)`: trả về aggregate status (all_complete / partial / all_failed / pending) dựa trên trạng thái các sub-jobs cùng batch | 2 |
+| `QUEUE-002` | Implement logic **Primary-only Push**: khi dispatch, module chỉ đẩy 1 job vào queue dành cho Primary Server đang `is_active = 1` | 3 |
+| `QUEUE-003` | Method `getStatus($batchId)`: trả về status (complete / failed / pending). Vì chỉ có 1 job/batch nên trạng thái batch chính là trạng thái job. | 2 |
 | `QUEUE-004` | Method `cancelPending($batchId)`: hủy các job chưa xử lý (dùng cho Conflict Resolution khi Admin ghi đè) | 1 |
 | `QUEUE-005` | Xử lý deduplication: nếu cùng 1 domain + cùng 1 record + cùng action đang có job `PENDING`, replace job cũ thay vì tạo thêm job mới | 2 |
 
 **AC**:
-- Mỗi lần dispatch tạo đúng N job = số server active
-- Tất cả sub-jobs cùng batch có chung `batch_id` (UUID)
+- Mỗi lần dispatch tạo đúng 1 job cho Primary Server
 - `dispatch()` hoàn thành trong < 50ms (chỉ write DB, không gọi API)
 - Deduplication không ảnh hưởng đến job đang `SYNCING`
 
@@ -162,7 +161,7 @@
 |-------|--------|-----|
 | `CLIENT-001` | Tạo Client Area page (`clientarea.tpl`) hiển thị bảng DNS records của domain đang chọn: cột Name, Type, Value, TTL, Status, Actions | 3 |
 | `CLIENT-002` | DataTable hỗ trợ filter theo Type (A, AAAA, CNAME, MX, TXT, SRV, NS, CAA), search theo Name/Value | 2 |
-| `CLIENT-003` | Mỗi record hiển thị **Sync Status Badge**: 🟢 `Live` / 🔄 `Syncing (2/3)` / 🟡 `Pending` / 🔴 `Failed` — dựa trên aggregate status của batch | 2 |
+| `CLIENT-003` | Mỗi record hiển thị **Sync Status Badge**: 🟢 `Live` / 🔄 `Syncing` / 🟡 `Pending` / 🔴 `Failed` — dựa trên status của job | 2 |
 | `CLIENT-004` | Tích hợp Alpine.js cho reactive UI: khi status thay đổi (poll Ajax mỗi 5 giây), badge tự cập nhật không cần reload trang | 3 |
 | `CLIENT-005` | Responsive layout: hoạt động tốt trên mobile (Bootstrap 5 grid collapse) | 1 |
 
@@ -202,7 +201,7 @@
 |-------|--------|-----|
 | `CLIENT-013` | API endpoint `/ajax/sync-status?domain_id=X` trả về danh sách record kèm aggregate status mới nhất | 2 |
 | `CLIENT-014` | Alpine.js component `SyncTracker`: poll endpoint mỗi 5 giây, cập nhật badge tương ứng. Khi tất cả job COMPLETE → dừng poll | 2 |
-| `CLIENT-015` | Hiển thị chi tiết khi hover/click badge: "Synced to 2/3 servers — dns3.hvn.vn: retrying in 4 min" (chỉ hiện tên server, không hiện IP) | 2 |
+| `CLIENT-015` | Hiển thị chi tiết khi hover/click badge: "Synced to Primary Server" hoặc "Retrying in 4 min" | 2 |
 | `CLIENT-016` | Toast notification khi record chuyển từ Pending/Syncing → Live: "✅ Record A mail.domain.com đã hoạt động trên tất cả server" | 1 |
 
 **AC**:
@@ -305,7 +304,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `PROV-001` | Hook `AfterModuleCreate`: tạo row trong `mod_hvndns_domains`, dispatch job `CREATE_ZONE` fan-out ra tất cả active server | 2 |
+| `PROV-001` | Hook `AfterModuleCreate`: tạo row trong `mod_hvndns_domains`, dispatch job `CREATE_ZONE` cho Primary server | 2 |
 | `PROV-002` | Áp DNS Template mặc định: lấy template từ `mod_hvndns_templates` → tạo các record chuẩn (NS records trỏ dns1/2/3, SOA, default A record) | 2 |
 | `PROV-003` | Hook `AfterModuleTerminate`: dispatch job `DELETE_ZONE` → xóa zone trên tất cả DA Node → soft-delete domain trong DB (giữ lại 30 ngày cho rollback) | 2 |
 | `PROV-004` | Hook `AfterModuleSuspend` / `AfterModuleUnsuspend`: đánh dấu domain suspended → Client không thể chỉnh sửa DNS nhưng zone vẫn hoạt động trên server | 1 |

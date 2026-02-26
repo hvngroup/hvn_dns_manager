@@ -181,7 +181,7 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 - Kiểm tra giá trị mode mới (off/free/paid) qua SettingsHelper để có luồng xử lý tương ứng
 ```
 
-### 2.5. Fan-out Multi-Server
+### 2.5. Primary-only Push
 
 ```
 ❌ CẤM:
@@ -191,9 +191,8 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 
 ✅ BẮT BUỘC:
 - QueueManager::dispatch() LUÔN query ServerRegistry::getActiveServers()
-- Tạo N sub-jobs độc lập (1 job per server) với cùng batch_id (UUID v4)
-- Mỗi sub-job có server_id riêng, status riêng, retry riêng
-- Aggregate status tính từ tất cả sub-jobs trong batch
+- Từ N server active → Mỗi lần dispatch tạo 1 job cho Primary Server
+- Status tính từ sub-job duy nhất của Primary Server
 ```
 
 ---
@@ -548,7 +547,7 @@ class DnsRecordService
             'priority'  => $priority,
         ]);
 
-        // 6. Dispatch to queue (Fan-out to all servers)
+        // 6. Dispatch to queue (Primary-only Push)
         $batchId = $this->queue->dispatch(
             domainId:  $domainId,
             action:    'ADD_RECORD',
@@ -770,7 +769,7 @@ class v1_0_0
  * Variables từ Controller:
  *   $domain      - Domain object
  *   $records     - Array of DnsRecord
- *   $syncStatus  - Aggregate sync status
+ *   $syncStatus  - Sync status của Primary Server
  *   $quota       - {current: int, limit: int}
  *}
 
@@ -1267,7 +1266,7 @@ Snapshot Types (mod_hvndns_snapshots.snapshot_type):
 
 Server Roles (mod_hvndns_servers.role):
   primary    → Server chính (dùng cho Drift Detection query)
-  secondary  → Bản sao. Fan-out gửi tới TẤT CẢ server, không phân biệt role
+  secondary  → Bản sao, được đồng bộ tự động, không nhận job trực tiếp từ WHMCS
 
 Actor Types (dùng chung cho queue, audit_trail, record_history):
   client  → Khách hàng từ Client Area

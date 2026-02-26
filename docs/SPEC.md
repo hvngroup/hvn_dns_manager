@@ -37,7 +37,7 @@
 
 - **Async-First**: Mọi thao tác thay đổi DNS đều đi qua hàng đợi (Queue). Không có bất kỳ API call nào tới DirectAdmin xảy ra trong request lifecycle của người dùng.
 - **WHMCS-Native**: Sử dụng tối đa hạ tầng có sẵn của WHMCS (Eloquent ORM, Smarty Template, Monolog, Hook System) thay vì tự build lại.
-- **Fan-out Multi-Node**: Một thay đổi DNS tạo ra N job song song cho N server DirectAdmin active.
+- **Primary-only Push**: Một thay đổi DNS chỉ tạo ra 1 job gửi đến Primary Server. Việc đồng bộ sang các Secondary Server do DA Cluster tự động xử lý.
 - **Fail-Safe**: Hệ thống được thiết kế để chịu lỗi — DA server down không ảnh hưởng trải nghiệm người dùng, queue tự retry khi server phục hồi.
 - **Single Source of Truth**: WHMCS Database là nguồn dữ liệu chính thức (authoritative). DirectAdmin là target execution layer.
 
@@ -63,13 +63,21 @@
 │                                  │               │
 └──────────────────────────────────┼───────────────┘
                                    │ HTTPS API
-                    ┌──────────────┼──────────────┐
-                    ▼              ▼               ▼
-              ┌──────────┐  ┌──────────┐   ┌──────────┐
-              │  dns1     │  │  dns2     │   │  dns3     │
-              │  .hvn.vn  │  │  .hvn.vn  │   │  .hvn.vn  │
-              │ (Primary) │  │(Secondary)│   │(Secondary)│
-              └──────────┘  └──────────┘   └──────────┘
+                                   │ HTTPS API
+                                   ▼
+                             ┌──────────┐
+                             │  dns1     │
+                             │  .hvn.vn  │
+                             │ (Primary) │
+                             └────┬─────┘
+                                  │ AXFR/IXFR
+                    ┌─────────────┴───────────────┐
+                    ▼                             ▼
+              ┌──────────┐                  ┌──────────┐
+              │  dns2     │                  │  dns3     │
+              │  .hvn.vn  │                  │  .hvn.vn  │
+              │(Secondary)│                  │(Secondary)│
+              └──────────┘                  └──────────┘
               DirectAdmin    DirectAdmin    DirectAdmin
 ```
 
@@ -168,7 +176,7 @@
 │   ├── getServerHealth($id)    → HealthStatus                │
 │   └── isServerInBackoff($id)  → bool                        │
 │                                                              │
-│   Fan-out Logic: 1 dispatch → N sub-jobs (1 per server)     │
+│   Primary-only Logic: 1 dispatch → 1 sub-job (Primary)      │
 ├─────────────────────────────────────────────────────────────┤
 │                  TẦNG 4: QUEUE & WORKER LAYER                │
 │                                                              │
@@ -471,7 +479,7 @@ CREATE TABLE mod_hvndns_queue (
 ```
 
 **Ghi chú kỹ thuật**:
-- **`batch_id`**: UUID v4 tạo bởi `QueueManager::dispatch()`. Khi fan-out ra 3 server, cả 3 job có cùng `batch_id`. Dùng để tính aggregate status.
+- **`batch_id`**: UUID v4 tạo bởi `QueueManager::dispatch()`. Dùng để nhóm job và phục vụ Client poll sync status.
 - **`locked_by`**: Chứa `hostname:pid` của Worker process đang xử lý. Dùng kèm `locked_at` để phát hiện stale lock (> 5 phút = stale).
 - **`priority`**: Job từ Admin có priority = 1 (cao nhất), Client = 5, System (auto-resign, auto-renew SSL) = 8. Worker pick job theo priority ASC.
 - **`payload` JSON format** tùy theo action:
@@ -768,14 +776,13 @@ CLIENT BROWSER                  WHMCS SERVER                           DATABASE 
      │                               │       domain_id, ADD_RECORD,        │                               │                               │
      │                               │       {record_id: 456, ...})        │                               │                               │
      │                               │                                     │                               │                               │
-     │                               │     ServerRegistry::getActive()     │                               │                               │
-     │                               │     └─ Returns [dns1, dns2, dns3]   │                               │                               │
-     │                               │                                     │                               │                               │
-     │                               │  8. INSERT 3x mod_hvndns_queue      │                               │                               │
-     │                               │     batch_id = "abc-123-def"        │                               │                               │
+     │                               │     ServerRegistry::getActive()     │                               │
+     │                               │     ServerRegistry::getPrimary()    │                               │
+     │                               │     └─ Returns [dns1 (primary)]     │                               │
+     │                               │                                     │                               │
+     │                               │  8. INSERT 1x mod_hvndns_queue      │                               │
+     │                               │     batch_id = "abc-123-def"        │                               │
      │                               │─────────────────────────────────────▶│  job #1 → dns1 PENDING        │                               │
-     │                               │─────────────────────────────────────▶│  job #2 → dns2 PENDING        │                               │
-     │                               │─────────────────────────────────────▶│  job #3 → dns3 PENDING        │                               │
      │                               │                                     │                               │                               │
      │                               │  9. INSERT mod_hvndns_audit_trail   │                               │                               │
      │                               │─────────────────────────────────────▶│  actor=client, action=add     │                               │
@@ -823,30 +830,27 @@ CLIENT BROWSER                  WHMCS SERVER                           DATABASE 
      │                               │                                     │  18. INSERT sync_log           │                               │
      │                               │                                     │◀─────────────────────────────│                               │
      │                               │                                     │                               │                               │
-     │                               │                                     │  (Lặp lại 14-18 cho dns2, dns3)│                               │
-     │                               │                                     │                               │                               │
      ═══════════ AJAX POLLING ═══════════════════════════════════════════════                               │                               │
      │                               │                                     │                               │                               │
      │  19. GET /ajax/sync-status    │                                     │                               │                               │
      │      ?batch_id=abc-123-def    │                                     │                               │                               │
      │──────────────────────────────▶│                                     │                               │                               │
      │                               │  20. QueueManager::getStatus()      │                               │                               │
-     │                               │──────────────────────────────────────▶│ SELECT COUNT by status       │                               │
+     │                               │──────────────────────────────────────▶│ SELECT status                │                               │
      │                               │                                     │  WHERE batch_id="abc-123-def" │                               │
-     │                               │  21. Aggregate: 3/3 COMPLETE        │                               │                               │
+     │                               │  21. Status: COMPLETE               │                               │                               │
      │  22. JSON {status:"complete", │                                     │                               │                               │
-     │      servers: {dns1:✅,        │                                     │                               │                               │
-     │      dns2:✅, dns3:✅}}        │                                     │                               │                               │
+     │      server: "dns1.hvn.vn"}   │                                     │                               │                               │
      │◀──────────────────────────────│                                     │                               │                               │
      │                               │                                     │                               │                               │
      │  UI: Badge chuyển sang        │                                     │                               │                               │
-     │  🟢 "Live on all servers"     │                                     │                               │                               │
+     │  🟢 "Live"                    │                                     │                               │                               │
      │  Toast: "✅ Record đã live!"   │                                     │                               │                               │
      │  Dừng polling.                │                                     │                               │                               │
      ▼                               ▼                                     ▼                               ▼                               ▼
 ```
 
-**Tổng thời gian end-to-end**: User nhấn Save (0s) → UI phản hồi (0.2s) → DNS live trên tất cả server (60-180s tùy chu kỳ cron).
+**Tổng thời gian end-to-end**: User nhấn Save (0s) → UI phản hồi (0.2s) → DNS live trên Primary server (60-120s tùy chu kỳ cron) → DA Cluster tự động bộ tới Secondary.
 
 ---
 
@@ -995,8 +999,6 @@ Admin sửa cùng record (T=60s)
 │                               │
 │ 3. Dispatch new admin jobs:  │
 │    Job #101 → dns1 PENDING   │
-│    Job #102 → dns2 PENDING   │
-│    Job #103 → dns3 PENDING   │
 │    (priority = 1, admin)     │
 │                               │
 │ 4. Update record in DB       │
@@ -1104,7 +1106,7 @@ WHMCS gọi Module::Create()
 │       template_records: [...],                                │
 │       actor_type: 'system'                                    │
 │    })                                                         │
-│    → Fan-out: 3 jobs cho dns1, dns2, dns3                    │
+│    → 1 job cho Primary Server (dns1)                          │
 │                                                               │
 │ 6. Audit trail: "Zone created via auto-provision"             │
 └──────────────────────────────────────────────────────────────┘
@@ -1324,7 +1326,7 @@ class DAResponse
 class QueueManager
 {
     /**
-     * Dispatch job mới vào queue (fan-out ra tất cả active servers)
+     * Dispatch job mới vào queue cho Primary Server
      * 
      * @param int    $domainId   ID domain trong mod_hvndns_domains
      * @param string $action     Action enum (ADD_RECORD, EDIT_RECORD, ...)
@@ -1345,16 +1347,11 @@ class QueueManager
     ): string;
 
     /**
-     * Lấy aggregate status của 1 batch
+     * Lấy status của 1 batch (job của Primary Server)
      * 
      * @return object {
-     *     status: 'pending'|'syncing'|'complete'|'partial'|'failed',
-     *     total: int,
-     *     complete: int,
-     *     pending: int,
-     *     syncing: int,
-     *     failed: int,
-     *     servers: [{hostname, status, error_message}]
+     *     status: 'pending'|'syncing'|'complete'|'failed',
+     *     server: {hostname, status, error_message}
      * }
      */
     public function getBatchStatus(string $batchId): object;
@@ -1397,7 +1394,7 @@ Khi QueueManager::dispatch() được gọi:
       → Chuyển sang ConflictResolver (xem FLOW-03)
 
 3. Nếu KHÔNG tìm thấy:
-   → Tạo job mới bình thường (fan-out)
+   → Tạo job mới cho Primary Server
 ```
 
 ### 7.3. Job Priority Matrix
