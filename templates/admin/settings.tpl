@@ -393,7 +393,7 @@
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-3" x-show="s.enable_masked_redirect" x-collapse>
+                                <div class="hvn-mb-3" x-show="s.enable_masked_redirect">
                                     <label class="form-label hvn-fw-bold">Hash Key cho Connector <code class="hvn-text-muted small">masked_hash_key</code> <span class="hvn-text-danger">*</span></label>
                                     <input type="password" class="hvn-form-control font-monospace" x-model="s.masked_hash_key" placeholder="Tối thiểu 8 ký tự bí mật...">
                                     <div class="form-text hvn-text-danger"><i class="bi bi-exclamation-triangle"></i> BẮT BUỘC thay đổi khỏi giá trị mặc định. Lưu encrypted trong DB.</div>
@@ -496,7 +496,7 @@
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_ddns_bruteforce">
                                     </div>
                                 </div>
-                                <div class="hvn-row g-3" x-show="s.enable_ddns_bruteforce" x-collapse>
+                                <div class="hvn-row g-3" x-show="s.enable_ddns_bruteforce">
                                     <div class="hvn-col-md-4">
                                         <label class="form-label hvn-fw-bold small">Ngưỡng fail <code class="hvn-text-muted small">ddns_bruteforce_threshold</code></label>
                                         <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_bruteforce_threshold" min="1"><span class="hvn-input-group-text">lần</span></div>
@@ -616,7 +616,7 @@
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_user_custom_templates">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3" x-show="s.enable_user_custom_templates" x-collapse>
+                                <div class="hvn-mb-3" x-show="s.enable_user_custom_templates">
                                     <label class="form-label hvn-fw-bold">Giới hạn Template/user <code class="hvn-text-muted small">user_template_limit</code></label>
                                     <div class="hvn-input-group" style="max-width:200px">
                                         <input type="number" class="hvn-form-control" x-model="s.user_template_limit" min="0">
@@ -638,7 +638,7 @@
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_client_notification">
                                     </div>
                                 </div>
-                                <div x-show="s.enable_client_notification" x-collapse>
+                                <div x-show="s.enable_client_notification">
                                     <div class="hvn-mb-3">
                                         <label class="form-label hvn-fw-bold">Email Template Thông báo <code class="hvn-text-muted small">notification_email_template</code></label>
                                         <select class="hvn-form-select" x-model="s.notification_email_template" style="max-width:400px">
@@ -675,7 +675,7 @@
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_telegram_alert">
                                     </div>
                                 </div>
-                                <div x-show="s.enable_telegram_alert" x-collapse>
+                                <div x-show="s.enable_telegram_alert">
                                     <div class="hvn-row g-3 hvn-mb-3">
                                         <div class="hvn-col-md-8">
                                             <label class="form-label hvn-fw-bold small">Bot Token <code class="hvn-text-muted small">telegram_bot_token</code></label>
@@ -693,7 +693,7 @@
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_email_alert">
                                     </div>
                                 </div>
-                                <div x-show="s.enable_email_alert" x-collapse>
+                                <div x-show="s.enable_email_alert">
                                     <div class="hvn-mb-3">
                                         <label class="form-label hvn-fw-bold small">Email nhận Alert <code class="hvn-text-muted small">alert_email_addresses</code></label>
                                         <input type="text" class="hvn-form-control" x-model="s.alert_email_addresses" placeholder="admin@hvn.vn, devops@hvn.vn">
@@ -938,7 +938,7 @@
                                     </div>
                                 </div>
 
-                                <div x-show="s.upsell_enable" x-collapse>
+                                <div x-show="s.upsell_enable">
                                     <div class="hvn-row g-3 hvn-mb-3">
                                         <div class="hvn-col-md-6">
                                             <label class="form-label hvn-fw-bold">ID Addon DNSSEC <code class="hvn-text-muted small">upsell_dnssec_addon_id</code></label>
