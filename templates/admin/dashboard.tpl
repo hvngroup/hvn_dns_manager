@@ -21,7 +21,7 @@
         <!-- Sync Pipeline -->
         <div class="hvn-col-md-8">
             <div class="hvn-card h-100 hvn-shadow-sm hvn-border-0">
-                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0 hvn-pt-3 hvn-pb-0">
+                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0">
                     <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-activity"></i> Sync Pipeline &mdash; 24 giờ qua</h5>
                 </div>
                 <div class="hvn-card-body">
@@ -50,7 +50,7 @@
         <!-- Tổng quan -->
         <div class="hvn-col-md-4">
             <div class="hvn-card h-100 hvn-shadow-sm hvn-border-0">
-                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0 hvn-pt-3 hvn-pb-0">
+                <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0">
                     <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-pie-chart-fill"></i> Tổng quan</h5>
                 </div>
                 <div class="hvn-card-body">
@@ -58,7 +58,7 @@
                         <span><i class="bi bi-globe"></i> Domains:</span>
                         <span class="hvn-fw-bold">{$dashboard.stats.domains|default:'342' }</span>
                     </div>
-                    <div class="hvn-d-flex hvn-justify-content-between hvn-border-bottom hvn-pb-3 hvn-mb-3">
+                    <div class="hvn-d-flex hvn-justify-content-between hvn-border-bottom hvn-pb-2 hvn-mb-2">
                         <span><i class="bi bi-card-list"></i> Records:</span>
                         <span class="hvn-fw-bold">{$dashboard.stats.records|default:'6,840' }</span>
                     </div>
@@ -185,7 +185,7 @@
                 <div class="hvn-card-body hvn-p-0">
                     <ul class="hvn-list-group hvn-list-group-flush font-monospace small">
                         {foreach from=$dashboard.recentActivity item=log}
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start border-{if $log.status == 'complete' }success{elseif $log.status == 'failed' }danger{else}warning{/if}">
+                            <li class="hvn-list-group-item hvn-py-2" style="background-color: {if $log.status == 'complete'}rgba(25,135,84,0.07){elseif $log.status == 'failed'}rgba(220,53,69,0.07){else}rgba(255,193,7,0.1){/if};">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span>
                                         <span class="hvn-text-muted hvn-pe-2">{$log.time}</span>
@@ -199,7 +199,7 @@
                                 </div>
                             </li>
                         {foreachelse}
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-danger">
+                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(220,53,69,0.07);">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:32</span> ❌ <strong>DELETE_RECORD</strong></span>
                                     <a href="#">myblog.net</a>
@@ -207,21 +207,21 @@
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns3.hvn.vn <span class="hvn-badge hvn-bg-danger-subtle hvn-text-danger hvn-fw-normal hvn-ms-1">timeout</span></div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1.hvn.vn <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">primary complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-success">
+                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(25,135,84,0.07);">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:31</span> ✅ <strong>ADD_RECORD</strong></span>
                                     <a href="#">shop.vn</a>
                                 </div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-success">
+                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(25,135,84,0.07);">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:30</span> ✅ <strong>EDIT_RECORD</strong></span>
                                     <a href="#">example.com</a>
                                 </div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
                             </li>
-                            <li class="hvn-list-group-item hvn-py-2 hvn-border-start hvn-border-warning">
+                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(255,193,7,0.1);">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span><span class="hvn-text-muted hvn-pe-2">14:28</span> ⚠️ <strong>ENABLE_DNSSEC</strong></span>
                                     <a href="#">test.org</a>
