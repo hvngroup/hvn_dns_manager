@@ -11,58 +11,58 @@
         <div class="hvn-col-md-3 hvn-mb-4">
             <div class="hvn-card hvn-shadow-sm hvn-border-0">
                 <div class="hvn-list-group hvn-list-group-flush hvn-rounded" id="settingsLayoutTabs" role="tablist">
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2 active" data-bs-toggle="list" data-bs-target="#pane-general" @click="activeTab='general'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='general'}{/literal}" @click="activeTab='general'">
                         <i class="bi bi-sliders fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Chung</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-domain-policy" @click="activeTab='domain-policy'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='domain-policy'}{/literal}" @click="activeTab='domain-policy'">
                         <i class="bi bi-globe fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Domain Policy</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-dns-editor" @click="activeTab='dns-editor'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='dns-editor'}{/literal}" @click="activeTab='dns-editor'">
                         <i class="bi bi-pencil-square fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">DNS Editor</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-limits" @click="activeTab='limits'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='limits'}{/literal}" @click="activeTab='limits'">
                         <i class="bi bi-bar-chart-steps fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Limits</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-redirect" @click="activeTab='redirect'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='redirect'}{/literal}" @click="activeTab='redirect'">
                         <i class="bi bi-link-45deg fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">URL Redirect</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-email" @click="activeTab='email'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='email'}{/literal}" @click="activeTab='email'">
                         <i class="bi bi-envelope fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Email Forwarding</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-ddns" @click="activeTab='ddns'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ddns'}{/literal}" @click="activeTab='ddns'">
                         <i class="bi bi-router fs-5 hvn-text-primary"></i> <span class="hvn-fw-bold">DDNS</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-dnssec" @click="activeTab='dnssec'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='dnssec'}{/literal}" @click="activeTab='dnssec'">
                         <i class="bi bi-shield-check fs-5 hvn-text-success"></i> <span class="hvn-fw-bold">DNSSEC</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-ssl" @click="activeTab='ssl'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ssl'}{/literal}" @click="activeTab='ssl'">
                         <i class="bi bi-lock fs-5 hvn-text-success"></i> <span class="hvn-fw-bold">SSL / Let's Encrypt</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-templates" @click="activeTab='templates'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='templates'}{/literal}" @click="activeTab='templates'">
                         <i class="bi bi-files fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">DNS Templates</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-notify" @click="activeTab='notify'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='notify'}{/literal}" @click="activeTab='notify'">
                         <i class="bi bi-bell fs-5 hvn-text-warning"></i> <span class="hvn-fw-bold">Notifications</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-ui" @click="activeTab='ui'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ui'}{/literal}" @click="activeTab='ui'">
                         <i class="bi bi-window fs-5 hvn-text-info"></i> <span class="hvn-fw-bold">UI / Navigation</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-perf" @click="activeTab='perf'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='perf'}{/literal}" @click="activeTab='perf'">
                         <i class="bi bi-speedometer2 fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Performance</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-queue" @click="activeTab='queue'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='queue'}{/literal}" @click="activeTab='queue'">
                         <i class="bi bi-stack fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Queue &amp; Cron</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-webhook" @click="activeTab='webhook'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='webhook'}{/literal}" @click="activeTab='webhook'">
                         <i class="bi bi-send fs-5 hvn-text-danger"></i> <span class="hvn-fw-bold">Webhook &amp; Alerts</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-security" @click="activeTab='security'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='security'}{/literal}" @click="activeTab='security'">
                         <i class="bi bi-incognito fs-5 hvn-text-danger"></i> <span class="hvn-fw-bold">Security</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-license" @click="activeTab='license'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='license'}{/literal}" @click="activeTab='license'">
                         <i class="bi bi-key-fill fs-5 hvn-text-warning"></i> <span class="hvn-fw-bold">License</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" data-bs-toggle="list" data-bs-target="#pane-upsell" @click="activeTab='upsell'">
+                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='upsell'}{/literal}" @click="activeTab='upsell'">
                         <i class="bi bi-cart-check fs-5 hvn-text-primary"></i> <span class="hvn-fw-bold">Upsell</span>
                     </button>
                 </div>
@@ -75,13 +75,13 @@
                 <div class="hvn-card-body hvn-p-0">
                     <form @submit.prevent="saveSettings()" id="settingsForm">
                         <input type="hidden" name="token" value="{$token}">
-                        <div class="tab-content">
+                        <div class="hvn-tab-content">
 
                             <!-- ════════════════════════════════
                                  TAB: CHUNG (Module Core)
                                  Settings #1-8
                             ════════════════════════════════ -->
-                            <div class="tab-pane fade show active hvn-p-4" id="pane-general" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='general'" id="pane-general" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-sliders hvn-text-secondary"></i> Cài đặt Chung (Module Core)</h5>
 
                                 <!-- module_enabled -->
@@ -148,7 +148,7 @@
                                  TAB: DOMAIN POLICY
                                  Settings #9-15
                             ════════════════════════════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-domain-policy" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='domain-policy'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-globe hvn-text-secondary"></i> Domain Policy — Chính sách Tên miền</h5>
 
                                 <!-- respect_whmcs_dns -->
@@ -226,7 +226,7 @@
                                  TAB: DNS EDITOR
                                  Settings #16-25 (Editor + Permissions)
                             ════════════════════════════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-dns-editor" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='dns-editor'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-pencil-square hvn-text-secondary"></i> DNS Editor &amp; Record Permissions</h5>
 
                                 <!-- enable_dns_editor -->
@@ -327,7 +327,7 @@
                                  TAB: LIMITS (Record Limits)
                                  Settings #26-33
                             ════════════════════════════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-limits" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='limits'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-1"><i class="bi bi-bar-chart-steps hvn-text-secondary"></i> Record Limits — Giới hạn Số lượng</h5>
                                 <div class="small hvn-text-muted hvn-mb-4">Ưu tiên: Admin Override &gt; Quota Plan &gt; Global Settings. <code>0</code> = unlimited.</div>
 
@@ -370,7 +370,7 @@
                             </div>
 
                             <!-- ════════ TAB: URL REDIRECT #34-37 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-redirect" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='redirect'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-link-45deg hvn-text-secondary"></i> URL Redirect — Chuyển hướng</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -410,7 +410,7 @@
                             </div>
 
                             <!-- ════════ TAB: EMAIL FORWARDING #38-42 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-email" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='email'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-envelope hvn-text-secondary"></i> Email Forwarding</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -453,7 +453,7 @@
                             </div>
 
                             <!-- ════════ TAB: DDNS #43-49 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-ddns" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ddns'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-router hvn-text-primary"></i> Dynamic DNS (DDNS)</h5>
 
                                 <div class="hvn-mb-4">
@@ -513,7 +513,7 @@
                             </div>
 
                             <!-- ════════ TAB: DNSSEC #50-51 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-dnssec" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='dnssec'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-shield-check hvn-text-success"></i> DNSSEC — Bảo mật tên miền</h5>
 
                                 <div class="hvn-mb-4">
@@ -554,7 +554,7 @@
                             </div>
 
                             <!-- ════════ TAB: SSL #52-55 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-ssl" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ssl'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-lock hvn-text-success"></i> SSL / Let's Encrypt</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -595,7 +595,7 @@
                             </div>
 
                             <!-- ════════ TAB: DNS TEMPLATES #56-58 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-templates" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='templates'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-files hvn-text-secondary"></i> DNS Templates</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -626,7 +626,7 @@
                             </div>
 
                             <!-- ════════ TAB: NOTIFICATIONS #59-63 + #81-89 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-notify" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='notify'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-bell hvn-text-warning"></i> Notifications</h5>
 
                                 <h6 class="hvn-fw-bold hvn-mb-3">📧 Client Email</h6>
@@ -716,7 +716,7 @@
                             </div>
 
                             <!-- ════════ TAB: UI / NAVIGATION #64-67 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-ui" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ui'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-window hvn-text-info"></i> UI / Navigation</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -752,7 +752,7 @@
                             </div>
 
                             <!-- ════════ TAB: PERFORMANCE & CACHE #68-72, #94-96 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-perf" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='perf'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-speedometer2 hvn-text-secondary"></i> Performance &amp; Cache</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -816,7 +816,7 @@
                             </div>
 
                             <!-- ════════ TAB: QUEUE & CRON #75-80 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-queue" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='queue'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-stack hvn-text-secondary"></i> Queue &amp; Cron Worker</h5>
 
                                 <div class="hvn-row g-3">
@@ -853,7 +853,7 @@
                             </div>
 
                             <!-- ════════ TAB: SECURITY #90-93 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-security" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='security'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-incognito hvn-text-danger"></i> Security &amp; Access Control</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -884,7 +884,7 @@
                             </div>
 
                             <!-- ════════ TAB: LICENSE #97-104 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-license" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='license'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-key-fill hvn-text-warning"></i> License &amp; Bản quyền</h5>
 
                                 <!-- Status Card -->
@@ -925,7 +925,7 @@
                             </div>
 
                             <!-- ════════ TAB: UPSELL #105-111 ════════ -->
-                            <div class="tab-pane fade hvn-p-4" id="pane-upsell" role="tabpanel">
+                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='upsell'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-cart-check hvn-text-primary"></i> Upsell &amp; Addon</h5>
 
                                 <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
@@ -1170,14 +1170,24 @@ document.addEventListener('alpine:init', () => {
 
 <style>
 {literal}
+.hvn-tab-pane {
+    display: block;
+}
 #settingsLayoutTabs .hvn-list-group-item {
     border: none;
     border-bottom: 1px solid #f1f3f5;
     padding: 0.85rem 1.25rem;
     transition: background 0.15s;
+    cursor: pointer;
+    background: none;
+    width: 100%;
+    text-align: left;
 }
-#settingsLayoutTabs .hvn-list-group-item.active {
+#settingsLayoutTabs .hvn-list-group-item.hvn-tab-active,
+#settingsLayoutTabs .hvn-list-group-item:hover {
     background-color: #f0f4ff;
+}
+#settingsLayoutTabs .hvn-list-group-item.hvn-tab-active {
     color: #0d6efd;
     border-left: 4px solid #0d6efd;
     font-weight: 600;
