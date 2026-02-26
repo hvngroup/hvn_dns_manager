@@ -1294,17 +1294,19 @@ git commit -m "refactor(server): tách ServerRegistry thành class độc lập"
 Sau khi hoàn thành task:
 
 1. Agent tổng kết các file đã thay đổi
-2. Agent đề xuất câu lệnh git add + git commit phù hợp
-3. Người dùng review và chạy lệnh
+2. Agent TỰ ĐỘNG chạy lệnh git add + git commit trong thư mục dự án
+   (sử dụng run_command với Cwd = thư mục gốc của project)
+3. Hiển thị kết quả commit cho người dùng xác nhận
 
-Ví dụ Agent đề xuất:
+Ví dụ Agent thực hiện:
 ─────────────────────────────────────────
 ✅ Task hoàn thành. Các file đã thay đổi:
   - app/Services/QueueManager.php   (MỚI)
   - app/Models/QueueJob.php          (MỚI)
   - app/Migration/versions/v1_0_0.php (MỚI)
 
-Đề xuất commit:
+Đang chạy git commit...
+  [run_command]
   git add app/Services/QueueManager.php app/Models/QueueJob.php app/Migration/versions/v1_0_0.php
   git commit -m "feat(queue): implement QueueManager và QueueJob model (QUEUE-001)"
 ─────────────────────────────────────────
@@ -1312,8 +1314,9 @@ Ví dụ Agent đề xuất:
 
 #### Lưu ý
 
-- **KHÔNG** tự chạy `git commit` — chỉ **đề xuất** lệnh cho người dùng
-- Nếu task sửa nhiều concerns khác nhau → tách thành nhiều commit nhỏ
+- **TỰ ĐỘNG chạy** `git add` + `git commit` qua `run_command` — KHÔNG chỉ đề xuất cho user copy
+- Cwd của `run_command` PHẢI là thư mục gốc của project (VD: `/Users/nguyenvuong/Desktop/Project/hvn_dns_manager`)
+- Nếu task sửa nhiều concerns khác nhau → tách thành nhiều commit nhỏ, chạy lần lượt
 - Luôn đề cập Issue ID liên quan trong commit message nếu có (VD: `Closes QUEUE-001`)
 - Commit message PHẢI ngắn gọn, rõ ràng, không quá 72 ký tự trên dòng đầu
 
