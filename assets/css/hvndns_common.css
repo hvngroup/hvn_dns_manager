@@ -11,6 +11,8 @@
    1. DESIGN TOKENS (CSS Custom Properties)
    ======================================================================= */
 :root {
+    --hvn-blue: #0d6efd;
+    --hvn-blue-hover: #0b5ed7;
     --hvn-primary: #ea4544;
     --hvn-primary-hover: #d32f2f;
     --hvn-secondary: #6c757d;
@@ -645,6 +647,30 @@
 .hvn-btn-outline-warning   { color: var(--hvn-warning); border-color: var(--hvn-warning); background-color: transparent; }
 .hvn-btn-outline-warning:hover { color: #000; background-color: var(--hvn-warning); }
 
+/* Blue (Bootstrap-like) variants */
+.hvn-btn-blue         { color: #fff; background-color: var(--hvn-blue); border-color: var(--hvn-blue); }
+.hvn-btn-blue:hover   { color: #fff; background-color: var(--hvn-blue-hover); border-color: var(--hvn-blue-hover); }
+.hvn-btn-blue:focus   { color: #fff; background-color: var(--hvn-blue-hover); outline: 0; box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25); }
+.hvn-btn-blue:disabled,.hvn-btn-blue.disabled { pointer-events: none; opacity: 0.65; }
+
+.hvn-btn-outline-blue         { color: var(--hvn-blue); border-color: var(--hvn-blue); background-color: transparent; }
+.hvn-btn-outline-blue:hover   { color: #fff; background-color: var(--hvn-blue); border-color: var(--hvn-blue); }
+.hvn-btn-outline-blue:focus   { box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.25); outline: 0; }
+
+/* Secondary (gray) — thường dùng cho nút phụ */
+.hvn-btn-secondary       { color: #fff; background-color: var(--hvn-secondary); border-color: var(--hvn-secondary); }
+.hvn-btn-secondary:hover { color: #fff; background-color: #5c636a; border-color: #565e64; }
+.hvn-btn-outline-secondary { color: var(--hvn-secondary); border-color: var(--hvn-secondary); background-color: transparent; }
+.hvn-btn-outline-secondary:hover { color: #fff; background-color: var(--hvn-secondary); }
+
+/* Button size utilities */
+.hvn-btn-sm { padding: 4px 8px !important; font-size: 13px !important; border-radius: var(--hvn-border-radius-sm) !important; }
+.hvn-btn-lg { padding: 10px 20px !important; font-size: 16px !important; border-radius: var(--hvn-border-radius-lg) !important; }
+.hvn-btn-xs { padding: 2px 6px !important; font-size: 11px !important; border-radius: var(--hvn-border-radius-sm) !important; }
+
+/* Icon button — square */
+.hvn-btn-icon { padding: 6px 8px !important; line-height: 1; }
+.hvn-btn-icon.hvn-btn-sm { padding: 3px 6px !important; }
 
 /* =======================================================================
    17. COMPONENTS — Form Controls
