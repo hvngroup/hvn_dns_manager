@@ -1,5 +1,6 @@
-<!-- Server Modal -->
-<div class="modal fade" id="serverModal" tabindex="-1" aria-hidden="true" x-data="{
+<!-- Server Modal Component -->
+<div x-data="{
+    isOpen: false,
     isEdit: false,
     form: { id: null, hostname: '', ip_address: '', port: 2222, use_ssl: true, username: 'admin', password: '', is_primary: false, max_concurrent_jobs: 50, notes: '' },
     submitting: false,
@@ -7,7 +8,7 @@
     testResult: '',
 
     closeModal() {
-        bootstrap.Modal.getInstance(document.getElementById('serverModal')).hide();
+        this.isOpen = false;
         this.testStatus = null;
     },
 
@@ -39,6 +40,7 @@
         }, 1500);
     }
 }" @open-server-modal.window="
+    isOpen = true;
     isEdit = !!$event.detail.server;
     if(isEdit) {
         form = { ...$event.detail.server, password: '' }; // Không load pass cũ
@@ -46,115 +48,121 @@
         form = { id: null, hostname: '', ip_address: '', port: 2222, use_ssl: true, username: 'admin', password: '', is_primary: false, max_concurrent_jobs: 50, notes: '' };
     }
     testStatus = null;
-    new bootstrap.Modal(document.getElementById('serverModal')).show();
 ">
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
+    <!-- Modal Container -->
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
+         tabindex="-1" aria-hidden="true" @click.self="closeModal()" x-show="isOpen" x-transition.opacity>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" x-text="isEdit ? 'Sửa Server DirectAdmin' : 'Thêm Server DirectAdmin'"></h5>
+            <div class="modal-header hvn-bg-light hvn-border-bottom">
+                <h5 class="modal-title hvn-fw-bold"><i class="bi bi-server hvn-text-primary"></i> <span x-text="isEdit ? 'Sửa Server DirectAdmin' : 'Thêm Server DirectAdmin'"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body hvn-p-4">
                 <form @submit.prevent="saveServer">
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Hostname <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" x-model="form.hostname" required placeholder="dns4.hvn.vn">
-                            <div class="form-text"><i class="bi bi-info-circle"></i> Tên hiển thị cho khách hàng (không hiện IP)</div>
+                    <div class="hvn-row hvn-mb-3">
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label">Hostname <span class="hvn-text-danger">*</span></label>
+                            <input type="text" class="hvn-form-control font-monospace" x-model="form.hostname" required placeholder="dns4.hvn.vn">
+                            <div class="form-text hvn-text-muted small"><i class="bi bi-info-circle"></i> Tên hiển thị cho khách hàng (không hiện IP)</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Địa chỉ IP <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" x-model="form.ip_address" required placeholder="103.xx.xx.13">
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label">Địa chỉ IP <span class="hvn-text-danger">*</span></label>
+                            <input type="text" class="hvn-form-control font-monospace" x-model="form.ip_address" required placeholder="103.xx.xx.13">
                         </div>
                     </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <label class="form-label">Port <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" x-model="form.port" required min="1" max="65535">
+                    <div class="hvn-row hvn-mb-4">
+                        <div class="hvn-col-md-3">
+                            <label class="hvn-form-label">Port <span class="hvn-text-danger">*</span></label>
+                            <input type="number" class="hvn-form-control font-monospace" x-model="form.port" required min="1" max="65535">
                         </div>
-                        <div class="col-md-3 d-flex align-items-center mt-3">
-                            <div class="form-check form-switch mt-2">
+                        <div class="hvn-col-md-3 hvn-d-flex hvn-align-items-center hvn-mt-3">
+                            <div class="form-check form-switch hvn-mt-2">
                                 <input class="form-check-input" type="checkbox" id="useSsl" x-model="form.use_ssl">
-                                <label class="form-check-label" for="useSsl">Sử dụng SSL (HTTPS)</label>
+                                <label class="form-check-label hvn-cursor-pointer" for="useSsl">Sử dụng SSL (HTTPS)</label>
                             </div>
                         </div>
                     </div>
 
-                    <h6 class="border-bottom pb-2 mb-3 mt-4 text-primary">Thông tin đăng nhập DirectAdmin</h6>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" x-model="form.username" required>
+                    <h6 class="hvn-border-bottom hvn-pb-2 hvn-mb-3 hvn-mt-4 hvn-text-primary hvn-fw-bold"><i class="bi bi-shield-lock hvn-me-1"></i> Thông tin đăng nhập DirectAdmin</h6>
+                    <div class="hvn-row hvn-mb-4">
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label">Username <span class="hvn-text-danger">*</span></label>
+                            <input type="text" class="hvn-form-control font-monospace" x-model="form.username" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Password <span x-show="!isEdit" class="text-danger">*</span></label>
-                            <input type="password" class="form-control" x-model="form.password" :required="!isEdit" placeholder="••••••••">
-                            <div class="form-text text-muted"><i class="bi bi-lock"></i> Mật khẩu được mã hóa AES-256 nội bộ WHMCS. <span x-show="isEdit">Để trống nếu không muốn đổi.</span></div>
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label">Password <span x-show="!isEdit" class="hvn-text-danger">*</span></label>
+                            <input type="password" class="hvn-form-control font-monospace" x-model="form.password" :required="!isEdit" placeholder="••••••••">
+                            <div class="form-text hvn-text-muted small"><i class="bi bi-lock-fill"></i> Mật khẩu mã hóa AES-256. <span x-show="isEdit" class="hvn-fw-bold hvn-text-warning">Để trống nếu giữ nguyên.</span></div>
                         </div>
                     </div>
 
-                    <h6 class="border-bottom pb-2 mb-3 mt-4 text-primary">Cấu hình luồng xử lý (Queue)</h6>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label d-block">Vai trò <span class="text-danger">*</span></label>
-                            <div class="form-check form-check-inline mt-1">
+                    <h6 class="hvn-border-bottom hvn-pb-2 hvn-mb-3 hvn-mt-4 hvn-text-primary hvn-fw-bold"><i class="bi bi-hdd-network hvn-me-1"></i> Cấu hình luồng xử lý (Queue)</h6>
+                    <div class="hvn-row hvn-mb-3">
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label hvn-d-block">Vai trò <span class="hvn-text-danger">*</span></label>
+                            <div class="form-check form-check-inline hvn-mt-1">
                                 <input class="form-check-input" type="radio" name="role" id="roleSec" :value="false" x-model="form.is_primary">
-                                <label class="form-check-label" for="roleSec">Secondary</label>
+                                <label class="form-check-label hvn-cursor-pointer" for="roleSec">Secondary</label>
                             </div>
-                            <div class="form-check form-check-inline mt-1">
+                            <div class="form-check form-check-inline hvn-mt-1">
                                 <input class="form-check-input" type="radio" name="role" id="rolePri" :value="true" x-model="form.is_primary">
-                                <label class="form-check-label fw-bold text-primary" for="rolePri">Primary</label>
+                                <label class="form-check-label hvn-cursor-pointer hvn-fw-bold hvn-text-primary" for="rolePri">Primary <i class="bi bi-star-fill hvn-text-warning small"></i></label>
                             </div>
-                            <div class="form-text"><i class="bi bi-info-circle"></i> Primary dùng cho Drift Detection, Zone Transfer master. Thường chỉ nên có 1 Primary.</div>
+                            <div class="form-text hvn-text-muted small"><i class="bi bi-info-circle"></i> Chỉ định 1 Primary cho Zone Transfer.</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Max Concurrent Jobs <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" x-model="form.max_concurrent_jobs" required min="1" max="500">
-                            <div class="form-text">Số job tối đa xử lý mỗi chu kỳ cron cho server này. Tùy thuộc vào phần cứng DA.</div>
+                        <div class="hvn-col-md-6">
+                            <label class="hvn-form-label">Max Concurrent Jobs <span class="hvn-text-danger">*</span></label>
+                            <input type="number" class="hvn-form-control font-monospace" x-model="form.max_concurrent_jobs" required min="1" max="500">
+                            <div class="form-text hvn-text-muted small">Khuyến nghị 50-100 (tùy thuộc tải DA).</div>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">Ghi chú nội bộ</label>
-                        <textarea class="form-control" rows="2" x-model="form.notes"></textarea>
+                    <div class="hvn-mb-4">
+                        <label class="hvn-form-label">Ghi chú nội bộ</label>
+                        <textarea class="hvn-form-control" rows="2" x-model="form.notes" placeholder="VD: Server DC Viettel..."></textarea>
                     </div>
 
                     <!-- Test Connection Result Area -->
                     <template x-if="testStatus !== null">
-                        <div class="card mb-3" :class="{ 'border-info': testStatus === 'loading', 'border-success': testStatus === 'success', 'border-danger': testStatus === 'error' }">
-                            <div class="card-header bg-transparent py-2 d-flex justify-content-between align-items-center">
-                                <strong><i class="bi bi-plug"></i> Kết quả Test Connection:</strong>
-                                <button type="button" class="btn-close" style="font-size: 0.5rem;" @click="testStatus = null"></button>
+                        <div class="hvn-card hvn-mb-4 hvn-border-2" :class="{ 'hvn-border-info': testStatus === 'loading', 'hvn-border-success': testStatus === 'success', 'hvn-border-danger': testStatus === 'error' }">
+                            <div class="hvn-card-header bg-transparent hvn-py-2 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <strong><i class="bi bi-plug" :class="{ 'hvn-text-info': testStatus === 'loading', 'hvn-text-success': testStatus === 'success', 'hvn-text-danger': testStatus === 'error' }"></i> Kết quả Test Connection:</strong>
+                                <button type="button" class="btn-close" style="font-size: 0.6rem;" @click="testStatus = null"></button>
                             </div>
-                            <div class="card-body py-2">
+                            <div class="hvn-card-body hvn-py-3">
                                 <template x-if="testStatus === 'loading'">
-                                    <div class="text-center py-2 text-info">
-                                        <div class="spinner-border spinner-border-sm me-2" role="status"></div> Đang kiểm tra kết nối tới DirectAdmin API...
+                                    <div class="hvn-text-center hvn-py-2 hvn-text-info hvn-fw-medium">
+                                        <span class="hvn-spinner-border hvn-spinner-border-sm hvn-me-2" role="status"></span> Đang kiểm tra kết nối API tới DirectAdmin...
                                     </div>
                                 </template>
                                 <template x-if="testStatus === 'success'">
-                                    <pre class="mb-0 text-success fw-bold font-monospace" style="white-space: pre-wrap;" x-text="testResult"></pre>
+                                    <pre class="hvn-mb-0 hvn-text-success hvn-fw-bold font-monospace hvn-p-2 hvn-bg-success-subtle hvn-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
                                 </template>
                                 <template x-if="testStatus === 'error'">
-                                    <pre class="mb-0 text-danger fw-bold font-monospace" style="white-space: pre-wrap;" x-text="testResult"></pre>
+                                    <pre class="hvn-mb-0 hvn-text-danger hvn-fw-bold font-monospace hvn-p-2 hvn-bg-danger-subtle hvn-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
                                 </template>
                             </div>
                         </div>
                     </template>
 
                     <!-- Modal Actions -->
-                    <div class="d-flex justify-content-between pt-3 border-top">
-                        <button type="button" class="btn btn-outline-info" @click="testConn()" :disabled="submitting || testStatus === 'loading'">
-                            <i class="bi bi-plug"></i> Test Connection
+                    <div class="hvn-d-flex hvn-justify-content-between hvn-pt-3">
+                        <button type="button" class="hvn-btn hvn-btn-outline-info" @click="testConn()" :disabled="submitting || testStatus === 'loading'">
+                            <i class="bi bi-lightning-charge"></i> Test Connection
                         </button>
                         
-                        <div class="gap-2 d-flex">
-                            <button type="button" class="btn btn-outline-secondary" @click="closeModal()" :disabled="submitting">Hủy</button>
-                            <button type="submit" class="btn btn-primary" :disabled="submitting">
-                                <span x-show="!submitting"><i class="bi bi-save"></i> Lưu Server</span>
-                                <span x-show="submitting"><span class="spinner-border spinner-border-sm" role="status"></span> Đang lưu...</span>
+                        <div class="hvn-gap-2 hvn-d-flex">
+                            <button type="button" class="hvn-btn hvn-btn-outline-secondary" @click="closeModal()" :disabled="submitting">Hủy bỏ</button>
+                            <button type="submit" class="hvn-btn hvn-btn-primary" :disabled="submitting">
+                                <span x-show="!submitting"><i class="bi bi-save hvn-me-1"></i> Lưu Server</span>
+                                <span x-show="submitting"><span class="hvn-spinner-border hvn-spinner-border-sm" role="status"></span> Đang lưu...</span>
                             </button>
                         </div>
                     </div>

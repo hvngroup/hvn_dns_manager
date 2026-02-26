@@ -68,8 +68,13 @@
         </div>
     </div>
 
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
     <!-- Edit Modal -->
-    <div class="modal fade" id="quotaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
+         tabindex="-1" aria-hidden="true" @click.self="closeModal()" x-show="isOpen" x-transition.opacity>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header hvn-bg-light">
@@ -166,6 +171,7 @@
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('quotaPlansManager', () => ({
+        isOpen: false,
         plans: [
             { id: 1, name: 'Basic Tier', description: 'Gói miễn phí đi kèm Shared Hosting', limit_records: 20, limit_subdomains: 10, limit_redirects: 2, limit_emails: 5, dnssec_enabled: false, ddns_enabled: false, limit_ddns: 0 },
             { id: 2, name: 'Pro Tier', description: 'Dành cho khách hàng mua riêng dịch vụ DNS', limit_records: 50, limit_subdomains: 20, limit_redirects: 5, limit_emails: 10, dnssec_enabled: false, ddns_enabled: true, limit_ddns: 2 },
@@ -174,14 +180,6 @@ document.addEventListener('alpine:init', () => {
         
         isEdit: false,
         form: { id: null, name: '', description: '', limit_records: 0, limit_subdomains: 0, limit_redirects: 0, limit_emails: 0, dnssec_enabled: false, ddns_enabled: false, limit_ddns: 0 },
-        modalInstance: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = document.getElementById('quotaModal');
-                if (el) this.modalInstance = new bootstrap.Modal(el);
-            });
-        },
 
         formatLimit(val) {
             return (val === 0 || val === '0') ? '∞' : val;
@@ -194,11 +192,11 @@ document.addEventListener('alpine:init', () => {
             } else {
                 this.form = { id: Date.now(), name: '', description: '', limit_records: 50, limit_subdomains: 10, limit_redirects: 2, limit_emails: 2, dnssec_enabled: false, ddns_enabled: false, limit_ddns: 1 };
             }
-            if(this.modalInstance) this.modalInstance.show();
+            this.isOpen = true;
         },
 
         closeModal() {
-            if(this.modalInstance) this.modalInstance.hide();
+            this.isOpen = false;
         },
 
         savePlan() {

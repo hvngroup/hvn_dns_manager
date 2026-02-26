@@ -110,15 +110,20 @@
         </div>
     </div>
 
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
     <!-- Audit Detail Modal -->
-    <div class="modal fade" id="auditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
+         tabindex="-1" aria-hidden="true" @click.self="closeModal()" x-show="isOpen" x-transition.opacity>
         <div class="modal-dialog modal-lg">
             <div class="modal-content" x-show="selectedLog">
                 <template x-if="selectedLog">
                     <div>
                         <div class="modal-header hvn-bg-dark hvn-text-white">
                             <h5 class="modal-title"><i class="bi bi-shield-lock"></i> Audit Entry #<span x-text="selectedLog.id"></span></h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close btn-close-white" @click="closeModal()" aria-label="Close"></button>
                         </div>
                         <div class="modal-body font-monospace hvn-p-4 hvn-bg-light" style="font-size: 0.9rem;">
                             
@@ -194,7 +199,7 @@
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="hvn-btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="hvn-btn btn-secondary" @click="closeModal()">Đóng</button>
                         </div>
                     </div>
                 </template>
@@ -207,6 +212,7 @@
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('auditTrailData', () => ({
+        isOpen: false,
         logs: [
             {
                 id: 89201, time: '25/02, 14:32', actorType: 'client', actorName: 'Lê C', domain: 'myblog.net', 
@@ -245,7 +251,11 @@ document.addEventListener('alpine:init', () => {
 
         openModal(log) {
             this.selectedLog = log;
-            new bootstrap.Modal(document.getElementById('auditModal')).show();
+            this.isOpen = true;
+        },
+
+        closeModal() {
+            this.isOpen = false;
         }
     }));
 });

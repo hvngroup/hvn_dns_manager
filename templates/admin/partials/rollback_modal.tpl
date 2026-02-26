@@ -1,5 +1,6 @@
 <!-- Rollback Modal (Admin Only) -->
-<div class="modal fade" id="rollbackModal" tabindex="-1" aria-hidden="true" x-data="{
+<div x-data="{
+    isOpen: false,
     snapshots: [
         { id: 101, date: '25/02/2026 02:00', type: 'Nightly backup', records: 15 },
         { id: 100, date: '24/02/2026 02:00', type: 'Nightly backup', records: 14 },
@@ -9,7 +10,7 @@
     submitting: false,
 
     closeModal() {
-        bootstrap.Modal.getInstance(document.getElementById('rollbackModal')).hide();
+        this.isOpen = false;
     },
 
     confirmRollback() {
@@ -20,10 +21,17 @@
             alert('Đã tạo Job khôi phục. Dữ liệu đang đồng bộ xuống các Server DA.');
         }, 1500);
     }
-}" @open-rollback-modal.window="new bootstrap.Modal(document.getElementById('rollbackModal')).show()">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning">
+}" @open-rollback-modal.window="isOpen = true">
+
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
+         tabindex="-1" aria-hidden="true" @click.self="closeModal()" x-show="isOpen" x-transition.opacity>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
                 <h5 class="modal-title text-dark"><i class="bi bi-skip-backward-fill"></i> Khôi phục Zone DNS — {$domain.domain}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -70,6 +78,7 @@
                     <span x-show="!submitting"><i class="bi bi-rewind"></i> Xác nhận Rollback</span>
                     <span x-show="submitting"><span class="spinner-border spinner-border-sm"></span> Đang xử lý...</span>
                 </button>
+            </div>
             </div>
         </div>
     </div>

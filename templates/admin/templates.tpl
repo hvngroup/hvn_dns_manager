@@ -41,8 +41,12 @@
         </template>
     </div>
 
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
     <!-- Modal Edit/Create Template -->
-    <div class="modal fade" id="templateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" tabindex="-1" aria-hidden="true" x-show="isOpen" x-transition.opacity>
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header hvn-bg-light">
@@ -174,17 +178,9 @@ document.addEventListener('alpine:init', () => {
                 is_visible: false, records_count: 4, records: []
             }
         ],
-        
+        isOpen: false,
         isEdit: false,
         form: { id: null, name: '', description: '', is_visible: true, records: [] },
-        modalInstance: null,
-
-        init() {
-            this.$nextTick(() => {
-                const el = document.getElementById('templateModal');
-                if (el) this.modalInstance = new bootstrap.Modal(el);
-            });
-        },
 
         openModal(tpl = null) {
             this.isEdit = !!tpl;
@@ -197,11 +193,11 @@ document.addEventListener('alpine:init', () => {
                 this.form = { id: Date.now(), name: '', description: '', is_visible: true, records: [] };
                 this.addEmptyRecord();
             }
-            if(this.modalInstance) this.modalInstance.show();
+            this.isOpen = true;
         },
 
         closeModal() {
-            if(this.modalInstance) this.modalInstance.hide();
+            this.isOpen = false;
         },
 
         addEmptyRecord() {

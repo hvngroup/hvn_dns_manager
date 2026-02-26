@@ -129,13 +129,18 @@
         </template>
     </div>
 
+    <!-- Custom Alpine Backdrop -->
+    <div x-show="isOpen" x-transition.opacity 
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 1040; display: none;"></div>
+
     <!-- Auto Fix Settings Modal -->
-    <div class="modal fade" id="autoFixModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" :class="{ 'show': isOpen }" :style="isOpen ? 'display: block; z-index: 1045;' : 'display: none;'" 
+         tabindex="-1" aria-hidden="true" @click.self="isOpen = false" x-show="isOpen" x-transition.opacity>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header hvn-bg-light">
                     <h5 class="modal-title"><i class="bi bi-gear"></i> Cài đặt Drift Auto-fix</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" @click="isOpen = false"></button>
                 </div>
                 <div class="modal-body">
                     <p class="hvn-text-muted small hvn-mb-4">Drift Detection quét dữ liệu Zone từ DirectAdmin mỗi đêm (cron) và so sánh với database WHMCS. Nếu có khác biệt, hệ thống xử lý thế nào?</p>
@@ -158,7 +163,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="hvn-btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="hvn-btn btn-outline-secondary" @click="isOpen = false">Đóng</button>
                     <button type="button" class="hvn-btn hvn-btn-primary" @click="saveAutoFix()"><i class="bi bi-save"></i> Lưu cài đặt</button>
                 </div>
             </div>
@@ -172,7 +177,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('driftManager', () => ({
         filterStatus: 'pending',
         autoFixEnabled: false,
-        settingsModal: null,
+        isOpen: false,
         domains: [
             {
                 id: 1, name: 'example.com', status: 'pending',
@@ -188,13 +193,6 @@ document.addEventListener('alpine:init', () => {
                 ]
             }
         ],
-
-        init() {
-            this.$nextTick(() => {
-                const el = document.getElementById('autoFixModal');
-                if (el) this.settingsModal = new bootstrap.Modal(el);
-            });
-        },
 
         get driftedDomains() {
             return this.domains.filter(d => d.drifts.length > 0);
@@ -228,12 +226,12 @@ document.addEventListener('alpine:init', () => {
         },
 
         openSettings() {
-            if (this.settingsModal) this.settingsModal.show();
+            this.isOpen = true;
         },
 
         saveAutoFix() {
             alert('Đã lưu cấu hình Drift Auto-fix!');
-            if (this.settingsModal) this.settingsModal.hide();
+            this.isOpen = false;
         },
 
         runScan() {
