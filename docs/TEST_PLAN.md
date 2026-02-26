@@ -479,9 +479,37 @@ tests/Integration/SettingsIntegrationTest.php
 ├── test_client_notification_not_sent_on_queue_only       Job pending → NO email yet
 ├── test_fetch_from_ns_updates_db_on_drift                fetch_on_load=1 + DA has extra record → DB updated
 └── test_cache_refresh_ttl_triggers_background_fetch       cache expired → background DA fetch triggered
+
+tests/Unit/Services/FeatureGateTest.php
+├── test_dnssec_mode_off_returns_false
+├── test_dnssec_mode_free_returns_true_without_billing_check
+├── test_dnssec_mode_paid_with_quota_plan_returns_true
+├── test_dnssec_mode_paid_with_addon_active_returns_true
+├── test_dnssec_mode_paid_with_config_option_returns_true
+├── test_dnssec_mode_paid_without_any_purchase_returns_false
+├── test_lock_reason_off_returns_feature_off
+├── test_lock_reason_free_returns_null
+├── test_lock_reason_paid_not_purchased_returns_not_purchased
+├── test_lock_reason_paid_purchased_returns_null
+└── (tương tự cho DDNS)
+
+tests/Unit/Services/ClientFeatureResolverTest.php
+├── test_quota_plan_dnssec_enabled_returns_true
+├── test_whmcs_addon_active_returns_true
+├── test_whmcs_addon_cancelled_returns_false
+├── test_config_option_checked_returns_true
+├── test_no_purchase_returns_false
+└── test_max_records_includes_extra_pack_addon
+
+tests/Unit/License/LicenseCheckerTest.php
+├── test_valid_local_key_returns_active
+├── test_expired_local_key_triggers_remote_check
+├── test_remote_check_success_updates_local_key
+├── test_remote_check_failure_with_grace_period
+└── test_grace_period_expired_returns_invalid
 ```
 
-**Tổng Unit Tests: ~120 test cases**
+**Tổng Unit Tests: ~141 test cases**
 
 ---
 
@@ -1019,8 +1047,10 @@ SCENARIO: Admin rollback zone
 | 08 | Conflict Resolution | Unit (8 cases) | Admin-Priority, Optimistic Locking | P0 |
 | 08 | Webhook Telegram | Integration | Alert trigger → Telegram API called → cooldown | P1 |
 | 08 | Webhook Email | Integration | Alert trigger → WHMCS mail sent | P1 |
+| 08B | Feature Gating | Unit (21 cases) | 3 states verification, client permission check | P0 |
+| 08B | License Check | Unit + Integration | Local key check, remote cache, grace period | P0 |
 
-**Phase 2 Total**: ~8 Unit + ~15 Integration + ~5 E2E + 15 UAT items
+**Phase 2 Total**: ~29 Unit + ~15 Integration + ~5 E2E + 15 UAT items
 
 ---
 
@@ -1130,4 +1160,5 @@ DEPLOYMENT:
 ## Changelog
 | Ngày | Thay đổi | Người thực hiện |
 |------|----------|-----------------|
+| 26/02/2026 | Thêm Test Case cho LicenseChecker, FeatureGate | — |
 | 25/02/2026 | Khởi tạo v1.0 — Full test plan 3 phases | — |

@@ -24,12 +24,13 @@ Khi nhận bất kỳ yêu cầu nào liên quan đến module này, Agent PHẢ
 1. **AGENT.md** (tệp này) — Quy tắc tối thượng, điều phối toàn bộ AI Agent
 2. **DB_SCHEMA.md** — Database schema chi tiết, định nghĩa cột, index strategy, retention policy
 3. **API_REFERENCE.md** — Tham chiếu API: DirectAdmin API, Internal Ajax API, REST API, Error Codes
-4. **SETTINGS.md** — 96 Admin settings, validation rules, logic
-5. **SPEC.md** — Thông số kỹ thuật, flow diagrams, kiến trúc hệ thống
-6. **EPICS.md** — User stories, acceptance criteria, issue list
-7. **TEST_PLAN.md** — Kế hoạch kiểm thử, test cases, fixtures, checklists
-8. **WIREFRAME.md** — Phác thảo giao diện Client Area & Admin Area
-9. **PLAN.md** — Kế hoạch phát triển tổng thể, phân phase
+4. **SETTINGS.md** — 111 Admin settings, validation rules, logic
+5. **LICENSING.md** — Các quy tắc cấp phép, Feature Gate cho DNSSEC/DDNS (tham chiếu Section 6-7 khi code features này)
+6. **SPEC.md** — Thông số kỹ thuật, flow diagrams, kiến trúc hệ thống
+7. **EPICS.md** — User stories, acceptance criteria, issue list
+8. **TEST_PLAN.md** — Kế hoạch kiểm thử, test cases, fixtures, checklists
+9. **WIREFRAME.md** — Phác thảo giao diện Client Area & Admin Area
+10. **PLAN.md** — Kế hoạch phát triển tổng thể, phân phase
 
 Nếu có mâu thuẫn giữa các tài liệu, thứ tự ưu tiên là: AGENT.md > DB_SCHEMA.md > API_REFERENCE.md > SPEC.md > EPICS.md > PLAN.md.
 
@@ -60,6 +61,8 @@ modules/addons/hvn_dns_manager/
 ├── app/
 │   ├── Controllers/
 │   ├── Services/
+│   │   ├── ClientFeatureResolver.php   # (Mới) Phân giải tính năng theo gói
+│   │   ├── UpsellHelper.php            # (Mới) Logic hiển thị upsell/addon
 │   ├── Models/
 │   ├── Gateway/
 │   ├── Validators/
@@ -102,7 +105,9 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 | 16 | `mod_hvndns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
 | 17 | `mod_hvndns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
 | 18 | `mod_hvndns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
-| 19 | `mod_hvndns_settings` | Setting | Module config key-value | 96 settings |
+| 19 | `mod_hvndns_settings` | Setting | Module config key-value | 111 settings |
+
+*Lưu ý: Bổ sung 2 helper services chính phục vụ feature flags: `ClientFeatureResolver` và `UpsellHelper`.*
 
 ---
 
@@ -163,9 +168,20 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 - Client Area chỉ thấy: hostname server (dns1.hvn.vn), KHÔNG thấy IP/port/credentials
 - Error messages cho client phải thân thiện, không leak technical details
 - Admin Area kiểm tra WHMCS admin permission trước mọi action
+
+### 2.4. Feature Gating & License Checking
+
+```
+❌ CẤM:
+- Kiểm tra tính năng bằng boolean đơn giản trước đây (VD: enable_dnssec == 1)
+- Cho phép xử lý API liên quan đến DDNS/DNSSEC mà không qua feature gate
+
+✅ BẮT BUỘC:
+- Mọi logic/UI liên quan đến DNSSEC và DDNS PHẢI wrap trong FeatureGate (VD: FeatureGate::canClientUseDnssec($serviceId))
+- Kiểm tra giá trị mode mới (off/free/paid) qua SettingsHelper để có luồng xử lý tương ứng
 ```
 
-### 2.4. Fan-out Multi-Server
+### 2.5. Fan-out Multi-Server
 
 ```
 ❌ CẤM:

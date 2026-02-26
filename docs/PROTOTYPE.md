@@ -154,11 +154,16 @@ Chạy migration tạo toàn bộ 19 bảng từ DB_SCHEMA.md. Đây là code PR
 
 ### 3.2. Mock Data Specification
 
-#### `mod_hvndns_settings` — 96 default settings
+#### `mod_hvndns_settings` — 111 default settings
 
 ```php
-// Seed toàn bộ 96 settings từ SETTINGS.md với default values
-// Đây là code PRODUCTION (giữ nguyên)
+// Seed toàn bộ 111 settings từ SETTINGS.md (gồm cả License, Upsell tabs)
+// Các thông số cần Fix cứng để Demo Feature Gating 3 trạng thái:
+// - license_status = "Active"
+// - dnssec_mode = "paid"
+// - ddns_mode = "paid"
+// - upsell_dnssec_addon_id = 14
+// - upsell_ddns_addon_id = 15
 ```
 
 #### `mod_hvndns_servers` — 3 servers
@@ -177,24 +182,29 @@ last_error_msg = "Connection timed out after 15000ms"
 → Demo trạng thái server có vấn đề trên Dashboard
 ```
 
-#### `mod_hvndns_domains` — 8 domains (phủ tất cả status)
+#### `mod_hvndns_domains` — 8 domains (phủ tất cả status & addons)
+
+Bảng này giả lập query join với `tblhostingaddons` để quyết định Premium Features:
 
 ```
-┌────┬──────────────────────┬───────────┬────────────────┬───────────┐
-│ id │ domain               │ user_id   │ status         │ ssl       │
-├────┼──────────────────────┼───────────┼────────────────┼───────────┤
-│ 1  │ hvngroup.vn          │ 1         │ active         │ active    │
-│ 2  │ example.com          │ 1         │ active         │ none      │
-│ 3  │ shop-demo.vn         │ 2         │ active         │ pending   │
-│ 4  │ myblog.net           │ 2         │ active         │ active    │
-│ 5  │ old-site.org         │ 3         │ suspended      │ expired   │
-│ 6  │ cancelled.io         │ 3         │ pending_delete │ none      │
-│ 7  │ big-records.com      │ 1         │ active         │ active    │
-│ 8  │ ddns-test.hvn.vn     │ 2         │ active         │ none      │
-└────┴──────────────────────┴───────────┴────────────────┴───────────┘
+┌────┬──────────────────────┬───────────┬────────────────┬───────────┬───────────────┬────────────────┐
+│ id │ domain               │ user_id   │ status         │ ssl       │ Addon DNSSEC  │ Addon DDNS     │
+├────┼──────────────────────┼───────────┼────────────────┼───────────┼───────────────┼────────────────┤
+│ 1  │ hvngroup.vn          │ 1         │ active         │ active    │ Active (14)   │ None           │
+│ 2  │ example.com          │ 1         │ active         │ none      │ Active (14)   │ None           │
+│ 3  │ shop-demo.vn         │ 2         │ active         │ pending   │ Active (14)   │ Active (15)    │
+│ 4  │ myblog.net           │ 2         │ active         │ active    │ Active (14)   │ None           │
+│ 5  │ old-site.org         │ 3         │ suspended      │ expired   │ None          │ None           │
+│ 6  │ cancelled.io         │ 3         │ pending_delete │ none      │ Cancelled (14)│ None           │
+│ 7  │ big-records.com      │ 1         │ active         │ active    │ (Mock mode=free)│ None           │
+│ 8  │ ddns-test.hvn.vn     │ 2         │ active         │ none      │ None          │ (Mock mode=free)│
+└────┴──────────────────────┴───────────┴────────────────┴───────────┴───────────────┴────────────────┘
 
-Domain 7: có nhiều records (50+) → test pagination
-Domain 8: có DDNS tokens → test tab DDNS
+Domain 1-4: Có mua DNSSEC Addon (14) → Tab DNSSEC hiện bình thường, ko bị Upsell.
+Domain 5-6: Không Có Addon (hoặc đã hủy) → Tab DNSSEC sẽ render màn hình Upsell Card.
+Domain 7: Đặc biệt mock setting global `dnssec_mode = "free"` → Toàn bộ khách mở được và không thấy Upsell.
+Domain 8:ặc biệt mock setting global `ddns_mode = "free"` → DDNS Tab mở bình thường không bị Upsell.
+Domain 7, 8 có mục đích là Mock dynamic Setting đổi chiều on-the-fly.
 ```
 
 #### `mod_hvndns_records` — ~120 records (đa dạng types + statuses)

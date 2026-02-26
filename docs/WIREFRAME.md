@@ -399,7 +399,7 @@ $alpine       Alpine.js reactive data
 ## CL-06: Tab DNSSEC
 
 > **Vị trí**: Tab DNSSEC trong DNS Editor  
-> **Điều kiện hiện**: `quota_plan.dnssec_enabled = true`
+> **Điều kiện hiện**: `quota_plan.dnssec_enabled = true` VÀ `dnssec_mode` khác "off"
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -451,7 +451,7 @@ $alpine       Alpine.js reactive data
 │  └────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
 
-── Khi DNSSEC chưa bật ──
+── Khi DNSSEC chưa bật (Trạng thái bình thường) ──
 
 ┌────────────────────────────────────────────────────────────────┐
 │  Trạng thái: ⚪ Chưa bật                                      │
@@ -465,6 +465,23 @@ $alpine       Alpine.js reactive data
 │     Bạn cần mang thông số DS Record đến nhà đăng ký để hoàn   │
 │     tất quá trình.                                              │
 └────────────────────────────────────────────────────────────────┘
+
+── Khi dnssec_mode = "paid" và Client CHƯA mua Addon (Upsell Card) ──
+
+┌────────────────────────────────────────────────────────────────┐
+│  🔒 Tính năng Cao cấp: DNSSEC Protection                      │
+│                                                                │
+│  Bảo vệ tên miền của bạn khỏi các cuộc tấn công DNS Spoofing │
+│  và Cache Poisoning với công nghệ ký số DNSSEC tiêu chuẩn.     │
+│                                                                │
+│  ✅ Ngăn chặn giả mạo website                                │
+│  ✅ Tăng độ tin cậy với người dùng & Google                  │
+│  ✅ Tương thích hoàn hảo với mọi nhà đăng ký tên miền        │
+│                                                                │
+│  Chỉ từ {upsell_price}/tháng                                   │
+│                                                                │
+│  [🛒 Nâng cấp Gói Dịch vụ]  «Tìm hiểu thêm»                  │
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -472,7 +489,7 @@ $alpine       Alpine.js reactive data
 ## CL-07: Tab DDNS
 
 > **Vị trí**: Tab DDNS trong DNS Editor  
-> **Điều kiện hiện**: `quota_plan.ddns_enabled = true`
+> **Điều kiện hiện**: `quota_plan.ddns_enabled = true` VÀ `ddns_mode` khác "off"
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -534,6 +551,23 @@ $alpine       Alpine.js reactive data
 │  │     hình lại trên thiết bị.                                │  │
 │  └────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
+
+── Khi ddns_mode = "paid" và Client CHƯA mua Addon (Upsell Card) ──
+
+┌────────────────────────────────────────────────────────────────┐
+│  🔒 Tính năng Cao cấp: Dynamic DNS (DDNS)                     │
+│                                                                │
+│  Giải pháp hoàn hảo để tự động cập nhật IP động cho tên miền, │
+│  giúp bạn dễ dàng truy cập Camera, NAS, Server tại nhà từ xa. │
+│                                                                │
+│  ✅ Không cần thuê IP tĩnh (tiết kiệm chi phí)                 │
+│  ✅ Hỗ trợ API chuẩn tương thích MỌI thiết bị                 │
+│  ✅ Cập nhật tức thì (TTL 5 phút)                              │
+│                                                                │
+│  Chỉ từ {upsell_price}/tháng                                   │
+│                                                                │
+│  [🛒 Nâng cấp Gói Dịch vụ]  «Tìm hiểu thêm»                  │
+└────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -1181,16 +1215,59 @@ $alpine       Alpine.js reactive data
 ## AD-12: Module Settings (Mở rộng)
 
 > **URL**: `?module=hvn_dns_manager&action=settings`
-> **Mục đích**: Trang cấu hình tổng hợp — 96 settings chia theo tabs
+> **Mục đích**: Trang cấu hình tổng hợp — **111 settings** chia theo 21 tabs
 
 Tab navigation:
-[Chung] [Domain Policy] [DNS Editor] [Limits] [Redirects] [Email]
-[DDNS] [DNSSEC] [SSL] [Templates] [Notifications] [UI] [Performance] [Queue] [Security]
+[License] [Chung] [Domain Policy] [DNS Editor] [Limits] [Redirects] [Email]
+[DDNS] [DNSSEC] [SSL] [Templates] [Upsell] ... (và các tab khác)
 
-Mỗi tab hiển thị các settings tương ứng từ SETTINGS.md.
-Form fields: input text, checkbox, select dropdown.
-Nút [💾 Lưu cài đặt] ở cuối mỗi tab.
+Mỗi tab hiển thị các settings tương ứng từ `SETTINGS.md`.
+Form fields: input text, checkbox, select dropdown, radio button.
+Nút `[💾 Lưu cài đặt]` ở cuối mỗi tab.
 Toast thông báo "Đã lưu thành công!" sau khi save.
+
+### Cấu trúc đặc biệt cho Tab DNSSEC / DDNS
+Sử dụng Radio Buttons thay vì Checkbox, có logic ẩn/hiện field nâng cao:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Cấu hình DNSSEC (Bảo mật tên miền)                              │
+│  ──────────────────────────────────                               │
+│                                                                   │
+│  Chế độ hoạt động (dnssec_mode) *                                │
+│  ( ) Off  — Vô hiệu hóa hoàn toàn, ẩn tab với mọi client        │
+│  (●) Free — Miễn phí cho mọi client (nếu quota cho phép)        │
+│  ( ) Paid — Tính năng trả phí (yêu cầu mua Addon)               │
+│                                                                   │
+│  ┌─── Hiện khi Paid được chọn ───────────────────────────────┐   │
+│  │ Cấu hình Upsell Addon                                     │   │
+│  │ [▼ 14 - Advanced DNS Security addon     ]                  │   │
+│  │ ℹ️ Chọn Addon trong WHMCS để cấp quyền dùng DNSSEC         │   │
+│  └───────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Tab License
+Một tab độc lập ở vị trí đầu tiên để khai báo key và trạng thái server.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Bản quyền Module (License)                                      │
+│  ──────────────────────────                                       │
+│                                                                   │
+│  License Key *                                                   │
+│  [__________HVN-DNS-XXXXXXXXXXXXXXXX__________]                   │
+│                                                                   │
+│  API Endpoint *                                                  │
+│  [__https://license.hvn.vn/api/v1/check__]                       │
+│                                                                   │
+│  Trạng thái hiện tại: 🟢 Active (Còn 315 ngày)                   │
+│  Loại gói: Enterprise (Không giới hạn server)                     │
+│  Lần check cuối: 25/02/2026 02:00                               │
+│                                                                   │
+│  [🔄 Check License Ngay]                                           │
+└──────────────────────────────────────────────────────────────────┘
+```
 
 ---
 

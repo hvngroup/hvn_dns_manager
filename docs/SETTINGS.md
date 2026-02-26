@@ -32,7 +32,9 @@
 19. [Webhook & Admin Alert](#19-webhook--admin-alert)
 20. [Security & Access Control](#20-security--access-control)
 21. [Data Retention — Lưu trữ Dữ liệu](#21-data-retention)
-22. [Bảng Tổng hợp Settings](#22-bảng-tổng-hợp)
+22. [License](#22-license)
+23. [Upsell](#23-upsell)
+24. [Bảng Tổng hợp Settings](#24-bảng-tổng-hợp-settings)
 
 ---
 
@@ -332,7 +334,7 @@ Nếu `email_verify_template` trống → bỏ qua bước xác minh, tạo forw
 
 | # | Setting Key | Label | Type | Default | Mô tả |
 |---|------------|-------|------|---------|-------|
-| 43 | `enable_ddns` | Bật Dynamic DNS | Boolean | `0` | Cho phép client tạo DDNS token. MẶC ĐỊNH TẮT — cần enable rõ ràng |
+| 43 | `ddns_mode` | Chế độ DDNS | Select | `"off"` | `off`: Tắt hoàn toàn<br>`free`: Tự do sử dụng<br>`paid`: Yêu cầu gói trả phí / addon |
 | 44 | `ddns_rate_limit` | Giới hạn Request/giờ | Integer | `60` | Số request DDNS tối đa mỗi giờ per token |
 | 45 | `ddns_token_limit` | Giới hạn Token/domain | Integer | `5` | Số DDNS token tối đa cho 1 domain |
 | 46 | `enable_ddns_bruteforce` | Bật Brute Force Detection | Boolean | `1` | Phát hiện và block IP gửi token sai liên tục |
@@ -350,7 +352,7 @@ Nếu `email_verify_template` trống → bỏ qua bước xác minh, tạo forw
 
 | # | Setting Key | Label | Type | Default | Mô tả |
 |---|------------|-------|------|---------|-------|
-| 50 | `enable_dnssec` | Bật DNSSEC cho Client | Boolean | `0` | Cho phép client bật/tắt DNSSEC từ Client Area. MẶC ĐỊNH TẮT. Yêu cầu DA server đã enable DNSSEC (`dnssec=1` trong directadmin.conf) |
+| 50 | `dnssec_mode` | Chế độ DNSSEC | Select | `"off"` | `off`: Tắt hoàn toàn<br>`free`: Tự do sử dụng<br>`paid`: Yêu cầu gói trả phí / addon. (Yêu cầu DA server bật `dnssec=1`) |
 | 51 | `dnssec_auto_resign` | Tự động Re-sign Zone | Boolean | `1` | Tự động dispatch job RESIGN_ZONE sau mỗi batch thay đổi record khi DNSSEC đang enabled |
 
 **Override bởi Quota Plan**: `dnssec_enabled` trong Quota Plan.
@@ -524,9 +526,42 @@ Client mở DNS Editor → Gọi DAGateway::getZone() (500-1500ms)
 
 ---
 
-## 22. Bảng Tổng hợp Settings
+## 22. License
 
-**Tổng: 96 settings** phân bổ theo nhóm:
+> **Tab Admin**: License
+
+| # | Setting Key | Label | Type | Default | Mô tả |
+|---|------------|-------|------|---------|-------|
+| 97 | `license_key` | License Key | String | `""` | Khóa bản quyền Module |
+| 98 | `license_local_key` | Local Key | Text | `""` | Khóa xác thực offline nội bộ, tự động sinh từ server |
+| 99 | `license_server_url` | License Server URL | String | `""` | Địa chỉ máy chủ cấp phép bản quyền |
+| 100 | `license_grace_days` | Grace Days | Integer | `3` | Số ngày cho phép tiếp tục sử dụng khi hết hạn bản quyền hoặc không kết nối được server |
+| 101 | `license_check_interval` | Chu kỳ kiểm tra (ngày) | Integer | `7` | Số ngày giữa các lần gọi API server check license |
+| 102 | `license_last_check` | Lần kiểm tra cuối | String | `""` | Timestamp lần kiểm tra bản quyền gần nhất |
+| 103 | `license_status` | Trạng thái License | String | `""` | Trạng thái bản quyền (Active, Suspended, Expired...) |
+| 104 | `license_error_message` | Thông báo lỗi License | String | `""` | Ghi nhận lỗi chi tiết nếu kiểm tra bản quyền thất bại |
+
+---
+
+## 23. Upsell
+
+> **Tab Admin**: Upsell
+
+| # | Setting Key | Label | Type | Default | Mô tả |
+|---|------------|-------|------|---------|-------|
+| 105 | `upsell_enable` | Bật module Upsell | Boolean | `0` | Cho phép hiển thị các gói nâng cấp/addon DNS |
+| 106 | `upsell_dnssec_addon_id` | ID Addon DNSSEC | Integer | `0` | Product/Addon ID trong WHMCS dùng để nâng cấp tính năng DNSSEC |
+| 107 | `upsell_ddns_addon_id` | ID Addon DDNS | Integer | `0` | Product/Addon ID trong WHMCS dùng để nâng cấp tính năng DDNS |
+| 108 | `upsell_quota_addon_ids` | IDs Addon Quota/Limits | String | `""` | Danh sách ID Addon nâng giới hạn DNS records (phân cách bằng dấu phẩy) |
+| 109 | `upsell_display_price` | Hiển thị giá Upsell | Boolean | `1` | Hiển thị giá trực tiếp trên Client Area khi quảng cáo tính năng |
+| 110 | `upsell_custom_url` | URL tùy chỉnh | String | `""` | Đường dẫn tùy chỉnh nếu click vào tính năng cần nâng cấp (ghi đè link mặc định) |
+| 111 | `upsell_description` | Mô tả chung Upsell | Text | `""` | Nội dung tiếp thị nâng cấp hiển thị trên giao diện giới hạn tính năng |
+
+---
+
+## 24. Bảng Tổng hợp Settings
+
+**Tổng: 111 settings** phân bổ theo nhóm:
 
 | Nhóm | Số lượng | Settings # |
 |------|---------|-----------|
@@ -549,7 +584,9 @@ Client mở DNS Editor → Gọi DAGateway::getZone() (500-1500ms)
 | Webhook & Alert | 9 | 81–89 |
 | Security & Access | 4 | 90–93 |
 | Data Retention | 3 | 94–96 |
-| **TỔNG** | **96** | |
+| License | 8 | 97–104 |
+| Upsell | 7 | 105–111 |
+| **TỔNG** | **111** | |
 
 ### Tác động tới các tài liệu khác
 
@@ -570,4 +607,5 @@ Client mở DNS Editor → Gọi DAGateway::getZone() (500-1500ms)
 ## Changelog
 | Ngày | Thay đổi | Người thực hiện |
 |------|----------|-----------------|
+| 26/02/2026 | Thay đổi cài đặt DDNS & DNSSEC, bổ sung License & Upsell (111 settings) | — |
 | 25/02/2026 | Khởi tạo v1.0 — 96 settings từ legacy analysis + thiết kế mới | — |

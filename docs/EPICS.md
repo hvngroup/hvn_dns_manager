@@ -437,6 +437,57 @@
 
 ---
 
+## EPIC-08B: License & Feature Gating 🔵
+> *Tích hợp kiểm tra bản quyền module và phân quyền tính năng theo gói dịch vụ (Upsell/Cross-sell).*
+
+### Story 8B.1 — License Integration
+**Là** admin, **tôi cần** hệ thống tự động kiểm tra bản quyền module với máy chủ cấp phép, **để** bảo vệ chất xám và đảm bảo khách hàng đang dùng phiên bản hợp lệ.
+
+| Issue | Mô tả | SP |
+|-------|--------|-----|
+| `LIC-001` | Viết class `LicenseChecker` để gọi API check bản quyền với caching (VD: 24h) | 2 |
+| `LIC-002` | Implement luồng kiểm tra: chặn các thao tác dispatch / cron nếu license invalid | 2 |
+| `LIC-003` | Admin UI: Hiển thị License Widget trên Dashboard & trang Settings | 1 |
+| `LIC-004` | Xây dựng trang báo lỗi "License Invalid/Expired" từ chối truy cập | 1 |
+
+**AC**:
+- License check không làm nghẽn quá trình load (phải dùng background check hoặc cache)
+- Nơi cấu hình license key phải rõ ràng (Admin Settings)
+
+---
+
+### Story 8B.2 — Feature Gating 3 lớp
+**Là** chủ host, **tôi muốn** khóa các tính năng cao cấp (DNSSEC, DDNS) và chỉ mở qua addon, **để** tăng doanh thu (upsell) cho hệ thống.
+
+| Issue | Mô tả | SP |
+|-------|--------|-----|
+| `FEAT-001` | Viết class `FeatureGate` kiểm tra `dnssec_mode` và `ddns_mode` (off/free/paid) | 1 |
+| `FEAT-002` | Viết class `ClientFeatureResolver` query database WHMCS (`tblhosting`, `tblhostingaddons`) để check quyền client | 2 |
+| `FEAT-003` | Cập nhật logic render: ẩn tính năng nếu mode=off, mở nếu mode=free/paid+có addon | 2 |
+| `FEAT-004` | Xây dựng Upsell Card template hiển thị khi client truy cập tính năng trả phí mà chưa mua | 2 |
+| `FEAT-005` | Helpers sinh link Upsell tự động vào giỏ hàng WHMCS dựa trên Addon ID config | 1 |
+
+**AC**:
+- Nếu chưa có quyền, Client bị chặn cả ở giao diện lẫn Ajax API
+- Upsell URL redirect trơn tru
+
+---
+
+### Story 8B.3 — Admin Premium Feature Settings
+**Là** admin, **tôi muốn** tùy chỉnh chế độ bán các tính năng cao cấp qua giao diện, **để** linh hoạt trong chính sách giá.
+
+| Issue | Mô tả | SP |
+|-------|--------|-----|
+| `FEAT-006` | Cập nhật Form Edit Settings cho tính năng Premium: Select UI 3 options (Off, Free, Paid) bằng Radio Buttons | 2 |
+| `FEAT-007` | Hiện Conditional config fields cho "Paid" Mode (chọn WHMCS Addon ID cho upsell) | 1 |
+| `FEAT-008` | Validation check: Đảm bảo Addon ID hợp lệ (tồn tại trong WHMCS) khi lưu mode Paid | 1 |
+
+**AC**:
+- Radio fields chuyển đổi mượt mà không cần reload
+- Dữ liệu lưu xuống `mod_hvndns_settings` dạng integer/string chuẩn
+
+---
+
 # PHASE 3 — ADD-ON VALUES 🟣
 > **Mục tiêu**: Hoàn thiện tất cả tính năng cao cấp: DDNS, DNSSEC, Drift Check, Quota, Audit Trail UI, Rollback.  
 > **Thời lượng ước tính**: 4–5 tuần  
@@ -667,9 +718,9 @@
 | Phase | Số Epic | Số Story | Số Issue | Tổng SP | Thời gian ước tính |
 |-------|---------|----------|----------|---------|---------------------|
 | 🟢 Phase 1 — MVP | 5 | 12 | 56 | ~105 SP | 5–7 tuần |
-| 🔵 Phase 2 — Enterprise | 3 | 7 | 31 | ~62 SP | 4–6 tuần |
+| 🔵 Phase 2 — Enterprise | 4 | 10 | 43 | ~80 SP | 5–7 tuần |
 | 🟣 Phase 3 — Add-on | 6 | 10 | 43 | ~80 SP | 4–5 tuần |
-| **Tổng** | **14** | **29** | **130** | **~247 SP** | **13–18 tuần** |
+| **Tổng** | **15** | **32** | **142** | **~265 SP** | **14–19 tuần** |
 
 ## Dependency Map (Thứ tự phụ thuộc)
 
@@ -684,7 +735,8 @@ EPIC-01 (Foundation) ──┬──→ EPIC-02 (Queue & Cron)
                        
 Phase 1 stable ──┬──→ EPIC-06 (Dashboard Metrics)
                  ├──→ EPIC-07 (URL Forwarding + SSL)
-                 └──→ EPIC-08 (Conflict + Webhook)
+                 ├──→ EPIC-08 (Conflict + Webhook)
+                 └──→ EPIC-08B (License & Feature Gating)
 
 Phase 2 stable ──┬──→ EPIC-09 (DDNS API)
                  ├──→ EPIC-10 (DNSSEC)
@@ -711,4 +763,5 @@ Phase 2 stable ──┬──→ EPIC-09 (DDNS API)
 ## Changelog
 | Ngày | Thay đổi | Người thực hiện |
 |------|----------|-----------------|
+| 26/02/2026 | Thêm EPIC License & Feature Gating vào Phase 2 | — |
 | 25/02/2026 | Khởi tạo tài liệu v1.0 | — |

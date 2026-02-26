@@ -114,10 +114,16 @@
 
 ## 3. Kiến trúc Hệ thống
 
-### 3.1. Kiến trúc 5 Tầng (Layer Architecture)
+### 3.1. Kiến trúc Hệ thống (Layer Architecture)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
+│                  TẦNG 0: LICENSE & FEATURE GATE              │
+│                                                              │
+│   ├── LicenseChecker         (Module license valid? call home)│
+│   ├── FeatureGate            (dnssec_mode / ddns_mode)        │
+│   └── ClientFeatureResolver  (Client đã mua addon? query DB)  │
+├─────────────────────────────────────────────────────────────┤
 │                  TẦNG 1: PRESENTATION LAYER                  │
 │                                                              │
 │   Client Area (Smarty + Alpine.js)                          │
@@ -1785,7 +1791,7 @@ echo "0 4 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/cleanup.p
 
 ### 14.3. Module Settings (Admin Configurable)
 
-Hệ thống có **96 settings** chia thành 19 nhóm. Chi tiết đầy đủ tại **SETTINGS.md**.
+Hệ thống có **111 settings** chia thành 21 nhóm. Chi tiết đầy đủ tại **SETTINGS.md**.
 
 Dưới đây là tóm tắt các nhóm:
 
@@ -1798,8 +1804,8 @@ Dưới đây là tóm tắt các nhóm:
 | Record Limits | 8 | Giới hạn số lượng từng loại record |
 | URL Redirect | 4 | Enable, masked, hash key, limit |
 | Email Forwarding | 5 | Enable, catch-all, alias/destination limits |
-| DDNS | 7 | Enable, rate limit, brute force config |
-| DNSSEC | 2 | Enable, auto re-sign |
+| DDNS | 7 | Mode (off/free/paid), rate limit, brute force config |
+| DNSSEC | 2 | Mode (off/free/paid), auto re-sign |
 | SSL / Let's Encrypt | 4 | Auto-SSL, client trigger, renew days |
 | DNS Templates | 3 | Enable, user custom, limit |
 | Client Notification | 5 | Email notification cho client khi DNS thay đổi |
@@ -1810,6 +1816,8 @@ Dưới đây là tóm tắt các nhóm:
 | Webhook & Alert | 9 | Telegram, email, thresholds, cooldown |
 | Security | 4 | Sub-account restriction, retention policies |
 | Data Retention | 3 | Snapshot, queue, drift retention |
+| License | 8 | Cấu hình License key, API Endpoint |
+| Upsell | 7 | Tích hợp giới thiệu/bán Addon cho client |
 
 ---
 
@@ -1818,4 +1826,5 @@ Dưới đây là tóm tắt các nhóm:
 ## Changelog
 | Ngày | Thay đổi | Người thực hiện |
 |------|----------|-----------------|
+| 26/02/2026 | Thêm Tầng 0 (License/Feature Gate) và cập nhật 111 Settings | — |
 | 25/02/2026 | Khởi tạo SPEC v1.0 — Toàn bộ 14 sections | — |

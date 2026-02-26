@@ -18,12 +18,14 @@ Khi cần thông tin chi tiết, đọc các file trong `docs/`:
 1. `docs/AGENT.md` — Quy tắc điều phối tối thượng
 2. `docs/DB_SCHEMA.md` — Database schema, định nghĩa cột, indexes
 3. `docs/API_REFERENCE.md` — DA API + Internal Ajax API + Error Codes
-4. `docs/SETTINGS.md` — 96 Admin settings, validation, permission logic
+4. `docs/SETTINGS.md` — 111 Admin settings, validation, permission logic
 5. `docs/SPEC.md` — Kiến trúc hệ thống, flow diagrams
 6. `docs/EPICS.md` — User stories, acceptance criteria, issue list
 7. `docs/TEST_PLAN.md` — Test cases, fixtures, checklists
 8. `docs/WIREFRAME.md` — Phác thảo giao diện
-9. `docs/PLAN.md` — Kế hoạch phát triển tổng thể
+9. `docs/PROTOTYPE.md` — Kế hoạch làm frontend UI prototype
+10. `docs/PLAN.md` — Kế hoạch phát triển tổng thể
+11. `docs/LICENSING.md` — Tài liệu về License & Feature Gating (DNSSEC/DDNS Upsell)
 
 ## Quy tắc tham chiếu theo ngữ cảnh
 - Code database (Model, migration, query) → đọc `docs/DB_SCHEMA.md`
@@ -32,6 +34,8 @@ Khi cần thông tin chi tiết, đọc các file trong `docs/`:
 - Code settings/config (SettingsHelper, admin settings page) → đọc `docs/SETTINGS.md`
 - Code permission check (record type enable/disable, NS check) → đọc `docs/SETTINGS.md` Section 5-6
 - Code limits enforcement (per-type limits, 3-layer priority) → đọc `docs/SETTINGS.md` Section 7
+- Code kiểm tra quyền Premium (DNSSEC/DDNS) → check `dnssec_mode`/`ddns_mode` (off/free/paid), KHÔNG dùng boolean `enable_dnssec`/`enable_ddns`.
+- `FeatureGate::canClientUseDnssec($serviceId)` là entry point DUY NHẤT để check permission (không tự query db để check tay).
 - Code giao diện (template, JS) → đọc `docs/WIREFRAME.md`
 - Code luồng xử lý (Service, Queue, Cron) → đọc `docs/SPEC.md`
 - Viết test → đọc `docs/TEST_PLAN.md`
