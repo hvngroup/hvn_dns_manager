@@ -165,7 +165,7 @@
                             <span x-text="Math.round((progress.done / preview.domains.length) * 100) + '%'"></span>
                         </div>
                         <div class="progress mb-2" style="height: 15px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" :style="`width: ${(progress.done / preview.domains.length) * 100}%`"></div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" :style="`width: ${ (progress.done / preview.domains.length) * 100 }%`"></div>
                         </div>
                         <div class="d-flex small text-muted justify-content-between">
                             <div>
