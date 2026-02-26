@@ -23,9 +23,9 @@
     --hvn-border-color: #dee2e6;
     --hvn-body-bg: #f4f6f9;
     --hvn-surface: #ffffff;
-    --hvn-border-radius: 0.375rem;
-    --hvn-border-radius-sm: 0.25rem;
-    --hvn-border-radius-lg: 0.5rem;
+    --hvn-border-radius: 6px;
+    --hvn-border-radius-sm: 4px;
+    --hvn-border-radius-lg: 8px;
     --hvn-border-radius-pill: 50rem;
     --hvn-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --hvn-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -52,7 +52,7 @@
 .hvn-wrapper h4, .hvn-wrapper h5, .hvn-wrapper h6 {
     font-weight: 600;
     margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     line-height: 1.2;
 }
 
@@ -443,12 +443,12 @@
 .hvn-fw-light    { font-weight: 300 !important; }
 .hvn-fst-italic  { font-style: italic !important; }
 
-.hvn-fs-1 { font-size: calc(1.375rem + 1.5vw) !important; }
-.hvn-fs-2 { font-size: calc(1.325rem + 0.9vw) !important; }
-.hvn-fs-3 { font-size: calc(1.3rem + 0.6vw) !important; }
-.hvn-fs-4 { font-size: calc(1.275rem + 0.3vw) !important; }
-.hvn-fs-5 { font-size: 1.25rem !important; }
-.hvn-fs-6 { font-size: 1rem !important; }
+.hvn-fs-1 { font-size: 36px !important; }
+.hvn-fs-2 { font-size: 30px !important; }
+.hvn-fs-3 { font-size: 26px !important; }
+.hvn-fs-4 { font-size: 22px !important; }
+.hvn-fs-5 { font-size: 20px !important; }
+.hvn-fs-6 { font-size: 16px !important; }
 
 /* Un-prefixed text aliases */
 .text-start     { text-align: left !important; }
@@ -463,9 +463,9 @@
 .fw-semibold    { font-weight: 600 !important; }
 .fw-medium      { font-weight: 500 !important; }
 .fw-normal      { font-weight: 400 !important; }
-.small          { font-size: 0.875em !important; }
+.small          { font-size: 12px !important; }
 .font-monospace { font-family: var(--hvn-font-monospace) !important; }
-.display-6      { font-size: calc(1.375rem + 1.5vw); font-weight: 300; line-height: 1.2; }
+.display-6      { font-size: 36px; font-weight: 300; line-height: 1.2; }
 .list-unstyled  { padding-left: 0; list-style: none; }
 
 /* =======================================================================
@@ -628,8 +628,8 @@
    ======================================================================= */
 .hvn-badge {
     display: inline-block;
-    padding: 0.35em 0.65em;
-    font-size: 0.75em;
+    padding: 4px 8px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
@@ -645,8 +645,8 @@
 /* Un-prefixed badge alias */
 .badge {
     display: inline-block;
-    padding: 0.35em 0.65em;
-    font-size: 0.75em;
+    padding: 4px 8px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
     color: #fff;
@@ -724,9 +724,9 @@
    ======================================================================= */
 .hvn-progress {
     display: flex;
-    height: 1rem;
+    height: 16px;
     overflow: hidden;
-    font-size: 0.75rem;
+    font-size: 12px;
     background-color: #e9ecef;
     border-radius: var(--hvn-border-radius);
 }
@@ -761,8 +761,8 @@
     user-select: none;
     background-color: transparent;
     border: 1px solid transparent;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 6px 12px;
+    font-size: 14px;
     border-radius: var(--hvn-border-radius);
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -794,8 +794,8 @@
 .hvn-btn-outline-warning:hover { color: #000; background-color: var(--hvn-warning); }
 
 /* Un-prefixed button aliases (still in some templates) */
-.btn-sm   { padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: var(--hvn-border-radius-sm); }
-.btn-lg   { padding: 0.5rem 1rem; font-size: 1.125rem; border-radius: var(--hvn-border-radius-lg); }
+.btn-sm   { padding: 4px 8px; font-size: 13px; border-radius: var(--hvn-border-radius-sm); }
+.btn-lg   { padding: 8px 16px; font-size: 18px; border-radius: var(--hvn-border-radius-lg); }
 .btn-light { color: #000; background-color: var(--hvn-light); border-color: var(--hvn-light); }
 .btn-light:hover { background-color: #e2e6ea; border-color: #dae0e5; }
 .btn-outline-info      { color: var(--hvn-info); border-color: var(--hvn-info); background-color: transparent; }
@@ -809,7 +809,7 @@
 
 /* Button group */
 .btn-group     { position: relative; display: inline-flex; vertical-align: middle; }
-.btn-group-sm > .hvn-btn, .btn-group-sm > .btn { padding: 0.25rem 0.5rem; font-size: 0.8125rem; }
+.btn-group-sm > .hvn-btn, .btn-group-sm > .btn { padding: 4px 8px; font-size: 13px; }
 .btn-group > .hvn-btn:not(:first-child),
 .btn-group > .btn:not(:first-child) { margin-left: -1px; }
 .btn-group > .hvn-btn:not(:last-child):not(.dropdown-toggle),
@@ -823,8 +823,8 @@
 .hvn-form-control {
     display: block;
     width: 100%;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 6px 12px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     color: #212529;
@@ -840,14 +840,14 @@
     background-color: #fff;
     border-color: #f29a99;
     outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(234, 69, 68, 0.25);
+    box-shadow: 0 0 0 4px rgba(234, 69, 68, 0.25);
 }
 
 .hvn-form-select {
     display: block;
     width: 100%;
-    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 6px 36px 6px 12px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     color: #212529;
@@ -858,19 +858,19 @@
 }
 
 .hvn-form-label {
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     font-weight: 500;
 }
 
 /* Un-prefixed form aliases */
-.form-control { display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 0.875rem; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
-.form-control:focus { border-color: #f29a99; outline: 0; box-shadow: 0 0 0 0.25rem rgba(234, 69, 68, 0.25); }
-.form-select  { display: block; width: 100%; padding: 0.375rem 2.25rem 0.375rem 0.75rem; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
-.form-label   { margin-bottom: 0.5rem; font-weight: 500; }
-.form-check   { display: block; min-height: 1.5rem; padding-left: 1.5em; margin-bottom: 0.125rem; }
+.form-control { display: block; width: 100%; padding: 6px 12px; font-size: 14px; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
+.form-control:focus { border-color: #f29a99; outline: 0; box-shadow: 0 0 0 4px rgba(234, 69, 68, 0.25); }
+.form-select  { display: block; width: 100%; padding: 6px 36px 6px 12px; border: 1px solid #ced4da; border-radius: var(--hvn-border-radius); }
+.form-label   { margin-bottom: 8px; font-weight: 500; }
+.form-check   { display: block; min-height: 24px; padding-left: 24px; margin-bottom: 2px; }
 .form-check-label { cursor: pointer; }
-.form-check-input { flex-shrink: 0; width: 1em; height: 1em; margin-top: 0.25em; vertical-align: top; }
-.form-text    { margin-top: 0.25rem; font-size: 0.875em; color: var(--hvn-secondary); }
+.form-check-input { flex-shrink: 0; width: 16px; height: 16px; margin-top: 4px; vertical-align: top; }
+.form-text    { margin-top: 4px; font-size: 12px; color: var(--hvn-secondary); }
 .input-group  { position: relative; display: flex; flex-wrap: wrap; align-items: stretch; width: 100%; }
 .input-group > .form-control,
 .input-group > .form-select { position: relative; flex: 1 1 auto; width: 1%; min-width: 0; }
@@ -880,18 +880,18 @@
    ======================================================================= */
 .hvn-spinner-border {
     display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    vertical-align: -0.125em;
-    border: 0.25em solid currentcolor;
+    width: 32px;
+    height: 32px;
+    vertical-align: -2px;
+    border: 4px solid currentcolor;
     border-right-color: transparent;
     border-radius: 50%;
     animation: hvn-spin 0.75s linear infinite;
 }
 .hvn-spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-    border-width: 0.2em;
+    width: 16px;
+    height: 16px;
+    border-width: 3px;
 }
 @keyframes hvn-spin {
     to { transform: rotate(360deg); }
