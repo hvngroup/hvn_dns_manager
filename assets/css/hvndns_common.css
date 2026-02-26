@@ -49,6 +49,7 @@
 
 /* --- 3. HỆ THỐNG LƯỚI (FLEX GRID BS5 STYLE) --- */
 .hvn-container-fluid {
+    box-sizing: border-box;
     width: 100%;
     padding-right: var(--bs-gutter-x, 1.5rem);
     padding-left: var(--bs-gutter-x, 1.5rem);
@@ -57,6 +58,7 @@
 }
 
 .hvn-row {
+    box-sizing: border-box;
     --bs-gutter-x: 1.5rem;
     --bs-gutter-y: 0;
     display: flex;
@@ -67,6 +69,7 @@
 }
 
 .hvn-row > * {
+    box-sizing: border-box;
     flex-shrink: 0;
     width: 100%;
     max-width: 100%;
