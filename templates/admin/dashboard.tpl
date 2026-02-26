@@ -116,9 +116,9 @@
                                 {/if}
                             </h6>
                             {if $srv.status == 'offline' }
-                                <div class="btn-group btn-group-sm">
-                                    <button class="hvn-btn btn-outline-secondary" onclick="alert('Đang Test lỗi kết nối server...')">Test</button>
-                                    <button class="hvn-btn btn-outline-danger" onclick="alert('Đã vô hiệu hóa server.')">Disable</button>
+                                <div class="hvn-d-flex hvn-gap-1">
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" onclick="alert('Đang Test lỗi kết nối server...')">Test</button>
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger" onclick="alert('Đã vô hiệu hóa server.')">Disable</button>
                                 </div>
                             {/if}
                         </div>
@@ -158,9 +158,9 @@
                     <div class="hvn-list-group-item hvn-py-3 hvn-bg-danger-subtle bg-opacity-10">
                         <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
                             <h6 class="hvn-mb-0 hvn-fw-bold"><span class="hvn-text-danger">🔴</span> dns3.hvn.vn</h6>
-                            <div class="btn-group btn-group-sm">
-                                <button class="hvn-btn btn-outline-secondary">Test</button>
-                                <button class="hvn-btn btn-outline-danger">Disable</button>
+                            <div class="hvn-d-flex hvn-gap-1">
+                                <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary">Test</button>
+                                <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger">Disable</button>
                             </div>
                         </div>
                         <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
