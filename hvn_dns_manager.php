@@ -49,9 +49,9 @@ function hvn_dns_manager_config()
     return [
         'name' => 'HVN - DirectAdmin DNS Manager',
         'description' => 'Quản lý DNS DirectAdmin mạnh mẽ với cơ chế Queue Async',
-        'author' => 'HVN Group',
+        'author' => 'Vuongnm',
         'language' => 'english',
-        'version' => '1.0',
+        'version' => '1.5',
         'fields' => []
     ];
 }
