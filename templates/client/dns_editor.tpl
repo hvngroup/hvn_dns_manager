@@ -1,13 +1,17 @@
-{* ── Load Alpine.js + Bootstrap Icons (chỉ inject nếu chưa có) ── *}
+{* ── Load Bootstrap Icons ── *}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-{* ── Alpine data + config PHẢI đặt TRƯỚC khi Alpine load ── *}
+{* ── Smarty variables → JS (TRƯỚC literal block) ── *}
 <script>
     var HVNDNS_CONFIG = {
         domainId: {$domain.id|intval},
         records: {$recordsJson nofilter}
     };
+</script>
 
+{* ── Alpine component logic (trong literal để Smarty không parse JS braces) ── *}
+<script>
+{literal}
     document.addEventListener('alpine:init', function() {
         Alpine.data('dnsEditor', function() {
             return {
@@ -18,13 +22,14 @@
                 activeTab: 'records',
 
                 get filteredRecords() {
+                    var self = this;
                     return this.records.filter(function(record) {
-                        var typeMatch = this.filterType === 'all' || record.type === this.filterType;
-                        var searchMatch = this.searchQuery === '' 
-                            || record.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-                            || record.value.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        var typeMatch = self.filterType === 'all' || record.type === self.filterType;
+                        var searchMatch = self.searchQuery === '' 
+                            || record.name.toLowerCase().includes(self.searchQuery.toLowerCase())
+                            || record.value.toLowerCase().includes(self.searchQuery.toLowerCase());
                         return typeMatch && searchMatch;
-                    }.bind(this));
+                    });
                 },
 
                 getTypeBadgeClass(type) {
@@ -57,6 +62,7 @@
             };
         });
     });
+{/literal}
 </script>
 
 <div class="hvn-dns-client" x-data="dnsEditor()">
@@ -99,45 +105,45 @@
         </div>
     </div>
 
-    {* ── Navigation Tabs (Alpine-powered, không phụ thuộc BS JS) ── *}
+    {* ── Navigation Tabs (Alpine-powered) ── *}
     <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'records' }" @click="activeTab = 'records'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'records' ? 'active' : ''" @click="activeTab = 'records'" type="button">
                 DNS Records
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'redirects' }" @click="activeTab = 'redirects'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'redirects' ? 'active' : ''" @click="activeTab = 'redirects'" type="button">
                 Redirects {if $domain.redirects_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.redirects_count}</span>{/if}
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'email' }" @click="activeTab = 'email'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'email' ? 'active' : ''" @click="activeTab = 'email'" type="button">
                 Email {if $domain.email_fwds_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.email_fwds_count}</span>{/if}
             </button>
         </li>
         {if $quota.dnssec_enabled}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'dnssec' }" @click="activeTab = 'dnssec'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'dnssec' ? 'active' : ''" @click="activeTab = 'dnssec'" type="button">
                 DNSSEC
             </button>
         </li>
         {/if}
         {if $quota.ddns_enabled}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'ddns' }" @click="activeTab = 'ddns'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'ddns' ? 'active' : ''" @click="activeTab = 'ddns'" type="button">
                 DDNS
             </button>
         </li>
         {/if}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'templates' }" @click="activeTab = 'templates'" type="button">
+            <button class="nav-link fw-bold" :class="activeTab === 'templates' ? 'active' : ''" @click="activeTab = 'templates'" type="button">
                 Templates
             </button>
         </li>
     </ul>
 
-    {* ── Tab Content (Alpine x-show thay vì BS tab-pane) ── *}
+    {* ── Tab Content (Alpine x-show) ── *}
     <div>
         <div x-show="activeTab === 'records'" x-cloak>
             {include file="./partials/record_table.tpl"}
@@ -172,14 +178,12 @@
     {include file="./partials/toast.tpl"}
 </div>
 
-{* ── Load Alpine.js SAU khi đã register xong alpine:init listener ── *}
+{* ── Load Alpine.js cuối cùng (SAU khi alpine:init listener đã đăng ký) ── *}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 <style>
 {literal}
-/* Alpine cloak: ẩn cho đến khi Alpine init xong */
 [x-cloak] { display: none !important; }
-
 .bg-purple { background-color: #6f42c1; color: white; }
 .nav-tabs .nav-link { color: #495057; cursor: pointer; }
 .nav-tabs .nav-link.active { 
