@@ -2,7 +2,7 @@
 
     <!-- Header -->
     <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
-        <h2><i class="bi bi-arrow-left-right"></i> Báo cáo Lệch Dữ liệu <span class="hvn-badge hvn-bg-danger" x-show="pendingCount > 0" x-text="pendingCount + ' lệch'"></span></h2>
+        <h2><i class="bi bi-arrow-left-right"></i> Báo cáo Lệch Dữ liệu <span class="hvn-badge" x-show="pendingCount > 0" x-text="pendingCount + ' lệch'"></span></h2>
         <div class="hvn-d-flex" style="gap:8px;">
             <button class="hvn-btn hvn-btn-outline-secondary" @click="runScan()" :disabled="scanning">
                 <span x-show="scanning" class="spinner-border spinner-border-sm hvn-me-1"></span>
