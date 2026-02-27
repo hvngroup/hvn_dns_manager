@@ -95,7 +95,7 @@
 
             <!-- Group Table (collapsible) -->
             <div x-show="expandedGroups.includes(group.type)" style="overflow-x:auto;">
-                <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0" style="font-size:.875rem;">
+                <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0" style="font-size:14px;">
                     <thead>
                         <tr style="background:#f8f9fa; font-size:14px; text-transform:uppercase; letter-spacing:.05em; color:#6c757d;">
                             <th class="hvn-ps-3" style="width:30%;">Tên (Name)</th>
