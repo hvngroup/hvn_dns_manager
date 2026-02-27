@@ -16,15 +16,20 @@ class AdminController
         $template = 'dashboard';
         
         $validActions = [
-            'servers', 'domains', 'dns_editor', 'sync_logs', 
+            'servers', 'domains', 'dns_editor', 'admin_dns_editor', 'sync_logs', 
             'audit_trail', 'templates', 'quota_plans', 
             'drift_reports', 'bulk', 'settings',
             'server_edit', 'quota_plan_edit', 'template_edit',
             'drift_settings', 'audit_detail', 'snapshot_rollback'
         ];
 
+        // Alias: action name → template name
+        $actionTemplateMap = [
+            'admin_dns_editor' => 'dns_editor',
+        ];
+
         if (in_array($action, $validActions)) {
-            $template = $action;
+            $template = $actionTemplateMap[$action] ?? $action;
         }
 
         // Setup Smarty cho Admin Area
