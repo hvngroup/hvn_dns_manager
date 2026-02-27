@@ -91,7 +91,7 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('auditDetail', () => ({
         log: {
-            id: '', time: '', actorType: '', actorName: '', domain: '', 
+            id: '', time: '', actorType: '', actorName: '', domain: '',
             action: '', details_brief: '', ip: '',
             actorFull: '', context: '', target: '',
             oldVal: '', newVal: '',
@@ -101,17 +101,72 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id') || '89201';
-            
-            // Mock load log by ID
-            this.log = {
-                id: id, time: '25/02, 14:32', actorType: 'client', actorName: 'Lê C', domain: 'myblog.net', 
-                action: 'delete_record', details_brief: 'A @ → 1.2.3.4', ip: '118.70.xx.xx',
-                actorFull: 'Lê C - Client #1236', context: 'client_area', target: 'Record #457 (A @)',
-                oldVal: '{\n  "name": "@",\n  "type": "A",\n  "value": "1.2.3.4",\n  "ttl": 3600\n}', newVal: 'null',
-                ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0', session: 'whmcs_sess_xyz987',
-                notes: 'User initiated delete from Client Area.', timeLong: '25/02/2026 14:32:05'
+            const id = parseInt(urlParams.get('id')) || 89201;
+
+            // Mock dataset — khớp với audit_trail.tpl allLogs
+            const mockDb = {
+                89201: {
+                    id: 89201, time: '27/02, 14:32', actorType: 'client', actorName: 'Lê Công', domain: 'myblog.net',
+                    action: 'delete_record', details_brief: 'A @ → 1.2.3.4 [xóa]', ip: '118.70.1.10',
+                    actorFull: 'Lê Công - Client #1236', context: 'client_area', target: 'Record #457 (A @)',
+                    oldVal: '{\n  "name": "@",\n  "type": "A",\n  "value": "1.2.3.4",\n  "ttl": 3600\n}',
+                    newVal: '[Đã xóa — record không còn tồn tại]',
+                    ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0',
+                    session: 'whmcs_sess_xyz987',
+                    notes: 'User initiated delete from Client Area.', timeLong: '27/02/2026 14:32:05'
+                },
+                89200: {
+                    id: 89200, time: '27/02, 14:30', actorType: 'admin', actorName: 'Vuong', domain: 'example.com',
+                    action: 'edit_record', details_brief: 'A mail: .90 → .91', ip: '10.0.0.1',
+                    actorFull: 'Vuong Nguyen - Admin #2', context: 'admin_editor', target: 'Record #456 (A mail)',
+                    oldVal: '{\n  "type": "A",\n  "name": "mail",\n  "value": "103.45.67.90",\n  "ttl": 3600\n}',
+                    newVal: '{\n  "type": "A",\n  "name": "mail",\n  "value": "103.45.67.91",\n  "ttl": 3600\n}',
+                    ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+                    session: 'whmcs_sess_abc123',
+                    notes: 'Overridden by Admin — cancelled client job', timeLong: '27/02/2026 14:30:22'
+                },
+                89199: {
+                    id: 89199, time: '27/02, 14:28', actorType: 'system', actorName: 'Cron', domain: 'test.org',
+                    action: 'enable_dnssec', details_brief: 'DNSSEC on', ip: 'WHMCS Server',
+                    actorFull: 'System Automation — Cron Hook', context: 'cron_hook', target: 'Domain test.org / DNSSEC Setting',
+                    oldVal: '{\n  "dnssec_enabled": false\n}',
+                    newVal: '{\n  "dnssec_enabled": true,\n  "algorithm": 13,\n  "key_tag": 12345\n}',
+                    ua: 'WHMCS/8.8.0 CLI', session: 'cron',
+                    notes: 'Auto-enabled via hook AddonActivation', timeLong: '27/02/2026 14:28:00'
+                },
+                89198: {
+                    id: 89198, time: '27/02, 14:25', actorType: 'api', actorName: 'DDNS', domain: 'cam.shop.vn',
+                    action: 'ddns_update', details_brief: 'IP: .5 → .6', ip: '118.70.5.6',
+                    actorFull: 'API Token — DDNS Client', context: 'api_endpoint', target: 'Record #992 (A cam)',
+                    oldVal: '{\n  "type": "A",\n  "name": "cam",\n  "value": "118.70.5.5"\n}',
+                    newVal: '{\n  "type": "A",\n  "name": "cam",\n  "value": "118.70.5.6"\n}',
+                    ua: 'Mikrotik/6.49.10 Fetch', session: 'token_a1b2c3d...',
+                    notes: 'DDNS IP automatically updated by router.', timeLong: '27/02/2026 14:25:32'
+                },
+                89197: {
+                    id: 89197, time: '27/02, 14:22', actorType: 'client', actorName: 'Hà Minh', domain: 'techstore.io',
+                    action: 'add_record', details_brief: 'MX 10 mail.ts.io.', ip: '203.0.113.5',
+                    actorFull: 'Hà Minh - Client #2301', context: 'client_area', target: 'Record #993 (MX @)',
+                    oldVal: '[Không có — record mới được tạo]',
+                    newVal: '{\n  "type": "MX",\n  "name": "@",\n  "priority": 10,\n  "value": "mail.ts.io.",\n  "ttl": 14400\n}',
+                    ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
+                    session: 'whmcs_sess_mno456',
+                    notes: 'New MX record added via Client DNS Editor', timeLong: '27/02/2026 14:22:18'
+                },
+                89191: {
+                    id: 89191, time: '27/02, 14:08', actorType: 'admin', actorName: 'Linh', domain: 'fintech-app.io',
+                    action: 'rollback', details_brief: 'Rollback v3 → v2', ip: '10.0.0.2',
+                    actorFull: 'Linh Tran - Admin #3', context: 'admin_panel', target: 'Zone Snapshot v3',
+                    oldVal: '{\n  "snapshot_id": "snap_v3",\n  "records_count": 12,\n  "created_at": "2026-02-27 12:00"\n}',
+                    newVal: '{\n  "restored_snapshot": "snap_v2",\n  "records_count": 10,\n  "restored_at": "2026-02-27 14:08"\n}',
+                    ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+                    session: 'whmcs_sess_admin003',
+                    notes: 'Manual rollback triggered by Admin after failed deployment', timeLong: '27/02/2026 14:08:44'
+                },
             };
+
+            // Tìm log theo ID, fallback về 89201 nếu không có
+            this.log = mockDb[id] ?? mockDb[89201];
         }
     }));
 });
