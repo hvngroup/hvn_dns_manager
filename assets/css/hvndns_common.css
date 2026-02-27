@@ -1503,7 +1503,7 @@ table.hvn-align-middle > :not(caption) > * > * { vertical-align: middle; }
     list-style: none;
 }
 .hvn-dropdown-menu.hvn-show { display: block; }
-.hvn-dropdown-menu-end { right: 0; left: auto; }
+.hvn-dropdown-menu-end { right: 0; left: auto; text-align: left; }
 .hvn-dropdown-item {
     display: block;
     width: 100%;
