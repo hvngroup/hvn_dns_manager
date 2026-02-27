@@ -13,7 +13,7 @@
                         <div class="hvn-row hvn-align-items-center">
                             <!-- Server Info Info -->
                             <div class="hvn-col-md-3">
-                                <h5 class="card-title hvn-mb-1 hvn-d-flex hvn-align-items-center">
+                                <h5 class="hvn-card-title hvn-mb-1 hvn-d-flex hvn-align-items-center">
                                     <template x-if="server.status === 'online' && server.is_active">
                                         <span class="hvn-text-success hvn-me-2" title="Online">🟢</span>
                                     </template>
@@ -33,12 +33,12 @@
                                         <span class="hvn-badge hvn-bg-secondary hvn-ms-2" style="font-size: 0.6em;">Secondary</span>
                                     </template>
                                 </h5>
-                                <div class="hvn-text-muted small">
-                                    IP: <span class="font-monospace" x-text="server.ip_address"></span> | 
+                                <div class="hvn-text-muted hvn-small">
+                                    IP: <span class="hvn-font-monospace" x-text="server.ip_address"></span> | 
                                     Port: <span x-text="server.port"></span> | 
                                     SSL: <span x-text="server.use_ssl ? '✅' : '❌'"></span>
                                 </div>
-                                <div class="hvn-text-muted small hvn-mt-1">
+                                <div class="hvn-text-muted hvn-small hvn-mt-1">
                                     Max concurrent: <span x-text="server.max_concurrent_jobs"></span>
                                 </div>
                             </div>
@@ -47,16 +47,16 @@
                             <div class="hvn-col-md-5 hvn-border-start hvn-border-end hvn-px-4">
                                 <template x-if="server.is_active && server.status !== 'offline'">
                                     <div>
-                                        <div class="hvn-row hvn-text-center hvn-mb-1 mt-2">
+                                        <div class="hvn-row hvn-text-center hvn-mb-1 hvn-mt-2">
                                             <div class="hvn-col hvn-border-end">
-                                                <i class="bi bi-activity hvn-text-primary hvn-fs-4 hvn-d-block mb-1"></i>
+                                                <i class="bi bi-activity hvn-text-primary hvn-fs-4 hvn-d-block hvn-mb-1"></i>
                                                 <div class="hvn-fw-bold hvn-fs-5"><span x-text="server.uptime"></span>%</div>
-                                                <div class="hvn-text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Uptime</div>
+                                                <div class="hvn-text-muted hvn-text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Uptime</div>
                                             </div>
                                             <div class="hvn-col hvn-border-end">
-                                                <i class="bi bi-speedometer2 hvn-text-info hvn-fs-4 hvn-d-block mb-1"></i>
+                                                <i class="bi bi-speedometer2 hvn-text-info hvn-fs-4 hvn-d-block hvn-mb-1"></i>
                                                 <div class="hvn-fw-bold hvn-fs-5"><span x-text="server.latency"></span>ms</div>
-                                                <div class="hvn-text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Avg Latency</div>
+                                                <div class="hvn-text-muted hvn-text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Avg Latency</div>
                                             </div>
                                             <div class="hvn-col">
                                                 <i class="bi bi-shield-check hvn-text-success hvn-fs-4 hvn-d-block mb-1"></i>
@@ -74,7 +74,7 @@
                                 
                                 <template x-if="!server.is_active">
                                     <div class="hvn-text-center hvn-text-muted hvn-py-3">
-                                        <i class="bi bi-pause-circle fs-4 hvn-d-block hvn-mb-1"></i>
+                                        <i class="bi bi-pause-circle hvn-fs-4 hvn-d-block hvn-mb-1"></i>
                                         Server đang bị vô hiệu hóa
                                     </div>
                                 </template>
@@ -84,10 +84,10 @@
                                         <div class="hvn-text-danger hvn-fw-bold hvn-mb-1">
                                             <i class="bi bi-exclamation-triangle"></i> BACKOFF: Retry lúc <span x-text="server.next_retry"></span> (<span x-text="server.retry_in"></span>)
                                         </div>
-                                        <div class="small hvn-text-muted hvn-mb-1">
+                                        <div class="hvn-small hvn-text-muted hvn-mb-1">
                                             Failed: <span x-text="server.failed_count"></span> liên tiếp | Last error: timeout
                                         </div>
-                                        <div class="small hvn-text-danger hvn-bg-danger-subtle hvn-p-1 hvn-rounded font-monospace" style="font-size: 0.75rem;">
+                                        <div class="hvn-small hvn-text-danger hvn-bg-danger-subtle hvn-p-1 hvn-rounded hvn-font-monospace" style="font-size: 0.75rem;">
                                             Error: <span x-text="server.last_error"></span>
                                         </div>
                                     </div>
@@ -96,24 +96,24 @@
                             
                             <!-- Actions -->
                             <div class="hvn-col-md-4 hvn-text-end">
-                                <button class="hvn-btn btn-sm btn-outline-info hvn-mb-1 w-100 text-start" @click="testConnection(server)">
+                                <button class="hvn-btn hvn-btn-sm hvn-btn-outline-info hvn-mb-1 hvn-w-100 hvn-text-start" @click="testConnection(server)">
                                     <i class="bi bi-plug"></i> Test Connection
                                 </button>
-                                <a :href="'{$modulelink}&action=server_edit&id=' + server.id" class="hvn-btn btn-sm hvn-btn-outline-primary hvn-mb-1 w-100 text-start hvn-d-block text-decoration-none">
+                                <a :href="'{$modulelink}&action=server_edit&id=' + server.id" class="hvn-btn hvn-btn-sm hvn-btn-outline-primary hvn-mb-1 hvn-w-100 hvn-text-start hvn-d-block hvn-text-decoration-none">
                                     <i class="bi bi-pencil"></i> Sửa cấu hình
                                 </a>
                                 <template x-if="server.is_active">
-                                    <button class="hvn-btn btn-sm btn-outline-danger w-100 text-start" @click="toggleStatus(server)">
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger hvn-w-100 hvn-text-start" @click="toggleStatus(server)">
                                         <i class="bi bi-pause-fill"></i> Vô hiệu hóa (Disable)
                                     </button>
                                 </template>
                                 <template x-if="!server.is_active">
-                                    <button class="hvn-btn btn-sm btn-outline-success w-100 text-start" @click="toggleStatus(server)">
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-success hvn-w-100 hvn-text-start" @click="toggleStatus(server)">
                                         <i class="bi bi-play-fill"></i> Kích hoạt (Enable)
                                     </button>
                                 </template>
                                 <template x-if="server.is_active && server.status === 'offline'">
-                                    <button class="hvn-btn btn-sm hvn-btn-warning w-100 text-start hvn-mt-1" @click="resetBackoff(server)">
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-warning hvn-w-100 hvn-text-start hvn-mt-1" @click="resetBackoff(server)">
                                         <i class="bi bi-arrow-repeat"></i> Reset Backoff
                                     </button>
                                 </template>
@@ -125,7 +125,7 @@
         </template>
     </div>
 
-    <div class="alert alert-info hvn-mt-4">
+    <div class="hvn-alert hvn-alert-info hvn-mt-4">
         <i class="bi bi-info-circle-fill"></i> <strong>Ghi chú:</strong> Disable server sẽ dừng nhận queue jobs (nếu là primary của zone). Job PENDING hiện tại đang gán cho server này sẽ chuyển sang CANCELLED hoặc gán lại (re-assign) cho server khác tùy cấu hình.
     </div>
 

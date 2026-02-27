@@ -1564,3 +1564,27 @@ table.hvn-align-middle > :not(caption) > * > * { vertical-align: middle; }
 .hvn-ps-3 { padding-left: 1rem !important; }
 .hvn-ps-4 { padding-left: 1.5rem !important; }
 .hvn-pe-4 { padding-right: 1.5rem !important; }
+
+/* =======================================================================
+   UTILITIES — Missing aliases
+   ======================================================================= */
+.hvn-small           { font-size: 12px !important; }
+.hvn-card-title      { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; }
+.hvn-text-start      { text-align: left !important; }
+.hvn-text-decoration-none { text-decoration: none !important; }
+.hvn-my-2 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+
+/* =======================================================================
+   COMPONENTS — Alert
+   ======================================================================= */
+.hvn-alert {
+    position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--hvn-border-radius);
+}
+.hvn-alert-info    { color: #055160; background-color: #cff4fc; border-color: #b6effb; }
+.hvn-alert-success { color: #0a3622; background-color: #d1e7dd; border-color: #a3cfbb; }
+.hvn-alert-warning { color: #664d03; background-color: #fff3cd; border-color: #ffe69c; }
+.hvn-alert-danger  { color: #58151c; background-color: #f8d7da; border-color: #f1aeb5; }
