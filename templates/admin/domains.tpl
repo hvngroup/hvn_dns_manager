@@ -35,8 +35,13 @@
                         <label class="hvn-form-check-label hvn-text-danger" for="errorOnly">Chỉ domain có lỗi</label>
                     </div>
                 </div>
-                <div class="hvn-col-md-2 hvn-text-end">
-                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+                <div class="hvn-col-md-2 hvn-text-end hvn-d-flex hvn-justify-content-end hvn-align-items-center hvn-gap-1">
+                    <select class="hvn-form-select" style="width:auto;" x-model="perPage" @change="currentPage=1; fetchDomains()">
+                        <option value="25">25/trang</option>
+                        <option value="50" selected>50/trang</option>
+                        <option value="100">100/trang</option>
+                    </select>
+                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i></button>
                 </div>
             </div>
         </div>
@@ -45,7 +50,7 @@
     <!-- Domain Table -->
     <div class="hvn-card hvn-shadow-sm hvn-border-0">
         <div class="hvn-card-body hvn-p-0">
-            <div class="hvn-table-responsive">
+            <div class="hvn-table-responsive" style="overflow: visible;">
                 <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0">
                     <thead class="hvn-table-light">
                         <tr>
@@ -115,15 +120,19 @@
                                             <span class="hvn-badge hvn-bg-danger" x-text="'🔴 ' + domain.status"></span>
                                         </template>
                                     </td>
-                                    <td class="hvn-text-end hvn-pe-4">
-                                        <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="hvn-btn hvn-btn-sm hvn-btn-outline-primary">
+                                    <td class="hvn-text-end hvn-pe-4" style="white-space: nowrap;">
+                                        <a :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"
+                                           class="hvn-btn hvn-btn-sm hvn-btn-blue hvn-me-1">
                                             <i class="bi bi-sliders"></i> DNS
                                         </a>
-                                        <div class="hvn-dropdown hvn-d-inline-block">
-                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary hvn-dropdown-toggle" type="button" @click.stop="$event.currentTarget.nextElementSibling.classList.toggle('hvn-show')">
+                                        <div class="hvn-dropdown hvn-d-inline-block" style="position: relative;">
+                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary hvn-dropdown-toggle"
+                                                    type="button"
+                                                    @click.stop="openDropdown($event)">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
                                             <ul class="hvn-dropdown-menu hvn-dropdown-menu-end">
+                                                <li><a class="hvn-dropdown-item" :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"><i class="bi bi-sliders hvn-text-primary"></i> Sửa DNS Records</a></li>
                                                 <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
                                                 <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
                                                 <li><hr class="hvn-dropdown-divider"></li>
@@ -141,8 +150,9 @@
         
         <!-- Pagination -->
         <div class="hvn-card-footer hvn-bg-white hvn-py-3 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-            <div class="hvn-text-muted small">
+            <div class="hvn-text-muted hvn-small">
                 Hiển thị <span x-text="domains.length"></span> / <span x-text="totalRecords"></span> domain
+                &nbsp;&bull;&nbsp; Trang <span x-text="currentPage"></span>/<span x-text="totalPages"></span>
             </div>
             <nav aria-label="Page navigation" x-show="totalPages > 1">
                 <ul class="hvn-pagination hvn-pagination-sm hvn-mb-0">
@@ -166,8 +176,9 @@ document.addEventListener('alpine:init', () => {
         loading: false,
         domains: [],
         totalRecords: 342,
-        totalPages: 35,
+        totalPages: 7,
         currentPage: 1,
+        perPage: 50,
         filters: { search: '', status: '', server: '', errorOnly: false },
 
         init() {
@@ -184,6 +195,33 @@ document.addEventListener('alpine:init', () => {
             if(page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
                 this.fetchDomains();
+            }
+        },
+
+        // Dropdown trong table: dùng position:fixed để thoát overflow
+        openDropdown(event) {
+            var btn = event.currentTarget;
+            var menu = btn.nextElementSibling;
+            var isOpen = menu.classList.contains('hvn-show');
+
+            // Đóng tất cả dropdown đang mở
+            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
+                m.classList.remove('hvn-show');
+                m.style.position = '';
+                m.style.top = '';
+                m.style.right = '';
+                m.style.left = '';
+                m.style.minWidth = '';
+            });
+
+            if (!isOpen) {
+                var rect = btn.getBoundingClientRect();
+                menu.style.position = 'fixed';
+                menu.style.top = (rect.bottom + 4) + 'px';
+                menu.style.right = (window.innerWidth - rect.right) + 'px';
+                menu.style.left = 'auto';
+                menu.style.minWidth = '200px';
+                menu.classList.add('hvn-show');
             }
         },
 
