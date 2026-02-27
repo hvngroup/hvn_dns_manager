@@ -38,7 +38,7 @@
                         <p class="card-text small mb-3">NS: {$default_ns|default:'dns1.hvn.vn, dns2.hvn.vn'}</p>
                     </div>
                     <div class="card-footer bg-transparent border-top-0 text-end">
-                        <a href="clientarea.php?action=productdetails&id={$serviceid}&domain_id={$domain.id}" class="btn btn-primary btn-sm">Quản lý DNS &rarr;</a>
+                        <a href="index.php?m=hvn_dns_manager&domain_id={$domain.id}" class="btn btn-primary btn-sm">Quản lý DNS &rarr;</a>
                     </div>
                 </div>
             </div>

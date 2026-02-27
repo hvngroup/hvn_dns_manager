@@ -124,9 +124,17 @@ function seedDomainsAndRecords() {
         ['domain_id' => $domainId2, 'type' => 'TXT', 'name' => '@', 'value' => '"v=spf1 -all"', 'ttl' => 3600, 'is_system' => 0]
     ];
     Capsule::table('mod_hvndns_records')->insert($records2);
+
+    // Domain 3: Dev-app.io
+    $domainId3 = Capsule::table('mod_hvndns_domains')->insertGetId([
+        'domain' => 'dev-app.io',
+        'whmcs_user_id' => $userId,
+        'status' => 'active',
+        'provisioned_at' => date('Y-m-d H:i:s')
+    ]);
     
     echo "[OK] Seeded domains and DNS records.\n";
-    return [$domainId1, $domainId2];
+    return [$domainId1, $domainId2, $domainId3];
 }
 
 function seedQueueAndLogs($domainIds) {

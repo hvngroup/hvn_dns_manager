@@ -16,6 +16,9 @@ class ClientController
      */
     public function dispatch($action, $params)
     {
+        // Global access usually provides userid in $params or session
+        $userId = $_SESSION['uid'] ?? 0;
+
         if ($action === 'record_edit') {
             return $this->showRecordEdit($params);
         }
@@ -26,7 +29,7 @@ class ClientController
             return $this->showDnsEditor($params, $domainId);
         }
 
-        return $this->showDomainList($params);
+        return $this->showDomainList($params, $userId);
     }
 
     /**
@@ -34,7 +37,7 @@ class ClientController
      */
     private function showRecordEdit($params)
     {
-        $serviceId = $params['serviceid'];
+        $serviceId = $params['serviceid'] ?? 0;
         $domainId = isset($_REQUEST['domain_id']) ? (int)$_REQUEST['domain_id'] : 1;
         $recordId = isset($_REQUEST['record_id']) ? (int)$_REQUEST['record_id'] : 0;
         
@@ -53,8 +56,7 @@ class ClientController
         return [
             'pagetitle' => ($recordId ? 'Sửa' : 'Thêm') . ' Bản ghi DNS',
             'breadcrumb' => [
-                'clientarea.php?action=productdetails&id=' . $serviceId => 'Dịch vụ',
-                'clientarea.php?action=productdetails&id=' . $serviceId . '&modop=custom&a=dns_manager&domain_id=' . $domainId => 'DNS Editor',
+                'index.php?m=hvn_dns_manager' => 'Domain Manager',
                 '#' => 'Bản ghi',
             ],
             'templatefile' => 'templates/client/record_edit',
@@ -69,14 +71,20 @@ class ClientController
     /**
      * Màn hình CL-01: Danh sách Domain
      */
-    private function showDomainList($params)
+    private function showDomainList($params, $userId = 0)
     {
-        $serviceId = $params['serviceid'];
+        $serviceId = $params['serviceid'] ?? 0;
         
-        // Mock data cho danh sách domains (Lấy từ DB nếu đã có mock_seeder)
+        // Mock data cho danh sách domains
         $domains = [];
         if (Capsule::schema()->hasTable('mod_hvndns_domains')) {
-            $domains = Domain::where('service_id', $serviceId)->get()->toArray();
+            $query = Domain::query();
+            if ($userId > 0) {
+                $query->where('whmcs_user_id', $userId);
+            } elseif ($serviceId > 0) {
+                $query->where('whmcs_service_id', $serviceId);
+            }
+            $domains = $query->get()->toArray();
         }
 
         // Mock data phòng trường hợp bảng rỗng
@@ -84,25 +92,23 @@ class ClientController
             $domains = [
                 ['id' => 1, 'domain' => 'mock-example.com', 'status' => 'active', 'sync_status' => 'complete', 'records_count' => 12],
                 ['id' => 2, 'domain' => 'mock-shop.vn', 'status' => 'active', 'sync_status' => 'syncing', 'records_count' => 5],
+                ['id' => 3, 'domain' => 'my-business.net', 'status' => 'active', 'sync_status' => 'failed', 'records_count' => 8],
             ];
         }
 
         return [
             'pagetitle' => 'Quản lý DNS',
             'breadcrumb' => [
-                'clientarea.php?action=productdetails&id=' . $serviceId => 'Dịch vụ',
-                '#' => 'DNS',
+                'index.php?m=hvn_dns_manager' => 'Domain Manager',
+                '#' => 'Danh sách',
             ],
             'templatefile' => 'templates/client/domain_list',
             'requirelogin' => true,
             'vars' => [
-                'plan_name' => 'DNS Premium (Mock)',
-                'service_status' => 'Active',
-                'expiry_date' => '31/12/2026',
+                'plan_name' => 'DNS Standard',
                 'domains' => $domains,
                 'default_ns1' => 'dns1.hvn.vn',
                 'default_ns2' => 'dns2.hvn.vn',
-                'default_ns3' => 'dns3.hvn.vn',
             ]
         ];
     }
@@ -112,7 +118,7 @@ class ClientController
      */
     private function showDnsEditor($params, $domainId)
     {
-        $serviceId = $params['serviceid'];
+        $serviceId = $params['serviceid'] ?? 0;
         
         // Mock data cho giao diện
         $domainInfo = [

@@ -27,3 +27,15 @@ add_hook('AddonActivation', 1, function($vars) {
         }
     }
 });
+
+/**
+ * Register "Domain Manager" Menu in Client Area
+ */
+add_hook('ClientAreaPrimaryNavbar', 1, function($primaryNavbar) {
+    // Add a new menu item under the main navbar
+    $primaryNavbar->addChild('HVN Domain Manager', [
+        'label' => 'Domain Manager',
+        'uri'   => 'index.php?m=hvn_dns_manager',
+        'order' => 20,
+    ]);
+});
