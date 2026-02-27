@@ -35,75 +35,145 @@
     <!-- Reuse the Client DNS Editor structure but inject admin-specific variables if needed -->
     <!-- Note: In a real implementation, you might pass a variable like $isAdmin=true to partials -->
     
-    <div class="hvn-card hvn-shadow-sm hvn-mb-4 hvn-border-0">
-        <div class="hvn-card-header hvn-bg-white">
-            <h5 class="hvn-mb-0">DNS Records</h5>
-        </div>
-        <div class="hvn-card-body hvn-p-0">
-            <!-- Tái sử dụng bảng records nhưng bằng Alpine logic của Admin -->
-            <div class="hvn-p-3 hvn-border-bottom hvn-bg-light hvn-d-flex hvn-justify-content-between">
-                <div>
-                     <input type="text" class="hvn-form-control hvn-form-control-sm d-inline-block w-auto" placeholder="Tìm kiếm..." x-model="searchQuery">
-                </div>
+    <!-- Search bar -->
+    <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-3 hvn-bg-light">
+        <div class="hvn-card-body hvn-py-2 hvn-px-3">
+            <div class="hvn-d-flex hvn-align-items-center" style="gap:10px;">
+                <i class="bi bi-search hvn-text-muted"></i>
+                <input type="text" class="hvn-form-control hvn-form-control-sm"
+                       style="max-width:300px;"
+                       placeholder="Lọc nhanh theo tên, giá trị..."
+                       x-model="searchQuery">
+                <span class="hvn-text-muted hvn-small" x-show="searchQuery">
+                    — <span x-text="filteredRecords.length"></span> kết quả
+                </span>
             </div>
-            
-            <table class="table table-hover align-middle hvn-mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="hvn-ps-3">Loại</th>
-                        <th>Tên (Name)</th>
-                        <th>Giá trị (Value)</th>
-                        <th>Khóa / Hệ thống</th>
-                        <th>Trạng thái Sync</th>
-                        <th class="hvn-text-end hvn-pe-3">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template x-for="record in filteredRecords" :key="record.id">
-                        <tr :class="{ 'table-secondary opacity-75': record.pending_delete}">
-                            <td class="hvn-ps-3">
-                                <span class="hvn-badge hvn-bg-secondary" x-text="record.type"></span>
-                            </td>
-                            <td class="font-monospace" x-text="record.name === '@' ? '{$domain.domain}' : record.name"></td>
-                            <td class="font-monospace text-wrap" style="max-width: 250px; word-break: break-all;" x-text="record.value"></td>
-                            <td>
-                                <!-- Admin view: Show system/lock status clearly and allow toggle -->
-                                <template x-if="record.is_system">
-                                    <span class="hvn-badge hvn-bg-dark" title="System Record"><i class="bi bi-gear"></i> System</span>
-                                </template>
-                                <div class="form-check form-switch hvn-mt-1" title="Khóa không cho Client sửa">
-                                    <input class="form-check-input" type="checkbox" :id="'lock_'+record.id" x-model="record.is_locked" @change="toggleLock(record)">
-                                    <label class="form-check-label small" :for="'lock_'+record.id">Khóa</label>
-                                </div>
-                            </td>
-                            <td>
-                                <template x-if="record.sync_status === 'complete'">
-                                    <span class="hvn-text-success small hvn-fw-bold"><i class="bi bi-check-circle-fill"></i> Live</span>
-                                </template>
-                                <template x-if="record.sync_status === 'syncing'">
-                                    <span class="hvn-text-info small hvn-fw-bold"><i class="bi bi-arrow-repeat spin"></i> Syncing</span>
-                                </template>
-                                <template x-if="record.sync_status === 'failed'">
-                                    <span class="hvn-text-danger small hvn-fw-bold"><i class="bi bi-x-circle-fill"></i> Failed (Timeout)</span>
-                                </template>
-                            </td>
-                            <td class="hvn-text-end hvn-pe-3">
-                                <template x-if="!record.pending_delete">
-                                    <div class="btn-group btn-group-sm">
-                                        <button class="hvn-btn btn-outline-secondary" @click="openEditModal(record)"><i class="bi bi-pencil"></i></button>
-                                        <button class="hvn-btn btn-outline-danger" @click="deleteRecord(record)"><i class="bi bi-trash"></i></button>
-                                    </div>
-                                </template>
-                                <template x-if="record.pending_delete">
-                                    <span class="hvn-text-muted small fst-italic">Deleting...</span>
-                                </template>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
         </div>
     </div>
+
+    <!-- No records empty state -->
+    <template x-if="filteredRecords.length === 0">
+        <div class="hvn-card hvn-border-0 hvn-shadow-sm hvn-text-center hvn-py-5 hvn-text-muted">
+            <i class="bi bi-inbox" style="font-size:2.5rem;opacity:.4;"></i>
+            <div class="hvn-mt-2">Không có bản ghi nào phù hợp.</div>
+        </div>
+    </template>
+
+    <!-- Groups: lặp qua từng type có trong filteredRecords -->
+    <template x-for="group in recordsByType" :key="group.type">
+        <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-3">
+
+            <!-- Group Header -->
+            <div class="hvn-card-header hvn-d-flex hvn-align-items-center hvn-justify-content-between"
+                 :style="'background:' + typeColor(group.type) + '18; border-left: 4px solid ' + typeColor(group.type) + ';'"
+                 style="cursor:pointer;" @click="toggleGroup(group.type)">
+                <div class="hvn-d-flex hvn-align-items-center" style="gap:10px;">
+                    <!-- Type pill -->
+                    <span class="hvn-fw-bold hvn-small" style="font-size:.7rem; letter-spacing:.08em; padding:3px 10px; border-radius:99px; color:#fff;"
+                          :style="'background:' + typeColor(group.type)">
+                        <span x-text="group.type"></span>
+                    </span>
+                    <span class="hvn-fw-bold" x-text="typeLabel(group.type)"></span>
+                    <span class="hvn-badge hvn-bg-secondary hvn-small" x-text="group.records.length + ' bản ghi'"></span>
+                    <!-- failed indicator -->
+                    <template x-if="group.records.some(r => r.sync_status === 'failed')">
+                        <span class="hvn-badge" style="background:#dc3545;font-size:.65rem;">
+                            <i class="bi bi-exclamation-triangle"></i> Có lỗi sync
+                        </span>
+                    </template>
+                </div>
+                <div class="hvn-d-flex hvn-align-items-center" style="gap:8px;">
+                    <button class="hvn-btn hvn-btn-sm"
+                            :style="'background:' + typeColor(group.type) + '; color:#fff; border:none; font-size:.75rem;'"
+                            @click.stop="openAddModal(group.type)"
+                            title="Thêm bản ghi loại này">
+                        <i class="bi bi-plus-lg"></i> Thêm <span x-text="group.type"></span>
+                    </button>
+                    <i class="bi" :class="expandedGroups.includes(group.type) ? 'bi-chevron-up' : 'bi-chevron-down'" style="font-size:.85rem;opacity:.6;"></i>
+                </div>
+            </div>
+
+            <!-- Group Table (collapsible) -->
+            <div x-show="expandedGroups.includes(group.type)" style="overflow-x:auto;">
+                <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0" style="font-size:.875rem;">
+                    <thead>
+                        <tr style="background:#f8f9fa; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6c757d;">
+                            <th class="hvn-ps-3" style="width:30%;">Tên (Name)</th>
+                            <th style="width:8%;">TTL</th>
+                            <th>Giá trị (Value)</th>
+                            <th style="width:12%;">Khóa / Sys</th>
+                            <th style="width:10%;">Sync</th>
+                            <th class="hvn-text-end hvn-pe-3" style="width:100px;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="record in group.records" :key="record.id">
+                            <tr :style="record.pending_delete ? 'opacity:.5;' : ''">
+                                <!-- Name -->
+                                <td class="hvn-ps-3" style="font-family:monospace; font-weight:600;"
+                                    x-text="record.name === '@' ? '{$domain.domain|default:'domain.com'}' : record.name + '.{$domain.domain|default:'domain.com'}'">
+                                </td>
+                                <!-- TTL -->
+                                <td class="hvn-text-muted hvn-small" x-text="record.ttl ? record.ttl + 's' : '3600s'"></td>
+                                <!-- Value -->
+                                <td style="font-family:monospace; word-break:break-all; max-width:260px;">
+                                    <span x-text="record.value"></span>
+                                    <template x-if="record.priority">
+                                        <span class="hvn-text-muted hvn-small"> (priority: <span x-text="record.priority"></span>)</span>
+                                    </template>
+                                </td>
+                                <!-- Lock / System -->
+                                <td>
+                                    <div class="hvn-d-flex hvn-align-items-center" style="gap:6px; flex-wrap:wrap;">
+                                        <template x-if="record.is_system">
+                                            <span style="font-size:.65rem; padding:2px 6px; background:#343a40; color:#fff; border-radius:4px;">
+                                                <i class="bi bi-gear-fill"></i> SYS
+                                            </span>
+                                        </template>
+                                        <label class="hvn-d-flex hvn-align-items-center hvn-gap-1" style="cursor:pointer; user-select:none; font-size:.8rem;" title="Khóa không cho Client sửa">
+                                            <input type="checkbox" :id="'lock_'+record.id" x-model="record.is_locked" @change="toggleLock(record)">
+                                            <span x-text="record.is_locked ? 'Khóa' : 'Mở'"></span>
+                                        </label>
+                                    </div>
+                                </td>
+                                <!-- Sync status -->
+                                <td>
+                                    <template x-if="record.sync_status === 'complete'">
+                                        <span style="color:#198754; font-size:.8rem; font-weight:600;"><i class="bi bi-check-circle-fill"></i> Live</span>
+                                    </template>
+                                    <template x-if="record.sync_status === 'syncing'">
+                                        <span style="color:#0dcaf0; font-size:.8rem; font-weight:600;"><i class="bi bi-arrow-repeat"></i> Syncing</span>
+                                    </template>
+                                    <template x-if="record.sync_status === 'failed'">
+                                        <span style="color:#dc3545; font-size:.8rem; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Failed</span>
+                                    </template>
+                                </td>
+                                <!-- Actions -->
+                                <td class="hvn-text-end hvn-pe-3">
+                                    <template x-if="!record.pending_delete">
+                                        <div class="hvn-d-flex hvn-justify-content-end" style="gap:4px;">
+                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" @click="openEditModal(record)" title="Sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger" @click="deleteRecord(record)" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <template x-if="record.pending_delete">
+                                        <span class="hvn-text-muted" style="font-size:.75rem; font-style:italic;">
+                                            <i class="bi bi-hourglass-split"></i> Deleting...
+                                        </span>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
 
     <!-- Modals -->
     <!-- Reuse Record Modal logic from Client -->
@@ -120,9 +190,13 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('adminDnsEditor', () => ({
         searchQuery: '',
         records: _adminRecords,
+        expandedGroups: ['A', 'MX', 'CNAME', 'TXT', 'SRV', 'NS', 'CAA', 'AAAA'],
+
+        // Canonical order for record types
+        _typeOrder: ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA'],
 
         get filteredRecords() {
-            if(this.searchQuery === '') return this.records;
+            if (this.searchQuery === '') return this.records;
             const text = this.searchQuery.toLowerCase();
             return this.records.filter(r =>
                 r.name.toLowerCase().includes(text) ||
@@ -131,14 +205,66 @@ document.addEventListener('alpine:init', () => {
             );
         },
 
-        openAddModal() {
-            window.dispatchEvent(new CustomEvent('open-record-modal', { detail: { isEdit: false } }));
+        // Group filteredRecords by type, maintain canonical order
+        get recordsByType() {
+            const map = {};
+            this.filteredRecords.forEach(r => {
+                if (!map[r.type]) map[r.type] = [];
+                map[r.type].push(r);
+            });
+            // Order: canonical first, then unknowns alphabetically
+            const knownOrder = this._typeOrder.filter(t => map[t]);
+            const others = Object.keys(map).filter(t => !this._typeOrder.includes(t)).sort();
+            return [...knownOrder, ...others].map(type => ({ type, records: map[type] }));
+        },
+
+        toggleGroup(type) {
+            const idx = this.expandedGroups.indexOf(type);
+            if (idx >= 0) {
+                this.expandedGroups.splice(idx, 1);
+            } else {
+                this.expandedGroups.push(type);
+            }
+        },
+
+        typeColor(type) {
+            const colors = {
+                'A':    '#0d6efd',
+                'AAAA': '#6610f2',
+                'CNAME':'#20c997',
+                'MX':   '#fd7e14',
+                'TXT':  '#6f42c1',
+                'NS':   '#6c757d',
+                'SRV':  '#0dcaf0',
+                'CAA':  '#dc3545',
+            };
+            return colors[type] || '#495057';
+        },
+
+        typeLabel(type) {
+            const labels = {
+                'A':    'IPv4 Address',
+                'AAAA': 'IPv6 Address',
+                'CNAME':'Canonical Name',
+                'MX':   'Mail Exchange',
+                'TXT':  'Text Record',
+                'NS':   'Name Server',
+                'SRV':  'Service Record',
+                'CAA':  'CA Authorization',
+            };
+            return labels[type] || type + ' Record';
+        },
+
+        openAddModal(prefillType) {
+            window.dispatchEvent(new CustomEvent('open-record-modal', {
+                detail: { isEdit: false, prefillType: prefillType || '' }
+            }));
         },
         openEditModal(record) {
             window.dispatchEvent(new CustomEvent('open-record-modal', { detail: { isEdit: true, record: record } }));
         },
         deleteRecord(record) {
-            if(confirm('Admin Privilege: X\u00f3a v\u0129nh vi\u1ec5n b\u1ea3n ghi ' + record.name + ' (' + record.type + ')?')) {
+            if (confirm('Admin Privilege: Xoa vinh vien ban ghi ' + record.name + ' (' + record.type + ')?')) {
                 record.pending_delete = true;
                 setTimeout(() => {
                     this.records = this.records.filter(r => r.id !== record.id);
@@ -146,7 +272,7 @@ document.addEventListener('alpine:init', () => {
             }
         },
         toggleLock(record) {
-            alert((record.is_locked ? 'KH\u00d3A' : 'M\u1ede KH\u00d3A') + ' b\u1ea3n ghi: Client kh\u00f4ng th\u1ec3 ch\u1ec9nh s\u1eeda b\u1ea3n ghi b\u1ecb kh\u00f3a.');
+            alert((record.is_locked ? 'KHOA' : 'MO KHOA') + ' ban ghi thanh cong.');
         }
     }));
 });
