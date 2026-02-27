@@ -145,7 +145,7 @@ class ClientController
             'redirects_count' => 3,
             'email_fwds_count' => 2,
             'has_dnssec_addon' => true,
-            'has_ddns_addon' => false,
+            'has_ddns_addon' => true,
             'dnssec' => ['last_signed' => '25/02/2026 14:30']
         ];
         
@@ -153,8 +153,8 @@ class ClientController
             'max_records' => 50,
             'dnssec_enabled' => true,
             'ddns_enabled' => true,
-            'dnssec_mode' => 'paid',
-            'ddns_mode' => 'paid',
+            'dnssec_mode' => 'free',
+            'ddns_mode' => 'free',
             'max_ddns_tokens' => 5
         ];
 
