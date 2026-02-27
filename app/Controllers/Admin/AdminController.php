@@ -16,7 +16,8 @@ class AdminController
         $template = 'dashboard';
         
         $validActions = [
-            'servers', 'domains', 'dns_editor', 'admin_dns_editor', 'sync_logs', 
+            'servers', 'domains', 'dns_editor', 'admin_dns_editor', 'sync_logs',
+            'sync_log_detail',
             'audit_trail', 'templates', 'quota_plans', 
             'drift_reports', 'bulk', 'settings',
             'server_edit', 'quota_plan_edit', 'template_edit',
