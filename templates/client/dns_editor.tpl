@@ -1,7 +1,7 @@
 <div class="hvn-dns-client" x-data="dnsEditor()">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <a href="clientarea.php?action=productdetails&id={$serviceid}" class="text-decoration-none">
+        <a href="index.php?m=hvn_dns_manager" class="text-decoration-none">
             &larr; Quay lại danh sách domain
         </a>
     </div>
@@ -116,10 +116,11 @@
     
     <!-- Alpine JS logic initialization -->
     <script>
+        {literal}
         document.addEventListener('alpine:init', () => {
             Alpine.data('dnsEditor', () => ({
-                domainId: {$domain.id},
-                records: {$recordsJson|default:'[]'},
+                domainId: {/literal}{$domain.id}{literal},
+                records: {/literal}{$recordsJson|default:'[]'}{literal},
                 filterType: 'all',
                 searchQuery: '',
                 
@@ -146,24 +147,24 @@
                     };
                     return classes[type] || 'bg-secondary';
                 },
-                // Additional methods for add/edit/delete will go here in JS file
-            }));
-        document.addEventListener('alpine:initialized', () => {
-            if (Alpine.$data(document.querySelector('.hvn-dns-client'))) {
-                const data = Alpine.$data(document.querySelector('.hvn-dns-client'));
-                data.deleteRecord = function(record) {
+
+                deleteRecord(record) {
                     if(confirm(`Bạn có chắc muốn xóa bản ghi: ${record.name} ${record.type}?`)) {
                         window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đã Xóa', msg: `Bản ghi ${record.name} đang được xóa...`, type: 'danger' } }));
                     }
-                };
-                data.retryRecord = function(id) {
+                },
+
+                retryRecord(id) {
                     window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' } }));
                 }
-            }
+            }));
         });
+        {/literal}
     </script>
 </div>
 <style>
+{literal}
 .bg-purple { background-color: #6f42c1; color: white; }
 .nav-tabs .nav-link.active { border-bottom-color: transparent !important; color: #ea4544 !important; }
+{/literal}
 </style>

@@ -67,6 +67,7 @@
 </div>
 
 <script>
+{literal}
 function copyToClipboard(selector, btn) {
     const text = document.querySelector(selector).innerText.replace(/\s+/g, ' ').trim();
     navigator.clipboard.writeText(text).then(() => {
@@ -79,9 +80,12 @@ function copyToClipboard(selector, btn) {
         }, 2000);
     });
 }
+{/literal}
 </script>
 
 <style>
+{literal}
 .spin { animation: spin 2s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+{/literal}
 </style>
