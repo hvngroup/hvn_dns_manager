@@ -84,7 +84,7 @@
                 </div>
                 <div class="hvn-d-flex hvn-align-items-center" style="gap:8px;">
                     <button class="hvn-btn hvn-btn-sm"
-                            :style="'background:' + typeColor(group.type) + '; color:#fff; border:none; font-size:.75rem;'"
+                            :style="'background:' + typeColor(group.type) + '; color:#fff; border:none; font-size:14px;'"
                             @click.stop="openAddModal(group.type)"
                             title="Thêm bản ghi loại này">
                         <i class="bi bi-plus-lg"></i> Thêm <span x-text="group.type"></span>
@@ -97,7 +97,7 @@
             <div x-show="expandedGroups.includes(group.type)" style="overflow-x:auto;">
                 <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0" style="font-size:.875rem;">
                     <thead>
-                        <tr style="background:#f8f9fa; font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; color:#6c757d;">
+                        <tr style="background:#f8f9fa; font-size:14px; text-transform:uppercase; letter-spacing:.05em; color:#6c757d;">
                             <th class="hvn-ps-3" style="width:30%;">Tên (Name)</th>
                             <th style="width:8%;">TTL</th>
                             <th>Giá trị (Value)</th>
@@ -161,7 +161,7 @@
                                         </div>
                                     </template>
                                     <template x-if="record.pending_delete">
-                                        <span class="hvn-text-muted" style="font-size:.75rem; font-style:italic;">
+                                        <span class="hvn-text-muted" style="font-size:14px; font-style:italic;">
                                             <i class="bi bi-hourglass-split"></i> Deleting...
                                         </span>
                                     </template>
