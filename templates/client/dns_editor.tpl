@@ -116,11 +116,17 @@
     
     <!-- Alpine JS logic initialization -->
     <script>
+        var HVNDNS_CONFIG = {
+            domainId: {$domain.id|intval},
+            records: {$recordsJson nofilter}
+        };
+    </script>
+    <script>
         {literal}
         document.addEventListener('alpine:init', () => {
             Alpine.data('dnsEditor', () => ({
-                domainId: {/literal}{$domain.id}{literal},
-                records: {/literal}{$recordsJson|default:'[]'}{literal},
+                domainId: HVNDNS_CONFIG.domainId,
+                records: HVNDNS_CONFIG.records,
                 filterType: 'all',
                 searchQuery: '',
                 
