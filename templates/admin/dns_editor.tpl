@@ -112,7 +112,6 @@
 </div>
 
 <script>
-    // Biến Smarty phải khai báo NGOÀI {literal} block
     var _adminRecords = {$recordsJson|default:'[{"id":1,"type":"A","name":"@","value":"203.0.113.10","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":2,"type":"MX","name":"@","value":"mail.example.com.","priority":10,"ttl":3600,"is_system":false,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":3,"type":"CNAME","name":"www","value":"example.com.","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"syncing"},{"id":4,"type":"TXT","name":"@","value":"v=spf1 include:mailgun.org ~all","ttl":600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":5,"type":"NS","name":"@","value":"ns1.hvn.vn.","ttl":86400,"is_system":true,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":6,"type":"AAAA","name":"ipv6","value":"2001:db8::1","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"failed"}]'};
 </script>
 <script>
