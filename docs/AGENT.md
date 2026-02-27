@@ -677,7 +677,45 @@ Smarty engine parse TẤT CẢ `{ }` thành Smarty tags. Khi viết template có
 </style>
 ```
 
-**Kỹ thuật kết hợp Smarty variable TRONG block `{literal}`:**
+> [!CAUTION]
+> **NGUY HIỂM TINH VI: Smarty tags trong JS comment**
+>
+> Smarty engine parse TẤT CẢ `{ }` bên ngoài `{literal}` block — **kể cả trong JS comment** `//` và `/* */`.
+> Đây là lỗi cực kỳ khó debug vì code trông đúng nhưng Smarty vẫn xử lý comment như code thường.
+>
+> **Ví dụ sai gây lỗi:**
+> ```html
+> <script>
+>     // Bien Smarty phai khai bao NGOAI {literal} block  ← SAI: Smarty parse {literal} này!
+>     var x = 1;
+> </script>
+> <script>
+> {literal}   ← SAI: Smarty coi đây là literal lồng nhau → Syntax error
+>     var y = 2;
+> {/literal}
+> </script>
+> ```
+>
+> **Cách đúng — không dùng Smarty syntax trong JS comment:**
+> ```html
+> <script>
+>     // Khai bao bien JS (dung bien trung gian, khong dung Smarty syntax trong comment)
+>     var _data = {$dataJson};
+> </script>
+> <script>
+> {literal}
+>     var y = 2;
+> {/literal}
+> </script>
+> ```
+>
+> **Quy tắc bổ sung:**
+> - ❌ KHÔNG viết `{literal}`, `{/literal}`, `{$var}`, `{if}`, `{foreach}` trong bất kỳ JS/CSS comment nào (`//`, `/* */`)
+> - ❌ KHÔNG viết Smarty tag trong HTML comment `<!-- -->` (ngoại trừ Smarty comment `{* *}`)
+> - ✅ Nếu muốn ghi chú liên quan đến Smarty, dùng Smarty comment `{* nội dung *}` đặt **ngoài** `<script>` block
+> - ✅ Viết comment JS không có dấu `{` `}`: "khai bao bien" thay vì "khai bao {literal} block"
+
+**Kỹ thuật kết hợp Smarty variable với `{literal}` block — 2 cách được phép:**
 
 Khi cần truyền Smarty variable vào JavaScript, KHÔNG đặt Smarty variable bên trong `{literal}` (sẽ không được parse). Thay vào đó:
 
