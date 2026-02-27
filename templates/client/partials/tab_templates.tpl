@@ -45,12 +45,17 @@
     </div>
 </div>
 
+{literal}
 <script>
-    document.getElementById('confirmTemplate')?.addEventListener('change', function(e) {
-        document.getElementById('btnLoadTemplate').disabled = !e.target.checked;
-    });
-    // Trigger initial state
-    if(document.getElementById('confirmTemplate')) {
-        document.getElementById('btnLoadTemplate').disabled = !document.getElementById('confirmTemplate').checked;
-    }
+    (function() {
+        var cb = document.getElementById('confirmTemplate');
+        var btn = document.getElementById('btnLoadTemplate');
+        if (cb && btn) {
+            cb.addEventListener('change', function(e) {
+                btn.disabled = !e.target.checked;
+            });
+            btn.disabled = !cb.checked;
+        }
+    })();
 </script>
+{/literal}

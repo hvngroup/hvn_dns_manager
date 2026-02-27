@@ -68,9 +68,11 @@
     <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>2/10</strong> chuyển tiếp
 </div>
 
+{literal}
 <script>
     document.getElementById('catchallToggle').addEventListener('change', function() {
-        const inputs = this.closest('.card-body').querySelectorAll('input[type="email"], button');
-        inputs.forEach(el => el.disabled = !this.checked);
+        var inputs = this.closest('.card-body').querySelectorAll('input[type="email"], button');
+        inputs.forEach(function(el) { el.disabled = !this.checked; }.bind(this));
     });
 </script>
+{/literal}
