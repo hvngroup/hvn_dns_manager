@@ -33,11 +33,19 @@ class ClientController
     }
 
     /**
+     * Build base URL for module links
+     */
+    private function getModuleLink($params)
+    {
+        return $params['modulelink'] ?? 'index.php?m=hvn_dns_manager';
+    }
+
+    /**
      * Màn hình record edit riêng rẽ
      */
     private function showRecordEdit($params)
     {
-        $serviceId = $params['serviceid'] ?? 0;
+        $moduleLink = $this->getModuleLink($params);
         $domainId = isset($_REQUEST['domain_id']) ? (int)$_REQUEST['domain_id'] : 1;
         $recordId = isset($_REQUEST['record_id']) ? (int)$_REQUEST['record_id'] : 0;
         
@@ -62,6 +70,7 @@ class ClientController
             'templatefile' => 'templates/client/record_edit',
             'requirelogin' => true,
             'vars' => [
+                'modulelink' => $moduleLink,
                 'domain' => $domainInfo,
                 'recordJson' => $recordJson,
             ]
@@ -73,6 +82,7 @@ class ClientController
      */
     private function showDomainList($params, $userId = 0)
     {
+        $moduleLink = $this->getModuleLink($params);
         $serviceId = $params['serviceid'] ?? 0;
         
         // Mock data cho danh sách domains
@@ -105,10 +115,14 @@ class ClientController
             'templatefile' => 'templates/client/domain_list',
             'requirelogin' => true,
             'vars' => [
+                'modulelink' => $moduleLink,
                 'plan_name' => 'DNS Standard',
+                'service_status' => 'Active',
+                'expiry_date' => '27/02/2027',
                 'domains' => $domains,
                 'default_ns1' => 'dns1.hvn.vn',
                 'default_ns2' => 'dns2.hvn.vn',
+                'default_ns3' => 'dns3.hvn.vn',
             ]
         ];
     }
@@ -118,7 +132,7 @@ class ClientController
      */
     private function showDnsEditor($params, $domainId)
     {
-        $serviceId = $params['serviceid'] ?? 0;
+        $moduleLink = $this->getModuleLink($params);
         
         // Mock data cho giao diện
         $domainInfo = [
@@ -181,13 +195,13 @@ class ClientController
         return [
             'pagetitle' => 'Quản lý DNS - ' . $domainInfo['domain'],
             'breadcrumb' => [
-                'clientarea.php?action=productdetails&id=' . $serviceId => 'Dịch vụ',
-                'clientarea.php?action=productdetails&id=' . $serviceId . '#' => 'DNS',
+                'index.php?m=hvn_dns_manager' => 'Domain Manager',
                 '#' => $domainInfo['domain'],
             ],
             'templatefile' => 'templates/client/dns_editor',
             'requirelogin' => true,
             'vars' => [
+                'modulelink' => $moduleLink,
                 'domain' => $domainInfo,
                 'quota' => $quota,
                 'recordsJson' => json_encode($records),

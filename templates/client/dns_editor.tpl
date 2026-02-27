@@ -14,12 +14,13 @@
             <hr>
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
+                    {assign var="safe_max" value=$quota.max_records|default:1}
+                    {math assign="percent" equation="round((c/m)*100)" c=$domain.records_count m=$safe_max}
                     <div class="d-flex justify-content-between mb-1">
                         <span>Đang dùng: <strong>{$domain.records_count}/{$quota.max_records} records</strong></span>
-                        <span>{math equation="round((c/m)*100)" c=$domain.records_count m=$quota.max_records}%</span>
+                        <span>{$percent}%</span>
                     </div>
                     <div class="progress" style="height: 10px;">
-                        {math assign="percent" equation="round((c/m)*100)" c=$domain.records_count m=$quota.max_records}
                         <div class="progress-bar {if $percent > 90}bg-danger{elseif $percent > 75}bg-warning{else}bg-primary{/if}" 
                              role="progressbar" style="width: {$percent}%;" aria-valuenow="{$percent}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
@@ -152,6 +153,11 @@
                         'CAA': 'bg-dark'
                     };
                     return classes[type] || 'bg-secondary';
+                },
+
+                formatTTL(ttl) {
+                    const map = {60:'1m', 300:'5m', 1800:'30m', 3600:'1h', 14400:'4h', 43200:'12h', 86400:'24h'};
+                    return map[ttl] || ttl + 's';
                 },
 
                 deleteRecord(record) {

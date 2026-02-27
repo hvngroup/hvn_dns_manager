@@ -15,7 +15,7 @@
         
         <input type="text" class="form-control form-control-sm d-inline-block w-auto ms-2" placeholder="Tìm kiếm..." x-model="searchQuery">
     </div>
-    <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=record_edit&domain_id=' + domainId" class="btn btn-primary btn-sm">
+    <a :href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg"></i> Thêm bản ghi
     </a>
 </div>
@@ -77,7 +77,7 @@
                         </template>
                         <template x-if="!record.is_system && !record.is_locked && !record.pending_delete">
                             <div class="btn-group btn-group-sm">
-                                <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=record_edit&domain_id=' + domainId + '&record_id=' + record.id" class="btn btn-outline-secondary" title="Sửa"><i class="bi bi-pencil"></i></a>
+                                <a :href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId + '&record_id=' + record.id" class="btn btn-outline-secondary" title="Sửa"><i class="bi bi-pencil"></i></a>
                                 <button class="btn btn-outline-danger" @click="deleteRecord(record)" title="Xóa"><i class="bi bi-trash"></i></button>
                             </div>
                         </template>
@@ -109,19 +109,4 @@
     </nav>
 </div>
 
-<script>
-    // Include formatTTL function in the Alpine component
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('recordTableHelpers', () => ({
-            formatTTL(ttl) {
-                if(ttl == 60) return '1m';
-                if(ttl == 300) return '5m';
-                if(ttl == 1800) return '30m';
-                if(ttl == 3600) return '1h';
-                if(ttl == 43200) return '12h';
-                if(ttl == 86400) return '24h';
-                return ttl + 's';
-            }
-        }));
-    });
-</script>
+

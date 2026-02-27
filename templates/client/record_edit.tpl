@@ -1,7 +1,7 @@
 <div class="hvn-dns-client hvn-record-edit" x-data="recordEditor()">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=dns_manager&domain_id=' + domainId" class="text-decoration-none text-muted">
+        <a :href="'index.php?m=hvn_dns_manager&domain_id=' + domainId" class="text-decoration-none text-muted">
             <i class="bi bi-arrow-left"></i> Quay lại cấu hình bản ghi
         </a>
     </div>
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-2">
-                    <a :href="'clientarea.php?action=productdetails&id={$serviceid}&modop=custom&a=dns_manager&domain_id=' + domainId" class="btn btn-outline-secondary" :class="{'disabled': submitting}">Hủy</a>
+                    <a :href="'index.php?m=hvn_dns_manager&domain_id=' + domainId" class="btn btn-outline-secondary" :class="{'disabled': submitting}">Hủy</a>
                     <button type="submit" class="btn btn-primary" :disabled="submitting">
                         <span x-show="!submitting"><i class="bi bi-save me-1"></i> Lưu bản ghi</span>
                         <span x-show="submitting"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang xử lý...</span>
@@ -147,7 +147,7 @@ document.addEventListener('alpine:init', () => {
             // Mock API save
             setTimeout(() => {
                 alert('Đã lưu bản ghi thành công!');
-                window.location.href = `clientarea.php?action=productdetails&id={/literal}{$serviceid}{literal}&modop=custom&a=dns_manager&domain_id=${this.domainId}`;
+                window.location.href = `index.php?m=hvn_dns_manager&domain_id=${this.domainId}`;
             }, 800);
         }
     }));
