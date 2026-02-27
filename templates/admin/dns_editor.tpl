@@ -69,7 +69,7 @@
                  style="cursor:pointer;" @click="toggleGroup(group.type)">
                 <div class="hvn-d-flex hvn-align-items-center" style="gap:10px;">
                     <!-- Type pill -->
-                    <span class="hvn-fw-bold hvn-small" style="font-size:.7rem; letter-spacing:.08em; padding:3px 10px; border-radius:99px; color:#fff;"
+                    <span class="hvn-badge hvn-fw-bold hvn-small" style="font-size:.7rem; letter-spacing:.08em; padding:3px 10px; border-radius:99px; color:#fff;"
                           :style="'background:' + typeColor(group.type)">
                         <span x-text="group.type"></span>
                     </span>
@@ -130,7 +130,7 @@
                                                 <i class="bi bi-gear-fill"></i> SYS
                                             </span>
                                         </template>
-                                        <label class="hvn-d-flex hvn-align-items-center hvn-gap-1" style="cursor:pointer; user-select:none; font-size:.8rem;" title="Khóa không cho Client sửa">
+                                        <label class="hvn-d-flex hvn-align-items-center hvn-gap-1" style="cursor:pointer; user-select:none; font-size:14px;" title="Khóa không cho Client sửa">
                                             <input type="checkbox" :id="'lock_'+record.id" x-model="record.is_locked" @change="toggleLock(record)">
                                             <span x-text="record.is_locked ? 'Khóa' : 'Mở'"></span>
                                         </label>
@@ -139,13 +139,13 @@
                                 <!-- Sync status -->
                                 <td>
                                     <template x-if="record.sync_status === 'complete'">
-                                        <span style="color:#198754; font-size:.8rem; font-weight:600;"><i class="bi bi-check-circle-fill"></i> Live</span>
+                                        <span style="color:#198754; font-size:14px; font-weight:600;"><i class="bi bi-check-circle-fill"></i> Live</span>
                                     </template>
                                     <template x-if="record.sync_status === 'syncing'">
-                                        <span style="color:#0dcaf0; font-size:.8rem; font-weight:600;"><i class="bi bi-arrow-repeat"></i> Syncing</span>
+                                        <span style="color:#0dcaf0; font-size:14px; font-weight:600;"><i class="bi bi-arrow-repeat"></i> Syncing</span>
                                     </template>
                                     <template x-if="record.sync_status === 'failed'">
-                                        <span style="color:#dc3545; font-size:.8rem; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Failed</span>
+                                        <span style="color:#dc3545; font-size:14px; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Failed</span>
                                     </template>
                                 </td>
                                 <!-- Actions -->
