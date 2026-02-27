@@ -8,8 +8,8 @@
         <div class="hvn-card-body hvn-py-3">
             <div class="hvn-row g-2 hvn-align-items-center">
                 <div class="hvn-col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text hvn-bg-white"><i class="bi bi-search"></i></span>
+                    <div class="hvn-input-group">
+                        <span class="hvn-input-group-text hvn-bg-white"><i class="bi bi-search"></i></span>
                         <input type="text" class="hvn-form-control" placeholder="Tìm kiếm tên miền..." x-model="filters.search" @input.debounce.500ms="fetchDomains()">
                     </div>
                 </div>
@@ -30,13 +30,13 @@
                     </select>
                 </div>
                 <div class="hvn-col-md-2 hvn-d-flex hvn-align-items-center">
-                    <div class="form-check form-switch hvn-mb-0">
-                        <input class="form-check-input" type="checkbox" id="errorOnly" x-model="filters.errorOnly" @change="fetchDomains()">
-                        <label class="form-check-label hvn-text-danger" for="errorOnly">Chỉ domain có lỗi</label>
+                    <div class="hvn-form-check hvn-form-switch hvn-mb-0">
+                        <input class="hvn-form-check-input" type="checkbox" id="errorOnly" x-model="filters.errorOnly" @change="fetchDomains()">
+                        <label class="hvn-form-check-label hvn-text-danger" for="errorOnly">Chỉ domain có lỗi</label>
                     </div>
                 </div>
                 <div class="hvn-col-md-2 hvn-text-end">
-                    <button class="hvn-btn btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
                 </div>
             </div>
         </div>
@@ -45,9 +45,9 @@
     <!-- Domain Table -->
     <div class="hvn-card hvn-shadow-sm hvn-border-0">
         <div class="hvn-card-body hvn-p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle hvn-mb-0">
-                    <thead class="table-light">
+            <div class="hvn-table-responsive">
+                <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0">
+                    <thead class="hvn-table-light">
                         <tr>
                             <th class="hvn-ps-4">Domain</th>
                             <th>Khách hàng</th>
@@ -116,18 +116,18 @@
                                         </template>
                                     </td>
                                     <td class="hvn-text-end hvn-pe-4">
-                                        <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="hvn-btn btn-sm hvn-btn-outline-primary">
+                                        <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="hvn-btn hvn-btn-sm hvn-btn-outline-primary">
                                             <i class="bi bi-sliders"></i> DNS
                                         </a>
-                                        <div class="dropdown d-inline-block">
-                                            <button class="hvn-btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <div class="hvn-dropdown hvn-d-inline-block">
+                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary hvn-dropdown-toggle" type="button" @click.stop="$event.currentTarget.nextElementSibling.classList.toggle('hvn-show')">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item" :href="'clientsservices.php?userid=' + domain.client_id + '&id=' + domain.service_id"><i class="bi bi-box"></i> Quản lý Service WHMCS</a></li>
+                                            <ul class="hvn-dropdown-menu hvn-dropdown-menu-end">
+                                                <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
+                                                <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
+                                                <li><hr class="hvn-dropdown-divider"></li>
+                                                <li><a class="hvn-dropdown-item" :href="'clientsservices.php?userid=' + domain.client_id + '&id=' + domain.service_id"><i class="bi bi-box"></i> Quản lý Service WHMCS</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -145,13 +145,13 @@
                 Hiển thị <span x-text="domains.length"></span> / <span x-text="totalRecords"></span> domain
             </div>
             <nav aria-label="Page navigation" x-show="totalPages > 1">
-                <ul class="pagination pagination-sm hvn-mb-0">
-                    <li class="page-item" :class="{ 'disabled': currentPage === 1}">
-                        <a class="page-link" href="#" @click.prevent="goToPage(currentPage - 1)">&laquo;</a>
+                <ul class="hvn-pagination hvn-pagination-sm hvn-mb-0">
+                    <li class="hvn-page-item" :class="{literal}{'hvn-disabled': currentPage === 1}{/literal}">
+                        <a class="hvn-page-link" href="#" @click.prevent="goToPage(currentPage - 1)">&laquo;</a>
                     </li>
-                    <li class="page-item active"><a class="page-link" href="#" x-text="currentPage"></a></li>
-                    <li class="page-item" :class="{ 'disabled': currentPage === totalPages}">
-                        <a class="page-link" href="#" @click.prevent="goToPage(currentPage + 1)">&raquo;</a>
+                    <li class="hvn-page-item hvn-active"><a class="hvn-page-link" href="#" x-text="currentPage"></a></li>
+                    <li class="hvn-page-item" :class="{literal}{'hvn-disabled': currentPage === totalPages}{/literal}">
+                        <a class="hvn-page-link" href="#" @click.prevent="goToPage(currentPage + 1)">&raquo;</a>
                     </li>
                 </ul>
             </nav>
