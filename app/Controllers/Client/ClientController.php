@@ -202,6 +202,7 @@ class ClientController
             'requirelogin' => true,
             'vars' => [
                 'modulelink' => $moduleLink,
+                'module_dir' => realpath(__DIR__ . '/../../../') . '/',
                 'domain' => $domainInfo,
                 'quota' => $quota,
                 'recordsJson' => json_encode($records),

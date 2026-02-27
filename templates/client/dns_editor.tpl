@@ -1,17 +1,16 @@
-{* ── Load Bootstrap Icons ── *}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-{* ── Smarty variables → JS (TRƯỚC literal block) ── *}
+{* ── Smarty variables → JS config ── *}
 <script>
-    var HVNDNS_CONFIG = {
+    var HVNDNS_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
         records: {$recordsJson nofilter}
-    };
+    {rdelim};
 </script>
 
-{* ── Alpine component logic (trong literal để Smarty không parse JS braces) ── *}
-<script>
+{* ── Alpine component (toàn bộ JS trong literal) ── *}
 {literal}
+<script>
     document.addEventListener('alpine:init', function() {
         Alpine.data('dnsEditor', function() {
             return {
@@ -32,7 +31,7 @@
                     });
                 },
 
-                getTypeBadgeClass(type) {
+                getTypeBadgeClass: function(type) {
                     var classes = {
                         'A': 'bg-primary', 'AAAA': 'bg-info text-dark', 'CNAME': 'bg-purple',
                         'MX': 'bg-warning text-dark', 'TXT': 'bg-success', 'SRV': 'bg-danger',
@@ -41,12 +40,12 @@
                     return classes[type] || 'bg-secondary';
                 },
 
-                formatTTL(ttl) {
+                formatTTL: function(ttl) {
                     var map = { 60:'1m', 300:'5m', 1800:'30m', 3600:'1h', 14400:'4h', 43200:'12h', 86400:'24h' };
                     return map[ttl] || ttl + 's';
                 },
 
-                deleteRecord(record) {
+                deleteRecord: function(record) {
                     if (confirm('Bạn có chắc muốn xóa bản ghi: ' + record.name + ' ' + record.type + '?')) {
                         window.dispatchEvent(new CustomEvent('show-toast', {
                             detail: { title: 'Đã Xóa', msg: 'Bản ghi ' + record.name + ' đang được xóa...', type: 'danger' }
@@ -54,7 +53,7 @@
                     }
                 },
 
-                retryRecord(id) {
+                retryRecord: function(id) {
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' }
                     }));
@@ -62,11 +61,16 @@
             };
         });
     });
-{/literal}
 </script>
+{/literal}
+
+{* ══════════════════════════════════════════════════════════════
+   HTML BODY — Tất cả Alpine x-bind dùng {ldelim}{rdelim} thay cho literal braces
+   ══════════════════════════════════════════════════════════════ *}
 
 <div class="hvn-dns-client" x-data="dnsEditor()">
-    {* ── Header ── *}
+
+    {* ── Back link ── *}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a href="index.php?m=hvn_dns_manager" class="text-decoration-none">
             &larr; Quay lại danh sách domain
@@ -105,84 +109,86 @@
         </div>
     </div>
 
-    {* ── Navigation Tabs (Alpine-powered) ── *}
+    {* ── Navigation Tabs ── *}
     <ul class="nav nav-tabs mb-4" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'records' ? 'active' : ''" @click="activeTab = 'records'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'records' && 'active'" x-on:click="activeTab = 'records'" type="button">
                 DNS Records
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'redirects' ? 'active' : ''" @click="activeTab = 'redirects'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'redirects' && 'active'" x-on:click="activeTab = 'redirects'" type="button">
                 Redirects {if $domain.redirects_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.redirects_count}</span>{/if}
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'email' ? 'active' : ''" @click="activeTab = 'email'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'email' && 'active'" x-on:click="activeTab = 'email'" type="button">
                 Email {if $domain.email_fwds_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.email_fwds_count}</span>{/if}
             </button>
         </li>
         {if $quota.dnssec_enabled}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'dnssec' ? 'active' : ''" @click="activeTab = 'dnssec'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'dnssec' && 'active'" x-on:click="activeTab = 'dnssec'" type="button">
                 DNSSEC
             </button>
         </li>
         {/if}
         {if $quota.ddns_enabled}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'ddns' ? 'active' : ''" @click="activeTab = 'ddns'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'ddns' && 'active'" x-on:click="activeTab = 'ddns'" type="button">
                 DDNS
             </button>
         </li>
         {/if}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold" :class="activeTab === 'templates' ? 'active' : ''" @click="activeTab = 'templates'" type="button">
+        <li class="nav-item">
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'templates' && 'active'" x-on:click="activeTab = 'templates'" type="button">
                 Templates
             </button>
         </li>
     </ul>
 
-    {* ── Tab Content (Alpine x-show) ── *}
+    {* ── Tab Content ── *}
     <div>
+        {assign var="partials_dir" value="{$module_dir}templates/client/partials"}
+
         <div x-show="activeTab === 'records'" x-cloak>
-            {include file="./partials/record_table.tpl"}
+            {include file="$partials_dir/record_table.tpl"}
         </div>
         
         <div x-show="activeTab === 'redirects'" x-cloak>
-            {include file="./partials/tab_redirects.tpl"}
+            {include file="$partials_dir/tab_redirects.tpl"}
         </div>
         
         <div x-show="activeTab === 'email'" x-cloak>
-            {include file="./partials/tab_email.tpl"}
+            {include file="$partials_dir/tab_email.tpl"}
         </div>
         
         {if $quota.dnssec_enabled}
         <div x-show="activeTab === 'dnssec'" x-cloak>
-            {include file="./partials/tab_dnssec.tpl"}
+            {include file="$partials_dir/tab_dnssec.tpl"}
         </div>
         {/if}
 
         {if $quota.ddns_enabled}
         <div x-show="activeTab === 'ddns'" x-cloak>
-            {include file="./partials/tab_ddns.tpl"}
+            {include file="$partials_dir/tab_ddns.tpl"}
         </div>
         {/if}
 
         <div x-show="activeTab === 'templates'" x-cloak>
-            {include file="./partials/tab_templates.tpl"}
+            {include file="$partials_dir/tab_templates.tpl"}
         </div>
     </div>
-    
+
     {* ── Toast ── *}
-    {include file="./partials/toast.tpl"}
+    {include file="$partials_dir/toast.tpl"}
 </div>
 
-{* ── Load Alpine.js cuối cùng (SAU khi alpine:init listener đã đăng ký) ── *}
+{* ── Alpine.js CDN (SAU listener đăng ký) ── *}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-<style>
 {literal}
+<style>
 [x-cloak] { display: none !important; }
 .bg-purple { background-color: #6f42c1; color: white; }
 .nav-tabs .nav-link { color: #495057; cursor: pointer; }
@@ -197,5 +203,5 @@
 }
 .spin { animation: spin 2s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
-{/literal}
 </style>
+{/literal}

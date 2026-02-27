@@ -1,3 +1,5 @@
+{* record_table.tpl — Partial dùng trong dns_editor.tpl (Alpine x-data="dnsEditor") *}
+
 <div class="mb-3 d-flex justify-content-between align-items-center">
     <div>
         <label for="filterType" class="me-2">Lọc:</label>
@@ -15,7 +17,7 @@
         
         <input type="text" class="form-control form-control-sm d-inline-block w-auto ms-2" placeholder="Tìm kiếm..." x-model="searchQuery">
     </div>
-    <a :href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId" class="btn btn-primary btn-sm">
+    <a x-bind:href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg"></i> Thêm bản ghi
     </a>
 </div>
@@ -33,17 +35,17 @@
             </tr>
         </thead>
         <tbody>
-            <template x-for="record in filteredRecords" :key="record.id">
-                <tr :class="{'opacity-50': record.pending_delete}">
+            <template x-for="record in filteredRecords" x-bind:key="record.id">
+                <tr x-bind:class="record.pending_delete && 'opacity-50'">
                     <td>
-                        <span class="badge" :class="getTypeBadgeClass(record.type)" x-text="record.type"></span>
+                        <span class="badge" x-bind:class="getTypeBadgeClass(record.type)" x-text="record.type"></span>
                         <template x-if="record.is_system">
                             <i class="bi bi-wrench text-muted ms-1" title="Bản ghi hệ thống"></i>
                         </template>
                     </td>
                     <td class="font-monospace" x-text="record.name === '@' ? '{$domain.domain}' : record.name"></td>
                     <td class="font-monospace text-break">
-                        <span x-text="record.value.length > 30 ? record.value.substring(0, 30) + '...' : record.value" :title="record.value"></span>
+                        <span x-text="record.value.length > 30 ? record.value.substring(0, 30) + '...' : record.value" x-bind:title="record.value"></span>
                         <template x-if="record.type === 'MX' || record.type === 'SRV'">
                             <span class="d-block small text-muted">Priority: <span x-text="record.priority"></span></span>
                         </template>
@@ -67,7 +69,7 @@
                         <template x-if="record.sync_status === 'failed'">
                             <div>
                                 <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Failed</span>
-                                <button class="btn btn-xs btn-outline-danger d-block mt-1 p-0 px-1" @click="retryRecord(record.id)">Retry</button>
+                                <button class="btn btn-xs btn-outline-danger d-block mt-1 p-0 px-1" x-on:click="retryRecord(record.id)">Retry</button>
                             </div>
                         </template>
                     </td>
@@ -77,8 +79,8 @@
                         </template>
                         <template x-if="!record.is_system && !record.is_locked && !record.pending_delete">
                             <div class="btn-group btn-group-sm">
-                                <a :href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId + '&record_id=' + record.id" class="btn btn-outline-secondary" title="Sửa"><i class="bi bi-pencil"></i></a>
-                                <button class="btn btn-outline-danger" @click="deleteRecord(record)" title="Xóa"><i class="bi bi-trash"></i></button>
+                                <a x-bind:href="'index.php?m=hvn_dns_manager&action=record_edit&domain_id=' + domainId + '&record_id=' + record.id" class="btn btn-outline-secondary" title="Sửa"><i class="bi bi-pencil"></i></a>
+                                <button class="btn btn-outline-danger" x-on:click="deleteRecord(record)" title="Xóa"><i class="bi bi-trash"></i></button>
                             </div>
                         </template>
                         <template x-if="record.pending_delete">
@@ -98,7 +100,6 @@
     <div class="text-muted small">
         Hiển thị <span x-text="filteredRecords.length"></span> / <span x-text="records.length"></span> bản ghi
     </div>
-    <!-- Simple Pagination Placeholder for Mock -->
     <nav aria-label="Page navigation" x-show="filteredRecords.length > 10">
         <ul class="pagination pagination-sm mb-0">
             <li class="page-item disabled"><a class="page-link" href="#" aria-label="Previous">&laquo;</a></li>
@@ -108,5 +109,3 @@
         </ul>
     </nav>
 </div>
-
-

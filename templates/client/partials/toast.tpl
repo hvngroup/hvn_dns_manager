@@ -1,4 +1,5 @@
-<!-- Toast Container -->
+{* toast.tpl — Toast notification component (Alpine) *}
+{literal}
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080" x-data="{
     show: false,
     title: '',
@@ -16,7 +17,10 @@
         this.timeout = setTimeout(() => { this.show = false; }, 3000);
     }
 }" @show-toast.window="showToastHandler($event)">
-    <div class="toast align-items-center text-white border-0" :class="{ 'show': show, ['bg-' + type]: true }" :style="show ? 'display: block;' : 'display: none;'" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast align-items-center text-white border-0" 
+         x-bind:class="'bg-' + type"
+         x-show="show"
+         role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body">
                 <strong x-text="title"></strong><br>
@@ -28,8 +32,9 @@
 </div>
 
 <script>
-    // Keeping function for direct call compatibility if any
-    function showToast(title, msg, type = 'success') {
+    function showToast(title, msg, type) {
+        type = type || 'success';
         window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: title, msg: msg, type: type } }));
     }
 </script>
+{/literal}
