@@ -61,25 +61,6 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 13. mod_hvndns_quota_plans (MUST BE CREATED BEFORE DOMAINS DUE TO FK)
-        if (!$schema->hasTable('mod_hvndns_quota_plans')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_quota_plans (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                plan_name VARCHAR(100) NOT NULL,
-                max_records SMALLINT UNSIGNED NOT NULL DEFAULT 50,
-                max_subdomains SMALLINT UNSIGNED NOT NULL DEFAULT 20,
-                max_redirects SMALLINT UNSIGNED NOT NULL DEFAULT 5,
-                max_email_fwd SMALLINT UNSIGNED NOT NULL DEFAULT 10,
-                max_ddns_tokens SMALLINT UNSIGNED NOT NULL DEFAULT 2,
-                ddns_enabled TINYINT(1) NOT NULL DEFAULT 0,
-                dnssec_enabled TINYINT(1) NOT NULL DEFAULT 0,
-                ssl_enabled TINYINT(1) NOT NULL DEFAULT 0,
-                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                UNIQUE INDEX uniq_plan_name (plan_name)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
-        }
-
         // 5. mod_hvndns_domains
         if (!$schema->hasTable('mod_hvndns_domains')) {
             Capsule::statement("CREATE TABLE mod_hvndns_domains (
@@ -90,7 +71,6 @@ class v0_1_0_prototype
                 status ENUM('active','suspended','terminated','pending_delete') NOT NULL DEFAULT 'active',
                 ssl_status ENUM('none','pending','active','expired','failed') NOT NULL DEFAULT 'none',
                 ssl_expires_at DATETIME NULL,
-                quota_plan_id INT UNSIGNED NULL,
                 default_ip VARCHAR(45) NULL,
                 notes TEXT NULL,
                 provisioned_at DATETIME NULL,
@@ -101,8 +81,7 @@ class v0_1_0_prototype
                 UNIQUE INDEX uniq_domain (domain),
                 INDEX idx_whmcs_user (whmcs_user_id),
                 INDEX idx_whmcs_service (whmcs_service_id),
-                INDEX idx_status (status),
-                FOREIGN KEY (quota_plan_id) REFERENCES mod_hvndns_quota_plans(id) ON DELETE SET NULL
+                INDEX idx_status (status)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
@@ -406,7 +385,6 @@ class v0_1_0_prototype
         $schema->dropIfExists('mod_hvndns_queue');
         $schema->dropIfExists('mod_hvndns_records');
         $schema->dropIfExists('mod_hvndns_domains');
-        $schema->dropIfExists('mod_hvndns_quota_plans');
         $schema->dropIfExists('mod_hvndns_servers');
         $schema->dropIfExists('mod_hvndns_settings');
         $schema->dropIfExists('mod_hvndns_schema_version');

@@ -594,28 +594,10 @@
 
 ---
 
-## EPIC-12: Quota & Template Management 🟣
-> *Giới hạn tài nguyên theo gói dịch vụ và quản lý DNS template.*
+## EPIC-12: DNS Template Management 🟣
+> *Quản lý các mẫu cấu hình DNS giúp thiết lập nhanh.*
 
-### Story 12.1 — Data Quota (Giới hạn theo gói dịch vụ)
-**Là** admin, **tôi muốn** giới hạn số lượng record/redirect/forwarder mà mỗi khách hàng được tạo dựa trên gói dịch vụ WHMCS, **để** phân tầng dịch vụ và bán upsell gói cao hơn.
-
-| Issue | Mô tả | SP |
-|-------|--------|-----|
-| `QUOTA-001` | Bảng `mod_hvndns_quota_plans` (plan_name, max_records, max_subdomains, max_redirects, max_email_forwards, ddns_enabled, dnssec_enabled) | 1 |
-| `QUOTA-002` | Admin UI: CRUD quota plans, mapping plan → WHMCS Product/Product Group | 2 |
-| `QUOTA-003` | Enforcement: trước khi dispatch job ADD, kiểm tra quota → nếu vượt → trả lỗi "Bạn đã đạt giới hạn X records cho gói dịch vụ hiện tại. Vui lòng nâng cấp." | 2 |
-| `QUOTA-004` | Client UI: hiển thị usage bar "Đang dùng 15/50 records" trong DNS Editor header | 1 |
-| `QUOTA-005` | Admin có thể override quota cho từng domain cụ thể (exception) | 1 |
-
-**AC**:
-- Quota check xảy ra trước khi job vào queue (không tốn resource xử lý rồi mới báo lỗi)
-- Thông báo vượt quota thân thiện, có link tới trang nâng cấp dịch vụ
-- Admin override được log trong audit trail
-
----
-
-### Story 12.2 — DNS Template Management
+### Story 12.1 — DNS Template Management
 **Là** admin, **tôi muốn** tạo và quản lý các mẫu DNS template, **để** áp dụng tự động cho domain mới hoặc cho phép khách hàng reset DNS nhanh.
 
 | Issue | Mô tả | SP |

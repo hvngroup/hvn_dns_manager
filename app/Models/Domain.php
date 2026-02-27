@@ -15,7 +15,6 @@ class Domain extends Model
         'status', 
         'ssl_status', 
         'ssl_expires_at', 
-        'quota_plan_id', 
         'default_ip', 
         'notes', 
         'provisioned_at', 
@@ -27,16 +26,10 @@ class Domain extends Model
         'whmcs_service_id' => 'integer',
         'whmcs_user_id' => 'integer',
         'ssl_expires_at' => 'datetime',
-        'quota_plan_id' => 'integer',
         'provisioned_at' => 'datetime',
         'suspended_at' => 'datetime',
         'terminated_at' => 'datetime',
     ];
-
-    public function quotaPlan()
-    {
-        return $this->belongsTo(QuotaPlan::class, 'quota_plan_id');
-    }
 
     public function records()
     {

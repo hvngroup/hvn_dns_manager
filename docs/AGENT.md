@@ -97,15 +97,14 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 | 8 | `mod_hvndns_record_history` | RecordHistory | Lịch sử thay đổi record | BIGINT PK |
 | 9 | `mod_hvndns_snapshots` | Snapshot | Bản sao zone | Rolling 30/domain |
 | 10 | `mod_hvndns_templates` | Template | Mẫu DNS | `{{placeholder}}` |
-| 11 | `mod_hvndns_quota_plans` | QuotaPlan | Gói giới hạn tài nguyên | `0` = unlimited |
-| 12 | `mod_hvndns_dnssec` | DnssecKey | Thông số DNSSEC | 1:1 với domain |
-| 13 | `mod_hvndns_ddns_tokens` | DdnsToken | Token DDNS | `token_hash` #️⃣ |
-| 14 | `mod_hvndns_redirects` | Redirect | URL forwarding | 301/302/masked |
-| 15 | `mod_hvndns_email_forwards` | EmailForward | Email forwarding | catch-all support |
-| 16 | `mod_hvndns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
-| 17 | `mod_hvndns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
-| 18 | `mod_hvndns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
-| 19 | `mod_hvndns_settings` | Setting | Module config key-value | 111 settings |
+| 11 | `mod_hvndns_dnssec` | DnssecKey | Thông số DNSSEC | 1:1 với domain |
+| 12 | `mod_hvndns_ddns_tokens` | DdnsToken | Token DDNS | `token_hash` #️⃣ |
+| 13 | `mod_hvndns_redirects` | Redirect | URL forwarding | 301/302/masked |
+| 14 | `mod_hvndns_email_forwards` | EmailForward | Email forwarding | catch-all support |
+| 15 | `mod_hvndns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
+| 16 | `mod_hvndns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
+| 17 | `mod_hvndns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
+| 18 | `mod_hvndns_settings` | Setting | Module config key-value | 111 settings |
 
 *Lưu ý: Bổ sung 2 helper services chính phục vụ feature flags: `ClientFeatureResolver` và `UpsellHelper`.*
 

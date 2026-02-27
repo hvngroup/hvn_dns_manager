@@ -18,9 +18,9 @@ class AdminController
         $validActions = [
             'servers', 'domains', 'dns_editor', 'admin_dns_editor', 'sync_logs',
             'sync_log_detail',
-            'audit_trail', 'templates', 'quota_plans', 
+            'audit_trail', 'templates', 
             'drift_reports', 'bulk', 'settings',
-            'server_edit', 'quota_plan_edit', 'template_edit',
+            'server_edit', 'template_edit',
             'drift_settings', 'audit_detail', 'snapshot_rollback'
         ];
 

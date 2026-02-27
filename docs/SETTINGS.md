@@ -191,7 +191,7 @@ Luồng khi `create_on_preregistrar = true`:
 | 16 | `enable_dns_editor` | Bật DNS Editor | Boolean | `1` | Tắt = Client không thể xem/sửa DNS records. Admin vẫn sửa được |
 | 17 | `subdomain_limit` | Giới hạn Subdomain | Integer | `0` | Số subdomain tối đa cho 1 domain. `0` = unlimited. `-1` = disable (không cho tạo subdomain). Subdomain = số unique values trong cột `name` (trừ `@`) |
 
-**Liên kết**: Override bởi Quota Plan nếu domain có `quota_plan_id` — Quota Plan luôn ưu tiên hơn global settings.
+**Liên kết**: Ưu tiên: Admin Override > Global Settings. <code>0</code> = unlimited. (Phase 3).
 
 ---
 
@@ -238,30 +238,19 @@ if (!SettingsHelper::getBool("allow_modify_" . strtolower($type))) {
 
 | # | Setting Key | Label | Type | Default | Mô tả |
 |---|------------|-------|------|---------|-------|
-| 26 | `a_record_limit` | Giới hạn A records | Integer | `100` | Số A records tối đa cho 1 domain |
-| 27 | `aaaa_record_limit` | Giới hạn AAAA records | Integer | `100` | Số AAAA records tối đa |
-| 28 | `cname_record_limit` | Giới hạn CNAME records | Integer | `100` | Số CNAME records tối đa |
-| 29 | `mx_record_limit` | Giới hạn MX records | Integer | `100` | Số MX records tối đa |
-| 30 | `txt_record_limit` | Giới hạn TXT records | Integer | `100` | Số TXT records tối đa |
-| 31 | `srv_record_limit` | Giới hạn SRV records | Integer | `100` | Số SRV records tối đa |
-| 32 | `caa_record_limit` | Giới hạn CAA records | Integer | `20` | Số CAA records tối đa |
-| 33 | `ns_record_limit` | Giới hạn NS records | Integer | `10` | Số NS records tối đa |
+| 26 | `total_record_limit` | Tổng số bản ghi tối đa | Integer | `50` | Giới hạn tổng tất cả các loại bản ghi của một tên miền |
+| 27 | `a_record_limit` | Giới hạn A records | Integer | `100` | Số A records tối đa cho 1 domain |
+| 28 | `aaaa_record_limit` | Giới hạn AAAA records | Integer | `100` | Số AAAA records tối đa |
+| 29 | `cname_record_limit` | Giới hạn CNAME records | Integer | `100` | Số CNAME records tối đa |
+| 30 | `mx_record_limit` | Giới hạn MX records | Integer | `100` | Số MX records tối đa |
+| 31 | `txt_record_limit` | Giới hạn TXT records | Integer | `100` | Số TXT records tối đa |
+| 32 | `srv_record_limit` | Giới hạn SRV records | Integer | `100` | Số SRV records tối đa |
+| 33 | `caa_record_limit` | Giới hạn CAA records | Integer | `20` | Số CAA records tối đa |
+| 34 | `ns_record_limit` | Giới hạn NS records | Integer | `10` | Số NS records tối đa |
 
-**Quan hệ với Quota Plan**:
+**Thứ tự ưu tiên**: Admin Override > Global Settings.
 
-Hệ thống có 2 lớp giới hạn:
-
-```
-Global Settings (Section 7)     ← Áp dụng cho TẤT CẢ domain
-        ↓
-Quota Plan (mod_hvndns_quota_plans) ← Override cho domain có quota_plan_id
-        ↓
-Admin Override per-domain        ← Admin đặt exception riêng cho 1 domain cụ thể
-```
-
-**Thứ tự ưu tiên**: Admin Override > Quota Plan > Global Settings.
-
-Quota Plan có `max_records` (tổng tất cả loại). Global Settings có limit riêng **từng loại**. Enforcement kiểm tra CẢ HAI:
+Enforcement kiểm tra cả giới hạn tổng và giới hạn từng loại:
 
 ```php
 // 1. Kiểm tra per-type limit (Global Settings)
@@ -272,13 +261,11 @@ if ($typeLimit > 0 && $currentTypeCount >= $typeLimit) {
     throw new QuotaExceededException("Đã đạt giới hạn {$typeLimit} bản ghi {$type}.");
 }
 
-// 2. Kiểm tra total limit (Quota Plan)
-if ($domain->quotaPlan) {
-    $totalLimit = $domain->quotaPlan->max_records;
-    $totalCount = DnsRecord::where('domain_id', $domainId)->active()->count();
-    if ($totalLimit > 0 && $totalCount >= $totalLimit) {
-        throw new QuotaExceededException("Đã đạt giới hạn {$totalLimit} bản ghi cho gói dịch vụ.");
-    }
+// 2. Kiểm tra total limit (Global Settings)
+$totalLimit = SettingsHelper::getInt('total_record_limit', 50);
+$totalCount = DnsRecord::where('domain_id', $domainId)->active()->count();
+if ($totalLimit > 0 && $totalCount >= $totalLimit) {
+    throw new QuotaExceededException("Đã đạt giới hạn {$totalLimit} bản ghi cho một tên miền.");
 }
 ```
 

@@ -65,7 +65,7 @@
 </div>
 
 <div class="alert alert-secondary py-2">
-    <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>2/10</strong> chuyển tiếp (Quota Plan)
+    <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>2/10</strong> chuyển tiếp
 </div>
 
 <script>

@@ -67,5 +67,5 @@
 </div>
 
 <div class="alert alert-secondary py-2">
-    <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>3/5</strong> chuyển hướng (Quota Plan)
+    <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>3/5</strong> chuyển hướng
 </div>

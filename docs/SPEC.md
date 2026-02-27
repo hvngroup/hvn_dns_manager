@@ -243,7 +243,6 @@ modules/addons/hvn_dns_manager/
 │   │   ├── Snapshot.php              # Eloquent: mod_hvndns_snapshots
 │   │   ├── RecordHistory.php         # Eloquent: mod_hvndns_record_history
 │   │   ├── Template.php              # Eloquent: mod_hvndns_templates
-│   │   ├── QuotaPlan.php             # Eloquent: mod_hvndns_quota_plans
 │   │   ├── DriftReport.php           # Eloquent: mod_hvndns_drift_reports
 │   │   └── IpBlacklist.php           # Eloquent: mod_hvndns_ip_blacklist
 │   │
@@ -285,7 +284,6 @@ modules/addons/hvn_dns_manager/
 │       ├── sync_logs.tpl
 │       ├── audit_trail.tpl
 │       ├── templates_manager.tpl
-│       ├── quota_plans.tpl
 │       ├── drift_report.tpl
 │       └── bulk_operations.tpl
 │
@@ -324,8 +322,7 @@ mod_hvndns_domains (1)───────(N) mod_hvndns_records
         │         ├──(N) mod_hvndns_snapshots
         │         ├──(N) mod_hvndns_dnssec
         │         ├──(N) mod_hvndns_ddns_tokens
-        │         ├──(N) mod_hvndns_drift_reports
-        │         └──(1) mod_hvndns_quota_plans (via WHMCS product)
+        │         └──(N) mod_hvndns_drift_reports
         │
         └──────────(N) mod_hvndns_audit_trail
 
@@ -380,7 +377,6 @@ CREATE TABLE mod_hvndns_domains (
     status          ENUM('active','suspended','terminated','pending_delete') DEFAULT 'active',
     ssl_status      ENUM('none','pending','active','expired','failed') DEFAULT 'none',
     ssl_expires_at  DATETIME NULL,
-    quota_plan_id   INT UNSIGNED NULL,               -- FK tới mod_hvndns_quota_plans
     notes           TEXT NULL,                        -- Admin notes
     provisioned_at  DATETIME NULL,                   -- Thời điểm zone tạo xong trên DA
     terminated_at   DATETIME NULL,
@@ -677,20 +673,6 @@ CREATE TABLE mod_hvndns_templates (
     description     TEXT NULL,
     is_default      TINYINT(1) DEFAULT 0,
     records_data    JSON NOT NULL,                    -- Template records with {{placeholders}}
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- mod_hvndns_quota_plans
-CREATE TABLE mod_hvndns_quota_plans (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    plan_name       VARCHAR(100) NOT NULL,
-    max_records     SMALLINT UNSIGNED DEFAULT 50,
-    max_subdomains  SMALLINT UNSIGNED DEFAULT 20,
-    max_redirects   SMALLINT UNSIGNED DEFAULT 5,
-    max_email_fwd   SMALLINT UNSIGNED DEFAULT 10,
-    ddns_enabled    TINYINT(1) DEFAULT 0,
-    dnssec_enabled  TINYINT(1) DEFAULT 0,
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

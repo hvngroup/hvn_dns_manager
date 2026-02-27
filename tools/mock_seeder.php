@@ -41,7 +41,7 @@ function truncateAll() {
         'mod_hvndns_dnssec', 'mod_hvndns_templates', 'mod_hvndns_snapshots',
         'mod_hvndns_record_history', 'mod_hvndns_audit_trail', 'mod_hvndns_sync_logs',
         'mod_hvndns_queue', 'mod_hvndns_records', 'mod_hvndns_domains',
-        'mod_hvndns_quota_plans', 'mod_hvndns_servers', 'mod_hvndns_settings',
+        'mod_hvndns_servers', 'mod_hvndns_settings',
         'mod_hvndns_schema_version'
     ];
     foreach ($tables as $table) {
@@ -93,29 +93,6 @@ function seedServers() {
     echo "[OK] Seeded DirectAdmin servers.\n";
 }
 
-function seedQuotaPlans() {
-    $plans = [
-        [
-            'plan_name' => 'Free',
-            'max_records' => 50,
-            'max_subdomains' => 5,
-            'ddns_enabled' => 0,
-            'dnssec_enabled' => 0,
-            'ssl_enabled' => 0
-        ],
-        [
-            'plan_name' => 'Pro',
-            'max_records' => 200,
-            'max_subdomains' => 50,
-            'ddns_enabled' => 1,
-            'dnssec_enabled' => 1,
-            'ssl_enabled' => 1
-        ]
-    ];
-    Capsule::table('mod_hvndns_quota_plans')->insert($plans);
-    echo "[OK] Seeded quota plans.\n";
-}
-
 function seedDomainsAndRecords() {
     $userId = 1; // mock client ID
 
@@ -124,7 +101,6 @@ function seedDomainsAndRecords() {
         'domain' => 'example.com',
         'whmcs_user_id' => $userId,
         'status' => 'active',
-        'quota_plan_id' => 2, // Pro
         'provisioned_at' => date('Y-m-d H:i:s')
     ]);
 
@@ -140,7 +116,6 @@ function seedDomainsAndRecords() {
         'domain' => 'my-shop.vn',
         'whmcs_user_id' => $userId,
         'status' => 'active',
-        'quota_plan_id' => 1, // Free
         'provisioned_at' => date('Y-m-d H:i:s')
     ]);
 
@@ -221,7 +196,6 @@ try {
     truncateAll();
     seedSettings();
     seedServers();
-    seedQuotaPlans();
     $domainIds = seedDomainsAndRecords();
     seedQueueAndLogs($domainIds);
     seedAuditTrail();

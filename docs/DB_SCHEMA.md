@@ -25,16 +25,15 @@
 10. [mod_hvndns_record_history](#10-mod_hvndns_record_history) — Lịch sử thay đổi record
 11. [mod_hvndns_snapshots](#11-mod_hvndns_snapshots) — Bản sao Zone
 12. [mod_hvndns_templates](#12-mod_hvndns_templates) — Mẫu DNS
-13. [mod_hvndns_quota_plans](#13-mod_hvndns_quota_plans) — Gói giới hạn tài nguyên
-14. [mod_hvndns_dnssec](#14-mod_hvndns_dnssec) — Thông số DNSSEC
-15. [mod_hvndns_ddns_tokens](#15-mod_hvndns_ddns_tokens) — Token DDNS
-16. [mod_hvndns_redirects](#16-mod_hvndns_redirects) — Chuyển hướng URL
-17. [mod_hvndns_email_forwards](#17-mod_hvndns_email_forwards) — Chuyển tiếp Email
-18. [mod_hvndns_drift_reports](#18-mod_hvndns_drift_reports) — Báo cáo lệch dữ liệu
-19. [mod_hvndns_ip_blacklist](#19-mod_hvndns_ip_blacklist) — Danh sách IP bị chặn
-20. [mod_hvndns_notification_cooldowns](#20-mod_hvndns_notification_cooldowns) — Kiểm soát tần suất cảnh báo
-21. [Phụ lục: Index Strategy](#21-phụ-lục-index-strategy)
-22. [Phụ lục: Data Retention Policy](#22-phụ-lục-data-retention-policy)
+13. [mod_hvndns_dnssec](#13-mod_hvndns_dnssec) — Thông số DNSSEC
+14. [mod_hvndns_ddns_tokens](#14-mod_hvndns_ddns_tokens) — Token DDNS
+15. [mod_hvndns_redirects](#15-mod_hvndns_redirects) — Chuyển hướng URL
+16. [mod_hvndns_email_forwards](#16-mod_hvndns_email_forwards) — Chuyển tiếp Email
+17. [mod_hvndns_drift_reports](#17-mod_hvndns_drift_reports) — Báo cáo lệch dữ liệu
+18. [mod_hvndns_ip_blacklist](#18-mod_hvndns_ip_blacklist) — Danh sách IP bị chặn
+19. [mod_hvndns_notification_cooldowns](#19-mod_hvndns_notification_cooldowns) — Kiểm soát tần suất cảnh báo
+20. [Phụ lục: Index Strategy](#20-phụ-lục-index-strategy)
+21. [Phụ lục: Data Retention Policy](#21-phụ-lục-data-retention-policy)
 
 ---
 
@@ -282,8 +281,7 @@ CREATE TABLE mod_hvndns_servers (
 | 5 | `status` | ENUM('active', 'suspended', 'terminated', 'pending_delete') | 📌 REQD DEFAULT `'active'` 📋 IDX | Trạng thái domain: `active` = hoạt động bình thường, Client có thể chỉnh sửa DNS; `suspended` = tạm ngưng (nợ phí), Client chỉ xem readonly, zone vẫn hoạt động trên DA; `terminated` = đã hủy, chuyển sang `pending_delete`; `pending_delete` = đang trong grace period 30 ngày trước khi xóa zone khỏi DA |
 | 6 | `ssl_status` | ENUM('none', 'pending', 'active', 'expired', 'failed') | 📌 REQD DEFAULT `'none'` | Trạng thái chứng chỉ SSL Let's Encrypt: `none` = chưa yêu cầu; `pending` = đang chờ cấp phát; `active` = đang hoạt động; `expired` = đã hết hạn; `failed` = cấp phát thất bại |
 | 7 | `ssl_expires_at` | DATETIME | NULL | Ngày hết hạn SSL certificate. Cron `ssl_checker` kiểm tra cột này để tự gia hạn khi còn < 7 ngày |
-| 8 | `quota_plan_id` | INT UNSIGNED | NULL 🔗 FK | FK tới `mod_hvndns_quota_plans.id`. Gói giới hạn tài nguyên áp dụng cho domain này. `NULL` = không giới hạn (unlimited) hoặc chưa cấu hình |
-| 9 | `default_ip` | VARCHAR(45) | NULL | IP mặc định cho domain (dùng khi áp template). Lấy từ WHMCS Product custom field hoặc Admin nhập tay |
+| 8 | `default_ip` | VARCHAR(45) | NULL | IP mặc định cho domain (dùng khi áp template). Lấy từ WHMCS Product custom field hoặc Admin nhập tay |
 | 10 | `notes` | TEXT | NULL | Ghi chú nội bộ Admin (VD: "Khách VIP — ưu tiên xử lý", "Domain đang chờ transfer NS") |
 | 11 | `provisioned_at` | DATETIME | NULL | Thời điểm zone được tạo thành công trên TẤT CẢ DA Node. `NULL` = chưa provision xong (vẫn đang queue) |
 | 12 | `suspended_at` | DATETIME | NULL | Thời điểm domain bị suspend. Dùng cho báo cáo |
@@ -308,7 +306,6 @@ CREATE TABLE mod_hvndns_domains (
     status          ENUM('active','suspended','terminated','pending_delete') NOT NULL DEFAULT 'active',
     ssl_status      ENUM('none','pending','active','expired','failed') NOT NULL DEFAULT 'none',
     ssl_expires_at  DATETIME NULL,
-    quota_plan_id   INT UNSIGNED NULL,
     default_ip      VARCHAR(45) NULL,
     notes           TEXT NULL,
     provisioned_at  DATETIME NULL,
@@ -320,8 +317,7 @@ CREATE TABLE mod_hvndns_domains (
     UNIQUE INDEX uniq_domain (domain),
     INDEX idx_whmcs_user (whmcs_user_id),
     INDEX idx_whmcs_service (whmcs_service_id),
-    INDEX idx_status (status),
-    FOREIGN KEY (quota_plan_id) REFERENCES mod_hvndns_quota_plans(id) ON DELETE SET NULL
+    INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
@@ -699,47 +695,7 @@ CREATE TABLE mod_hvndns_templates (
 
 ---
 
-## 13. mod_hvndns_quota_plans
-
-> **Mục đích**: Định nghĩa các gói giới hạn tài nguyên DNS. Map vào WHMCS Product để phân tầng dịch vụ (Basic/Pro/Enterprise).
-
-| # | Cột | Kiểu | Ràng buộc | Mô tả |
-|---|-----|------|-----------|-------|
-| 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID plan |
-| 2 | `plan_name` | VARCHAR(100) | 📌 REQD 🦄 UNIQ | Tên gói. VD: "DNS Basic", "DNS Pro", "DNS Enterprise" |
-| 3 | `max_records` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `50` | Số bản ghi DNS tối đa cho 1 domain. `0` = unlimited |
-| 4 | `max_subdomains` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `20` | Số subdomain riêng biệt tối đa. `0` = unlimited |
-| 5 | `max_redirects` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `5` | Số URL redirect tối đa. `0` = unlimited |
-| 6 | `max_email_fwd` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `10` | Số email forwarder tối đa. `0` = unlimited |
-| 7 | `max_ddns_tokens` | SMALLINT UNSIGNED | 📌 REQD DEFAULT `2` | Số DDNS token tối đa. `0` = unlimited |
-| 8 | `ddns_enabled` | TINYINT(1) | 📌 REQD DEFAULT `0` | Gói này cho phép DDNS? `0` = không, `1` = có |
-| 9 | `dnssec_enabled` | TINYINT(1) | 📌 REQD DEFAULT `0` | Gói này cho phép DNSSEC? `0` = không, `1` = có |
-| 10 | `ssl_enabled` | TINYINT(1) | 📌 REQD DEFAULT `0` | Gói này cho phép Auto-SSL? `0` = không, `1` = có |
-| 11 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo |
-| 12 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
-
-```sql
-CREATE TABLE mod_hvndns_quota_plans (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    plan_name       VARCHAR(100) NOT NULL,
-    max_records     SMALLINT UNSIGNED NOT NULL DEFAULT 50,
-    max_subdomains  SMALLINT UNSIGNED NOT NULL DEFAULT 20,
-    max_redirects   SMALLINT UNSIGNED NOT NULL DEFAULT 5,
-    max_email_fwd   SMALLINT UNSIGNED NOT NULL DEFAULT 10,
-    max_ddns_tokens SMALLINT UNSIGNED NOT NULL DEFAULT 2,
-    ddns_enabled    TINYINT(1) NOT NULL DEFAULT 0,
-    dnssec_enabled  TINYINT(1) NOT NULL DEFAULT 0,
-    ssl_enabled     TINYINT(1) NOT NULL DEFAULT 0,
-    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    UNIQUE INDEX uniq_plan_name (plan_name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
----
-
-## 14. mod_hvndns_dnssec
+## 13. mod_hvndns_dnssec
 
 > **Mục đích**: Lưu thông số DNSSEC (DS Records) cho từng domain. Sau khi enable DNSSEC trên DA, thông tin keys được lưu ở đây để hiển thị cho Client mang đi cấu hình tại nhà đăng ký.
 
@@ -780,7 +736,7 @@ CREATE TABLE mod_hvndns_dnssec (
 
 ---
 
-## 15. mod_hvndns_ddns_tokens
+## 14. mod_hvndns_ddns_tokens
 
 > **Mục đích**: Quản lý token xác thực cho DDNS endpoint. Router/Camera dùng token để cập nhật IP tự động mà không cần đăng nhập WHMCS.
 
@@ -820,7 +776,7 @@ CREATE TABLE mod_hvndns_ddns_tokens (
 
 ---
 
-## 16. mod_hvndns_redirects
+## 15. mod_hvndns_redirects
 
 > **Mục đích**: Lưu cấu hình chuyển hướng URL (301/302/Masked). Được quản lý tách biệt khỏi DNS records vì redirect đòi hỏi web server config, không chỉ DNS.
 
@@ -858,7 +814,7 @@ CREATE TABLE mod_hvndns_redirects (
 
 ---
 
-## 17. mod_hvndns_email_forwards
+## 16. mod_hvndns_email_forwards
 
 > **Mục đích**: Quản lý email forwarding và catch-all. Đồng bộ qua Queue lên DirectAdmin.
 
@@ -892,7 +848,7 @@ CREATE TABLE mod_hvndns_email_forwards (
 
 ---
 
-## 18. mod_hvndns_drift_reports
+## 17. mod_hvndns_drift_reports
 
 > **Mục đích**: Kết quả scan drift hàng đêm — phát hiện sự khác biệt giữa DNS trên DirectAdmin và DB local WHMCS.
 
@@ -935,7 +891,7 @@ CREATE TABLE mod_hvndns_drift_reports (
 
 ---
 
-## 19. mod_hvndns_ip_blacklist
+## 18. mod_hvndns_ip_blacklist
 
 > **Mục đích**: Danh sách IP bị tạm chặn do phát hiện hành vi brute force trên DDNS endpoint. Auto-expire sau thời gian cấu hình.
 
@@ -964,7 +920,7 @@ CREATE TABLE mod_hvndns_ip_blacklist (
 
 ---
 
-## 20. mod_hvndns_notification_cooldowns
+## 19. mod_hvndns_notification_cooldowns
 
 > **Mục đích**: Kiểm soát tần suất gửi cảnh báo. Tránh spam Admin khi server down kéo dài — cùng 1 loại alert chỉ gửi 1 lần mỗi X phút.
 
@@ -992,7 +948,7 @@ CREATE TABLE mod_hvndns_notification_cooldowns (
 
 ---
 
-## 21. Phụ lục: Index Strategy
+## 20. Phụ lục: Index Strategy
 
 ### 21.1. Tổng hợp tất cả Indexes
 
@@ -1042,7 +998,7 @@ Index `idx_worker_pickup(status, next_retry_at, priority, scheduled_at)` PHẢI 
 
 ---
 
-## 22. Phụ lục: Data Retention Policy
+## 21. Phụ lục: Data Retention Policy
 
 | Bảng | Retention | Cơ chế xóa | Ghi chú |
 |------|-----------|------------|---------|

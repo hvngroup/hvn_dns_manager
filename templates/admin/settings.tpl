@@ -329,11 +329,22 @@
                             ════════════════════════════════ -->
                             <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='limits'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-1"><i class="bi bi-bar-chart-steps hvn-text-secondary"></i> Record Limits — Giới hạn Số lượng</h5>
-                                <div class="small hvn-text-muted hvn-mb-4">Ưu tiên: Admin Override &gt; Quota Plan &gt; Global Settings. <code>0</code> = unlimited.</div>
+                                <div class="small hvn-text-muted hvn-mb-4">Ưu tiên: Admin Override &gt; Global Settings. <code>0</code> = unlimited.</div>
 
-                                <!-- Static record limit inputs -->
+                                <!-- Total record limit -->
+                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                    <div>
+                                        <div class="hvn-fw-bold">Tổng số bản ghi tối đa / Domain <code class="hvn-text-muted small">total_record_limit</code></div>
+                                        <div class="small hvn-text-muted">Giới hạn tổng tất cả các loại bản ghi của một tên miền.</div>
+                                    </div>
+                                    <div class="hvn-input-group" style="max-width: 200px;">
+                                        <input type="number" class="hvn-form-control" x-model="s.total_record_limit" min="0">
+                                        <span class="hvn-input-group-text">records</span>
+                                    </div>
+                                </div>
 
-                                <div class="hvn-row g-3 hvn-mt-1">
+                                <h6 class="hvn-fw-bold hvn-mb-3">Giới hạn theo từng loại bản ghi</h6>
+                                <div class="hvn-row g-3">
                                     <div class="hvn-col-md-6 hvn-col-lg-4">
                                         <label class="form-label hvn-fw-bold hvn-mb-1">A <code class="hvn-text-muted small">a_record_limit</code></label>
                                         <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.a_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
@@ -466,7 +477,7 @@
                                             </div>
                                             <div class="form-check hvn-mb-2">
                                                 <input class="form-check-input" type="radio" name="ddnsMode" id="ddnsFree" value="free" x-model="s.ddns_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="ddnsFree">Free — Mở theo Quota Plan</label>
+                                                <label class="form-check-label hvn-fw-bold" for="ddnsFree">Free — Miễn phí</label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="ddnsMode" id="ddnsPaid" value="paid" x-model="s.ddns_mode">
@@ -527,7 +538,7 @@
                                             </div>
                                             <div class="form-check hvn-mb-3">
                                                 <input class="form-check-input" type="radio" name="dnssecMode" id="dnssecFree" value="free" x-model="s.dnssec_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="dnssecFree">Free — Miễn phí theo Quota Plan</label>
+                                                <label class="form-check-label hvn-fw-bold" for="dnssecFree">Free — Miễn phí</label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="dnssecMode" id="dnssecPaid" value="paid" x-model="s.dnssec_mode">
@@ -1028,6 +1039,7 @@ document.addEventListener('alpine:init', () => {
             allow_modify_ns: false,
 
             // Record Limits
+            total_record_limit: 50,
             a_record_limit: 100,
             aaaa_record_limit: 100,
             cname_record_limit: 100,

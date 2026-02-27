@@ -113,7 +113,7 @@
     </div>
     
     <div class="alert alert-secondary py-2">
-        <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>2/{$quota.max_ddns_tokens|default:5}</strong> Token DDNS (Quota Plan)
+        <i class="bi bi-bar-chart-fill"></i> Đang dùng: <strong>2/{$quota.max_ddns_tokens|default:5}</strong> Token DDNS
     </div>
 {/if}
 

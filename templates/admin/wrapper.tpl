@@ -48,9 +48,6 @@
                 <a href="{$modulelink}&action=templates" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'templates' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
                     <i class="bi bi-file-text hvn-me-2"></i> Templates
                 </a>
-                <a href="{$modulelink}&action=quota_plans" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'quota_plans' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-box-seam hvn-me-2"></i> Quota Plans
-                </a>
                 <a href="{$modulelink}&action=drift_reports" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'drift_reports' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
                     <i class="bi bi-arrow-left-right hvn-me-2"></i> Drift Reports
                 </a>
