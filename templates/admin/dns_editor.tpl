@@ -112,18 +112,22 @@
 </div>
 
 <script>
+    // Biến Smarty phải khai báo NGOÀI {literal} block
+    var _adminRecords = {$recordsJson|default:'[{"id":1,"type":"A","name":"@","value":"203.0.113.10","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":2,"type":"MX","name":"@","value":"mail.example.com.","priority":10,"ttl":3600,"is_system":false,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":3,"type":"CNAME","name":"www","value":"example.com.","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"syncing"},{"id":4,"type":"TXT","name":"@","value":"v=spf1 include:mailgun.org ~all","ttl":600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":5,"type":"NS","name":"@","value":"ns1.hvn.vn.","ttl":86400,"is_system":true,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":6,"type":"AAAA","name":"ipv6","value":"2001:db8::1","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"failed"}]'};
+</script>
+<script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('adminDnsEditor', () => ({
         searchQuery: '',
-        records: {$recordsJson|default:'[]' }, // Passed from Controller
+        records: _adminRecords,
 
         get filteredRecords() {
             if(this.searchQuery === '') return this.records;
             const text = this.searchQuery.toLowerCase();
-            return this.records.filter(r => 
-                r.name.toLowerCase().includes(text) || 
-                r.value.toLowerCase().includes(text) || 
+            return this.records.filter(r =>
+                r.name.toLowerCase().includes(text) ||
+                r.value.toLowerCase().includes(text) ||
                 r.type.toLowerCase().includes(text)
             );
         },
@@ -135,16 +139,15 @@ document.addEventListener('alpine:init', () => {
             window.dispatchEvent(new CustomEvent('open-record-modal', { detail: { isEdit: true, record: record } }));
         },
         deleteRecord(record) {
-            if(confirm(`Admin Privilege: Xóa vĩnh viễn bản ghi ${record.name} (${record.type})?`)) {
+            if(confirm('Admin Privilege: X\u00f3a v\u0129nh vi\u1ec5n b\u1ea3n ghi ' + record.name + ' (' + record.type + ')?')) {
                 record.pending_delete = true;
                 setTimeout(() => {
                     this.records = this.records.filter(r => r.id !== record.id);
-                    showToast('Đã xóa', 'Record deleted and sync started.', 'success'); // Requires showToast function
                 }, 1000);
             }
         },
         toggleLock(record) {
-            alert(`Đã ${record.is_locked ? 'KHÓA' : 'MỞ KHÓA' } bản ghi: Client không thể chỉnh sửa bản ghi bị khóa.`);
+            alert((record.is_locked ? 'KH\u00d3A' : 'M\u1ede KH\u00d3A') + ' b\u1ea3n ghi: Client kh\u00f4ng th\u1ec3 ch\u1ec9nh s\u1eeda b\u1ea3n ghi b\u1ecb kh\u00f3a.');
         }
     }));
 });

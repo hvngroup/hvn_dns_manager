@@ -54,11 +54,36 @@
                 <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0">
                     <thead class="hvn-table-light">
                         <tr>
-                            <th class="hvn-ps-4">Domain</th>
-                            <th>Khách hàng</th>
-                            <th class="hvn-text-center">Records</th>
-                            <th>Sync gần nhất</th>
-                            <th>Trạng thái</th>
+                            <th class="hvn-ps-4" style="cursor:pointer;white-space:nowrap;" @click="sortBy('domain')">
+                                Domain
+                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                    <span x-text="sortCol === 'domain' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
+                                </span>
+                            </th>
+                            <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('client_name')">
+                                Khách hàng
+                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                    <span x-text="sortCol === 'client_name' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
+                                </span>
+                            </th>
+                            <th class="hvn-text-center" style="cursor:pointer;white-space:nowrap;" @click="sortBy('records_count')">
+                                Records
+                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                    <span x-text="sortCol === 'records_count' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
+                                </span>
+                            </th>
+                            <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('failed_jobs')">
+                                Sync gần nhất
+                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                    <span x-text="sortCol === 'failed_jobs' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
+                                </span>
+                            </th>
+                            <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('status')">
+                                Trạng thái
+                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                    <span x-text="sortCol === 'status' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
+                                </span>
+                            </th>
                             <th class="hvn-text-end hvn-pe-4">Hành động</th>
                         </tr>
                     </thead>
@@ -190,7 +215,9 @@ document.addEventListener('alpine:init', () => {
         totalPages: 7,
         currentPage: 1,
         perPage: 50,
-        syncingId: null,     // ID domain đang được force re-sync
+        syncingId: null,
+        sortCol: 'domain',
+        sortDir: 'asc',
         filters: { search: '', status: '', server: '', errorOnly: false },
 
         init() {
@@ -199,8 +226,30 @@ document.addEventListener('alpine:init', () => {
 
         resetFilters() {
             this.filters = { search: '', status: '', server: '', errorOnly: false };
+            this.sortCol = 'domain';
+            this.sortDir = 'asc';
             this.currentPage = 1;
             this.fetchDomains();
+        },
+
+        sortBy(col) {
+            if (this.sortCol === col) {
+                this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortCol = col;
+                this.sortDir = 'asc';
+            }
+            // Client-side sort trên data hiện tại
+            this.domains = [...this.domains].sort((a, b) => {
+                var va = a[col] ?? '';
+                var vb = b[col] ?? '';
+                if (typeof va === 'number' && typeof vb === 'number') {
+                    return this.sortDir === 'asc' ? va - vb : vb - va;
+                }
+                return this.sortDir === 'asc'
+                    ? String(va).localeCompare(String(vb))
+                    : String(vb).localeCompare(String(va));
+            });
         },
 
         goToPage(page) {
