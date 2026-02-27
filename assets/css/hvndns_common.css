@@ -1378,22 +1378,9 @@
 .hvn-wrapper .form-check, .hvn-admin-layout .form-check {
     display: block; min-height: 1.5rem; padding-left: 1.5em; margin-bottom: 0.125rem;
 }
-.hvn-wrapper .form-check-input, .hvn-admin-layout .form-check-input {
-    float: left; margin-left: -1.5em; width: 1em; height: 1em; margin-top: 0.25em;
-    vertical-align: top; appearance: none; background-color: #fff;
-    background-repeat: no-repeat; background-position: center; background-size: contain;
-    border: 1px solid rgba(0,0,0,0.25); border-radius: 0.25em;
-}
-.hvn-wrapper .form-check-input[type=radio], .hvn-admin-layout .form-check-input[type=radio] { border-radius: 50%; }
-.hvn-wrapper .form-check-input:checked, .hvn-admin-layout .form-check-input:checked { background-color: var(--hvn-primary); border-color: var(--hvn-primary); }
 .hvn-wrapper .form-check-label, .hvn-admin-layout .form-check-label { cursor: pointer; }
 .hvn-wrapper .form-switch, .hvn-admin-layout .form-switch { padding-left: 2.5em; }
-.hvn-wrapper .form-switch .form-check-input, .hvn-admin-layout .form-switch .form-check-input {
-    width: 2em; margin-left: -2.5em; border-radius: 2em;
-}
-.hvn-wrapper .form-switch .form-check-input:checked, .hvn-admin-layout .form-switch .form-check-input:checked {
-    background-color: var(--hvn-primary); border-color: var(--hvn-primary);
-}
+
 
 /* --- Buttons (scoped) --- */
 .hvn-wrapper .btn-sm,   .hvn-admin-layout .btn-sm   { padding: 4px 8px; font-size: 13px; border-radius: var(--hvn-border-radius-sm); }
