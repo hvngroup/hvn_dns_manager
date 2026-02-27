@@ -467,23 +467,13 @@
                             <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ddns'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-router hvn-text-primary"></i> Dynamic DNS (DDNS)</h5>
 
-                                <div class="hvn-mb-4">
-                                    <label class="form-label hvn-fw-bold">Chế độ hoạt động <code class="hvn-text-muted small">ddns_mode</code> <span class="hvn-text-danger">*</span></label>
-                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
-                                        <div class="hvn-card-body">
-                                            <div class="form-check hvn-mb-2">
-                                                <input class="form-check-input" type="radio" name="ddnsMode" id="ddnsOff" value="off" x-model="s.ddns_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="ddnsOff">Off — Tắt hoàn toàn</label>
-                                            </div>
-                                            <div class="form-check hvn-mb-2">
-                                                <input class="form-check-input" type="radio" name="ddnsMode" id="ddnsFree" value="free" x-model="s.ddns_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="ddnsFree">Free — Miễn phí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="ddnsMode" id="ddnsPaid" value="paid" x-model="s.ddns_mode">
-                                                <label class="form-check-label hvn-fw-bold hvn-text-primary" for="ddnsPaid">Paid — Yêu cầu mua Addon WHMCS</label>
-                                            </div>
-                                        </div>
+                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                    <div>
+                                        <div class="hvn-fw-bold">Kích hoạt Dynamic DNS (DDNS) <code class="hvn-text-muted small">enable_ddns</code></div>
+                                        <div class="small hvn-text-muted">Cho phép khách hàng sử dụng API để cập nhật IP động.</div>
+                                    </div>
+                                    <div class="form-check form-switch hvn-ms-3">
+                                        <input class="form-check-input" type="checkbox" x-model="s.enable_ddns">
                                     </div>
                                 </div>
 
@@ -527,25 +517,13 @@
                             <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='dnssec'" role="tabpanel">
                                 <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-shield-check hvn-text-success"></i> DNSSEC — Bảo mật tên miền</h5>
 
-                                <div class="hvn-mb-4">
-                                    <label class="form-label hvn-fw-bold">Chế độ hoạt động <code class="hvn-text-muted small">dnssec_mode</code> <span class="hvn-text-danger">*</span></label>
-                                    <div class="hvn-card hvn-border-0 hvn-bg-light">
-                                        <div class="hvn-card-body">
-                                            <div class="form-check hvn-mb-3">
-                                                <input class="form-check-input" type="radio" name="dnssecMode" id="dnssecOff" value="off" x-model="s.dnssec_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="dnssecOff">Off — Tắt hoàn toàn</label>
-                                                <div class="small hvn-text-muted">Ẩn tab DNSSEC với mọi client.</div>
-                                            </div>
-                                            <div class="form-check hvn-mb-3">
-                                                <input class="form-check-input" type="radio" name="dnssecMode" id="dnssecFree" value="free" x-model="s.dnssec_mode">
-                                                <label class="form-check-label hvn-fw-bold" for="dnssecFree">Free — Miễn phí</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="dnssecMode" id="dnssecPaid" value="paid" x-model="s.dnssec_mode">
-                                                <label class="form-check-label hvn-fw-bold hvn-text-primary" for="dnssecPaid">Paid — Yêu cầu Addon WHMCS</label>
-                                                <div class="small hvn-text-muted">Hiển thị Upsell Card nếu client chưa mua.</div>
-                                            </div>
-                                        </div>
+                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                    <div>
+                                        <div class="hvn-fw-bold">Kích hoạt DNSSEC <code class="hvn-text-muted small">enable_dnssec</code></div>
+                                        <div class="small hvn-text-muted">Cho phép khách hàng bật DNSSEC cho tên miền.</div>
+                                    </div>
+                                    <div class="form-check form-switch hvn-ms-3">
+                                        <input class="form-check-input" type="checkbox" x-model="s.enable_dnssec">
                                     </div>
                                 </div>
 
@@ -559,7 +537,7 @@
                                     </div>
                                 </div>
 
-                                <div class="hvn-alert hvn-alert-warning" x-show="s.dnssec_mode !== 'off'">
+                                <div class="hvn-alert hvn-alert-warning" x-show="s.enable_dnssec">
                                     <i class="bi bi-exclamation-triangle-fill"></i> Yêu cầu DA Server đã bật <code>dnssec=1</code> trong cấu hình máy chủ.
                                 </div>
                             </div>
@@ -1063,7 +1041,7 @@ document.addEventListener('alpine:init', () => {
             email_verify_template: '',
 
             // DDNS
-            ddns_mode: 'off',
+            enable_ddns: false,
             ddns_rate_limit: 60,
             ddns_token_limit: 5,
             enable_ddns_bruteforce: true,
@@ -1072,7 +1050,7 @@ document.addEventListener('alpine:init', () => {
             ddns_bruteforce_ban_duration: 3600,
 
             // DNSSEC
-            dnssec_mode: 'off',
+            enable_dnssec: false,
             dnssec_auto_resign: true,
 
             // SSL
