@@ -509,6 +509,7 @@
     font-weight: 700;
     line-height: 1;
     color: #fff;
+    background-color: #6c757d; /* default fallback — tránh chữ trắng trên nền trắng */
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
