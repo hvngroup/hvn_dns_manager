@@ -69,13 +69,27 @@
                 <table class="table table-hover align-middle hvn-mb-0 font-monospace" style="font-size: 12px">
                     <thead class="table-light">
                         <tr>
-                            <th class="hvn-ps-3">ID</th>
-                            <th>Thời gian</th>
-                            <th>Domain</th>
-                            <th>Action</th>
-                            <th>Server</th>
-                            <th>Status</th>
-                            <th>ms</th>
+                            <th class="hvn-ps-3 hvn-sortable" @click="setSort('id')">
+                                ID <span x-text="sortIcon('id')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('time')">
+                                Thời gian <span x-text="sortIcon('time')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('domain')">
+                                Domain <span x-text="sortIcon('domain')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('action')">
+                                Action <span x-text="sortIcon('action')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('server')">
+                                Server <span x-text="sortIcon('server')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('status')">
+                                Status <span x-text="sortIcon('status')"></span>
+                            </th>
+                            <th class="hvn-sortable" @click="setSort('ms')">
+                                ms <span x-text="sortIcon('ms')"></span>
+                            </th>
                             <th class="hvn-text-end hvn-pe-3"></th>
                         </tr>
                     </thead>
@@ -138,6 +152,24 @@
     </nav>
 </div>
 
+<style>
+{literal}
+.hvn-sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.hvn-sortable:hover {
+    background-color: rgba(0,0,0,.06);
+}
+.hvn-sortable span {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-left: 2px;
+}
+{/literal}
+</style>
+
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
@@ -145,6 +177,8 @@ document.addEventListener('alpine:init', () => {
         filterDomain: '', filterStatus: '', filterServer: '', filterAction: '',
         perPage: 100,
         currentPage: 1,
+        sortBy: 'id',
+        sortDir: 'desc',
 
         allLogs: [
             {id:4521,time:'2026-02-27 14:32',domain:'myblog.net',    action:'DELETE_RECORD',details:'A @ 1.2.3.4',         server:'dns3.hvn.vn',status:'failed',  error_brief:'Connection timeout',ms:null},
@@ -204,13 +238,36 @@ document.addEventListener('alpine:init', () => {
         ],
 
         get filteredLogs() {
-            return this.allLogs.filter(l => {
+            const filtered = this.allLogs.filter(l => {
                 if (this.filterDomain && !l.domain.includes(this.filterDomain)) return false;
                 if (this.filterStatus && l.status !== this.filterStatus) return false;
                 if (this.filterServer && l.server !== this.filterServer) return false;
                 if (this.filterAction && l.action !== this.filterAction) return false;
                 return true;
             });
+            const key = this.sortBy;
+            const dir = this.sortDir === 'asc' ? 1 : -1;
+            return filtered.sort((a, b) => {
+                const av = a[key] ?? '';
+                const bv = b[key] ?? '';
+                if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+                return String(av).localeCompare(String(bv)) * dir;
+            });
+        },
+
+        setSort(col) {
+            if (this.sortBy === col) {
+                this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortBy = col;
+                this.sortDir = col === 'id' || col === 'time' ? 'desc' : 'asc';
+            }
+            this.currentPage = 1;
+        },
+
+        sortIcon(col) {
+            if (this.sortBy !== col) return '⇅';
+            return this.sortDir === 'asc' ? '▲' : '▼';
         },
 
         get pagedLogs() {
