@@ -86,7 +86,7 @@
                         <!-- Data Rows -->
                         <template x-if="!loading && domains.length > 0">
                             <template x-for="domain in domains" :key="domain.id">
-                                <tr>
+                                <tr :style="syncingId === domain.id ? 'background: rgba(13,110,253,0.05);' : ''">
                                     <td class="hvn-ps-4 font-monospace hvn-fw-bold">
                                         <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="text-decoration-none">
                                             <span x-text="domain.domain"></span>
@@ -105,19 +105,29 @@
                                         </template>
                                     </td>
                                     <td>
-                                        <template x-if="domain.status === 'active'">
-                                            <template x-if="domain.sync_status === 'complete'">
-                                                <span class="hvn-badge hvn-bg-success">🟢 Active</span>
-                                            </template>
-                                            <template x-if="domain.sync_status === 'syncing'">
-                                                <span class="hvn-badge hvn-bg-info"><span class="hvn-spinner-border hvn-spinner-border-sm" role="status" aria-hidden="true" style="width: 0.75rem; height: 0.75rem;"></span> Syncing</span>
-                                            </template>
-                                            <template x-if="domain.sync_status === 'failed'">
-                                                <span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡 Sync Failed</span>
-                                            </template>
+                                        <!-- Đang force re-sync: hiện spinner -->
+                                        <template x-if="syncingId === domain.id">
+                                            <span class="hvn-badge" style="background:#0d6efd;color:#fff;">
+                                                <span class="hvn-spinner-border hvn-spinner-border-sm" style="width:.7rem;height:.7rem;" role="status"></span>
+                                                Re-syncing...
+                                            </span>
                                         </template>
-                                        <template x-if="domain.status !== 'active'">
-                                            <span class="hvn-badge hvn-bg-danger" x-text="'🔴 ' + domain.status"></span>
+                                        <!-- Trạng thái bình thường -->
+                                        <template x-if="syncingId !== domain.id && domain.status === 'active'">
+                                            <span>
+                                                <template x-if="domain.sync_status === 'complete'">
+                                                    <span class="hvn-badge hvn-bg-success">&#x1F7E2; Active</span>
+                                                </template>
+                                                <template x-if="domain.sync_status === 'syncing'">
+                                                    <span class="hvn-badge hvn-bg-info"><span class="hvn-spinner-border hvn-spinner-border-sm" role="status" style="width:.75rem;height:.75rem;"></span> Syncing</span>
+                                                </template>
+                                                <template x-if="domain.sync_status === 'failed'">
+                                                    <span class="hvn-badge hvn-bg-warning hvn-text-dark">&#x1F7E1; Sync Failed</span>
+                                                </template>
+                                            </span>
+                                        </template>
+                                        <template x-if="syncingId !== domain.id && domain.status !== 'active'">
+                                            <span class="hvn-badge hvn-bg-danger" x-text="domain.status"></span>
                                         </template>
                                     </td>
                                     <td class="hvn-text-end hvn-pe-4" style="white-space: nowrap;">
@@ -128,15 +138,16 @@
                                         <div class="hvn-dropdown hvn-d-inline-block" style="position: relative;">
                                             <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary hvn-dropdown-toggle"
                                                     type="button"
+                                                    :disabled="syncingId === domain.id"
                                                     @click.stop="openDropdown($event)">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
                                             <ul class="hvn-dropdown-menu hvn-dropdown-menu-end">
-                                                <li><a class="hvn-dropdown-item" :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"><i class="bi bi-sliders hvn-text-primary"></i> Sửa DNS Records</a></li>
-                                                <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
+                                                <li><a class="hvn-dropdown-item" :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"><i class="bi bi-sliders hvn-text-primary"></i> S&#x1EED;a DNS Records</a></li>
+                                                <li><a class="hvn-dropdown-item" href="#" @click.prevent="forceResync(domain)"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
                                                 <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
                                                 <li><hr class="hvn-dropdown-divider"></li>
-                                                <li><a class="hvn-dropdown-item" :href="'clientsservices.php?userid=' + domain.client_id + '&id=' + domain.service_id"><i class="bi bi-box"></i> Quản lý Service WHMCS</a></li>
+                                                <li><a class="hvn-dropdown-item" :href="'clientsservices.php?userid=' + domain.client_id + '&id=' + domain.service_id"><i class="bi bi-box"></i> Qu&#x1EA3;n l&#xFD; Service WHMCS</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -179,6 +190,7 @@ document.addEventListener('alpine:init', () => {
         totalPages: 7,
         currentPage: 1,
         perPage: 50,
+        syncingId: null,     // ID domain đang được force re-sync
         filters: { search: '', status: '', server: '', errorOnly: false },
 
         init() {
@@ -222,6 +234,42 @@ document.addEventListener('alpine:init', () => {
                 menu.style.left = 'auto';
                 menu.style.minWidth = '200px';
                 menu.classList.add('hvn-show');
+            }
+        },
+
+        // Force re-sync: đặt syncingId → gọi API → clear khi xong
+        async forceResync(domain) {
+            if (this.syncingId !== null) return; // tránh double-click
+            this.syncingId = domain.id;
+
+            // Đóng dropdown
+            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
+                m.classList.remove('hvn-show');
+            });
+
+            try {
+                // TODO: thay bằng AJAX thực tế khi backend sẵn sàng
+                // const res = await fetch(window.HVNDNS_BASE_URL + '&action=ajax&method=forceResync', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                //     body: JSON.stringify({ domain_id: domain.id })
+                // });
+                // const data = await res.json();
+
+                // Mock: giả lập 2.5s xử lý
+                await new Promise(r => setTimeout(r, 2500));
+
+                // Cập nhật trạng thái domain trong list
+                var idx = this.domains.findIndex(d => d.id === domain.id);
+                if (idx !== -1) {
+                    this.domains[idx].sync_status = 'complete';
+                    this.domains[idx].failed_jobs = 0;
+                    this.domains[idx].last_sync = 'Vừa xong';
+                }
+            } catch (e) {
+                console.error('Force re-sync thất bại:', e);
+            } finally {
+                this.syncingId = null;
             }
         },
 
