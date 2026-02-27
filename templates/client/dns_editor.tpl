@@ -1,11 +1,73 @@
+{* ── Load Alpine.js + Bootstrap Icons (chỉ inject nếu chưa có) ── *}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+{* ── Alpine data + config PHẢI đặt TRƯỚC khi Alpine load ── *}
+<script>
+    var HVNDNS_CONFIG = {
+        domainId: {$domain.id|intval},
+        records: {$recordsJson nofilter}
+    };
+
+    document.addEventListener('alpine:init', function() {
+        Alpine.data('dnsEditor', function() {
+            return {
+                domainId: HVNDNS_CONFIG.domainId,
+                records: HVNDNS_CONFIG.records,
+                filterType: 'all',
+                searchQuery: '',
+                activeTab: 'records',
+
+                get filteredRecords() {
+                    return this.records.filter(function(record) {
+                        var typeMatch = this.filterType === 'all' || record.type === this.filterType;
+                        var searchMatch = this.searchQuery === '' 
+                            || record.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+                            || record.value.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        return typeMatch && searchMatch;
+                    }.bind(this));
+                },
+
+                getTypeBadgeClass(type) {
+                    var classes = {
+                        'A': 'bg-primary', 'AAAA': 'bg-info text-dark', 'CNAME': 'bg-purple',
+                        'MX': 'bg-warning text-dark', 'TXT': 'bg-success', 'SRV': 'bg-danger',
+                        'NS': 'bg-secondary', 'CAA': 'bg-dark'
+                    };
+                    return classes[type] || 'bg-secondary';
+                },
+
+                formatTTL(ttl) {
+                    var map = { 60:'1m', 300:'5m', 1800:'30m', 3600:'1h', 14400:'4h', 43200:'12h', 86400:'24h' };
+                    return map[ttl] || ttl + 's';
+                },
+
+                deleteRecord(record) {
+                    if (confirm('Bạn có chắc muốn xóa bản ghi: ' + record.name + ' ' + record.type + '?')) {
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: 'Đã Xóa', msg: 'Bản ghi ' + record.name + ' đang được xóa...', type: 'danger' }
+                        }));
+                    }
+                },
+
+                retryRecord(id) {
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' }
+                    }));
+                }
+            };
+        });
+    });
+</script>
+
 <div class="hvn-dns-client" x-data="dnsEditor()">
-    <!-- Header -->
+    {* ── Header ── *}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a href="index.php?m=hvn_dns_manager" class="text-decoration-none">
             &larr; Quay lại danh sách domain
         </a>
     </div>
 
+    {* ── Domain Info Card ── *}
     <div class="card mb-4 border-primary">
         <div class="card-body">
             <h2 class="card-title d-flex align-items-center gap-2 mb-3">
@@ -37,146 +99,99 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs mb-4" id="dnsTabs" role="tablist">
+    {* ── Navigation Tabs (Alpine-powered, không phụ thuộc BS JS) ── *}
+    <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold" id="records-tab" data-bs-toggle="tab" data-bs-target="#records" type="button" role="tab" aria-controls="records" aria-selected="true">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'records' }" @click="activeTab = 'records'" type="button">
                 DNS Records
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-dark" id="redirects-tab" data-bs-toggle="tab" data-bs-target="#redirects" type="button" role="tab" aria-controls="redirects" aria-selected="false">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'redirects' }" @click="activeTab = 'redirects'" type="button">
                 Redirects {if $domain.redirects_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.redirects_count}</span>{/if}
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-dark" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="false">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'email' }" @click="activeTab = 'email'" type="button">
                 Email {if $domain.email_fwds_count > 0}<span class="badge bg-secondary rounded-pill">{$domain.email_fwds_count}</span>{/if}
             </button>
         </li>
         {if $quota.dnssec_enabled}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-dark" id="dnssec-tab" data-bs-toggle="tab" data-bs-target="#dnssec" type="button" role="tab" aria-controls="dnssec" aria-selected="false">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'dnssec' }" @click="activeTab = 'dnssec'" type="button">
                 DNSSEC
             </button>
         </li>
         {/if}
         {if $quota.ddns_enabled}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-dark" id="ddns-tab" data-bs-toggle="tab" data-bs-target="#ddns" type="button" role="tab" aria-controls="ddns" aria-selected="false">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'ddns' }" @click="activeTab = 'ddns'" type="button">
                 DDNS
             </button>
         </li>
         {/if}
         <li class="nav-item" role="presentation">
-            <button class="nav-link fw-bold text-dark" id="templates-tab" data-bs-toggle="tab" data-bs-target="#templates" type="button" role="tab" aria-controls="templates" aria-selected="false">
+            <button class="nav-link fw-bold" :class="{ 'active': activeTab === 'templates' }" @click="activeTab = 'templates'" type="button">
                 Templates
             </button>
         </li>
     </ul>
 
-    <!-- Tab Content -->
-    <div class="tab-content" id="dnsTabsContent">
-        <!-- Records Tab -->
-        <div class="tab-pane fade show active" id="records" role="tabpanel" aria-labelledby="records-tab">
+    {* ── Tab Content (Alpine x-show thay vì BS tab-pane) ── *}
+    <div>
+        <div x-show="activeTab === 'records'" x-cloak>
             {include file="./partials/record_table.tpl"}
         </div>
         
-        <!-- Redirects Tab -->
-        <div class="tab-pane fade" id="redirects" role="tabpanel" aria-labelledby="redirects-tab">
+        <div x-show="activeTab === 'redirects'" x-cloak>
             {include file="./partials/tab_redirects.tpl"}
         </div>
         
-        <!-- Email Tab -->
-        <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+        <div x-show="activeTab === 'email'" x-cloak>
             {include file="./partials/tab_email.tpl"}
         </div>
         
-        <!-- DNSSEC Tab -->
         {if $quota.dnssec_enabled}
-        <div class="tab-pane fade" id="dnssec" role="tabpanel" aria-labelledby="dnssec-tab">
+        <div x-show="activeTab === 'dnssec'" x-cloak>
             {include file="./partials/tab_dnssec.tpl"}
         </div>
         {/if}
 
-        <!-- DDNS Tab -->
         {if $quota.ddns_enabled}
-        <div class="tab-pane fade" id="ddns" role="tabpanel" aria-labelledby="ddns-tab">
+        <div x-show="activeTab === 'ddns'" x-cloak>
             {include file="./partials/tab_ddns.tpl"}
         </div>
         {/if}
 
-        <!-- Templates Tab -->
-        <div class="tab-pane fade" id="templates" role="tabpanel" aria-labelledby="templates-tab">
+        <div x-show="activeTab === 'templates'" x-cloak>
             {include file="./partials/tab_templates.tpl"}
         </div>
     </div>
     
-    <!-- Modals -->
+    {* ── Toast ── *}
     {include file="./partials/toast.tpl"}
-    
-    <!-- Alpine JS logic initialization -->
-    <script>
-        var HVNDNS_CONFIG = {
-            domainId: {$domain.id|intval},
-            records: {$recordsJson nofilter}
-        };
-    </script>
-    <script>
-        {literal}
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('dnsEditor', () => ({
-                domainId: HVNDNS_CONFIG.domainId,
-                records: HVNDNS_CONFIG.records,
-                filterType: 'all',
-                searchQuery: '',
-                
-                get filteredRecords() {
-                    return this.records.filter(record => {
-                        const typeMatch = this.filterType === 'all' || record.type === this.filterType;
-                        const searchMatch = this.searchQuery === '' 
-                            || record.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-                            || record.value.toLowerCase().includes(this.searchQuery.toLowerCase());
-                        return typeMatch && searchMatch;
-                    });
-                },
-                
-                getTypeBadgeClass(type) {
-                    const classes = {
-                        'A': 'bg-primary',
-                        'AAAA': 'bg-info text-dark',
-                        'CNAME': 'bg-purple',
-                        'MX': 'bg-warning text-dark',
-                        'TXT': 'bg-success',
-                        'SRV': 'bg-danger',
-                        'NS': 'bg-secondary',
-                        'CAA': 'bg-dark'
-                    };
-                    return classes[type] || 'bg-secondary';
-                },
-
-                formatTTL(ttl) {
-                    const map = {60:'1m', 300:'5m', 1800:'30m', 3600:'1h', 14400:'4h', 43200:'12h', 86400:'24h'};
-                    return map[ttl] || ttl + 's';
-                },
-
-                deleteRecord(record) {
-                    if(confirm(`Bạn có chắc muốn xóa bản ghi: ${record.name} ${record.type}?`)) {
-                        window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đã Xóa', msg: `Bản ghi ${record.name} đang được xóa...`, type: 'danger' } }));
-                    }
-                },
-
-                retryRecord(id) {
-                    window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' } }));
-                }
-            }));
-        });
-        {/literal}
-    </script>
 </div>
+
+{* ── Load Alpine.js SAU khi đã register xong alpine:init listener ── *}
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 <style>
 {literal}
+/* Alpine cloak: ẩn cho đến khi Alpine init xong */
+[x-cloak] { display: none !important; }
+
 .bg-purple { background-color: #6f42c1; color: white; }
-.nav-tabs .nav-link.active { border-bottom-color: transparent !important; color: #ea4544 !important; }
+.nav-tabs .nav-link { color: #495057; cursor: pointer; }
+.nav-tabs .nav-link.active { 
+    border-bottom-color: transparent !important; 
+    color: #ea4544 !important; 
+    font-weight: 700 !important;
+}
+.nav-tabs .nav-link:hover:not(.active) {
+    border-color: transparent;
+    color: #ea4544;
+}
+.spin { animation: spin 2s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 {/literal}
 </style>

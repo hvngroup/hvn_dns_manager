@@ -1,3 +1,13 @@
+<script>
+if (!window.Alpine) {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
+    s.defer = true;
+    document.head.appendChild(s);
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
 <div class="hvn-dns-client hvn-record-edit" x-data="recordEditor()">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -154,3 +164,5 @@ document.addEventListener('alpine:init', () => {
 });
 {/literal}
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
