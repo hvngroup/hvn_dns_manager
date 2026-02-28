@@ -4,21 +4,29 @@
 <script>
     var HVNDNS_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
+        domainName: '{$domain.domain|escape:'javascript'}',
         records: {$recordsJson nofilter}
     {rdelim};
 </script>
 
-{* ── Alpine component (toàn bộ JS trong literal) ── *}
+{* ── Alpine component ── *}
 {literal}
 <script>
     document.addEventListener('alpine:init', function() {
         Alpine.data('dnsEditor', function() {
             return {
                 domainId: HVNDNS_CONFIG.domainId,
+                domainName: HVNDNS_CONFIG.domainName,
                 records: HVNDNS_CONFIG.records,
                 filterType: 'all',
                 searchQuery: '',
                 activeTab: 'records',
+
+                // ── Inline editing state ──
+                editingId: null,       // id record đang sửa (null = không edit)
+                addingNew: false,      // đang thêm row mới?
+                editForm: { type: 'A', name: '', value: '', ttl: 3600, priority: 10, weight: 0, port: 443 },
+                saving: false,
 
                 get filteredRecords() {
                     var self = this;
@@ -45,18 +53,122 @@
                     return map[ttl] || ttl + 's';
                 },
 
+                // ── Bắt đầu thêm mới ──
+                startAdd: function() {
+                    this.cancelEdit();
+                    this.addingNew = true;
+                    this.editForm = { type: 'A', name: '', value: '', ttl: 3600, priority: 10, weight: 0, port: 443 };
+                },
+
+                // ── Bắt đầu sửa 1 record ──
+                startEdit: function(record) {
+                    this.addingNew = false;
+                    this.editingId = record.id;
+                    this.editForm = {
+                        type: record.type,
+                        name: record.name,
+                        value: record.value,
+                        ttl: record.ttl,
+                        priority: record.priority || 10,
+                        weight: record.weight || 0,
+                        port: record.port || 443
+                    };
+                },
+
+                // ── Hủy ──
+                cancelEdit: function() {
+                    this.editingId = null;
+                    this.addingNew = false;
+                    this.saving = false;
+                },
+
+                // ── Lưu (thêm hoặc sửa) ──
+                saveEdit: function() {
+                    if (!this.editForm.value.trim()) {
+                        alert('Vui lòng nhập giá trị bản ghi');
+                        return;
+                    }
+                    if (!this.editForm.name.trim()) {
+                        this.editForm.name = '@';
+                    }
+
+                    this.saving = true;
+                    var self = this;
+
+                    // Mock API delay
+                    setTimeout(function() {
+                        if (self.addingNew) {
+                            // Thêm record mới vào danh sách
+                            var newRecord = {
+                                id: Date.now(),
+                                type: self.editForm.type,
+                                name: self.editForm.name,
+                                value: self.editForm.value,
+                                ttl: parseInt(self.editForm.ttl),
+                                priority: parseInt(self.editForm.priority) || 0,
+                                weight: parseInt(self.editForm.weight) || 0,
+                                port: parseInt(self.editForm.port) || 0,
+                                is_system: false,
+                                is_locked: false,
+                                sync_status: 'syncing',
+                                pending_delete: false
+                            };
+                            self.records.unshift(newRecord);
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã thêm', msg: self.editForm.type + ' ' + self.editForm.name + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        } else {
+                            // Cập nhật record hiện tại
+                            var idx = -1;
+                            for (var i = 0; i < self.records.length; i++) {
+                                if (self.records[i].id === self.editingId) { idx = i; break; }
+                            }
+                            if (idx >= 0) {
+                                self.records[idx].name = self.editForm.name;
+                                self.records[idx].value = self.editForm.value;
+                                self.records[idx].ttl = parseInt(self.editForm.ttl);
+                                self.records[idx].priority = parseInt(self.editForm.priority) || 0;
+                                self.records[idx].weight = parseInt(self.editForm.weight) || 0;
+                                self.records[idx].port = parseInt(self.editForm.port) || 0;
+                                self.records[idx].sync_status = 'syncing';
+                            }
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã cập nhật', msg: self.editForm.type + ' ' + self.editForm.name + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        }
+                        self.cancelEdit();
+                    }, 500);
+                },
+
+                // ── Xóa ──
                 deleteRecord: function(record) {
                     if (confirm('Bạn có chắc muốn xóa bản ghi: ' + record.name + ' ' + record.type + '?')) {
+                        record.pending_delete = true;
+                        record.sync_status = 'syncing';
                         window.dispatchEvent(new CustomEvent('show-toast', {
-                            detail: { title: 'Đã Xóa', msg: 'Bản ghi ' + record.name + ' đang được xóa...', type: 'danger' }
+                            detail: { title: 'Đang xóa', msg: 'Bản ghi ' + record.name + ' đang được xóa...', type: 'danger' }
                         }));
                     }
                 },
 
                 retryRecord: function(id) {
+                    for (var i = 0; i < this.records.length; i++) {
+                        if (this.records[i].id === id) {
+                            this.records[i].sync_status = 'syncing';
+                            break;
+                        }
+                    }
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' }
                     }));
+                },
+
+                // ── Helper: cần hiện priority? ──
+                needsPriority: function(type) {
+                    return type === 'MX' || type === 'SRV';
+                },
+                needsSrv: function(type) {
+                    return type === 'SRV';
                 }
             };
         });
@@ -64,13 +176,10 @@
 </script>
 {/literal}
 
-{* ══════════════════════════════════════════════════════════════
-   HTML BODY — Tất cả Alpine x-bind dùng {ldelim}{rdelim} thay cho literal braces
-   ══════════════════════════════════════════════════════════════ *}
+{* ══════════════════════════ HTML ══════════════════════════ *}
 
 <div class="hvn-dns-client" x-data="dnsEditor()">
 
-    {* ── Back link ── *}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a href="index.php?m=hvn_dns_manager" class="text-decoration-none">
             &larr; Quay lại danh sách domain
@@ -89,7 +198,7 @@
                     {assign var="safe_max" value=$quota.max_records|default:1}
                     {math assign="percent" equation="round((c/m)*100)" c=$domain.records_count m=$safe_max}
                     <div class="d-flex justify-content-between mb-1">
-                        <span>Đang dùng: <strong>{$domain.records_count}/{$quota.max_records} records</strong></span>
+                        <span>Đang dùng: <strong x-text="records.length + '/{$quota.max_records} records'"></strong></span>
                         <span>{$percent}%</span>
                     </div>
                     <div class="progress" style="height: 10px;">
@@ -109,12 +218,10 @@
         </div>
     </div>
 
-    {* ── Navigation Tabs ── *}
+    {* ── Tabs ── *}
     <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item">
-            <button class="nav-link fw-bold" x-bind:class="activeTab === 'records' && 'active'" x-on:click="activeTab = 'records'" type="button">
-                DNS Records
-            </button>
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'records' && 'active'" x-on:click="activeTab = 'records'" type="button">DNS Records</button>
         </li>
         <li class="nav-item">
             <button class="nav-link fw-bold" x-bind:class="activeTab === 'redirects' && 'active'" x-on:click="activeTab = 'redirects'" type="button">
@@ -128,22 +235,16 @@
         </li>
         {if $quota.dnssec_enabled}
         <li class="nav-item">
-            <button class="nav-link fw-bold" x-bind:class="activeTab === 'dnssec' && 'active'" x-on:click="activeTab = 'dnssec'" type="button">
-                DNSSEC
-            </button>
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'dnssec' && 'active'" x-on:click="activeTab = 'dnssec'" type="button">DNSSEC</button>
         </li>
         {/if}
         {if $quota.ddns_enabled}
         <li class="nav-item">
-            <button class="nav-link fw-bold" x-bind:class="activeTab === 'ddns' && 'active'" x-on:click="activeTab = 'ddns'" type="button">
-                DDNS
-            </button>
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'ddns' && 'active'" x-on:click="activeTab = 'ddns'" type="button">DDNS</button>
         </li>
         {/if}
         <li class="nav-item">
-            <button class="nav-link fw-bold" x-bind:class="activeTab === 'templates' && 'active'" x-on:click="activeTab = 'templates'" type="button">
-                Templates
-            </button>
+            <button class="nav-link fw-bold" x-bind:class="activeTab === 'templates' && 'active'" x-on:click="activeTab = 'templates'" type="button">Templates</button>
         </li>
     </ul>
 
@@ -154,37 +255,30 @@
         <div x-show="activeTab === 'records'" x-cloak>
             {include file="$partials_dir/record_table.tpl"}
         </div>
-        
         <div x-show="activeTab === 'redirects'" x-cloak>
             {include file="$partials_dir/tab_redirects.tpl"}
         </div>
-        
         <div x-show="activeTab === 'email'" x-cloak>
             {include file="$partials_dir/tab_email.tpl"}
         </div>
-        
         {if $quota.dnssec_enabled}
         <div x-show="activeTab === 'dnssec'" x-cloak>
             {include file="$partials_dir/tab_dnssec.tpl"}
         </div>
         {/if}
-
         {if $quota.ddns_enabled}
         <div x-show="activeTab === 'ddns'" x-cloak>
             {include file="$partials_dir/tab_ddns.tpl"}
         </div>
         {/if}
-
         <div x-show="activeTab === 'templates'" x-cloak>
             {include file="$partials_dir/tab_templates.tpl"}
         </div>
     </div>
 
-    {* ── Toast ── *}
     {include file="$partials_dir/toast.tpl"}
 </div>
 
-{* ── Alpine.js CDN (SAU listener đăng ký) ── *}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 {literal}
@@ -192,16 +286,17 @@
 [x-cloak] { display: none !important; }
 .bg-purple { background-color: #6f42c1; color: white; }
 .nav-tabs .nav-link { color: #495057; cursor: pointer; }
-.nav-tabs .nav-link.active { 
-    border-bottom-color: transparent !important; 
-    color: #ea4544 !important; 
-    font-weight: 700 !important;
-}
-.nav-tabs .nav-link:hover:not(.active) {
-    border-color: transparent;
-    color: #ea4544;
-}
+.nav-tabs .nav-link.active { border-bottom-color: transparent !important; color: #ea4544 !important; font-weight: 700 !important; }
+.nav-tabs .nav-link:hover:not(.active) { border-color: transparent; color: #ea4544; }
 .spin { animation: spin 2s linear infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Inline edit row */
+.hvn-inline-edit td { background-color: #fff8e1 !important; }
+.hvn-inline-edit .form-control,
+.hvn-inline-edit .form-select { font-size: 12px; padding: 3px 6px; height: auto; }
+.hvn-inline-add td { background-color: #e8f5e9 !important; }
+.hvn-inline-add .form-control,
+.hvn-inline-add .form-select { font-size: 12px; padding: 3px 6px; height: auto; }
 </style>
 {/literal}

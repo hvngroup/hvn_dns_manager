@@ -1,21 +1,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <div class="hvn-dns-client">
-    <div class="card mb-4">
-        <div class="card-body">
-            <h3 class="card-title">DNS Management &mdash; Gói {$plan_name|default:'DNS Basic'}</h3>
-            <p class="card-text">
-                Trạng thái: 
-                {if $service_status == 'Active'}
-                    <span class="badge bg-success">Active</span>
-                {else}
-                    <span class="badge bg-danger">{$service_status}</span>
-                {/if}
-                &nbsp;&nbsp;&nbsp; Hết hạn: {$expiry_date}
-            </p>
-        </div>
-    </div>
-
-    <h4>Domain của bạn</h4>
+    <h3 class="mb-4">DNS Management - Lựa chọn domain bạn cần quản lý</h3>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
         {foreach from=$domains item=domain}
             <div class="col">
