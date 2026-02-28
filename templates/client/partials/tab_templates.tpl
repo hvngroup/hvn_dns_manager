@@ -36,6 +36,7 @@
 </div>
 
 {* ── Template Preview Modal (Inline x-show) ── *}
+{literal}
 <div x-show="showTemplatePreview" x-cloak class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0,0,0,0.5); z-index: 1050;">
     <div class="card shadow-lg w-100" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center position-sticky top-0" style="z-index: 1;">
@@ -92,3 +93,4 @@
         </div>
     </div>
 </div>
+{/literal}

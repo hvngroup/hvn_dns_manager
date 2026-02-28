@@ -59,6 +59,7 @@
                 emails: HVNDNS_CONFIG.emails || [],
                 ddnsTokens: HVNDNS_CONFIG.ddnsTokens || [],
                 templates: HVNDNS_CONFIG.templates || [],
+                confirmPreviewCheck: false,
                 filterType: 'all',
                 searchQuery: '',
                 activeTab: 'records',
@@ -530,6 +531,7 @@
                     if (template) {
                         this.previewTemplateId = template.id;
                         this.previewTemplateRecords = template.records || [];
+                        this.confirmPreviewCheck = false;
                         this.showTemplatePreview = true;
                     }
                 },
