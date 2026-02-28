@@ -7,7 +7,9 @@
         domainName: '{$domain.domain|escape:'javascript'}',
         records: {$recordsJson nofilter},
         redirects: {$redirectsJson|default:'[]' nofilter},
-        emails: {$emailsJson|default:'[]' nofilter}
+        emails: {$emailsJson|default:'[]' nofilter},
+        ddnsTokens: {$ddnsJson|default:'[]' nofilter},
+        templates: {$templatesJson|default:'[]' nofilter}
     {rdelim};
 </script>
 
@@ -18,10 +20,11 @@
         Alpine.data('dnsEditor', function() {
             return {
                 domainId: HVNDNS_CONFIG.domainId,
-                domainName: HVNDNS_CONFIG.domainName,
                 records: HVNDNS_CONFIG.records,
                 redirects: HVNDNS_CONFIG.redirects || [],
                 emails: HVNDNS_CONFIG.emails || [],
+                ddnsTokens: HVNDNS_CONFIG.ddnsTokens || [],
+                templates: HVNDNS_CONFIG.templates || [],
                 filterType: 'all',
                 searchQuery: '',
                 activeTab: 'records',
@@ -374,10 +377,145 @@
                     }
                 },
 
-                // ── Khác ──
-                needsPriority: function(type) {
-                    return type === 'MX' || type === 'SRV';
+                // ── Helper: Cần title? ──
+                needsTitle: function(type) {
+                    return type === 'masked';
                 },
+
+                // ── DDNS Handlers ──
+                showCreateDdnsForm: false,
+                newDdnsToken: { subdomain: '', label: '' },
+
+                toggleDdnsDetail: function(id) {
+                    for (var i = 0; i < this.ddnsTokens.length; i++) {
+                        if (this.ddnsTokens[i].id === id) {
+                            this.ddnsTokens[i].showDetail = !this.ddnsTokens[i].showDetail;
+                            break;
+                        }
+                    }
+                },
+
+                toggleDdnsActive: function(id) {
+                    var token = null;
+                    for (var i = 0; i < this.ddnsTokens.length; i++) {
+                        if (this.ddnsTokens[i].id === id) {
+                            this.ddnsTokens[i].active = !this.ddnsTokens[i].active;
+                            token = this.ddnsTokens[i];
+                            break;
+                        }
+                    }
+                    if (token) {
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: token.active ? 'Đã bật' : 'Đã tắt', msg: 'Token ' + token.subdomain + ' đã ' + (token.active ? 'kích hoạt' : 'vô hiệu hóa'), type: token.active ? 'success' : 'warning' }
+                        }));
+                    }
+                },
+
+                deleteDdnsToken: function(id) {
+                    var token = null;
+                    for (var i = 0; i < this.ddnsTokens.length; i++) {
+                        if (this.ddnsTokens[i].id === id) {
+                            token = this.ddnsTokens[i];
+                            break;
+                        }
+                    }
+                    if (token && confirm('Xóa DDNS token cho ' + token.subdomain + '? Thiết bị sẽ không thể cập nhật IP nữa.')) {
+                        this.ddnsTokens = this.ddnsTokens.filter(function(t) { return t.id !== id; });
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: 'Đã xóa', msg: 'Token ' + token.subdomain + ' đã bị xóa', type: 'danger' }
+                        }));
+                    }
+                },
+
+                createDdnsToken: function() {
+                    if (!this.newDdnsToken.subdomain.trim()) {
+                        alert('Vui lòng nhập subdomain');
+                        return;
+                    }
+                    var newId = Date.now();
+                    this.ddnsTokens.push({
+                        id: newId,
+                        subdomain: this.newDdnsToken.subdomain,
+                        label: this.newDdnsToken.label || 'Token mới',
+                        ip: 'Chưa cập nhật',
+                        updated: 'Vừa tạo',
+                        requests: 0,
+                        active: true,
+                        showDetail: true,
+                        token_url: 'https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/ddns.php?token=' + Math.random().toString(36).substring(2, 18)
+                    });
+                    this.newDdnsToken = { subdomain: '', label: '' };
+                    this.showCreateDdnsForm = false;
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { title: 'Thành công', msg: 'DDNS Token đã được tạo', type: 'success' }
+                    }));
+                },
+
+                copyDdnsUrl: function(tokenId) {
+                    var token = null;
+                    for (var i = 0; i < this.ddnsTokens.length; i++) {
+                        if (this.ddnsTokens[i].id === tokenId) {
+                            token = this.ddnsTokens[i];
+                            break;
+                        }
+                    }
+                    if (token) {
+                        navigator.clipboard.writeText(token.token_url).then(function() {
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã copy', msg: 'URL đã được lưu vào khay nhớ tạm', type: 'success' }
+                            }));
+                        });
+                    }
+                },
+
+                copyDdnsMikrotik: function(tokenId) {
+                    var token = null;
+                    for (var i = 0; i < this.ddnsTokens.length; i++) {
+                        if (this.ddnsTokens[i].id === tokenId) {
+                            token = this.ddnsTokens[i];
+                            break;
+                        }
+                    }
+                    if (token) {
+                        var script = '/tool fetch url="' + token.token_url + '" mode=http';
+                        navigator.clipboard.writeText(script).then(function() {
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã copy', msg: 'Script Mikrotik đã được lưu', type: 'success' }
+                            }));
+                        });
+                    }
+                },
+
+                // ── Templates Preview ──
+                showTemplatePreview: false,
+                previewTemplateId: null,
+                previewTemplateRecords: [],
+
+                openTemplatePreview: function(templateId) {
+                    var template = this.templates.find(function(t) { return t.id === templateId; });
+                    if (template) {
+                        this.previewTemplateId = template.id;
+                        this.previewTemplateRecords = template.records || [];
+                        this.showTemplatePreview = true;
+                    }
+                },
+
+                closeTemplatePreview: function() {
+                    this.showTemplatePreview = false;
+                    this.previewTemplateId = null;
+                    this.previewTemplateRecords = [];
+                },
+
+                applyTemplate: function() {
+                    if (confirm('CẢNH BÁO: Thao tác này sẽ XÓA TOÀN BỘ bản ghi hiện tại và áp dụng mẫu mới. Hệ thống sẽ tự động tạo bản backup. Bạn chắc chắn muốn tiếp tục?')) {
+                        this.showTemplatePreview = false;
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: 'Đang áp dụng mẫu', msg: 'Hệ thống đang tiến hành nạp mẫu DNS...', type: 'warning' }
+                        }));
+                    }
+                },
+
+                // ── Khác ──
                 needsSrv: function(type) {
                     return type === 'SRV';
                 }
