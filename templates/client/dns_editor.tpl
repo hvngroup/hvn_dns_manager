@@ -5,7 +5,8 @@
     var HVNDNS_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
         domainName: '{$domain.domain|escape:'javascript'}',
-        records: {$recordsJson nofilter}
+        records: {$recordsJson nofilter},
+        redirects: {$redirectsJson|default:'[]' nofilter}
     {rdelim};
 </script>
 
@@ -18,15 +19,22 @@
                 domainId: HVNDNS_CONFIG.domainId,
                 domainName: HVNDNS_CONFIG.domainName,
                 records: HVNDNS_CONFIG.records,
+                redirects: HVNDNS_CONFIG.redirects || [],
                 filterType: 'all',
                 searchQuery: '',
                 activeTab: 'records',
 
-                // ── Inline editing state ──
+                // ── Inline editing state (DNS) ──
                 editingId: null,       // id record đang sửa (null = không edit)
                 addingNew: false,      // đang thêm row mới?
                 editForm: { type: 'A', name: '', value: '', ttl: 3600, priority: 10, weight: 0, port: 443 },
                 saving: false,
+
+                // ── Inline editing state (Redirects) ──
+                editingRedirectId: null,
+                addingNewRedirect: false,
+                editRedirectForm: { source: '/', destination: 'https://', type: '301', title: '' },
+                savingRedirect: false,
 
                 get filteredRecords() {
                     var self = this;
@@ -161,6 +169,116 @@
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại...', type: 'warning' }
                     }));
+                },
+
+                retryRedirect: function(id) {
+                    for (var i = 0; i < this.redirects.length; i++) {
+                        if (this.redirects[i].id === id) {
+                            this.redirects[i].sync_status = 'syncing';
+                            break;
+                        }
+                    }
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại chuyển hướng...', type: 'warning' }
+                    }));
+                },
+
+                getTypeRedirectBadgeClass: function(type) {
+                    var classes = { '301': 'bg-primary', '302': 'bg-info text-dark', 'masked': 'bg-dark' };
+                    return classes[type] || 'bg-secondary';
+                },
+
+                getTypeRedirectLabel: function(type) {
+                    var labels = { '301': 'Vĩnh viễn', '302': 'Tạm thời', 'masked': 'Trang ảo' };
+                    return labels[type] || '';
+                },
+
+                // ── Bắt đầu thêm chuyển hướng mới ──
+                startAddRedirect: function() {
+                    this.cancelEditRedirect();
+                    this.addingNewRedirect = true;
+                    this.editRedirectForm = { source: '/', destination: 'https://', type: '301', title: '' };
+                },
+
+                // ── Bắt đầu sửa 1 chuyển hướng ──
+                startEditRedirect: function(redirect) {
+                    this.addingNewRedirect = false;
+                    this.editingRedirectId = redirect.id;
+                    this.editRedirectForm = {
+                        source: redirect.source,
+                        destination: redirect.destination,
+                        type: redirect.type,
+                        title: redirect.title || ''
+                    };
+                },
+
+                // ── Hủy (Redirects) ──
+                cancelEditRedirect: function() {
+                    this.editingRedirectId = null;
+                    this.addingNewRedirect = false;
+                    this.savingRedirect = false;
+                },
+
+                // ── Lưu (thêm hoặc sửa chuyển hướng) ──
+                saveEditRedirect: function() {
+                    if (!this.editRedirectForm.source.trim() || !this.editRedirectForm.destination.trim()) {
+                        alert('Vui lòng nhập nguồn và đích chuyển hướng');
+                        return;
+                    }
+
+                    this.savingRedirect = true;
+                    var self = this;
+
+                    // Mock API delay
+                    setTimeout(function() {
+                        if (self.addingNewRedirect) {
+                            var newRedirect = {
+                                id: Date.now(),
+                                source: self.editRedirectForm.source,
+                                destination: self.editRedirectForm.destination,
+                                type: self.editRedirectForm.type,
+                                title: self.editRedirectForm.title,
+                                sync_status: 'syncing',
+                                pending_delete: false
+                            };
+                            self.redirects.unshift(newRedirect);
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã thêm', msg: 'Chuyển hướng từ ' + self.editRedirectForm.source + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        } else {
+                            var idx = -1;
+                            for (var i = 0; i < self.redirects.length; i++) {
+                                if (self.redirects[i].id === self.editingRedirectId) { idx = i; break; }
+                            }
+                            if (idx >= 0) {
+                                self.redirects[idx].source = self.editRedirectForm.source;
+                                self.redirects[idx].destination = self.editRedirectForm.destination;
+                                self.redirects[idx].type = self.editRedirectForm.type;
+                                self.redirects[idx].title = self.editRedirectForm.title;
+                                self.redirects[idx].sync_status = 'syncing';
+                            }
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã cập nhật', msg: 'Chuyển hướng từ ' + self.editRedirectForm.source + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        }
+                        self.cancelEditRedirect();
+                    }, 500);
+                },
+
+                // ── Xóa chuyển hướng ──
+                deleteRedirect: function(redirect) {
+                    if (confirm('Bạn có chắc muốn xóa chuyển hướng: ' + redirect.source + ' -> ' + redirect.destination + '?')) {
+                        redirect.pending_delete = true;
+                        redirect.sync_status = 'syncing';
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: 'Đang xóa', msg: 'Chuyển hướng ' + redirect.source + ' đang được xóa...', type: 'danger' }
+                        }));
+                    }
+                },
+
+                // ── Helper: Cần title? ──
+                needsTitle: function(type) {
+                    return type === 'masked';
                 },
 
                 // ── Helper: cần hiện priority? ──
