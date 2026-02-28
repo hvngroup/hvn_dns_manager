@@ -5,6 +5,8 @@
     var HVNDNS_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
         domainName: '{$domain.domain|escape:'javascript'}',
+        records: {$recordsJson nofilter},
+        redirects: {$redirectsJson|default:'[]' nofilter},
         emails: {$emailsJson|default:'[]' nofilter},
         ddnsTokens: {$ddnsJson|default:'[]' nofilter},
         templates: {$templatesJson|default:'[
