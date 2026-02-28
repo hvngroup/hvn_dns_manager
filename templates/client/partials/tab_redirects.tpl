@@ -86,8 +86,12 @@
                     </td>
                     <td class="text-end" x-show="editingRedirectId !== redirect.id">
                         <div class="btn-group btn-group-sm" x-show="!redirect.pending_delete && redirect.sync_status !== 'syncing'">
-                            <button class="btn btn-outline-secondary" x-on:click="startEditRedirect(redirect)" x-bind:disabled="addingNewRedirect || editingRedirectId !== null"><i class="bi bi-pencil"></i></button>
-                            <button class="btn btn-outline-danger" x-on:click="deleteRedirect(redirect)" x-bind:disabled="addingNewRedirect || editingRedirectId !== null"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-outline-secondary" x-on:click="startEditRedirect(redirect)" x-bind:disabled="addingNewRedirect || editingRedirectId !== null">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" x-on:click="deleteRedirect(redirect)" x-bind:disabled="addingNewRedirect || editingRedirectId !== null">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </div>
                         <button class="btn btn-sm btn-outline-warning" x-show="redirect.sync_status === 'failed'" x-on:click="retryRedirect(redirect.id)" title="Thử lại">
                             <i class="bi bi-arrow-clockwise"></i>

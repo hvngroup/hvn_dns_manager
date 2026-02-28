@@ -6,7 +6,8 @@
         domainId: {$domain.id|intval},
         domainName: '{$domain.domain|escape:'javascript'}',
         records: {$recordsJson nofilter},
-        redirects: {$redirectsJson|default:'[]' nofilter}
+        redirects: {$redirectsJson|default:'[]' nofilter},
+        emails: {$emailsJson|default:'[]' nofilter}
     {rdelim};
 </script>
 
@@ -20,6 +21,7 @@
                 domainName: HVNDNS_CONFIG.domainName,
                 records: HVNDNS_CONFIG.records,
                 redirects: HVNDNS_CONFIG.redirects || [],
+                emails: HVNDNS_CONFIG.emails || [],
                 filterType: 'all',
                 searchQuery: '',
                 activeTab: 'records',
@@ -35,6 +37,12 @@
                 addingNewRedirect: false,
                 editRedirectForm: { source: '/', destination: 'https://', type: '301', title: '' },
                 savingRedirect: false,
+
+                // ── Inline editing state (Email) ──
+                editingEmailId: null,
+                addingNewEmail: false,
+                editEmailForm: { source: '', destination: '' },
+                savingEmail: false,
 
                 get filteredRecords() {
                     var self = this;
@@ -281,7 +289,92 @@
                     return type === 'masked';
                 },
 
-                // ── Helper: cần hiện priority? ──
+                // ── Xử lý Email Forwards ──
+                retryEmail: function(id) {
+                    for (var i = 0; i < this.emails.length; i++) {
+                        if (this.emails[i].id === id) {
+                            this.emails[i].sync_status = 'syncing';
+                            break;
+                        }
+                    }
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { title: 'Đang thử lại', msg: 'Hệ thống đang đồng bộ lại chuyển tiếp...', type: 'warning' }
+                    }));
+                },
+
+                startAddEmail: function() {
+                    this.cancelEditEmail();
+                    this.addingNewEmail = true;
+                    this.editEmailForm = { source: '', destination: '' };
+                },
+
+                startEditEmail: function(email) {
+                    this.addingNewEmail = false;
+                    this.editingEmailId = email.id;
+                    this.editEmailForm = {
+                        source: email.source.replace('@' + this.domainName, ''),
+                        destination: email.destination
+                    };
+                },
+
+                cancelEditEmail: function() {
+                    this.editingEmailId = null;
+                    this.addingNewEmail = false;
+                    this.savingEmail = false;
+                },
+
+                saveEditEmail: function() {
+                    if (!this.editEmailForm.source.trim() || !this.editEmailForm.destination.trim()) {
+                        alert('Vui lòng nhập tên người dùng và địa chỉ đích');
+                        return;
+                    }
+
+                    this.savingEmail = true;
+                    var self = this;
+                    var fullSource = self.editEmailForm.source + '@' + self.domainName;
+
+                    setTimeout(function() {
+                        if (self.addingNewEmail) {
+                            var newEmail = {
+                                id: Date.now(),
+                                source: fullSource,
+                                destination: self.editEmailForm.destination,
+                                sync_status: 'syncing',
+                                pending_delete: false
+                            };
+                            self.emails.unshift(newEmail);
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã thêm', msg: 'Chuyển tiếp cho ' + fullSource + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        } else {
+                            var idx = -1;
+                            for (var i = 0; i < self.emails.length; i++) {
+                                if (self.emails[i].id === self.editingEmailId) { idx = i; break; }
+                            }
+                            if (idx >= 0) {
+                                self.emails[idx].source = fullSource;
+                                self.emails[idx].destination = self.editEmailForm.destination;
+                                self.emails[idx].sync_status = 'syncing';
+                            }
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đã cập nhật', msg: 'Chuyển tiếp cho ' + fullSource + ' đang đồng bộ...', type: 'success' }
+                            }));
+                        }
+                        self.cancelEditEmail();
+                    }, 500);
+                },
+
+                deleteEmail: function(email) {
+                    if (confirm('Bạn có chắc muốn xóa chuyển tiếp: ' + email.source + '?')) {
+                        email.pending_delete = true;
+                        email.sync_status = 'syncing';
+                        window.dispatchEvent(new CustomEvent('show-toast', {
+                            detail: { title: 'Đang xóa', msg: 'Chuyển tiếp ' + email.source + ' đang được xóa...', type: 'danger' }
+                        }));
+                    }
+                },
+
+                // ── Khác ──
                 needsPriority: function(type) {
                     return type === 'MX' || type === 'SRV';
                 },
