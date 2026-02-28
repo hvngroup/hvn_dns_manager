@@ -5,11 +5,45 @@
     var HVNDNS_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
         domainName: '{$domain.domain|escape:'javascript'}',
-        records: {$recordsJson nofilter},
-        redirects: {$redirectsJson|default:'[]' nofilter},
         emails: {$emailsJson|default:'[]' nofilter},
         ddnsTokens: {$ddnsJson|default:'[]' nofilter},
-        templates: {$templatesJson|default:'[]' nofilter}
+        templates: {$templatesJson|default:'[
+            {
+                "id": 1,
+                "name": "Google Workspace",
+                "description": "Các bản ghi MX và TXT (SPF) tiêu chuẩn để sử dụng dịch vụ thư điện tử Google Workspace (kèm CNAME mail, docs...)",
+                "records_count": 9,
+                "is_system": true,
+                "records": [
+                    { "type": "MX", "name": "@", "value": "aspmx.l.google.com", "ttl": 3600, "priority": 1 },
+                    { "type": "MX", "name": "@", "value": "alt1.aspmx.l.google.com", "ttl": 3600, "priority": 5 },
+                    { "type": "MX", "name": "@", "value": "alt2.aspmx.l.google.com", "ttl": 3600, "priority": 5 },
+                    { "type": "MX", "name": "@", "value": "alt3.aspmx.l.google.com", "ttl": 3600, "priority": 10 },
+                    { "type": "MX", "name": "@", "value": "alt4.aspmx.l.google.com", "ttl": 3600, "priority": 10 },
+                    { "type": "TXT", "name": "@", "value": "v=spf1 include:_spf.google.com ~all", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "mail", "value": "ghs.googlehosted.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "calendar", "value": "ghs.googlehosted.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "docs", "value": "ghs.googlehosted.com", "ttl": 3600, "priority": 0 }
+                ]
+            },
+            {
+                "id": 2,
+                "name": "Microsoft 365 (Office 365)",
+                "description": "Các bản ghi MX, TXT (SPF), CNAME (Autodiscover, xích mdoc) và SRV cho Exchange, Skype/Teams của Microsoft 365",
+                "records_count": 8,
+                "is_system": true,
+                "records": [
+                    { "type": "MX", "name": "@", "value": "domain-com.mail.protection.outlook.com", "ttl": 3600, "priority": 0 },
+                    { "type": "TXT", "name": "@", "value": "v=spf1 include:spf.protection.outlook.com -all", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "autodiscover", "value": "autodiscover.outlook.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "sip", "value": "sipdir.online.lync.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "lyncdiscover", "value": "webdir.online.lync.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "enterpriseenrollment", "value": "enterpriseenrollment.manage.microsoft.com", "ttl": 3600, "priority": 0 },
+                    { "type": "CNAME", "name": "enterpriseregistration", "value": "enterpriseregistration.windows.net", "ttl": 3600, "priority": 0 },
+                    { "type": "SRV", "name": "_sip._tls", "value": "100 1 443 sipdir.online.lync.com", "ttl": 3600, "priority": 100 }
+                ]
+            }
+        ]' nofilter}
     {rdelim};
 </script>
 
