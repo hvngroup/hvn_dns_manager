@@ -1,0 +1,27 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# Build / source maps (không commit map; CSS được build từ nguồn)
+*.css.map
+*.js.map
+
+# Dependencies
+/vendor/
+node_modules/
+
+# Local config / secrets — KHÔNG commit license-config thật
+lib/license-config.local.php
+*.local.php
+
+# Logs / tmp
+*.log
+/tmp/
+
+# Công cụ dev nội bộ (không đóng gói vào bản phát hành)
+/tools/
