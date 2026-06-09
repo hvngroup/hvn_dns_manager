@@ -177,8 +177,8 @@ class ClientController
 
         $quota = array(
             'max_records'        => \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50),
-            'dnssec_enabled'     => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('dnssec_mode', false),
-            'ddns_enabled'       => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('ddns_mode', false),
+            'dnssec_enabled'     => \HvnGroup\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode'),
+            'ddns_enabled'       => \HvnGroup\DnsManager\Helpers\SettingsHelper::isModeEnabled('ddns_mode'),
             'templates_enabled'  => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_templates', true),
             'redirects_enabled'  => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true),
             'email_enabled'      => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_email_forwarder', true),

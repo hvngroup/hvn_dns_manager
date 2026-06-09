@@ -76,16 +76,16 @@ class SettingsService
             'email_forwarder_limit' => (int) $get('email_forwarder_limit', 5),
             'email_destination_limit' => (int) $get('email_destination_limit', 10),
             'email_verify_template' => $get('email_verify_template', ''),
-            // DDNS
-            'ddns_mode' => $b('ddns_mode', false),
+            // DDNS (mode: off/free/paid — giữ chuỗi cho dropdown admin)
+            'ddns_mode' => $get('ddns_mode', 'off'),
             'ddns_rate_limit' => (int) $get('ddns_rate_limit', 60),
             'ddns_token_limit' => (int) $get('ddns_token_limit', 5),
             'enable_ddns_bruteforce' => $b('enable_ddns_bruteforce', true),
             'ddns_bruteforce_threshold' => (int) $get('ddns_bruteforce_threshold', 10),
             'ddns_bruteforce_window' => (int) $get('ddns_bruteforce_window', 3600),
             'ddns_bruteforce_ban_duration' => (int) $get('ddns_bruteforce_ban_duration', 3600),
-            // DNSSEC
-            'dnssec_mode' => $b('dnssec_mode', false),
+            // DNSSEC (mode: off/free/paid — giữ chuỗi cho dropdown admin)
+            'dnssec_mode' => $get('dnssec_mode', 'off'),
             'dnssec_auto_resign' => $b('dnssec_auto_resign', true),
             // SSL
             'enable_auto_ssl' => $b('enable_auto_ssl', true),

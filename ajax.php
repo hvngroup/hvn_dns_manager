@@ -254,11 +254,16 @@ try {
 
 } catch (\Throwable $e) {
     ob_clean();
+    // Log chi tiết kỹ thuật phía server, KHÔNG leak ra client (05-security.md)
+    if (function_exists('logActivity')) {
+        logActivity('HVN DNS Manager AJAX error: ' . $e->getMessage()
+            . ' in ' . $e->getFile() . ':' . $e->getLine());
+    }
     echo json_encode(array(
         'success' => false,
         'error'   => array(
             'code'    => 'SERVER_ERROR',
-            'message' => $e->getMessage() . ' in ' . basename($e->getFile()) . ' trên dòng ' . $e->getLine()
+            'message' => 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
         )
     ));
 }

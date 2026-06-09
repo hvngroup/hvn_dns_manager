@@ -80,7 +80,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 // ── 1. Kiểm tra module có bật không ──────────────────────────────────────────
 try {
-    $ddnsEnabled = SettingsHelper::getBool('ddns_mode', false);
+    $ddnsEnabled = SettingsHelper::isModeEnabled('ddns_mode');
     if (!$ddnsEnabled) {
         ddns_respond('dnserr');
     }

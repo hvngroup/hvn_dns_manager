@@ -44,8 +44,8 @@ class DnssecService
 
     public function toggle(int $domainId, int $userId, bool $enable): array
     {
-        // Kiểm tra admin có bật tính năng DNSSEC không
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('dnssec_mode', false)) {
+        // Kiểm tra admin có bật tính năng DNSSEC không (mode: off/free/paid)
+        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode')) {
             return array('success' => false, 'error' => 'Tính năng DNSSEC chưa được kích hoạt trên hệ thống.');
         }
 

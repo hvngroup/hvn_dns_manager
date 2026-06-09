@@ -55,4 +55,32 @@ class SettingsHelper
     {
         return (int) self::get($key, $default);
     }
+
+    /**
+     * Đọc giá trị của một feature 3-mode (off/free/paid).
+     *
+     * @param  string $key     Khóa setting (vd 'dnssec_mode', 'ddns_mode').
+     * @param  string $default Giá trị mặc định nếu không hợp lệ.
+     * @return string Một trong: 'off' | 'free' | 'paid'.
+     */
+    public static function getMode($key, $default = 'off')
+    {
+        $mode = strtolower(trim((string) self::get($key, $default)));
+        return in_array($mode, ['off', 'free', 'paid'], true) ? $mode : $default;
+    }
+
+    /**
+     * Kiểm tra một feature 3-mode có đang BẬT không (mode khác 'off').
+     *
+     * Dùng cho các setting lưu chuỗi 'off'/'free'/'paid' — KHÔNG dùng getBool()
+     * vì getBool() luôn trả false với chuỗi 'free'/'paid'. Việc phân biệt
+     * free vs paid (quyền Premium) do FeatureGate đảm nhiệm.
+     *
+     * @param  string $key Khóa setting (vd 'dnssec_mode', 'ddns_mode').
+     * @return bool
+     */
+    public static function isModeEnabled($key)
+    {
+        return self::getMode($key) !== 'off';
+    }
 }

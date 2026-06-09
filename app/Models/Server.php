@@ -29,7 +29,9 @@ class Server extends Model
     ];
 
     protected $hidden = [
-        'password_enc'
+        'password_enc',
+        'username',
+        'ip_address'
     ];
 
     protected $casts = [
