@@ -179,8 +179,8 @@ class ClientController
 
         $quota = array(
             'max_records'        => \MJ\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50),
-            'dnssec_enabled'     => \MJ\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode'),
-            'ddns_enabled'       => \MJ\DnsManager\Helpers\SettingsHelper::isModeEnabled('ddns_mode'),
+            'dnssec_enabled'     => \MJ\DnsManager\Services\FeatureGate::canClientUseDnssec($userId),
+            'ddns_enabled'       => \MJ\DnsManager\Services\FeatureGate::canClientUseDdns($userId),
             'templates_enabled'  => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_templates', true),
             'redirects_enabled'  => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true),
             'email_enabled'      => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_email_forwarder', true),

@@ -80,7 +80,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 
 // ── 1. Kiểm tra module có bật không ──────────────────────────────────────────
 try {
-    $ddnsEnabled = SettingsHelper::isModeEnabled('ddns_mode');
+    $ddnsEnabled = \MJ\DnsManager\Services\FeatureGate::getDdnsMode() !== 'off';
     if (!$ddnsEnabled) {
         ddns_respond('dnserr');
     }
@@ -202,6 +202,12 @@ try {
 
 if (!$domain || $domain->status !== 'active') {
     ddns_respond('nohost');
+}
+
+// FeatureGate (per-client): DDNS phải đang bật và client có quyền dùng
+// (mode 'paid' → kiểm tra billing). Addon hết hạn → ngừng cập nhật.
+if (!\MJ\DnsManager\Services\FeatureGate::canClientUseDdns((int) $domain->whmcs_user_id)) {
+    ddns_respond('dnserr');
 }
 
 $subdomain  = $tokenRow->subdomain;

@@ -46,9 +46,10 @@ class DnssecService
 
     public function toggle(int $domainId, int $userId, bool $enable): array
     {
-        // Kiểm tra admin có bật tính năng DNSSEC không (mode: off/free/paid)
-        if (!\MJ\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode')) {
-            return array('success' => false, 'error' => 'Tính năng DNSSEC chưa được kích hoạt trên hệ thống.');
+        // FeatureGate — entry point duy nhất: off → false, free → true,
+        // paid → kiểm tra billing của client.
+        if (!\MJ\DnsManager\Services\FeatureGate::canClientUseDnssec($userId)) {
+            return array('success' => false, 'error' => 'Tính năng DNSSEC chưa được kích hoạt hoặc tài khoản của bạn chưa có quyền sử dụng.');
         }
 
         $domain = Domain::where('id', $domainId)
