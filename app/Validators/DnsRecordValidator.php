@@ -68,48 +68,6 @@ class DnsRecordValidator
         return empty($this->errors);
     }
 
-    /**
-     * Validate payload của Queue Job theo action type.
-     * Kiểm tra payload có đủ required keys không (theo JobInterface::PAYLOAD_REQUIRED_KEYS).
-     *
-     * @param  string $action  Action name (VD: ADD_RECORD, EDIT_RECORD).
-     * @param  array  $payload Payload cần kiểm tra.
-     * @return bool   True nếu hợp lệ.
-     */
-    public function validateJobPayload($action, array $payload)
-    {
-        $this->errors = [];
-
-        $validActions = [
-            'ADD_RECORD', 'EDIT_RECORD', 'DELETE_RECORD',
-            'CREATE_ZONE', 'DELETE_ZONE',
-            'CREATE_REDIRECT', 'EDIT_REDIRECT', 'DELETE_REDIRECT',
-            'CREATE_EMAIL_FWD', 'DELETE_EMAIL_FWD',
-            'ENABLE_DNSSEC', 'DISABLE_DNSSEC', 'RESIGN_ZONE',
-            'REQUEST_SSL', 'RENEW_SSL',
-        ];
-
-        $payloadRequiredKeys = [
-            'ADD_RECORD'    => ['record_id', 'type', 'name', 'value', 'ttl'],
-            'EDIT_RECORD'   => ['record_id', 'old_record', 'new_record'],
-            'DELETE_RECORD' => ['record_id', 'type', 'name', 'value'],
-        ];
-
-        if (!in_array($action, $validActions)) {
-            $this->addError('action', "Action '{$action}' không hợp lệ.");
-            return false;
-        }
-
-        $requiredKeys = $payloadRequiredKeys[$action] ?? [];
-
-        foreach ($requiredKeys as $key) {
-            if (!isset($payload[$key]) || $payload[$key] === '' || $payload[$key] === null) {
-                $this->addError('payload', "Payload thiếu trường bắt buộc: '{$key}' cho action {$action}.");
-            }
-        }
-
-        return empty($this->errors);
-    }
 
     /**
      * Lấy tất cả lỗi validation.

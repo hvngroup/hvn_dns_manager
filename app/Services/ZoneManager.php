@@ -294,17 +294,4 @@ class ZoneManager
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Zone create / delete (giữ lại từ bản gốc, dùng bởi ProvisioningService)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    public function createZone($domainId)
-    {
-        return true;
-    }
-
-    public function deleteZone($domainId)
-    {
-        return true;
-    }
 }

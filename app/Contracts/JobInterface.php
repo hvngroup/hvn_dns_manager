@@ -89,8 +89,4 @@ interface JobInterface
         self::ACTION_APPLY_TEMPLATE    => ['template_id', 'template_name', 'records'],
         self::ACTION_SYNC_ZONE         => [],
     ];
-
-    public function getAction();
-    public function getPayload();
-    public function validate();
 }
