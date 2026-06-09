@@ -40,6 +40,8 @@ spl_autoload_register(function ($class) {
 
 use HvnGroup\DnsManager\Controllers\Client\ClientController;
 use HvnGroup\DnsManager\Controllers\Admin\AdminController;
+use HvnGroup\DnsManager\Migration\Versions\v0_1_0_prototype;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
  * Define addon module configuration parameters.
@@ -58,14 +60,44 @@ function hvn_dns_manager_config()
 
 /**
  * Activate.
+ *
+ * Chạy DB migration trực tiếp trong hàm activate của module — đây là nơi WHMCS
+ * dành riêng cho logic kích hoạt addon module. Migration là idempotent
+ * (kiểm tra hasTable trước khi tạo) nên kích hoạt lại nhiều lần vẫn an toàn.
  */
 function hvn_dns_manager_activate()
 {
-    // The AfterModuleActivate hook handles the DB migration
-    return [
-        'status' => 'success',
-        'description' => 'Bật thành công.',
-    ];
+    try {
+        $migration = new v0_1_0_prototype();
+        $migration->up();
+
+        // Ghi version vào bảng tracking (UNIQUE trên version đảm bảo không trùng)
+        $version = '0.1.0';
+        $alreadyStamped = Capsule::table('mod_hvndns_schema_version')
+            ->where('version', $version)
+            ->exists();
+        if (!$alreadyStamped) {
+            Capsule::table('mod_hvndns_schema_version')->insert([
+                'version' => $version,
+                'description' => 'Initial prototype schema',
+                'executed_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        logActivity('HVN DNS Manager: Khởi tạo cơ sở dữ liệu thành công (schema ' . $version . ').');
+
+        return [
+            'status' => 'success',
+            'description' => 'Bật thành công. Đã khởi tạo cơ sở dữ liệu.',
+        ];
+    } catch (\Exception $e) {
+        logActivity('HVN DNS Manager Error: Migration khi kích hoạt thất bại - ' . $e->getMessage());
+
+        return [
+            'status' => 'error',
+            'description' => 'Không thể khởi tạo cơ sở dữ liệu: ' . $e->getMessage(),
+        ];
+    }
 }
 
 /**
