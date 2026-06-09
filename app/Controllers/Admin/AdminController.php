@@ -497,24 +497,53 @@ class AdminController
         echo json_encode((new SettingsService())->testEmail($input));
     }
 
+    // Async-first: các nút "Run now" KHÔNG gọi DA trong request admin. Chúng chỉ
+    // ghi force-flag; AfterCronJob (cron context, được phép gọi DA) sẽ thực thi.
     private function ajaxRunSslCheck(): void
     {
-        echo json_encode((new ReportService())->runSslCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_ssl_check', $id > 0 ? (string) $id : 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch kiểm tra SSL. Kết quả cập nhật sau chu kỳ cron tiếp theo (vài phút) — tải lại trang để xem.',
+        ]);
     }
 
     private function ajaxRunDriftCheck(): void
     {
-        echo json_encode((new ReportService())->runDriftCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', $id > 0 ? ('id:' . $id) : 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift. Kết quả cập nhật sau chu kỳ cron tiếp theo (vài phút) — tải lại trang để xem.',
+        ]);
     }
 
     private function ajaxRunDriftScanByName(): void
     {
-        echo json_encode((new ReportService())->runDriftScanByName(trim($_REQUEST['domain'] ?? '')));
+        $name = trim($_REQUEST['domain'] ?? '');
+        if ($name === '') {
+            echo json_encode(['success' => false, 'error' => 'Thiếu tên domain.']);
+            return;
+        }
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', 'name:' . $name);
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift cho ' . $name . '. Tải lại trang sau vài phút để xem kết quả.',
+        ]);
     }
 
     private function ajaxRunDriftScanAll(): void
     {
-        echo json_encode((new ReportService())->runDriftScanAll());
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift toàn bộ domain. Tải lại trang sau vài phút để xem kết quả.',
+        ]);
     }
 
     private function ajaxResolveDrift(): void

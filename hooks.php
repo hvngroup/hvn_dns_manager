@@ -107,6 +107,33 @@ add_hook('AfterCronJob', 1, function ($vars) {
         logActivity('MJ DNS Manager [DriftChecker Error]: ' . $e->getMessage()
             . ' in ' . basename($e->getFile()) . ':' . $e->getLine());
     }
+
+    // Force-run SSL/Drift theo yêu cầu admin (async: admin chỉ set flag ở request,
+    // cron — được phép gọi DA — thực thi tại đây rồi xóa flag).
+    try {
+        $report = new \MJ\DnsManager\Services\ReportService();
+
+        $ssl = \MJ\DnsManager\Helpers\SettingsHelper::get('force_ssl_check', '');
+        if ($ssl !== '') {
+            \MJ\DnsManager\Helpers\SettingsHelper::set('force_ssl_check', '');
+            $report->runSslCheck($ssl === 'all' ? 0 : (int) $ssl);
+        }
+
+        $drift = \MJ\DnsManager\Helpers\SettingsHelper::get('force_drift_check', '');
+        if ($drift !== '') {
+            \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', '');
+            if ($drift === 'all') {
+                $report->runDriftScanAll();
+            } elseif (strncmp($drift, 'name:', 5) === 0) {
+                $report->runDriftScanByName(substr($drift, 5));
+            } elseif (strncmp($drift, 'id:', 3) === 0) {
+                $report->runDriftCheck((int) substr($drift, 3));
+            }
+        }
+    } catch (\Throwable $e) {
+        logActivity('MJ DNS Manager [ForceRun Error]: ' . $e->getMessage()
+            . ' in ' . basename($e->getFile()) . ':' . $e->getLine());
+    }
 });
 
 // ─── DNS Zone Auto-Provisioning (Accept Order Flow) ───────────────────────────
