@@ -375,6 +375,14 @@ class QueueWorker
             case 'APPLY_TEMPLATE':
                 $response = $this->handleApplyTemplate($gateway, $domainName, $payload);
                 break;
+            case 'SYNC_ZONE':
+                // Pull toàn bộ zone từ DA về DB (đồng bộ ngược). Worker chạy nền,
+                // KHÔNG block request client (async-first).
+                $response = $gateway->getZone($domainName);
+                if ($response->isSuccess()) {
+                    $this->pullZoneRecords($gateway, $domainName, $response);
+                }
+                break;
             case 'CREATE_EMAIL_FWD':
                 $response = $this->handleCreateEmailFwd($gateway, $domainName, $payload);
                 break;
@@ -850,10 +858,12 @@ class QueueWorker
      * @param  string    $domainName
      * @return void
      */
-    private function pullZoneRecords(DAGateway $gateway, string $domainName): void
+    private function pullZoneRecords(DAGateway $gateway, string $domainName, $response = null): void
     {
         try {
-            $response = $gateway->getZone($domainName);
+            if ($response === null) {
+                $response = $gateway->getZone($domainName);
+            }
 
             if (!$response->isSuccess() || !isset($response->data['records'])) {
                 logActivity("HVN DNS Manager [QueueWorker]: pullZoneRecords failed for '{$domainName}' — " . ($response->errorMessage ?? 'No records returned'));

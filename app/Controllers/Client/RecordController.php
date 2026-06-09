@@ -449,95 +449,26 @@ class RecordController
     private function syncZone(array $input, $userId)
     {
         $domainId = (int) ($input['domain_id'] ?? 0);
-        $domain = $this->getDomainOrError($domainId, $userId);
+        $this->getDomainOrError($domainId, $userId);
 
-        $server = \HvnGroup\DnsManager\Models\Server::where('role', 'primary')
-            ->where('is_active', 1)->first();
-        if (!$server) {
-            throw new \Exception('Không tìm thấy Active Primary Server.');
-        }
+        // Async-first: KHÔNG gọi DA trong request lifecycle của client.
+        // Dispatch job SYNC_ZONE để QueueWorker pull zone từ DA về DB; client
+        // poll trạng thái qua action 'sync_status' với batch_id trả về.
+        $qm = new \HvnGroup\DnsManager\Services\QueueManager();
+        $batchId = $qm->dispatch(
+            $domainId,
+            'SYNC_ZONE',
+            [],
+            5,
+            'client',
+            $userId
+        );
 
-        try {
-            $gateway = new \HvnGroup\DnsManager\Gateway\DAGateway($server);
-            $response = $gateway->getZone($domain->domain);
-
-            if (!$response->isSuccess() || !isset($response->data['records'])) {
-                throw new \Exception('Không thể đồng bộ DNS từ máy chủ: ' . ($response->errorMessage ?? 'Lỗi không xác định'));
-            }
-
-            $newRecordsData = [];
-            foreach ($response->data['records'] as $rec) {
-                $type = strtoupper((string) ($rec['type'] ?? ''));
-                if (!in_array($type, DnsRecordValidator::ALLOWED_TYPES))
-                    continue;
-
-                $name = (string) ($rec['name'] ?? '');
-                if ($name === $domain->domain . '.') {
-                    $name = '@';
-                } else {
-                    $name = str_replace('.' . $domain->domain . '.', '', $name);
-                }
-
-                $value = (string) ($rec['value'] ?? '');
-                $ttl = (int) ($rec['ttl'] ?? 3600);
-                $priority = null;
-                $weight = null;
-                $port = null;
-
-                if ($type === 'MX') {
-                    $parts = explode(' ', $value, 2);
-                    if (count($parts) === 2) {
-                        $priority = (int) $parts[0];
-                        $value = trim($parts[1]);
-                    }
-                } elseif ($type === 'SRV') {
-                    $parts = explode(' ', $value, 3);
-                    if (count($parts) === 3) {
-                        $weight = (int) $parts[0];
-                        $port = (int) $parts[1];
-                        $value = trim($parts[2]);
-                    }
-                    if (isset($rec['priority']))
-                        $priority = (int) $rec['priority'];
-                }
-
-                $newRecordsData[] = [
-                    'domain_id' => $domainId,
-                    'type' => $type,
-                    'name' => $name,
-                    'value' => $value,
-                    'ttl' => $ttl,
-                    'priority' => $priority,
-                    'weight' => $weight,
-                    'port' => $port,
-                    'is_system' => in_array($type, ['NS', 'SOA']) ? 1 : 0,
-                    'is_locked' => 0,
-                    'pending_delete' => 0,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ];
-            }
-
-            Capsule::beginTransaction();
-            Record::where('domain_id', $domainId)->where('is_locked', 0)->delete();
-            if (!empty($newRecordsData)) {
-                Record::insert($newRecordsData);
-            }
-            Capsule::commit();
-
-            $records = Record::where('domain_id', $domainId)->orderBy('type')->orderBy('name')->get();
-
-            return [
-                'success' => true,
-                'data' => ['records' => $records->toArray()],
-                'message' => 'Đã đồng bộ DNS thành công.',
-            ];
-        } catch (\Throwable $e) {
-            if (Capsule::connection()->transactionLevel() > 0) {
-                Capsule::rollBack();
-            }
-            throw $e;
-        }
+        return [
+            'success' => true,
+            'data' => ['batch_id' => $batchId],
+            'message' => 'Đang đồng bộ bản ghi từ máy chủ. Vui lòng đợi trong giây lát.',
+        ];
     }
 
     private function getAllRecords(array $input, $userId)

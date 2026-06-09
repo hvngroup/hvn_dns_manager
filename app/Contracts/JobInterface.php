@@ -20,6 +20,7 @@ interface JobInterface
     const ACTION_REQUEST_SSL       = 'REQUEST_SSL';
     const ACTION_RENEW_SSL         = 'RENEW_SSL';
     const ACTION_APPLY_TEMPLATE    = 'APPLY_TEMPLATE';
+    const ACTION_SYNC_ZONE         = 'SYNC_ZONE';
 
     const STATUS_PENDING            = 'PENDING';
     const STATUS_SYNCING            = 'SYNCING';
@@ -57,6 +58,7 @@ interface JobInterface
         self::ACTION_REQUEST_SSL,
         self::ACTION_RENEW_SSL,
         self::ACTION_APPLY_TEMPLATE,
+        self::ACTION_SYNC_ZONE,
     ];
 
     const VALID_ACTOR_TYPES = [
@@ -83,6 +85,7 @@ interface JobInterface
         self::ACTION_EDIT_REDIRECT     => ['redirect_id', 'source_path', 'destination_url'],
         self::ACTION_DELETE_REDIRECT   => ['redirect_id'],
         self::ACTION_APPLY_TEMPLATE    => ['template_id', 'template_name', 'records'],
+        self::ACTION_SYNC_ZONE         => [],
     ];
 
     public function getAction();

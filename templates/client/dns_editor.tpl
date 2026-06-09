@@ -177,20 +177,26 @@
                                     return;
                                 }
                                 self._refreshToken(res);
-                                self.isSyncingZone = false;
                                 if (!res.success) {
+                                    self.isSyncingZone = false;
                                     var errMsg = (res.error && res.error.message) ? res.error.message : 'Lỗi gửi yêu cầu đồng bộ.';
                                     window.dispatchEvent(new CustomEvent('show-toast', {
                                         detail: { title: 'Đồng bộ thất bại', msg: errMsg, type: 'danger' }
                                     }));
                                     return;
                                 }
-                                if (res.data && res.data.records) {
-                                    self.records = res.data.records;
+                                var batchId = (res.data && res.data.batch_id) ? res.data.batch_id : '';
+                                if (!batchId) {
+                                    self.isSyncingZone = false;
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: { title: 'Đã gửi yêu cầu', msg: 'Đồng bộ đang chạy nền.', type: 'warning' }
+                                    }));
+                                    return;
                                 }
                                 window.dispatchEvent(new CustomEvent('show-toast', {
-                                    detail: { title: 'Thành công', msg: 'Đã cập nhật các bản ghi DNS mới nhất!', type: 'success' }
+                                    detail: { title: 'Đang đồng bộ', msg: 'Đang lấy bản ghi mới nhất từ máy chủ, vui lòng đợi...', type: 'warning' }
                                 }));
+                                self._pollSyncZone(batchId, 0);
                             })
                             .catch(function() {
                                 self.isSyncingZone = false;
@@ -199,6 +205,50 @@
                                 }));
                             });
                         });
+                    },
+
+                    // ─────────────────────────────────────────────────────────
+                    // Poll trạng thái đồng bộ zone (SYNC_ZONE) → reload khi xong
+                    // ─────────────────────────────────────────────────────────
+                    _pollSyncZone: function(batchId, attempt) {
+                        var self = this;
+                        if (attempt > 30) {
+                            self.isSyncingZone = false;
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: { title: 'Đang xử lý', msg: 'Đồng bộ vẫn đang chạy nền. Hãy tải lại trang sau giây lát.', type: 'warning' }
+                            }));
+                            return;
+                        }
+                        setTimeout(function() {
+                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=sync_status', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                },
+                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId, batch_id: batchId })
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(res) {
+                                self._refreshToken(res);
+                                var status = (res.data && res.data.status) ? res.data.status : '';
+                                if (status === 'complete') {
+                                    self.isSyncingZone = false;
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: { title: 'Thành công', msg: 'Đã đồng bộ bản ghi từ máy chủ!', type: 'success' }
+                                    }));
+                                    setTimeout(function() { window.location.reload(); }, 800);
+                                } else if (status === 'failed' || status === 'permanently_failed' || status === 'cancelled') {
+                                    self.isSyncingZone = false;
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: { title: 'Đồng bộ thất bại', msg: 'Máy chủ báo lỗi khi đồng bộ. Vui lòng thử lại sau.', type: 'danger' }
+                                    }));
+                                } else {
+                                    self._pollSyncZone(batchId, attempt + 1);
+                                }
+                            })
+                            .catch(function() { self._pollSyncZone(batchId, attempt + 1); });
+                        }, 3000);
                     },
 
                     // ─────────────────────────────────────────────────────────
