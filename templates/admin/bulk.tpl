@@ -221,10 +221,12 @@ document.addEventListener('alpine:init', () => {
         scanPreview() {
             // Validation
             if (this.operation === 'change_ip' && (!this.formIp.oldIp || !this.formIp.newIp)) {
-                return alert('Vui lòng nhập IP cũ và Mới!');
+                window._hvnToast('warning', 'Thiếu thông tin', 'Vui lòng nhập IP cũ và IP Mới!');
+                return;
             }
             if (this.operation === 'apply_template' && !this.formTemplate.templateId) {
-                return alert('Vui lòng chọn Template!');
+                window._hvnToast('warning', 'Chưa chọn Template', 'Vui lòng chọn Template trước khi quét!');
+                return;
             }
 
             this.resetState();
@@ -254,27 +256,35 @@ document.addEventListener('alpine:init', () => {
             }, 1000);
         },
 
-        executeBulk() {
-            if(!confirm('Cảnh báo thay đổi hàng loạt. Vui lòng xác nhận bạn muốn tiếp tục?')) return;
+        async executeBulk() {
+            var ok = await window._hvnConfirm({
+                title:        'Xác nhận thao tác hàng loạt',
+                message:      'Cảnh báo: Thao tác này sẽ thay đổi DNS trên tất cả các domain đã chọn. Bạn có chắc chắn muốn tiếp tục?',
+                variant:      'danger',
+                confirmLabel: 'Thực hiện',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
             
             this.isExecuting = true;
             this.progress = { done: 0, success: 0, fails: 0, working: 2 };
 
             // Mock execution progress
-            let total = this.preview.domains.length;
-            let current = 0;
+            var total = this.preview.domains.length;
+            var current = 0;
+            var self = this;
             
-            let interval = setInterval(() => {
+            var interval = setInterval(function() {
                 current++;
-                this.progress.done = current;
-                this.progress.success = current;
+                self.progress.done = current;
+                self.progress.success = current;
                 
                 if (current >= total) {
                     clearInterval(interval);
-                    this.isExecuting = false;
-                    this.isDone = true;
-                    this.progress.working = 0;
-                    alert('Hoàn tất thao tác hàng loạt!');
+                    self.isExecuting = false;
+                    self.isDone = true;
+                    self.progress.working = 0;
+                    window._hvnToast('success', 'Hoàn tất', 'Thao tác hàng loạt đã hoàn thành thành công!');
                 }
             }, 600);
         }

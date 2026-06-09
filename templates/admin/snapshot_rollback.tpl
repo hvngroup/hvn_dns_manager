@@ -94,12 +94,23 @@ document.addEventListener('alpine:init', () => {
             return { unchanged: 12, deleted: 0, changed: 0, added: 0, diffs: [] };
         },
 
-        confirmRollback() {
+        async confirmRollback() {
+            var ok = await window._hvnConfirm({
+                title:        'Xác nhận Rollback',
+                message:      'Rollback sẽ ghi đè hệ thống bằng Snapshot này.\nMột snapshot backup nội bộ sẽ được tự động tạo trước khi ghi đè.',
+                variant:      'warning',
+                confirmLabel: 'Xác nhận Rollback',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
+
             this.submitting = true;
             setTimeout(() => {
-                alert('Đã tạo Job khôi phục. Dữ liệu đang đồng bộ xuống các Server DA.');
-                window.location.href = '?module=hvn_dns_manager&action=dns_editor&domain=' + this.domainName;
-            }, 1500);
+                window._hvnToast('success', 'Job Khôi Phục', 'Đã tạo Job khôi phục. Dữ liệu đang đồng bộ xuống các Server DA.');
+                setTimeout(() => {
+                     window.location.href = '?module=hvn_dns_manager&action=dns_editor&domain=' + this.domainName;
+                }, 1500);
+            }, 1000);
         }
     }));
 });

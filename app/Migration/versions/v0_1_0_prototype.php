@@ -66,7 +66,7 @@ class v0_1_0_prototype
             Capsule::statement("CREATE TABLE mod_hvndns_domains (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain VARCHAR(253) NOT NULL,
-                whmcs_service_id INT UNSIGNED NULL,
+                whmcs_domain_id INT UNSIGNED NULL COMMENT 'tbldomains.id (domain registration)',
                 whmcs_user_id INT UNSIGNED NOT NULL,
                 status ENUM('active','suspended','terminated','pending_delete') NOT NULL DEFAULT 'active',
                 ssl_status ENUM('none','pending','active','expired','failed') NOT NULL DEFAULT 'none',
@@ -80,7 +80,7 @@ class v0_1_0_prototype
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 UNIQUE INDEX uniq_domain (domain),
                 INDEX idx_whmcs_user (whmcs_user_id),
-                INDEX idx_whmcs_service (whmcs_service_id),
+                INDEX idx_whmcs_domain (whmcs_domain_id),
                 INDEX idx_status (status)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
@@ -115,7 +115,7 @@ class v0_1_0_prototype
                 batch_id CHAR(36) NOT NULL,
                 domain_id INT UNSIGNED NOT NULL,
                 server_id INT UNSIGNED NOT NULL,
-                action ENUM('ADD_RECORD','EDIT_RECORD','DELETE_RECORD','CREATE_ZONE','DELETE_ZONE','CREATE_REDIRECT','EDIT_REDIRECT','DELETE_REDIRECT','CREATE_EMAIL_FWD','DELETE_EMAIL_FWD','ENABLE_DNSSEC','DISABLE_DNSSEC','RESIGN_ZONE','REQUEST_SSL','RENEW_SSL') NOT NULL,
+                action ENUM('ADD_RECORD','EDIT_RECORD','DELETE_RECORD','CREATE_ZONE','DELETE_ZONE','CREATE_REDIRECT','EDIT_REDIRECT','DELETE_REDIRECT','CREATE_EMAIL_FWD','DELETE_EMAIL_FWD','ENABLE_DNSSEC','DISABLE_DNSSEC','RESIGN_ZONE','REQUEST_SSL','RENEW_SSL','FETCH_DS_RECORDS','APPLY_TEMPLATE') NOT NULL,
                 payload JSON NOT NULL,
                 status ENUM('PENDING','SYNCING','COMPLETE','FAILED','CANCELLED','PERMANENTLY_FAILED') NOT NULL DEFAULT 'PENDING',
                 priority TINYINT UNSIGNED NOT NULL DEFAULT 5,
@@ -363,6 +363,48 @@ class v0_1_0_prototype
                 last_sent_at DATETIME NOT NULL,
                 UNIQUE INDEX uniq_rule_target (rule_id, target_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        }
+
+        // ── Patch: Add nameservers column to mod_hvndns_servers (idempotent) ──
+        if ($schema->hasTable('mod_hvndns_servers')) {
+            if (!$schema->hasColumn('mod_hvndns_servers', 'nameservers')) {
+                Capsule::statement("ALTER TABLE mod_hvndns_servers ADD COLUMN nameservers TEXT NULL COMMENT 'JSON array of nameservers e.g. [\"ns1.hvn.vn\",\"ns2.hvn.vn\"]' AFTER notes");
+            }
+        }
+
+        // ── Patch: Mở rộng ENUM action trong mod_hvndns_queue ─────────────────
+        // Thêm FETCH_DS_RECORDS và APPLY_TEMPLATE vào ENUM
+        // Idempotent: kiểm tra xem APPLY_TEMPLATE đã có trong ENUM chưa trước khi ALTER
+        if ($schema->hasTable('mod_hvndns_queue')) {
+            $enumDef = Capsule::selectOne(
+                "SELECT COLUMN_TYPE FROM information_schema.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'mod_hvndns_queue'
+                    AND COLUMN_NAME = 'action'"
+            );
+            $currentEnum = $enumDef ? (string) $enumDef->COLUMN_TYPE : '';
+
+            if (strpos($currentEnum, 'APPLY_TEMPLATE') === false) {
+                Capsule::statement(
+                    "ALTER TABLE mod_hvndns_queue
+                     MODIFY COLUMN action
+                     ENUM('ADD_RECORD','EDIT_RECORD','DELETE_RECORD','CREATE_ZONE','DELETE_ZONE',
+                          'CREATE_REDIRECT','EDIT_REDIRECT','DELETE_REDIRECT',
+                          'CREATE_EMAIL_FWD','DELETE_EMAIL_FWD',
+                          'ENABLE_DNSSEC','DISABLE_DNSSEC','RESIGN_ZONE',
+                          'REQUEST_SSL','RENEW_SSL',
+                          'FETCH_DS_RECORDS','APPLY_TEMPLATE') NOT NULL"
+                );
+            }
+        }
+
+        // ── Patch: Add synced_at column to mod_hvndns_email_forwards (idempotent) ──
+        // Đánh dấu thời điểm forwarder được đồng bộ thành công lên DA server.
+        // NULL = chưa sync (pending), NOT NULL = đã sync thành công.
+        if ($schema->hasTable('mod_hvndns_email_forwards')) {
+            if (!$schema->hasColumn('mod_hvndns_email_forwards', 'synced_at')) {
+                Capsule::statement("ALTER TABLE mod_hvndns_email_forwards ADD COLUMN synced_at DATETIME NULL DEFAULT NULL COMMENT 'Thời điểm sync thành công lên DA. NULL = chưa sync.' AFTER is_catchall");
+            }
         }
     }
 

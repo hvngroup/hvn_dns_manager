@@ -59,8 +59,12 @@ document.addEventListener('alpine:init', function() {
                 this.submitting = true;
                 var self = this;
                 setTimeout(function() {
-                    alert('Đã lưu bản ghi thành công!');
-                    window.location.href = 'index.php?m=hvn_dns_manager&domain_id=' + self.domainId;
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { title: 'Thành công', msg: 'Đã lưu bản ghi thành công, đợi hệ thống đồng bộ', type: 'success' }
+                    }));
+                    setTimeout(function() {
+                        window.location.href = 'index.php?m=hvn_dns_manager&domain_id=' + self.domainId;
+                    }, 800);
                 }, 800);
             }
         };
@@ -168,3 +172,7 @@ document.addEventListener('alpine:init', function() {
 
 {* ── Alpine.js CDN ── *}
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+{assign var="partials_dir_re" value="{$module_dir}templates/client/partials"}
+{include file="$partials_dir_re/toast.tpl"}
+{include file="$partials_dir_re/confirm_modal.tpl"}

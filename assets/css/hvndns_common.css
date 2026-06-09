@@ -1575,3 +1575,204 @@ table.hvn-align-middle > :not(caption) > * > * { vertical-align: middle; }
 .hvn-alert-success { color: #0a3622; background-color: #d1e7dd; border-color: #a3cfbb; }
 .hvn-alert-warning { color: #664d03; background-color: #fff3cd; border-color: #ffe69c; }
 .hvn-alert-danger  { color: #58151c; background-color: #f8d7da; border-color: #f1aeb5; }
+
+/* =======================================================================
+   COMPONENTS — Toast Notification System
+   ======================================================================= */
+.hvn-toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.hvn-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 280px;
+    max-width: 380px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.4;
+    pointer-events: all;
+    animation: hvn-toast-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.hvn-toast.hvn-toast-leaving {
+    animation: hvn-toast-out 0.25s ease-in both;
+}
+
+.hvn-toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.hvn-toast-body { flex: 1; }
+.hvn-toast-title { font-weight: 700; margin-bottom: 2px; }
+.hvn-toast-message  { opacity: 0.92; }
+.hvn-toast-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+.hvn-toast-close:hover { color: #fff; }
+
+/* Type colors */
+.hvn-toast-success { background: linear-gradient(135deg, #16a34a, #15803d); }
+.hvn-toast-error  { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.hvn-toast-warning { background: linear-gradient(135deg, #d97706, #b45309); }
+.hvn-toast-info    { background: linear-gradient(135deg, #0284c7, #0369a1); }
+
+@keyframes hvn-toast-in {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hvn-toast-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(30px); }
+}
+
+/* =======================================================================
+   COMPONENTS — Confirm Modal
+   ======================================================================= */
+.hvn-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: hvn-backdrop-in 0.2s ease both;
+}
+@keyframes hvn-backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.hvn-modal-box {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    max-width: 460px;
+    width: 100%;
+    animation: hvn-modal-in 0.18s ease both;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+@keyframes hvn-modal-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.hvn-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e9ecef;
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+}
+.hvn-modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.hvn-modal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.hvn-modal-icon-danger  { background: #fee2e2; color: #dc2626; }
+.hvn-modal-icon-warning { background: #fef3c7; color: #d97706; }
+.hvn-modal-icon-info    { background: #dbeafe; color: #2563eb; }
+.hvn-modal-icon-success { background: #dcfce7; color: #16a34a; }
+.hvn-modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+.hvn-modal-close:hover { background: #f1f5f9; color: #475569; }
+.hvn-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #202124;
+    margin: 0 !important;
+    line-height: 1.3;
+    align-self: center;
+}
+
+.hvn-modal-body {
+    padding: 18px 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+.hvn-modal-message {
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.65;
+    margin: 0;
+    white-space: pre-line;
+}
+
+.hvn-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: #fff;
+}
+
+.hvn-modal-btn {
+    height: 44px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+    white-space: nowrap;
+}
+.hvn-modal-btn-cancel { background: #fff; color: #495057; border: 1px solid #dee2e6; }
+.hvn-modal-btn-cancel:hover { background: #f8f9fa; border-color: #adb5bd; }
+.hvn-modal-btn-ok-danger  { background: #dc2626; color: #fff; }
+.hvn-modal-btn-ok-danger:hover  { background: #b91c1c; }
+.hvn-modal-btn-ok-warning { background: #d97706; color: #fff; }
+.hvn-modal-btn-ok-warning:hover { background: #b45309; }
+.hvn-modal-btn-ok-info    { background: #2563eb; color: #fff; }
+.hvn-modal-btn-ok-info:hover    { background: #1d4ed8; }
+.hvn-modal-btn-ok-success { background: #16a34a; color: #fff; }
+.hvn-modal-btn-ok-success:hover { background: #15803d; }
+

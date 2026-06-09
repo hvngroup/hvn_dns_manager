@@ -63,6 +63,14 @@
                         <div class="small">Job đang nằm trong hàng đợi, chưa được Cron Worker xử lý</div>
                     </div>
                 </div>
+            {elseif $log.status == 'cancelled'}
+                <div class="hvn-alert hvn-alert-secondary hvn-d-flex hvn-align-items-center hvn-mb-4">
+                    <i class="bi bi-slash-circle-fill hvn-me-2 hvn-fs-4"></i>
+                    <div>
+                        <strong>Đã hủy</strong>
+                        <div class="small">Job đã bị hủy thủ công bởi Admin — sẽ không được xử lý.</div>
+                    </div>
+                </div>
             {/if}
 
             {* Thông tin cơ bản *}
@@ -102,6 +110,8 @@
                                         <span class="hvn-badge hvn-bg-success">✅ COMPLETE</span>
                                     {elseif $log.status == 'failed'}
                                         <span class="hvn-badge hvn-bg-danger">❌ FAILED</span>
+                                    {elseif $log.status == 'cancelled'}
+                                        <span class="hvn-badge hvn-bg-secondary">⛔ CANCELLED</span>
                                     {else}
                                         <span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡 PENDING</span>
                                     {/if}
@@ -175,34 +185,49 @@
         <div class="hvn-col-md-4">
 
             {* Action Buttons *}
-            <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4">
-                <div class="hvn-card-header">
-                    <h6 class="hvn-mb-0"><i class="bi bi-tools"></i> Hành động</h6>
-                </div>
-                <div class="hvn-card-body">
-                    {if $log.status == 'failed' || $log.status == 'pending'}
-                    <form method="post" action="{$modulelink}&action=retry_job" class="hvn-mb-2">
-                        <input type="hidden" name="token" value="{$token}">
-                        <input type="hidden" name="job_id" value="{$log.id|escape:'htmlall'}">
-                        <button type="submit" class="hvn-btn hvn-btn-warning w-100">
-                            <i class="bi bi-arrow-repeat"></i> Thử lại ngay (Retry)
-                        </button>
-                    </form>
-                    <form method="post" action="{$modulelink}&action=cancel_job" class="hvn-mb-2"
-                          onsubmit="return confirm('Xác nhận hủy Job #{$log.id}?')">
-                        <input type="hidden" name="token" value="{$token}">
-                        <input type="hidden" name="job_id" value="{$log.id|escape:'htmlall'}">
-                        <button type="submit" class="hvn-btn btn-outline-danger w-100">
-                            <i class="bi bi-x-circle"></i> Hủy Job (Cancel)
-                        </button>
-                    </form>
-                    {/if}
-                    <a href="{$modulelink}&action=sync_logs&batch_id={$log.batch_id|escape:'url'}"
-                       class="hvn-btn btn-outline-secondary w-100 text-decoration-none hvn-d-block hvn-text-center">
-                        <i class="bi bi-collection"></i> Xem tất cả Job trong Batch
-                    </a>
-                </div>
+        <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4"
+             x-data="jobActions({
+                 jobId:      {$log.id|intval},
+                 jobStatus:  '{$log.status|escape:'javascript'}',
+                 moduleLink: '{$modulelink|escape:'javascript'}'
+             })">
+            <div class="hvn-card-header">
+                <h6 class="hvn-mb-0"><i class="bi bi-tools"></i> Hành động</h6>
             </div>
+            <div class="hvn-card-body">
+
+                {* Retry *}
+                {if $log.status == 'failed' || $log.status == 'pending'}
+                <button
+                    class="hvn-btn hvn-btn-warning w-100 hvn-mb-2"
+                    @click="retryJob()"
+                    :disabled="loading"
+                    x-show="canAct"
+                >
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span x-text="loading && lastAction==='retry' ? 'Đang xử lý...' : 'Thử lại ngay (Retry)'"></span>
+                </button>
+
+                {* Cancel *}
+                <button
+                    class="hvn-btn btn-outline-danger w-100 hvn-mb-2"
+                    @click="cancelJob()"
+                    :disabled="loading"
+                    x-show="canAct"
+                >
+                    <i class="bi bi-x-circle"></i>
+                    <span x-text="loading && lastAction==='cancel' ? 'Đang hủy...' : 'Hủy Job (Cancel)'"></span>
+                </button>
+                {/if}
+
+
+
+                <a href="{$modulelink}&action=sync_logs"
+                   class="hvn-btn btn-outline-secondary w-100 text-decoration-none hvn-d-block hvn-text-center">
+                    <i class="bi bi-arrow-left"></i> Quay lại Sync Logs
+                </a>
+            </div>
+        </div>
 
             {* Server Info *}
             <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4">
@@ -248,3 +273,95 @@
     </div>
 
 </div>
+
+<script>
+{literal}
+document.addEventListener('alpine:init', () => {
+    Alpine.data('jobActions', function(cfg) {
+        return {
+            jobId:      cfg.jobId,
+            jobStatus:  cfg.jobStatus,
+            moduleLink: cfg.moduleLink,
+            loading:    false,
+            lastAction: '',
+            resultMsg:  '',
+            resultOk:   false,
+
+            get canAct() {
+                return !this.loading && this.jobStatus !== 'cancelled' && this.jobStatus !== 'complete';
+            },
+
+            retryJob: async function() {
+                var ok = await window._hvnConfirm({
+                    title:        'Retry Job #' + this.jobId + '?',
+                    message:      'Job sẽ về PENDING và được xử lý khi Cron Worker chạy.',
+                    variant:      'warning',
+                    confirmLabel: 'Retry',
+                    cancelLabel:  'Hủy'
+                });
+                if (!ok) return;
+
+                var self = this;
+                self.loading    = true;
+                self.lastAction = 'retry';
+
+                fetch(self.moduleLink + '&action=ajax', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body:    'method=retryJob&job_id=' + self.jobId
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    self.loading = false;
+                    if (data.success) {
+                        window._hvnToast('success', 'Thành công', data.message);
+                        self.jobStatus = 'pending';
+                    } else {
+                        window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                    }
+                })
+                .catch(function() {
+                    self.loading = false;
+                    window._hvnToast('error', 'Lỗi mạng', 'Lỗi kết nối, vui lòng thử lại.');
+                });
+            },
+
+            cancelJob: async function() {
+                var ok = await window._hvnConfirm({
+                    title:        'Xác nhận hủy Job #' + this.jobId + '?',
+                    message:      'Job sẽ chuyển sang trạng thái CANCELLED và không thể tự động khôi phục.',
+                    variant:      'danger',
+                    confirmLabel: 'Hủy Job',
+                    cancelLabel:  'Không hủy'
+                });
+                if (!ok) return;
+
+                var self = this;
+                self.loading    = true;
+                self.lastAction = 'cancel';
+
+                fetch(self.moduleLink + '&action=ajax', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body:    'method=cancelJob&job_id=' + self.jobId
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    self.loading = false;
+                    if (data.success) {
+                        window._hvnToast('success', 'Đã hủy', data.message);
+                        self.jobStatus = 'cancelled';
+                    } else {
+                        window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                    }
+                })
+                .catch(function() {
+                    self.loading = false;
+                    window._hvnToast('error', 'Lỗi mạng', 'Lỗi kết nối, vui lòng thử lại.');
+                });
+            }
+        };
+    });
+});
+{/literal}
+</script>

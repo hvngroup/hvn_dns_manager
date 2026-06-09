@@ -212,100 +212,23 @@
     </div>
 </div>
 
-<script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('recordModal', () => ({
-        open: false,
-        isEdit: false,
-        submitting: false,
-        form: { type: '', name: '@', ttl: '3600', value: '', priority: 10, weight: 20, port: 443, caa_tag: 'issue' },
-        errors: {},
-
-        openModal(detail) {
-            this.errors = {};
-            this.submitting = false;
-            this.isEdit = !!detail.isEdit;
-            if (detail.isEdit && detail.record) {
-                const r = detail.record;
-                this.form = {
-                    id: r.id,
-                    type: r.type || '',
-                    name: r.name || '@',
-                    ttl: r.ttl || '3600',
-                    value: r.value || '',
-                    priority: r.priority || 10,
-                    weight: r.weight || 20,
-                    port: r.port || 443,
-                    caa_tag: r.caa_tag || 'issue'
-                };
-            } else {
-                this.form = { type: '', name: '@', ttl: '3600', value: '', priority: 10, weight: 20, port: 443, caa_tag: 'issue' };
-            }
-            this.open = true;
-            document.body.style.overflow = 'hidden';
-        },
-
-        close() {
-            if (this.submitting) return;
-            this.open = false;
-            document.body.style.overflow = '';
-        },
-
-        validate() {
-            this.errors = {};
-            if (!this.form.type) { this.errors.type = 'Vui lòng chọn loại bản ghi.'; }
-            if (!this.form.name || this.form.name.trim() === '') { this.errors.name = 'Tên bản ghi không được để trống.'; }
-            if (!this.form.value || this.form.value.trim() === '') { this.errors.value = 'Giá trị không được để trống.'; }
-            return Object.keys(this.errors).length === 0;
-        },
-
-        async submitRecord() {
-            if (!this.validate()) return;
-            this.submitting = true;
-
-            // TODO: thay bằng fetch() thực tế khi backend sẵn sàng
-            // const endpoint = this.isEdit ? 'updateRecord' : 'createRecord';
-            // const res = await fetch(window.HVNDNS_BASE_URL + '&action=ajax&method=' + endpoint, {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-            //     body: JSON.stringify(this.form)
-            // });
-            // const data = await res.json();
-
-            try {
-                await new Promise(r => setTimeout(r, 800)); // Mock
-
-                // Phát event để parent (adminDnsEditor / clientDnsEditor) cập nhật danh sách
-                window.dispatchEvent(new CustomEvent('record-saved', {
-                    detail: { isEdit: this.isEdit, record: { ...this.form, id: this.form.id || Date.now(), sync_status: 'syncing' } }
-                }));
-
-                this.close();
-            } catch (e) {
-                this.errors.general = 'Có lỗi xảy ra khi lưu bản ghi. Vui lòng thử lại.';
-                this.submitting = false;
-            }
-        }
-    }));
-});
-{/literal}
-</script>
-
 {* ── CSS cho modal (chỉ inject 1 lần nếu chưa có) ── *}
 <style>
 {literal}
 .hvn-modal-overlay {
     position: fixed; inset: 0; z-index: 1050;
     display: flex; align-items: center; justify-content: center;
-}
-.hvn-modal-backdrop {
-    position: absolute; inset: 0;
-    background: rgba(0,0,0,0.45);
+    /* backdrop-filter đặt ở đây để KHÔNG tạo stacking context trong overlay */
     backdrop-filter: blur(2px);
 }
+.hvn-modal-backdrop {
+    position: absolute; inset: 0; z-index: 0;
+    background: rgba(0,0,0,0.45);
+    /* KHÔNG dùng backdrop-filter ở đây — sẽ tạo stacking context mới
+       khiến modal-dialog (z-index:1) vẫn bị blur theo backdrop */
+}
 .hvn-modal-dialog {
-    position: relative; z-index: 1;
+    position: relative; z-index: 10;
     width: 100%; max-width: 540px;
     margin: 1rem;
     animation: hvnModalIn .2s ease;

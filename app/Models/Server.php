@@ -3,27 +3,28 @@
 namespace HvnGroup\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use WHMCS\Security\Encryption;
+
 
 class Server extends Model
 {
     protected $table = 'mod_hvndns_servers';
-    
+
     protected $fillable = [
-        'hostname', 
-        'ip_address', 
-        'port', 
-        'username', 
-        'use_ssl', 
-        'role', 
-        'is_active', 
-        'max_concurrent', 
-        'backoff_until', 
-        'backoff_count', 
-        'last_success_at', 
-        'last_error_at', 
-        'last_error_msg', 
-        'sort_order', 
+        'hostname',
+        'ip_address',
+        'port',
+        'username',
+        'use_ssl',
+        'role',
+        'is_active',
+        'max_concurrent',
+        'nameservers',
+        'backoff_until',
+        'backoff_count',
+        'last_success_at',
+        'last_error_at',
+        'last_error_msg',
+        'sort_order',
         'notes'
     ];
 
@@ -36,22 +37,27 @@ class Server extends Model
         'use_ssl' => 'boolean',
         'is_active' => 'boolean',
         'max_concurrent' => 'integer',
-        'backoff_until' => 'datetime',
         'backoff_count' => 'integer',
-        'last_success_at' => 'datetime',
-        'last_error_at' => 'datetime',
         'sort_order' => 'integer',
+        'nameservers' => 'array', // TEXT column storing JSON array of NS hostnames
+        // backoff_until, last_success_at, last_error_at: kept as strings
+        // AdminController uses date()/strtotime() to format these safely
     ];
 
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password_enc'] = Encryption::encode($value);
+        $this->attributes['password_enc'] = class_exists('\WHMCS\Security\Encryption')
+            ? \WHMCS\Security\Encryption::encode($value)
+            : base64_encode($value);
     }
 
     public function getPasswordAttribute()
     {
-        return isset($this->attributes['password_enc']) 
-            ? Encryption::decode($this->attributes['password_enc']) 
-            : null;
+        if (!isset($this->attributes['password_enc'])) {
+            return null;
+        }
+        return class_exists('\WHMCS\Security\Encryption')
+            ? \WHMCS\Security\Encryption::decode($this->attributes['password_enc'])
+            : base64_decode($this->attributes['password_enc']);
     }
 }

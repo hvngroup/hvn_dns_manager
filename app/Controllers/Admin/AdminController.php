@@ -2,80 +2,596 @@
 
 namespace HvnGroup\DnsManager\Controllers\Admin;
 
-/**
- * Controller mock phục vụ cho Prototype UI Phase 0D (Admin).
- * Sẽ được refactor thành logic thật trong Phase 2/3.
- */
+use HvnGroup\DnsManager\Services\DashboardService;
+use HvnGroup\DnsManager\Services\ZoneManager;
+use HvnGroup\DnsManager\Services\RecordManager;
+use HvnGroup\DnsManager\Services\ReportService;
+use HvnGroup\DnsManager\Services\SettingsService;
+use Illuminate\Database\Capsule\Manager as Capsule;
+
 class AdminController
 {
-    /**
-     * Entry point của Admin Area
-     */
-    public function dispatch($action, $params)
+    private \Smarty $smarty;
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Dispatch
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function dispatch($action, $params): void
     {
-        $template = 'dashboard';
-        
+        if ($action === 'ajax') {
+            $this->handleAjax($params);
+            return;
+        }
+
+        if (!$this->tablesExist()) {
+            echo '<div style="margin:30px;padding:20px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px">
+                <h4>⚠️ Database chưa được khởi tạo</h4>
+                <p>Bảng <code>mod_hvndns_*</code> chưa tồn tại. Vui lòng:</p>
+                <ol>
+                    <li>Vào <strong>Admin &rsaquo; Addons &rsaquo; HVN DNS Manager</strong></li>
+                    <li>Bấm <strong>Deactivate</strong> rồi <strong>Activate</strong> lại module</li>
+                    <li>Migration sẽ tự chạy và tạo các bảng</li>
+                </ol>
+            </div>';
+            return;
+        }
+
         $validActions = [
-            'servers', 'domains', 'dns_editor', 'admin_dns_editor', 'sync_logs',
+            'servers',
+            'domains',
+            'dns_editor',
+            'admin_dns_editor',
+            'sync_logs',
             'sync_log_detail',
-            'audit_trail', 'templates', 
-            'drift_reports', 'bulk', 'settings',
-            'server_edit', 'template_edit',
-            'drift_settings', 'audit_detail', 'snapshot_rollback'
+            'audit_trail',
+            'templates',
+            'drift_reports',
+            'bulk',
+            'settings',
+            'server_edit',
+            'template_edit',
+            'drift_settings',
+            'audit_detail',
+            'snapshot_rollback',
+            'ajax',
         ];
 
-        // Alias: action name → template name
         $actionTemplateMap = [
             'admin_dns_editor' => 'dns_editor',
         ];
 
-        if (in_array($action, $validActions)) {
-            $template = $actionTemplateMap[$action] ?? $action;
-        }
+        $template = in_array($action, $validActions)
+            ? ($actionTemplateMap[$action] ?? $action)
+            : 'dashboard';
 
-        // Setup Smarty cho Admin Area
         global $templates_compiledir;
-        $smarty = new \Smarty();
-        $smarty->template_dir = dirname(dirname(dirname(__DIR__))) . '/templates/admin/';
-        $smarty->compile_dir = $templates_compiledir;
-        
-        // Disable notice/warning for missing variables in mock dev
-        $smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
+        $this->smarty = new \Smarty();
+        $this->smarty->template_dir = dirname(dirname(dirname(__DIR__))) . '/templates/admin/';
+        $this->smarty->compile_dir  = $templates_compiledir;
+        $this->smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
 
-        $smarty->assign('modulelink', $params['modulelink']);
-        $smarty->assign('action', $action ?: 'dashboard');
-        $smarty->assign('template_name', $template);
-        
-        // Mock data cho Dashboard
-        if ($template === 'dashboard') {
-            $smarty->assign('dashboard', ['hasCriticalAlert' => true]);
+        $this->smarty->assign('modulelink', $params['modulelink']);
+        $this->smarty->assign('action',        $action ?: 'dashboard');
+        $this->smarty->assign('template_name', $template);
+        $this->smarty->assign('token',         $_SESSION['whmcs']['token'] ?? '');
+
+        switch ($template) {
+            case 'dashboard':
+                $this->actionDashboard();
+                break;
+            case 'sync_logs':
+                $this->actionSyncLogs();
+                break;
+            case 'sync_log_detail':
+                $this->actionSyncLogDetail();
+                break;
+            case 'servers':
+                $this->actionServers();
+                break;
+            case 'server_edit':
+                $this->actionServerEdit();
+                break;
+            case 'domains':
+                $this->actionDomains();
+                break;
+            case 'audit_trail':
+                $this->actionAuditTrail();
+                break;
+            case 'audit_detail':
+                $this->actionAuditDetail();
+                break;
+            case 'dns_editor':
+                $this->actionAdminDnsEditor();
+                break;
+            case 'settings':
+                $this->actionSettings();
+                break;
+            case 'drift_reports':
+                $this->actionDriftReports();
+                break;
+            case 'templates':
+                $this->actionTemplates();
+                break;
+            case 'template_edit':
+                $this->actionTemplateEdit();
+                break;
+            default:
+                break;
         }
 
-        // Mock data cho Sync Log Detail
-        if ($template === 'sync_log_detail') {
-            $jobId = (int) ($_GET['id'] ?? 0);
-
-            // Mock dataset khớp với sync_logs.tpl
-            $mockLogs = [
-                4521 => ['id'=>4521,'domain'=>'myblog.net','domain_id'=>101,'action'=>'DELETE_RECORD','details'=>'A @ 1.2.3.4','server_hostname'=>'dns3.hvn.vn','server_is_primary'=>false,'server_use_ssl'=>true,'status'=>'failed','attempt'=>3,'ms'=>null,'batch_id'=>'b1a2c3d4-e5f6-7890-abcd-ef1234567890','actor_type'=>'CLIENT','actor_id'=>42,'actor_ip'=>'203.0.113.10','created_at'=>'2026-02-27 14:32:00','completed_at'=>null,'next_retry'=>'2026-02-27 14:47:00','payload'=>"{\n  \"type\": \"A\",\n  \"name\": \"@\",\n  \"value\": \"1.2.3.4\",\n  \"ttl\": 14400\n}",'error_msg'=>"Connection timeout after 30s\nServer: dns3.hvn.vn:2222\nDA API endpoint: /CMD_API_DNS_CONTROL\nAttempt: 3/5",'da_response'=>null],
-                4520 => ['id'=>4520,'domain'=>'shop.vn','domain_id'=>102,'action'=>'ADD_RECORD','details'=>'A mail 203.0.1.10','server_hostname'=>'dns1.hvn.vn','server_is_primary'=>true,'server_use_ssl'=>true,'status'=>'complete','attempt'=>1,'ms'=>89,'batch_id'=>'c2b3d4e5-f6a7-8901-bcde-f01234567891','actor_type'=>'CLIENT','actor_id'=>55,'actor_ip'=>'203.0.113.20','created_at'=>'2026-02-27 14:31:00','completed_at'=>'2026-02-27 14:31:05','next_retry'=>null,'payload'=>"{\n  \"type\": \"A\",\n  \"name\": \"mail\",\n  \"value\": \"203.0.1.10\",\n  \"ttl\": 14400\n}",'error_msg'=>null,'da_response'=>"error=0\ntext=Command completed successfully"],
-                4519 => ['id'=>4519,'domain'=>'shop.vn','domain_id'=>102,'action'=>'ADD_RECORD','details'=>'A mail 203.0.1.10','server_hostname'=>'dns2.hvn.vn','server_is_primary'=>false,'server_use_ssl'=>true,'status'=>'complete','attempt'=>1,'ms'=>92,'batch_id'=>'c2b3d4e5-f6a7-8901-bcde-f01234567891','actor_type'=>'CLIENT','actor_id'=>55,'actor_ip'=>'203.0.113.20','created_at'=>'2026-02-27 14:31:00','completed_at'=>'2026-02-27 14:31:06','next_retry'=>null,'payload'=>"{\n  \"type\": \"A\",\n  \"name\": \"mail\",\n  \"value\": \"203.0.1.10\",\n  \"ttl\": 14400\n}",'error_msg'=>null,'da_response'=>"error=0\ntext=Command completed successfully"],
-                4518 => ['id'=>4518,'domain'=>'shop.vn','domain_id'=>102,'action'=>'ADD_RECORD','details'=>'A mail 203.0.1.10','server_hostname'=>'dns3.hvn.vn','server_is_primary'=>false,'server_use_ssl'=>true,'status'=>'failed','attempt'=>3,'ms'=>null,'batch_id'=>'c2b3d4e5-f6a7-8901-bcde-f01234567891','actor_type'=>'CLIENT','actor_id'=>55,'actor_ip'=>'203.0.113.20','created_at'=>'2026-02-27 14:31:00','completed_at'=>null,'next_retry'=>'2026-02-27 14:46:00','payload'=>"{\n  \"type\": \"A\",\n  \"name\": \"mail\",\n  \"value\": \"203.0.1.10\",\n  \"ttl\": 14400\n}",'error_msg'=>"Connection timeout after 30s\nServer: dns3.hvn.vn:2222",'da_response'=>null],
-                4515 => ['id'=>4515,'domain'=>'myfashion.vn','domain_id'=>103,'action'=>'DELETE_RECORD','details'=>'CNAME www','server_hostname'=>'dns1.hvn.vn','server_is_primary'=>true,'server_use_ssl'=>false,'status'=>'failed','attempt'=>5,'ms'=>null,'batch_id'=>'d3c4e5f6-a7b8-9012-cdef-012345678902','actor_type'=>'ADMIN','actor_id'=>1,'actor_ip'=>'10.0.0.1','created_at'=>'2026-02-27 14:20:00','completed_at'=>null,'next_retry'=>null,'payload'=>"{\n  \"type\": \"CNAME\",\n  \"name\": \"www\",\n  \"value\": \"myfashion.vn.\",\n  \"ttl\": 14400\n}",'error_msg'=>"Auth failed: Invalid DirectAdmin credentials\nUsername: dns_sync_user\nServer: dns1.hvn.vn:2222\nHTTP 401 Unauthorized",'da_response'=>"error=1\ntext=Authentication Failed\ndetails=Invalid username or password"],
-                4505 => ['id'=>4505,'domain'=>'realty.com.vn','domain_id'=>104,'action'=>'ADD_RECORD','details'=>'CAA 0 issue le.org','server_hostname'=>'dns1.hvn.vn','server_is_primary'=>true,'server_use_ssl'=>true,'status'=>'pending','attempt'=>0,'ms'=>null,'batch_id'=>'e4d5f6a7-b8c9-0123-def0-123456789003','actor_type'=>'CLIENT','actor_id'=>88,'actor_ip'=>'203.0.113.50','created_at'=>'2026-02-27 13:50:00','completed_at'=>null,'next_retry'=>null,'payload'=>"{\n  \"type\": \"CAA\",\n  \"name\": \"@\",\n  \"flags\": 0,\n  \"tag\": \"issue\",\n  \"value\": \"letsencrypt.org\",\n  \"ttl\": 3600\n}",'error_msg'=>null,'da_response'=>null],
-            ];
-
-            // Tìm log theo ID, fallback về log đầu tiên nếu không tìm thấy
-            $log = $mockLogs[$jobId] ?? reset($mockLogs);
-            $smarty->assign('log', $log);
-            $smarty->assign('token', $_SESSION['whmcs']['token'] ?? 'mock_csrf_token_prototype');
-        }
-        
-        // Render wrapper (chứa sidebar + nội dung chính)
         try {
-            $smarty->display('wrapper.tpl');
+            $this->smarty->display('wrapper.tpl');
         } catch (\Exception $e) {
-            echo "<div class='alert alert-danger'>Lỗi render template: " . $e->getMessage() . "</div>";
+            echo "<div class='alert alert-danger'>Lỗi render template: "
+                . htmlspecialchars($e->getMessage()) . "</div>";
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // AJAX dispatcher
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function handleAjax(array $params): void
+    {
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        header('Content-Type: application/json; charset=utf-8');
+
+        // Parse JSON body nếu có
+        $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+        if (strpos($contentType, 'application/json') !== false) {
+            $raw = file_get_contents('php://input');
+            if ($raw) {
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $_REQUEST = array_merge($_REQUEST, $decoded);
+                    $_POST    = array_merge($_POST,    $decoded);
+                }
+            }
+        }
+
+        $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : '';
+
+        $methodMap = [
+            // Dashboard
+            'getDashboardStats'    => 'ajaxGetDashboardStats',
+            // Queue / Jobs
+            'runPendingJobs'       => 'ajaxRunPendingJobs',
+            'retryJob'             => 'ajaxRetryJob',
+            'retryAllFailed'       => 'ajaxRetryAllFailed',
+            'cancelJob'            => 'ajaxCancelJob',
+            // Server
+            'testConnection'       => 'ajaxTestConnection',
+            'toggleServerStatus'   => 'ajaxToggleServerStatus',
+            'resetServerBackoff'   => 'ajaxResetServerBackoff',
+            // DNS Records (Admin)
+            'adminAddRecord'       => 'ajaxAdminAddRecord',
+            'adminEditRecord'      => 'ajaxAdminEditRecord',
+            'adminDeleteRecord'    => 'ajaxAdminDeleteRecord',
+            'adminToggleLock'      => 'ajaxAdminToggleLock',
+            // Settings
+            'saveSettings'         => 'ajaxSaveSettings',
+            'testNotification'     => 'ajaxTestNotification',
+            'testEmail'            => 'ajaxTestEmail',
+            // Drift / SSL
+            'runSslCheck'          => 'ajaxRunSslCheck',
+            'runDriftCheck'        => 'ajaxRunDriftCheck',
+            'runDriftScanByName'   => 'ajaxRunDriftScanByName',
+            'runDriftScanAll'      => 'ajaxRunDriftScanAll',
+            'resolveDrift'         => 'ajaxResolveDrift',
+        ];
+
+        if (isset($methodMap[$method])) {
+            $callable = $methodMap[$method];
+            $this->$callable();
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Invalid ajax method']);
+        }
+        exit;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Page actions — chỉ gọi Service, assign Smarty
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function actionDashboard(): void
+    {
+        $this->smarty->assign('dashboard', (new DashboardService())->getPageData());
+    }
+
+    private function actionSyncLogs(): void
+    {
+        $data = (new ReportService())->getSyncLogs();
+        $this->smarty->assign('syncLogsJson',    json_encode($data['logs'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+        $this->smarty->assign('serverHostnames', $data['serverHostnames']);
+    }
+
+    private function actionSyncLogDetail(): void
+    {
+        $data = (new ReportService())->getSyncLogDetail((int) ($_GET['id'] ?? 0));
+        $this->smarty->assign('log',   $data['log'] ?? null);
+        $this->smarty->assign('error', $data['error'] ?? null);
+    }
+
+    private function actionServers(): void
+    {
+        $servers = (new ZoneManager())->getServersForList();
+        $this->smarty->assign('serversJson', json_encode($servers, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+    }
+
+    private function actionServerEdit(): void
+    {
+        $flash = $_SESSION['hvndns_flash'] ?? null;
+        unset($_SESSION['hvndns_flash']);
+        $this->smarty->assign('flash', $flash);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $result = (new ZoneManager())->saveServer($_POST);
+            if ($result['success']) {
+                $this->redirectToServers($result['message']);
+            } else {
+                $this->redirectToServerEdit($result['id'] ?? 0, 'error', $result['error']);
+            }
+            return;
+        }
+
+        $serverId = (int) ($_GET['id'] ?? 0);
+        $data     = (new ZoneManager())->getServerForEdit($serverId);
+        $this->smarty->assign('serverJson', json_encode($data['server'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+        $this->smarty->assign('isEdit',     $data['isEdit']);
+        $this->smarty->assign('serverId',   $serverId);
+    }
+
+    private function actionDomains(): void
+    {
+        // Logic query đơn giản — giữ thẳng trong controller
+        $search       = trim($_GET['search'] ?? '');
+        $filterStatus = trim($_GET['status'] ?? '');
+        $page         = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage      = 50;
+
+        $query = \HvnGroup\DnsManager\Models\Domain::orderBy('domain');
+        if ($search)       $query->where('domain', 'like', '%' . $search . '%');
+        if ($filterStatus) $query->where('status', $filterStatus);
+
+        $total   = $query->count();
+        $domains = $query->skip(($page - 1) * $perPage)->limit($perPage)->get();
+
+        $userIds = $domains->pluck('whmcs_user_id')->filter()->unique()->toArray();
+        $clients = [];
+        if (!empty($userIds)) {
+            $rows = Capsule::table('tblclients')->whereIn('id', $userIds)->select(['id', 'firstname', 'lastname'])->get();
+            foreach ($rows as $row) {
+                $clients[$row->id] = trim($row->firstname . ' ' . $row->lastname);
+            }
+        }
+
+        $domainIds   = $domains->pluck('id')->toArray();
+        $failedCounts = $lastSyncs = [];
+        if (!empty($domainIds)) {
+            $failedCounts = \HvnGroup\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
+                ->whereIn('status', ['FAILED', 'PERMANENTLY_FAILED'])
+                ->selectRaw('domain_id, count(*) as cnt')->groupBy('domain_id')
+                ->pluck('cnt', 'domain_id')->toArray();
+            $lastSyncs = \HvnGroup\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
+                ->whereNotNull('completed_at')
+                ->selectRaw('domain_id, max(completed_at) as last_completed')->groupBy('domain_id')
+                ->pluck('last_completed', 'domain_id')->toArray();
+        }
+
+        $result = $domains->map(function ($d) use ($clients, $failedCounts, $lastSyncs) {
+            $failed    = $failedCounts[$d->id] ?? 0;
+            $lastSyncRaw = $lastSyncs[$d->id] ?? null;
+            $lastSync  = $lastSyncRaw ? (new \DateTime($lastSyncRaw))->format('d/m H:i') : 'Chưa đồng bộ';
+            return [
+                'id'           => $d->id,
+                'service_id'   => $d->whmcs_domain_id ?? 0,
+                'domain'       => $d->domain,
+                'client_id'    => $d->whmcs_user_id,
+                'client_name'  => $clients[$d->whmcs_user_id] ?? '(Unknown)',
+                'records_count' => \HvnGroup\DnsManager\Models\Record::where('domain_id', $d->id)->count(),
+                'last_sync'    => $lastSync,
+                'failed_jobs'  => $failed,
+                'status'       => $d->status,
+                'sync_status'  => $failed > 0 ? 'failed' : 'complete',
+            ];
+        })->values()->toArray();
+
+        $this->smarty->assign('domainsJson',  json_encode($result, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+        $this->smarty->assign('totalDomains', $total);
+        $this->smarty->assign('totalPages',   (int) ceil($total / $perPage));
+        $this->smarty->assign('currentPage',  $page);
+    }
+
+    private function actionAuditTrail(): void
+    {
+        $logs = (new ReportService())->getAuditLogs();
+        $this->smarty->assign('auditLogsJson', json_encode($logs, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+    }
+
+    private function actionAuditDetail(): void
+    {
+        $data = (new ReportService())->getAuditLogDetail((int) ($_GET['id'] ?? 0));
+        $this->smarty->assign('auditLog',   isset($data['log'])
+            ? json_encode($data['log'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG)
+            : null);
+        $this->smarty->assign('auditError', $data['error'] ?? null);
+    }
+
+    private function actionAdminDnsEditor(): void
+    {
+        $domainId = (int) ($_GET['domain_id'] ?? 0);
+        $data     = (new RecordManager())->getRecordsForEditor($domainId);
+        $this->smarty->assign('editorError', $data['error'] ?? null);
+        $this->smarty->assign('domain',      $data['domain'] ?? null);
+        $this->smarty->assign('recordsJson', json_encode($data['records'] ?? [], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+        $this->smarty->assign('domainId',    $domainId);
+    }
+
+    private function actionSettings(): void
+    {
+        $settings = (new SettingsService())->getSettingsForPage();
+        $this->smarty->assign('settingsJson', json_encode($settings, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+    }
+
+    private function actionDriftReports(): void
+    {
+        $data = (new ReportService())->getDriftReports();
+        $this->smarty->assign('driftReportsJson', json_encode($data['reports'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+        $this->smarty->assign('driftLastRun',     $data['lastRun']);
+        $this->smarty->assign('driftNextRun',     $data['nextRun']);
+    }
+
+    private function actionTemplates(): void
+    {
+        $templates = \HvnGroup\DnsManager\Models\Template::orderBy('is_default', 'desc')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($t) {
+                $records = is_array($t->records_data) ? $t->records_data : [];
+                return [
+                    'id'            => $t->id,
+                    'name'          => $t->name,
+                    'description'   => $t->description,
+                    'is_default'    => (bool) $t->is_default,
+                    'is_visible'    => (bool) $t->is_visible_client,
+                    'records_count' => count($records),
+                    'records'       => $records,
+                    'created_at'    => $t->created_at
+                        ? $t->created_at->format('d/m/Y H:i') : '',
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        $this->smarty->assign(
+            'templatesJson',
+            json_encode($templates, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG)
+        );
+    }
+
+    private function actionTemplateEdit(): void
+    {
+        $flash = $_SESSION['hvndns_flash'] ?? null;
+        unset($_SESSION['hvndns_flash']);
+        $this->smarty->assign('flash', $flash);
+
+        $id       = (int) ($_GET['id'] ?? 0);
+        $isEdit   = $id > 0;
+        $template = null;
+
+        if ($isEdit) {
+            $row = \HvnGroup\DnsManager\Models\Template::find($id);
+            if ($row) {
+                $records = is_array($row->records_data) ? $row->records_data : [];
+                // Chuẩn hoá field: backend dùng 'priority', template_edit.tpl dùng 'prio'
+                foreach ($records as &$rec) {
+                    if (!isset($rec['prio']) && isset($rec['priority'])) {
+                        $rec['prio'] = $rec['priority'];
+                    }
+                }
+                unset($rec);
+                $template = [
+                    'id'          => $row->id,
+                    'name'        => $row->name,
+                    'description' => $row->description,
+                    'is_default'  => (bool) $row->is_default,
+                    'is_visible'  => (bool) $row->is_visible_client,
+                    'records'     => $records,
+                ];
+            }
+        }
+
+        $this->smarty->assign('isEdit',       $isEdit);
+        $this->smarty->assign('templateJson', json_encode($template, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // AJAX handlers — chỉ gọi Service, echo JSON
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function ajaxGetDashboardStats(): void
+    {
+        $days = (int) ($_GET['days'] ?? 7);
+        if (!in_array($days, [7, 15, 30])) $days = 7;
+        echo json_encode((new DashboardService())->getStats($days));
+    }
+
+    private function ajaxRunPendingJobs(): void
+    {
+        echo json_encode((new ReportService())->runPendingJobs());
+    }
+
+    private function ajaxRetryJob(): void
+    {
+        echo json_encode((new ReportService())->retryJob((int) ($_POST['job_id'] ?? 0)));
+    }
+
+    private function ajaxRetryAllFailed(): void
+    {
+        echo json_encode((new ReportService())->retryAllFailed());
+    }
+
+    private function ajaxCancelJob(): void
+    {
+        echo json_encode((new ReportService())->cancelJob((int) ($_POST['job_id'] ?? 0)));
+    }
+
+    private function ajaxTestConnection(): void
+    {
+        echo json_encode((new ZoneManager())->testConnection($_POST));
+    }
+
+    private function ajaxToggleServerStatus(): void
+    {
+        echo json_encode((new ZoneManager())->toggleStatus((int) ($_POST['server_id'] ?? 0)));
+    }
+
+    private function ajaxResetServerBackoff(): void
+    {
+        echo json_encode((new ZoneManager())->resetBackoff((int) ($_POST['server_id'] ?? 0)));
+    }
+
+    private function ajaxAdminAddRecord(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        echo json_encode((new RecordManager())->addRecord($input, 'admin'));
+    }
+
+    private function ajaxAdminEditRecord(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        echo json_encode((new RecordManager())->editRecord($input, 'admin'));
+    }
+
+    private function ajaxAdminDeleteRecord(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        echo json_encode((new RecordManager())->deleteRecord($input, 'admin'));
+    }
+
+    private function ajaxAdminToggleLock(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        echo json_encode((new RecordManager())->toggleLock($input));
+    }
+
+    private function ajaxSaveSettings(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        echo json_encode((new SettingsService())->saveSettings($input));
+    }
+
+    private function ajaxTestNotification(): void
+    {
+        echo json_encode((new SettingsService())->testNotification());
+    }
+
+    private function ajaxTestEmail(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        echo json_encode((new SettingsService())->testEmail($input));
+    }
+
+    private function ajaxRunSslCheck(): void
+    {
+        echo json_encode((new ReportService())->runSslCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+    }
+
+    private function ajaxRunDriftCheck(): void
+    {
+        echo json_encode((new ReportService())->runDriftCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+    }
+
+    private function ajaxRunDriftScanByName(): void
+    {
+        echo json_encode((new ReportService())->runDriftScanByName(trim($_REQUEST['domain'] ?? '')));
+    }
+
+    private function ajaxRunDriftScanAll(): void
+    {
+        echo json_encode((new ReportService())->runDriftScanAll());
+    }
+
+    private function ajaxResolveDrift(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        $driftId = (int) ($input['drift_id'] ?? 0);
+        $action = trim($input['action'] ?? '');
+
+        if ($driftId <= 0 || empty($action)) {
+            echo json_encode(['success' => false, 'error' => 'Thiếu drift_id hoặc action.']);
+            return;
+        }
+
+        $allowed = ['pull', 'push', 'delete_da', 'delete_whmcs', 'ignore'];
+        if (!in_array($action, $allowed, true)) {
+            echo json_encode(['success' => false, 'error' => "Action không hợp lệ: {$action}"]);
+            return;
+        }
+
+        echo json_encode((new \HvnGroup\DnsManager\Services\ReportService())->resolveDrift($driftId, $action));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Public gateway cho ajax.php (admin record actions)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function handleAdminRecordAjax(string $method): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        $svc   = new RecordManager();
+
+        switch ($method) {
+            case 'adminAddRecord':
+                echo json_encode($svc->addRecord($input, 'admin'));
+                break;
+            case 'adminEditRecord':
+                echo json_encode($svc->editRecord($input, 'admin'));
+                break;
+            case 'adminDeleteRecord':
+                echo json_encode($svc->deleteRecord($input, 'admin'));
+                break;
+            case 'adminToggleLock':
+                echo json_encode($svc->toggleLock($input));
+                break;
+            default:
+                echo json_encode(['success' => false, 'error' => ['message' => 'Invalid admin method.']]);
+        }
+        exit;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private function tablesExist(): bool
+    {
+        try {
+            return Capsule::schema()->hasTable('mod_hvndns_queue');
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    // Dùng bởi ServerService::saveServer() để redirect sau khi lưu
+    public function redirectToServers(string $msg): void
+    {
+        $_SESSION['hvndns_flash'] = ['type' => 'success', 'message' => $msg];
+        header('Location: addonmodules.php?module=hvn_dns_manager&action=servers');
+        exit;
+    }
+
+    public function redirectToServerEdit(int $id, string $type, string $msg): void
+    {
+        $_SESSION['hvndns_flash'] = ['type' => $type, 'message' => $msg];
+        $url = 'addonmodules.php?module=hvn_dns_manager&action=server_edit';
+        if ($id > 0) {
+            $url .= '&id=' . $id;
+        }
+        header('Location: ' . $url);
+        exit;
     }
 }

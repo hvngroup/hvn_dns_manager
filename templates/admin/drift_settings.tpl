@@ -49,7 +49,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         saveAutoFix() {
-            alert('Đã lưu cấu hình Drift Auto-fix!');
+            window._hvnToast('success', 'Đã lưu', 'Cấu hình Drift Auto-fix đã được lưu!');
             window.location.href = '{/literal}{$modulelink}&action=drift_reports{literal}';
         }
     }));

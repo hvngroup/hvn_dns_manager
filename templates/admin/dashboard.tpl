@@ -1,48 +1,65 @@
-<div class="hvn-dns-admin">
-    <!-- Thêm thư viện Chart.js nếu theme WHMCS chưa có -->
+<div class="hvn-dns-admin" x-data="dashboardManager()" x-init="init()">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-    <!-- Alert Banner -->
-    {if $dashboard.hasCriticalAlert}
-    <div class="alert alert-danger hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
-        <div>
-            <i class="bi bi-exclamation-triangle-fill fs-5 hvn-me-2"></i>
-            <strong>CẢNH BÁO:</strong> dns3.hvn.vn mất kết nối từ 14:30 &mdash; 7 job FAILED liên tiếp.
+    <!-- ── Alert Banner (dynamic) ─────────────────────────────────────── -->
+    <template x-if="hasCriticalAlert">
+        <div class="alert alert-danger hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
+            <div>
+                <i class="bi bi-exclamation-triangle-fill fs-5 hvn-me-2"></i>
+                <strong>CẢNH BÁO:</strong>
+                <template x-for="msg in alertMessages" :key="msg">
+                    <span x-text="msg" class="hvn-ms-1"></span>
+                </template>
+            </div>
+            <div>
+                <button class="hvn-btn btn-sm btn-outline-danger hvn-me-2"
+                    onclick="location.href='?module=hvn_dns_manager&action=sync_logs'">
+                    Xem chi tiết
+                </button>
+                <button class="hvn-btn btn-sm hvn-btn-danger" @click="hasCriticalAlert = false">
+                    <i class="bi bi-x"></i> Dismiss
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="hvn-btn btn-sm btn-outline-danger hvn-me-2">Xem chi tiết</button>
-            <button class="hvn-btn btn-sm btn-outline-danger hvn-me-2">Retry All</button>
-            <button class="hvn-btn btn-sm hvn-btn-danger"><i class="bi bi-x"></i> Dismiss</button>
-        </div>
-    </div>
-    {/if}
+    </template>
 
+    <!-- ── Row 1: Sync Pipeline + Tổng quan ──────────────────────────── -->
     <div class="hvn-row hvn-mb-4">
+        <!-- Sync Pipeline -->
         <div class="hvn-col-md-8">
             <div class="hvn-card h-100 hvn-shadow-sm hvn-border-0">
                 <div class="hvn-card-header hvn-bg-white hvn-border-bottom-0 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                    <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-activity"></i> Sync Pipeline</h5>
+                    <h5 class="hvn-mb-0 hvn-text-secondary">
+                        <i class="bi bi-activity"></i> Sync Pipeline
+                        <!-- Spinner khi đang load -->
+                        <span x-show="loading" class="spinner-border spinner-border-sm hvn-ms-2 hvn-text-secondary" role="status"></span>
+                        <!-- Thời gian cập nhật gần nhất -->
+                        <small x-show="!loading && generatedAt" class="hvn-text-muted hvn-ms-2" style="font-size:0.75rem;" x-text="'cập nhật lúc ' + generatedAt"></small>
+                    </h5>
                     <div class="hvn-d-flex hvn-gap-1" id="syncChartFilter">
-                        <button class="hvn-btn hvn-btn-sm hvn-btn-blue" data-days="7" onclick="syncChartSetRange(7)">7 ngày</button>
-                        <button class="hvn-btn hvn-btn-sm hvn-btn-outline-blue" data-days="15" onclick="syncChartSetRange(15)">15 ngày</button>
-                        <button class="hvn-btn hvn-btn-sm hvn-btn-outline-blue" data-days="30" onclick="syncChartSetRange(30)">30 ngày</button>
+                        <button class="hvn-btn hvn-btn-sm hvn-btn-blue" :class="chartDays===7?'hvn-btn-blue':'hvn-btn-outline-blue'" @click="setDays(7)">7 ngày</button>
+                        <button class="hvn-btn hvn-btn-sm" :class="chartDays===15?'hvn-btn-blue':'hvn-btn-outline-blue'" @click="setDays(15)">15 ngày</button>
+                        <button class="hvn-btn hvn-btn-sm" :class="chartDays===30?'hvn-btn-blue':'hvn-btn-outline-blue'" @click="setDays(30)">30 ngày</button>
                     </div>
                 </div>
                 <div class="hvn-card-body">
+                    <!-- 3 số lớn -->
                     <div class="hvn-row hvn-text-center hvn-mb-4">
                         <div class="hvn-col-4 hvn-border-end">
-                            <div class="display-6 hvn-text-success hvn-fw-bold">{$dashboard.stats.complete|default:'1,247' }</div>
+                            <div class="display-6 hvn-text-success hvn-fw-bold" x-text="stats.complete || '—'"></div>
                             <div class="hvn-text-muted text-uppercase small">Complete</div>
                         </div>
                         <div class="hvn-col-4 hvn-border-end">
-                            <div class="display-6 hvn-text-warning hvn-fw-bold">{$dashboard.stats.pending|default:'23' }</div>
+                            <div class="display-6 hvn-text-warning hvn-fw-bold" x-text="stats.pending || '—'"></div>
                             <div class="hvn-text-muted text-uppercase small">Pending</div>
                         </div>
                         <div class="hvn-col-4">
-                            <div class="display-6 hvn-text-danger hvn-fw-bold">{$dashboard.stats.failed|default:'12' }</div>
+                            <div class="display-6 hvn-text-danger hvn-fw-bold" x-text="stats.failed || '—'"></div>
                             <div class="hvn-text-muted text-uppercase small">Failed</div>
                         </div>
                     </div>
+                    <!-- Chart -->
                     <div style="height: 140px;">
                         <canvas id="syncChart"></canvas>
                     </div>
@@ -59,40 +76,34 @@
                 <div class="hvn-card-body">
                     <div class="hvn-d-flex hvn-justify-content-between hvn-border-bottom hvn-pb-2 hvn-mb-2">
                         <span><i class="bi bi-globe"></i> Domains:</span>
-                        <span class="hvn-fw-bold">{$dashboard.stats.domains|default:'342' }</span>
+                        <span class="hvn-fw-bold" x-text="stats.domains || '—'"></span>
                     </div>
                     <div class="hvn-d-flex hvn-justify-content-between hvn-border-bottom hvn-pb-2 hvn-mb-2">
                         <span><i class="bi bi-card-list"></i> Records:</span>
-                        <span class="hvn-fw-bold">{$dashboard.stats.records|default:'6,840' }</span>
+                        <span class="hvn-fw-bold" x-text="stats.records || '—'"></span>
                     </div>
-                    
-                    <h6 class="hvn-text-muted small text-uppercase">Top thay đổi 7 ngày</h6>
+
+                    <h6 class="hvn-text-muted small text-uppercase hvn-mt-3">Top thay đổi 7 ngày</h6>
                     <ul class="list-unstyled hvn-mb-0">
-                        {foreach from=$dashboard.topDomains item=d name=top}
+                        <template x-if="topDomains.length === 0">
+                            <li class="hvn-text-muted small">Chưa có dữ liệu</li>
+                        </template>
+                        <template x-for="(d, i) in topDomains" :key="d.domain">
                             <li class="hvn-d-flex hvn-justify-content-between hvn-mb-1">
-                                <span class="text-truncate" style="max-width: 150px;">{$smarty.foreach.top.iteration}. <a href="?module=hvn_dns_manager&action=domains&search={$d.domain}">{$d.domain}</a></span>
-                                <span class="hvn-badge hvn-bg-light hvn-text-dark">{$d.changes_count} thay đổi</span>
+                                <span class="text-truncate" style="max-width:150px;">
+                                    <span x-text="(i+1) + '. '"></span>
+                                    <a :href="'?module=hvn_dns_manager&action=domains&search=' + d.domain" x-text="d.domain"></a>
+                                </span>
+                                <span class="hvn-badge hvn-bg-light hvn-text-dark" x-text="d.changes_count + ' thay đổi'"></span>
                             </li>
-                        {foreachelse}
-                            <li class="hvn-d-flex hvn-justify-content-between hvn-mb-1">
-                                <span>1. example.com</span>
-                                <span class="hvn-badge hvn-bg-light hvn-text-dark">45 thay đổi</span>
-                            </li>
-                            <li class="hvn-d-flex hvn-justify-content-between hvn-mb-1">
-                                <span>2. shop.vn</span>
-                                <span class="hvn-badge hvn-bg-light hvn-text-dark">38 thay đổi</span>
-                            </li>
-                            <li class="hvn-d-flex hvn-justify-content-between hvn-mb-1">
-                                <span>3. myblog.net</span>
-                                <span class="hvn-badge hvn-bg-light hvn-text-dark">22 thay đổi</span>
-                            </li>
-                        {/foreach}
+                        </template>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ── Row 2: Server Health + Activity Feed ───────────────────────── -->
     <div class="hvn-row">
         <!-- Server Health -->
         <div class="hvn-col-md-5 hvn-mb-4">
@@ -102,140 +113,117 @@
                     <a href="?module=hvn_dns_manager&action=servers" class="hvn-btn btn-sm btn-link text-decoration-none">Quản lý</a>
                 </div>
                 <div class="hvn-list-group hvn-list-group-flush hvn-pb-2">
-                    {foreach from=$dashboard.servers item=srv}
-                    <div class="hvn-list-group-item hvn-py-3">
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
-                            <h6 class="hvn-mb-0">
-                                {if $srv.status == 'online' }
-                                    <span class="hvn-text-success" title="Online">🟢</span>
-                                {elseif $srv.status == 'offline' }
-                                    <span class="hvn-text-danger" title="Offline">🔴</span>
-                                {else}
-                                    <span class="hvn-text-warning" title="Warning">🟡</span>
-                                {/if}
-                                {$srv.hostname}
-                                {if $srv.is_primary}
-                                    <span class="hvn-badge hvn-bg-primary hvn-ms-1" style="font-size: 0.65em">PRI</span>
-                                {/if}
-                            </h6>
-                            {if $srv.status == 'offline' }
-                                <div class="hvn-d-flex hvn-gap-1">
-                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" onclick="alert('Đang Test lỗi kết nối server...')">Test</button>
-                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger" onclick="alert('Đã vô hiệu hóa server.')">Disable</button>
-                                </div>
-                            {/if}
-                        </div>
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
-                            <span>{$srv.uptime|default:'99.9' }% &bull; {$srv.latency|default:'45' }ms avg</span>
-                            {if $srv.pending > 0}
-                                <span><i class="bi bi-clock"></i> {$srv.pending} pending</span>
-                            {elseif $srv.failed > 0}
-                                <span class="hvn-text-danger hvn-fw-bold"><i class="bi bi-exclamation-triangle"></i> {$srv.failed} failed</span>
-                            {else}
-                                <span class="hvn-text-success"><i class="bi bi-check-circle"></i> Clear</span>
-                            {/if}
-                        </div>
-                        {if $srv.status == 'offline' }
-                            <div class="hvn-text-danger small hvn-mt-1"><i class="bi bi-exclamation-circle-fill"></i> Timeout (Failed 7 times)</div>
-                        {/if}
-                    </div>
-                    {foreachelse}
-                    <div class="hvn-list-group-item hvn-py-3">
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
-                            <h6 class="hvn-mb-0"><span class="hvn-text-success">🟢</span> dns1.hvn.vn <span class="hvn-badge hvn-bg-primary hvn-ms-1" style="font-size: 0.65em">PRI</span></h6>
-                        </div>
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
-                            <span>99.8% &bull; 45ms avg</span>
-                            <span><i class="bi bi-clock"></i> 12 pending</span>
-                        </div>
-                    </div>
-                    <div class="hvn-list-group-item hvn-py-3">
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
-                            <h6 class="hvn-mb-0"><span class="hvn-text-success">🟢</span> dns2.hvn.vn</h6>
-                        </div>
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
-                            <span>99.5% &bull; 52ms avg</span>
-                            <span><i class="bi bi-clock"></i> 12 pending</span>
-                        </div>
-                    </div>
-                    <div class="hvn-list-group-item hvn-py-3 hvn-bg-danger-subtle bg-opacity-10">
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
-                            <h6 class="hvn-mb-0 hvn-fw-bold"><span class="hvn-text-danger">🔴</span> dns3.hvn.vn</h6>
-                            <div class="hvn-d-flex hvn-gap-1">
-                                <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary">Test</button>
-                                <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger">Disable</button>
+                    <template x-if="servers.length === 0">
+                        <div class="hvn-list-group-item hvn-py-3 hvn-text-muted small">Chưa có server nào.</div>
+                    </template>
+                    <template x-for="srv in servers" :key="srv.id">
+                        <div class="hvn-list-group-item hvn-py-3"
+                            :class="srv.status === 'offline' ? 'hvn-bg-danger-subtle' : ''">
+                            <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-1">
+                                <h6 class="hvn-mb-0">
+                                    <template x-if="srv.status === 'online'"><span title="Online">🟢</span></template>
+                                    <template x-if="srv.status === 'warning'"><span title="Warning">🟡</span></template>
+                                    <template x-if="srv.status === 'offline'"><span title="Offline">🔴</span></template>
+                                    <span x-text="srv.hostname"></span>
+                                    <template x-if="srv.is_primary">
+                                        <span class="hvn-badge hvn-bg-primary hvn-ms-1" style="font-size:0.65em">PRI</span>
+                                    </template>
+                                </h6>
+                                <template x-if="srv.status === 'offline'">
+                                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-danger"
+                                        onclick="location.href='?module=hvn_dns_manager&action=servers'">
+                                        Xử lý
+                                    </button>
+                                </template>
                             </div>
+                            <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
+                                <span>
+                                    <template x-if="srv.uptime !== null">
+                                        <span x-text="srv.uptime + '%'"></span>
+                                    </template>
+                                    <template x-if="srv.uptime === null"><span>—</span></template>
+                                    &bull;
+                                    <template x-if="srv.latency"><span x-text="srv.latency + 'ms avg'"></span></template>
+                                    <template x-if="!srv.latency"><span>N/A</span></template>
+                                </span>
+                                <template x-if="srv.pending > 0">
+                                    <span><i class="bi bi-clock"></i> <span x-text="srv.pending"></span> pending</span>
+                                </template>
+                                <template x-if="srv.pending === 0 && srv.failed > 0">
+                                    <span class="hvn-text-danger hvn-fw-bold">
+                                        <i class="bi bi-exclamation-triangle"></i> <span x-text="srv.failed"></span> failed
+                                    </span>
+                                </template>
+                                <template x-if="srv.pending === 0 && srv.failed === 0">
+                                    <span class="hvn-text-success"><i class="bi bi-check-circle"></i> Clear</span>
+                                </template>
+                            </div>
+                            <template x-if="srv.status === 'offline' && srv.last_error">
+                                <div class="hvn-text-danger small hvn-mt-1">
+                                    <i class="bi bi-exclamation-circle-fill"></i>
+                                    <span x-text="srv.last_error"></span>
+                                </div>
+                            </template>
                         </div>
-                        <div class="hvn-d-flex hvn-justify-content-between hvn-text-muted small">
-                            <span class="hvn-text-danger">97.1% &bull; timeout</span>
-                            <span class="hvn-text-danger hvn-fw-bold"><i class="bi bi-exclamation-triangle"></i> 7 failed</span>
-                        </div>
-                    </div>
-                    {/foreach}
+                    </template>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Activity Feed -->
         <div class="hvn-col-md-7 hvn-mb-4">
             <div class="hvn-card hvn-shadow-sm hvn-border-0 h-100">
                 <div class="hvn-card-header hvn-bg-white hvn-pt-3 hvn-pb-2 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                    <h5 class="hvn-mb-0 hvn-text-secondary"><i class="bi bi-journal-text"></i> Hoạt động gần đây (Live)</h5>
-                    <div class="spinner-grow spinner-grow-sm hvn-text-success" role="status" title="Live update">
-                        <span class="visually-hidden">Loading...</span>
+                    <h5 class="hvn-mb-0 hvn-text-secondary">
+                        <i class="bi bi-journal-text"></i> Hoạt động gần đây
+                    </h5>
+                    <!-- Spinner live — nhấp nháy khi đang refresh -->
+                    <div class="spinner-grow spinner-grow-sm hvn-text-success" role="status" title="Auto-refresh 30s">
+                        <span class="visually-hidden">Live</span>
                     </div>
                 </div>
                 <div class="hvn-card-body hvn-p-0">
                     <ul class="hvn-list-group hvn-list-group-flush font-monospace small">
-                        {foreach from=$dashboard.recentActivity item=log}
-                            <li class="hvn-list-group-item hvn-py-2" style="background-color: {if $log.status == 'complete'}rgba(25,135,84,0.07){elseif $log.status == 'failed'}rgba(220,53,69,0.07){else}rgba(255,193,7,0.1){/if};">
+                        <template x-if="recentActivity.length === 0">
+                            <li class="hvn-list-group-item hvn-py-3 hvn-text-muted">Chưa có hoạt động nào.</li>
+                        </template>
+                        <template x-for="log in recentActivity" :key="log.id">
+                            <li class="hvn-list-group-item hvn-py-2"
+                                :style="log.status==='complete'
+                                    ? 'background:rgba(25,135,84,0.07)'
+                                    : log.status==='failed'
+                                        ? 'background:rgba(220,53,69,0.07)'
+                                        : 'background:rgba(255,193,7,0.1)'">
                                 <div class="hvn-d-flex w-100 hvn-justify-content-between">
                                     <span>
-                                        <span class="hvn-text-muted hvn-pe-2">{$log.time}</span>
-                                        {if $log.status == 'complete' }✅{elseif $log.status == 'failed' }❌{else}⚠️{/if} 
-                                        <strong>{$log.action}</strong>
+                                        <span class="hvn-text-muted hvn-pe-2" x-text="log.time"></span>
+                                        <span x-text="log.status==='complete'?'✅':log.status==='failed'?'❌':'⚠️'"></span>
+                                        <strong x-text="log.action"></strong>
                                     </span>
-                                    <a href="?module=hvn_dns_manager&action=domains&search={$log.domain}">{$log.domain}</a>
+                                    <a :href="'?module=hvn_dns_manager&action=domains&search='+log.domain" x-text="log.domain"></a>
                                 </div>
                                 <div class="hvn-text-muted ps-5 hvn-pt-1">
-                                    &rarr; {$log.server} <span class="hvn-badge {if $log.status == 'complete' }hvn-bg-success-subtle hvn-text-success{elseif $log.status == 'failed' }hvn-bg-danger-subtle hvn-text-danger{else}hvn-bg-warning-subtle hvn-text-warning{/if} hvn-fw-normal hvn-ms-1">{$log.status_text}</span>
+                                    &rarr; <span x-text="log.server"></span>
+                                    <span class="hvn-badge hvn-fw-normal hvn-ms-1"
+                                        :class="log.status==='complete'
+                                            ? 'hvn-bg-success-subtle hvn-text-success'
+                                            : log.status==='failed'
+                                                ? 'hvn-bg-danger-subtle hvn-text-danger'
+                                                : 'hvn-bg-warning-subtle hvn-text-warning'"
+                                        x-text="log.status_text">
+                                    </span>
                                 </div>
+                                <template x-if="log.error_brief">
+                                    <div class="hvn-text-danger ps-5 hvn-pt-1" style="font-size:0.75rem;" x-text="log.error_brief"></div>
+                                </template>
                             </li>
-                        {foreachelse}
-                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(220,53,69,0.07);">
-                                <div class="hvn-d-flex w-100 hvn-justify-content-between">
-                                    <span><span class="hvn-text-muted hvn-pe-2">14:32</span> ❌ <strong>DELETE_RECORD</strong></span>
-                                    <a href="#">myblog.net</a>
-                                </div>
-                                <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns3.hvn.vn <span class="hvn-badge hvn-bg-danger-subtle hvn-text-danger hvn-fw-normal hvn-ms-1">timeout</span></div>
-                                <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1.hvn.vn <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">primary complete</span></div>
-                            </li>
-                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(25,135,84,0.07);">
-                                <div class="hvn-d-flex w-100 hvn-justify-content-between">
-                                    <span><span class="hvn-text-muted hvn-pe-2">14:31</span> ✅ <strong>ADD_RECORD</strong></span>
-                                    <a href="#">shop.vn</a>
-                                </div>
-                                <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
-                            </li>
-                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(25,135,84,0.07);">
-                                <div class="hvn-d-flex w-100 hvn-justify-content-between">
-                                    <span><span class="hvn-text-muted hvn-pe-2">14:30</span> ✅ <strong>EDIT_RECORD</strong></span>
-                                    <a href="#">example.com</a>
-                                </div>
-                                <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns1,dns2,dns3 <span class="hvn-badge hvn-bg-success-subtle hvn-text-success hvn-fw-normal hvn-ms-1">complete</span></div>
-                            </li>
-                            <li class="hvn-list-group-item hvn-py-2" style="background-color: rgba(255,193,7,0.1);">
-                                <div class="hvn-d-flex w-100 hvn-justify-content-between">
-                                    <span><span class="hvn-text-muted hvn-pe-2">14:28</span> ⚠️ <strong>ENABLE_DNSSEC</strong></span>
-                                    <a href="#">test.org</a>
-                                </div>
-                                <div class="hvn-text-muted ps-5 hvn-pt-1">&rarr; dns3.hvn.vn <span class="hvn-badge hvn-bg-warning-subtle hvn-text-warning hvn-fw-normal hvn-ms-1">retrying...</span></div>
-                            </li>
-                        {/foreach}
+                        </template>
                     </ul>
                 </div>
                 <div class="hvn-card-footer hvn-bg-white hvn-border-top-0 hvn-pt-0 hvn-pb-3">
-                    <a href="?module=hvn_dns_manager&action=sync_logs" class="hvn-btn btn-light btn-sm w-100">« Xem tất cả Sync Logs &rarr; »</a>
+                    <a href="?module=hvn_dns_manager&action=sync_logs" class="hvn-btn btn-light btn-sm w-100">
+                        « Xem tất cả Sync Logs »
+                    </a>
                 </div>
             </div>
         </div>
@@ -243,145 +231,148 @@
 </div>
 
 <script>
+var HVNDNS_MODULELINK = '{$modulelink|escape:'javascript'}';
+</script>
+<script>
 {literal}
-document.addEventListener('DOMContentLoaded', function() {
-    var syncChartInstance = null;
+document.addEventListener('alpine:init', () => {
+    Alpine.data('dashboardManager', () => ({
+        // ── State ─────────────────────────────────────────────────────────
+        loading:          true,
+        chartDays:        7,
+        stats:            { complete: '—', pending: '—', failed: '—', domains: '—', records: '—' },
+        chartData:        null,
+        servers:          [],
+        recentActivity:   [],
+        topDomains:       [],
+        hasCriticalAlert: false,
+        alertMessages:    [],
+        generatedAt:      null,
+        chartInstance:    null,
+        refreshTimer:     null,
 
-    // Generate last N days labels (dd/mm)
-    function genLabels(days) {
-        var labels = [];
-        var now = new Date();
-        for (var i = days - 1; i >= 0; i--) {
-            var d = new Date(now);
-            d.setDate(d.getDate() - i);
-            labels.push((d.getDate() < 10 ? '0' : '') + d.getDate() + '/' + (d.getMonth() < 9 ? '0' : '') + (d.getMonth() + 1));
-        }
-        return labels;
-    }
+        // ── Init ──────────────────────────────────────────────────────────
+        init() {
+            this.fetchStats();
+            // Auto-refresh mỗi 30 giây
+            this.refreshTimer = setInterval(() => { this.fetchStats(); }, 30000);
+        },
 
-    // Mock 30-day data (complete / failed / pending)
-    var allData30 = {
-        complete: [85,92,74,110,98,120,135,88,76,95,102,89,115,130,142,98,87,105,118,125,97,88,110,132,145,120,98,115,88,95],
-        failed:   [3, 2, 5, 1, 4, 0, 2, 6, 3, 2, 1, 4, 2, 0, 3, 5, 2, 1, 3, 2, 4, 1, 2, 0, 3, 2, 5, 1, 6, 4],
-        pending:  [8, 5, 9, 6, 3, 7, 4, 10,5, 8, 6, 7, 5, 4, 6, 8, 9, 5, 7, 4, 6, 9, 5, 3, 7, 6, 4, 8, 5, 7]
-    };
+        // ── Fetch từ API ──────────────────────────────────────────────────
+        async fetchStats() {
+            this.loading = true;
+            try {
+                const url = HVNDNS_MODULELINK + '&action=ajax&method=getDashboardStats&days=' + this.chartDays;
+                const res  = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
 
-    function getSlice(days) {
-        return {
-            labels: genLabels(days),
-            complete: allData30.complete.slice(-days),
-            failed:   allData30.failed.slice(-days),
-            pending:  allData30.pending.slice(-days)
-        };
-    }
+                if (!data.success) return;
 
-    function renderChart(days) {
-        var ctx = document.getElementById('syncChart');
-        if (!ctx || typeof Chart === 'undefined') return;
+                this.stats            = data.stats;
+                this.chartData        = data.chartData;
+                this.servers          = data.servers;
+                this.recentActivity   = data.recentActivity;
+                this.topDomains       = data.topDomains || [];
+                this.hasCriticalAlert = data.hasCriticalAlert;
+                this.alertMessages    = data.alertMessages || [];
+                this.generatedAt      = data.generatedAt;
 
-        var d = getSlice(days);
+                // Render chart sau khi có data
+                this.$nextTick(() => { this.renderChart(); });
 
-        if (syncChartInstance) {
-            syncChartInstance.data.labels = d.labels;
-            syncChartInstance.data.datasets[0].data = d.complete;
-            syncChartInstance.data.datasets[1].data = d.failed;
-            syncChartInstance.data.datasets[2].data = d.pending;
-            syncChartInstance.update();
-            return;
-        }
+            } catch (e) {
+                console.error('Dashboard fetch error:', e);
+            } finally {
+                this.loading = false;
+            }
+        },
 
-        syncChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: d.labels,
-                datasets: [
-                    {
-                        label: 'Complete',
-                        data: d.complete,
-                        borderColor: '#198754',
-                        backgroundColor: 'rgba(25,135,84,0.12)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointHoverRadius: 4
-                    },
-                    {
-                        label: 'Failed',
-                        data: d.failed,
-                        borderColor: '#dc3545',
-                        backgroundColor: 'rgba(220,53,69,0.1)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointHoverRadius: 4
-                    },
-                    {
-                        label: 'Pending',
-                        data: d.pending,
-                        borderColor: '#ffc107',
-                        backgroundColor: 'rgba(255,193,7,0.1)',
-                        borderWidth: 2,
-                        fill: false,
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointHoverRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { boxWidth: 12, font: { size: 11 }, padding: 8 }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            title: function(items) { return 'Ngày ' + items[0].label; }
+        // ── Đổi khoảng thời gian chart ────────────────────────────────────
+        setDays(days) {
+            this.chartDays = days;
+            this.fetchStats();
+        },
+
+        // ── Render / Update Chart.js ──────────────────────────────────────
+        renderChart() {
+            const ctx = document.getElementById('syncChart');
+            if (!ctx || !this.chartData || typeof Chart === 'undefined') return;
+
+            const d = this.chartData;
+
+            if (this.chartInstance) {
+                // Update data mà không destroy → không flicker
+                this.chartInstance.data.labels              = d.labels;
+                this.chartInstance.data.datasets[0].data   = d.complete;
+                this.chartInstance.data.datasets[1].data   = d.failed;
+                this.chartInstance.data.datasets[2].data   = d.pending;
+                this.chartInstance.update('none'); // 'none' = không animate khi update
+                return;
+            }
+
+            // Khởi tạo lần đầu
+            this.chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: d.labels,
+                    datasets: [
+                        {
+                            label: 'Complete',
+                            data: d.complete,
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25,135,84,0.12)',
+                            borderWidth: 2, fill: true, tension: 0.4,
+                            pointRadius: 2, pointHoverRadius: 4
+                        },
+                        {
+                            label: 'Failed',
+                            data: d.failed,
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220,53,69,0.1)',
+                            borderWidth: 2, fill: false, tension: 0.4,
+                            pointRadius: 2, pointHoverRadius: 4
+                        },
+                        {
+                            label: 'Pending',
+                            data: d.pending,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255,193,7,0.1)',
+                            borderWidth: 2, fill: false, tension: 0.4,
+                            pointRadius: 2, pointHoverRadius: 4
                         }
-                    }
+                    ]
                 },
-                scales: {
-                    x: {
-                        display: true,
-                        grid: { display: false },
-                        ticks: { font: { size: 10 }, maxRotation: 0, maxTicksLimit: 10 }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 400 },
+                    plugins: {
+                        legend: {
+                            display: true, position: 'top',
+                            labels: { boxWidth: 12, font: { size: 11 }, padding: 8 }
+                        },
+                        tooltip: {
+                            mode: 'index', intersect: false,
+                            callbacks: { title: (items) => 'Ngày ' + items[0].label }
+                        }
                     },
-                    y: {
-                        display: true,
-                        min: 0,
-                        grid: { color: 'rgba(0,0,0,0.05)' },
-                        ticks: { font: { size: 10 }, maxTicksLimit: 5 }
-                    }
-                },
-                interaction: { mode: 'nearest', axis: 'x', intersect: false }
-            }
-        });
-    }
-
-    // Filter button handler
-    window.syncChartSetRange = function(days) {
-        renderChart(days);
-        // Update active button state
-        var btns = document.querySelectorAll('#syncChartFilter button');
-        btns.forEach(function(btn) {
-            var d = parseInt(btn.getAttribute('data-days'));
-            if (d === days) {
-                btn.className = btn.className.replace('hvn-btn-outline-blue', 'hvn-btn-blue');
-            } else {
-                btn.className = btn.className.replace('hvn-btn-blue', 'hvn-btn-outline-blue');
-            }
-        });
-    };
-
-    // Init with 7 days
-    renderChart(7);
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxRotation: 0, maxTicksLimit: 10 }
+                        },
+                        y: {
+                            display: true, min: 0,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { font: { size: 10 }, maxTicksLimit: 5 }
+                        }
+                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                }
+            });
+        }
+    }));
 });
 {/literal}
 </script>

@@ -7,7 +7,8 @@
             <button class="hvn-btn hvn-btn-outline-secondary" @click="runScan()" :disabled="scanning">
                 <span x-show="scanning" class="spinner-border spinner-border-sm hvn-me-1"></span>
                 <i x-show="!scanning" class="bi bi-search hvn-me-1"></i>
-                <span x-text="scanning ? 'Đang quét...' : 'Quét thủ công'"></span>
+                <span x-show="!scanning" x-text="filterDomain ? 'Quét: ' + filterDomain : 'Quét tất cả'"></span>
+                <span x-show="scanning">Đang quét...</span>
             </button>
             <a href="{$modulelink}&action=drift_settings" class="hvn-btn hvn-btn-primary">
                 <i class="bi bi-gear"></i> Cài đặt Auto-fix
@@ -19,8 +20,8 @@
     <div class="hvn-card hvn-border-0 hvn-shadow-sm hvn-mb-3" style="background:#f8fafc;">
         <div class="hvn-card-body hvn-py-2 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
             <div class="small hvn-text-muted hvn-d-flex hvn-align-items-center" style="gap:16px;">
-                <span><i class="bi bi-clock-history"></i> Lần quét gần nhất: <strong class="hvn-text-dark">27/02/2026 02:15</strong></span>
-                <span><i class="bi bi-calendar-event"></i> Kế tiếp: <strong class="hvn-text-dark">28/02/2026 02:00</strong></span>
+                <span><i class="bi bi-clock-history"></i> Lần quét gần nhất: <strong class="hvn-text-dark">{$driftLastRun}</strong></span>
+                <span><i class="bi bi-calendar-event"></i> Kế tiếp: <strong class="hvn-text-dark">{$driftNextRun}</strong></span>
             </div>
             <div class="small hvn-text-muted">
                 <i class="bi bi-database hvn-text-primary"></i> WHMCS là <strong>Source of Truth</strong> — dữ liệu trên WHMCS được ưu tiên khi có xung đột.
@@ -296,6 +297,10 @@
 </div>
 
 <script>
+    var _hvnDriftRows = {$driftReportsJson};
+    var _hvnModuleLink = "{$modulelink|escape:'javascript'}";
+</script>
+<script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('driftManager', () => ({
@@ -319,18 +324,7 @@ document.addEventListener('alpine:init', () => {
 
         // ── Mock data ──────────────────────────
         // Flat rows: mỗi row là 1 bản ghi lệch độc lập
-        rows: [
-            { id: 101, domain: 'example.com', domain_id: 1, type: 'added_on_da',   record_type: 'A',     record_name: 'test2',  whmcs_val: null,                                        da_val: '5.6.7.8',                      status: 'pending'  },
-            { id: 102, domain: 'example.com', domain_id: 1, type: 'modified',      record_type: 'TXT',   record_name: '@',      whmcs_val: 'v=spf1 include:_spf.google.com ~all',       da_val: 'v=spf1 include:_spf.zoho.com ~all', status: 'pending' },
-            { id: 103, domain: 'shop.vn',     domain_id: 2, type: 'missing_on_da', record_type: 'CNAME', record_name: 'ftp',    whmcs_val: 'shop.vn.',                                  da_val: null,                           status: 'pending'  },
-            { id: 104, domain: 'shop.vn',     domain_id: 2, type: 'modified',      record_type: 'MX',    record_name: '@',      whmcs_val: '10 mail.shop.vn.',                          da_val: '5 mail2.shop.vn.',             status: 'pending'  },
-            { id: 105, domain: 'techblog.io', domain_id: 3, type: 'added_on_da',   record_type: 'AAAA',  record_name: 'ipv6',   whmcs_val: null,                                        da_val: '2001:db8::1',                  status: 'pending'  },
-            { id: 106, domain: 'techblog.io', domain_id: 3, type: 'missing_on_da', record_type: 'CAA',   record_name: '@',      whmcs_val: '0 issue letsencrypt.org',                   da_val: null,                           status: 'pending'  },
-            { id: 107, domain: 'mystore.vn',  domain_id: 4, type: 'modified',      record_type: 'A',     record_name: '@',      whmcs_val: '103.20.0.10',                               da_val: '103.20.0.99',                  status: 'pending'  },
-            { id: 108, domain: 'mystore.vn',  domain_id: 4, type: 'added_on_da',   record_type: 'TXT',   record_name: '_dkim',  whmcs_val: null,                                        da_val: 'v=DKIM1; k=rsa; p=MIGfMA...',  status: 'pending'  },
-            { id: 109, domain: 'api.dev',     domain_id: 5, type: 'modified',      record_type: 'NS',    record_name: '@',      whmcs_val: 'ns1.hvn.vn.',                               da_val: 'ns1.other.vn.',                status: 'resolved' },
-            { id: 110, domain: 'api.dev',     domain_id: 5, type: 'missing_on_da', record_type: 'SRV',   record_name: '_sip',   whmcs_val: '10 20 5060 sip.api.dev.',                   da_val: null,                           status: 'ignored'  },
-        ],
+        rows: _hvnDriftRows,
 
         // ── Computed ────────────────────────────
         get pendingCount() {
@@ -409,31 +403,112 @@ document.addEventListener('alpine:init', () => {
         },
 
         // ── Actions ─────────────────────────────
-        resolve(row, action) {
+        async resolve(row, action) {
+            const labels = {
+                push:          'push',
+                pull:          'pull',
+                delete_da:     'xóa trên DA',
+                delete_whmcs:  'xóa trong WHMCS',
+                ignore:        'bỏ qua',
+            };
             const msgs = {
-                push: `Push: Ghi đè DA bằng WHMCS cho ${row.record_type} ${row.record_name} (${row.domain})?`,
-                pull: `Pull: Lấy dữ liệu ${row.record_type} ${row.record_name} từ DA cập nhật vào WHMCS?`,
+                push:         `Push: Ghi đè DA bằng WHMCS cho ${row.record_type} ${row.record_name} (${row.domain})?`,
+                pull:         `Pull: Lấy dữ liệu ${row.record_type} ${row.record_name} từ DA cập nhật vào WHMCS?`,
                 delete_da:    `XÓA bản ghi ${row.record_type} ${row.record_name} trên DirectAdmin?`,
                 delete_whmcs: `XÓA bản ghi ${row.record_type} ${row.record_name} trong CSDL WHMCS?`,
-                ignore: `Bỏ qua cảnh báo ${row.record_type} ${row.record_name} tới lần quét sau?`,
+                ignore:       `Bỏ qua cảnh báo ${row.record_type} ${row.record_name} tới lần quét sau?`,
             };
 
-            if (confirm(msgs[action] || 'Xác nhận hành động?')) {
-                if (action === 'ignore') {
-                    row.status = 'ignored';
+            var ok = await window._hvnConfirm({
+                title:        'Xác nhận hành động',
+                message:      msgs[action] || 'Xác nhận xử lý bản ghi này?',
+                variant:      (action === 'delete_da' || action === 'delete_whmcs') ? 'danger' : 'warning',
+                confirmLabel: 'Xác nhận',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
+
+            // Hiển thị trạng thái đang xử lý
+            const originalStatus = row.status;
+            row._resolving = true;
+
+            try {
+                const res = await fetch(_hvnModuleLink + '&action=ajax', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        method:   'resolveDrift',
+                        drift_id: row.id,
+                        action:   action,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Cập nhật status trực tiếp trên row — không cần reload
+                    row.status = (action === 'ignore') ? 'ignored' : 'resolved';
+                    row._resolving = false;
+
+                    window._hvnToast('success', 'Thành công', data.message || 'Đã xử lý thành công.');
                 } else {
-                    row.status = 'resolved';
+                    row.status     = originalStatus;
+                    row._resolving = false;
+                    window._hvnToast('error', 'Lỗi xử lý', data.error || 'Không xác định');
                 }
-                // TODO: gọi fetch() Ajax endpoint thực tế
+
+            } catch (e) {
+                row.status     = originalStatus;
+                row._resolving = false;
+                window._hvnToast('error', 'Lỗi mạng', e.message);
             }
         },
 
-        runScan() {
+        async runScan() {
             this.scanning = true;
-            setTimeout(() => {
+
+            try {
+                var url = _hvnModuleLink + '&action=ajax';
+                var body = {};
+
+                if (this.filterDomain) {
+                    // Scan 1 domain cụ thể — tìm domain_id từ rows hiện có
+                    var domainRow = this.rows.find(function(r) {
+                        return r.domain === this.filterDomain;
+                    }.bind(this));
+
+                    if (!domainRow) {
+                        // Không tìm thấy domain_id trong rows hiện tại — vẫn gửi tên domain
+                        // Controller sẽ tự tìm
+                        body = { method: 'runDriftScanByName', domain: this.filterDomain };
+                    } else {
+                        body = { method: 'runDriftCheck', domain_id: domainRow.domain_id };
+                    }
+                } else {
+                    // Scan toàn bộ hệ thống
+                    body = { method: 'runDriftScanAll' };
+                }
+
+                var res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                var data = await res.json();
+
+                if (data.success) {
+                    // Hiển thị toast và reload để lấy data mới
+                    window._hvnToast('success', 'Quét hoàn tất', data.message || '');
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                } else {
+                    window._hvnToast('error', 'Quét thất bại', data.error || 'Lỗi không xác định');
+                    this.scanning = false;
+                }
+            } catch (e) {
+                window._hvnToast('error', 'Lỗi mạng', e.message);
                 this.scanning = false;
-                alert('Quét hoàn tất. Không tìm thấy lỗi mới.');
-            }, 2000);
+            }
         }
     }));
 });

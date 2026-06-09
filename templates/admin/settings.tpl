@@ -1,9 +1,10 @@
+<script>
+    var HVNDNS_SETTINGS = {$settingsJson|default:'{}' nofilter};
+</script>
+
 <div class="hvn-dns-admin hvn-settings" x-data="settingsManager()">
     <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-gear-fill"></i> Cài đặt Module (Settings)</h2>
-        <div x-show="savedMsg" x-transition class="hvn-alert hvn-alert-success hvn-py-2 hvn-px-3 hvn-mb-0">
-            <i class="bi bi-check-circle-fill hvn-me-1"></i> Đã lưu cài đặt!
-        </div>
     </div>
 
     <div class="hvn-row">
@@ -52,9 +53,6 @@
                     </button>
                     <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='queue'}{/literal}" @click="activeTab='queue'">
                         <i class="bi bi-stack fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Queue &amp; Cron</span>
-                    </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='webhook'}{/literal}" @click="activeTab='webhook'">
-                        <i class="bi bi-send fs-5 hvn-text-danger"></i> <span class="hvn-fw-bold">Webhook &amp; Alerts</span>
                     </button>
                     <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='security'}{/literal}" @click="activeTab='security'">
                         <i class="bi bi-incognito fs-5 hvn-text-danger"></i> <span class="hvn-fw-bold">Security</span>
@@ -473,7 +471,7 @@
                                         <div class="small hvn-text-muted">Cho phép khách hàng sử dụng API để cập nhật IP động.</div>
                                     </div>
                                     <div class="form-check form-switch hvn-ms-3">
-                                        <input class="form-check-input" type="checkbox" x-model="s.enable_ddns">
+                                        <input class="form-check-input" type="checkbox" x-model="s.ddns_mode">
                                     </div>
                                 </div>
 
@@ -519,11 +517,11 @@
 
                                 <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Kích hoạt DNSSEC <code class="hvn-text-muted small">enable_dnssec</code></div>
+                                        <div class="hvn-fw-bold">Kích hoạt DNSSEC <code class="hvn-text-muted small">dnssec_mode</code></div>
                                         <div class="small hvn-text-muted">Cho phép khách hàng bật DNSSEC cho tên miền.</div>
                                     </div>
                                     <div class="form-check form-switch hvn-ms-3">
-                                        <input class="form-check-input" type="checkbox" x-model="s.enable_dnssec">
+                                        <input class="form-check-input" type="checkbox" x-model="s.dnssec_mode">
                                     </div>
                                 </div>
 
@@ -537,7 +535,7 @@
                                     </div>
                                 </div>
 
-                                <div class="hvn-alert hvn-alert-warning" x-show="s.enable_dnssec">
+                                <div class="hvn-alert hvn-alert-warning" x-show="s.dnssec_mode">
                                     <i class="bi bi-exclamation-triangle-fill"></i> Yêu cầu DA Server đã bật <code>dnssec=1</code> trong cấu hình máy chủ.
                                 </div>
                             </div>
@@ -668,7 +666,7 @@
                                     <div class="hvn-row g-3 hvn-mb-3">
                                         <div class="hvn-col-md-8">
                                             <label class="form-label hvn-fw-bold small">Bot Token <code class="hvn-text-muted small">telegram_bot_token</code></label>
-                                            <input type="password" class="hvn-form-control font-monospace" x-model="s.telegram_bot_token" placeholder="123456:ABC-DEF...">
+                                            <input type="password" class="hvn-form-control font-monospace" x-model="s.telegram_bot_token" :placeholder="s.telegram_has_token ? '(Token đã lưu — nhập mới để thay đổi)' : '123456:ABC-DEF...'">
                                         </div>
                                         <div class="hvn-col-md-4">
                                             <label class="form-label hvn-fw-bold small">Chat ID <code class="hvn-text-muted small">telegram_chat_id</code></label>
@@ -700,6 +698,33 @@
                                     <div class="hvn-col-md-4">
                                         <label class="form-label hvn-fw-bold small">Ngưỡng Queue Tồn đọng <code class="hvn-text-muted small">alert_queue_backlog_threshold</code></label>
                                         <input type="number" class="hvn-form-control" x-model="s.alert_queue_backlog_threshold" min="1">
+                                    </div>
+                                </div>
+
+                                <!-- ── Nút Test Notification ── -->
+                                <div class="hvn-mt-4 hvn-border-top hvn-pt-3">
+                                    <p class="hvn-fw-bold small hvn-mb-2">🧪 Test Notification</p>
+                                    <p class="hvn-text-muted small hvn-mb-3">Gửi tin nhắn test để xác nhận cấu hình đúng. Lưu settings trước khi test.</p>
+                                    <div class="hvn-d-flex hvn-align-items-center" style="gap:10px; flex-wrap:wrap;">
+                                        <button type="button" class="hvn-btn hvn-btn-outline-secondary"
+                                                @click="sendTestNotification()" :disabled="isTesting || isTestingEmail">
+                                            <i class="bi bi-telegram" :class="isTesting ? 'hvn-spin' : ''"></i>
+                                            <span x-text="isTesting ? 'Đang gửi...' : 'Gửi test Telegram'"></span>
+                                        </button>
+
+                                        <button type="button" class="hvn-btn hvn-btn-outline-primary"
+                                                @click="sendTestEmail()" :disabled="isTesting || isTestingEmail">
+                                            <i class="bi bi-envelope" :class="isTestingEmail ? 'hvn-spin' : ''"></i>
+                                            <span x-text="isTestingEmail ? 'Đang gửi...' : 'Gửi test Email'"></span>
+                                        </button>
+
+                                        <!-- Kết quả 2 nút hiển thị chung sau nút Email -->
+                                        <span x-show="telegramResult.msg" class="small"
+                                            :class="telegramResult.ok ? 'hvn-text-success' : 'hvn-text-danger'"
+                                            x-text="telegramResult.msg"></span>
+                                        <span x-show="emailResult.msg" class="small hvn-ms-2"
+                                            :class="emailResult.ok ? 'hvn-text-success' : 'hvn-text-danger'"
+                                            x-text="emailResult.msg"></span>
                                     </div>
                                 </div>
                             </div>
@@ -979,181 +1004,148 @@
 
 <script>
 {literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('settingsManager', () => ({
-        activeTab: 'general',
-        isSaving: false,
-        savedMsg: false,
+document.addEventListener('alpine:init', function() {
+    Alpine.data('settingsManager', function() {
+        return {
+            activeTab: 'general',
+            isSaving: false,
+            savedMsg: false,
+            isTesting: false,
+            isTestingEmail: false,
+            telegramResult: { ok: false, msg: '' },
+            emailResult: { ok: false, msg: '' },
 
-        s: {
-            // Module Core
-            module_enabled: true,
-            default_nameserver_1: 'dns1.hvn.vn',
-            default_nameserver_2: 'dns2.hvn.vn',
-            default_nameserver_3: 'dns3.hvn.vn',
-            default_nameserver_4: '',
-            default_nameserver_5: '',
-            default_ttl: 3600,
+            s: Object.assign({
+                // Fallback defaults nếu PHP không truyền
+                module_enabled: true,
+                default_nameserver_1: 'dns1.hvn.vn',
+                default_nameserver_2: 'dns2.hvn.vn',
+                default_nameserver_3: 'dns3.hvn.vn',
+                default_nameserver_4: '',
+                default_nameserver_5: '',
+                default_ttl: 3600,
+                enable_telegram_alert: false,
+                telegram_bot_token: '',
+                telegram_chat_id: '',
+                telegram_has_token: false,
+                enable_email_alert: false,
+                alert_email_addresses: '',
+                alert_cooldown: 900,
+                alert_failed_threshold: 5,
+                alert_unreachable_threshold: 3,
+                alert_queue_backlog_threshold: 100,
+                notify_client_on_record_create: false,
+            }, typeof HVNDNS_SETTINGS !== 'undefined' ? HVNDNS_SETTINGS : {}),
 
-            // Domain Policy
-            respect_whmcs_dns: false,
-            disable_manage_wrong_ns: true,
-            ns_check_method: 'dns_lookup',
-            create_on_preregistrar: true,
-            create_on_registration: true,
-            create_on_transfer: true,
-            grace_period_days: 30,
+            saveSettings: function() {
+                var self = this;
+                this.isSaving = true;
 
-            // DNS Editor
-            enable_dns_editor: true,
-            subdomain_limit: 0,
-            allow_modify_a: true,
-            allow_modify_aaaa: true,
-            allow_modify_cname: true,
-            allow_modify_mx: true,
-            allow_modify_txt: true,
-            allow_modify_srv: true,
-            allow_modify_caa: true,
-            allow_modify_ns: false,
+                // Convert boolean → "1"/"0" cho PHP
+                var data = {};
+                for (var k in this.s) {
+                    if (typeof this.s[k] === 'boolean') {
+                        data[k] = this.s[k] ? '1' : '0';
+                    } else {
+                        data[k] = this.s[k];
+                    }
+                }
 
-            // Record Limits
-            total_record_limit: 50,
-            a_record_limit: 100,
-            aaaa_record_limit: 100,
-            cname_record_limit: 100,
-            mx_record_limit: 100,
-            txt_record_limit: 100,
-            srv_record_limit: 100,
-            caa_record_limit: 20,
-            ns_record_limit: 10,
+                fetch(window.location.href + '&action=ajax&method=saveSettings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    self.isSaving = false;
+                    if (res.success) {
+                        self.savedMsg = true;
+                        window._hvnToast('success', 'Đã lưu', 'Cài đặt đã được lưu thành công.');
+                        setTimeout(function() { self.savedMsg = false; }, 3000);
+                    } else {
+                        window._hvnToast('error', 'Lỗi lưu settings', res.error || 'Không xác định');
+                    }
+                })
+                .catch(function(e) {
+                    self.isSaving = false;
+                    window._hvnToast('error', 'Lỗi kết nối', 'Không thể kết nối khi lưu settings. Vui lòng thử lại.');
+                });
+            },
 
-            // URL Redirect
-            enable_url_redirect: true,
-            enable_masked_redirect: true,
-            masked_hash_key: '',
-            url_redirect_limit: 5,
+            sendTestNotification: function() {
+                var self = this;
+                this.isTesting = true;
+                this.telegramResult = { ok: false, msg: '' };
+                fetch(window.location.href + '&action=ajax&method=testNotification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    self.isTesting = false;
+                    if (res.success) {
+                        if (res.data && res.data.telegram === true)
+                            self.telegramResult = { ok: true, msg: 'Telegram ✅' };
+                        else if (res.data && res.data.telegram === false)
+                            self.telegramResult = { ok: false, msg: 'Telegram ❌' };
+                        else
+                            self.telegramResult = { ok: true, msg: 'Đã gửi' };
+                    } else {
+                        self.telegramResult = { ok: false, msg: 'Lỗi: ' + (res.error || 'Không xác định') };
+                    }
+                })
+                .catch(function(e) {
+                    self.isTesting = false;
+                    self.telegramResult = { ok: false, msg: 'Lỗi kết nối' };
+                });
+            },
 
-            // Email Forwarding
-            enable_email_forwarder: true,
-            enable_email_catchall: true,
-            email_forwarder_limit: 5,
-            email_destination_limit: 10,
-            email_verify_template: '',
+            sendTestEmail: function() {
+                var self = this;
+                if (!this.s.alert_email_addresses || !this.s.alert_email_addresses.trim()) {
+                    this.emailResult = { ok: false, msg: 'Chưa nhập email trong alert_email_addresses' };
+                    return;
+                }
+                this.isTestingEmail = true;
+                this.emailResult = { ok: false, msg: '' };
+                fetch(window.location.href + '&action=ajax&method=testEmail', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email_addresses: this.s.alert_email_addresses })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(res) {
+                    self.isTestingEmail = false;
+                    if (res.success) {
+                        self.emailResult = { ok: true, msg: 'Email ✅ ' + (res.sent_to || '') };
+                    } else {
+                        self.emailResult = { ok: false, msg: 'Email ❌ ' + (res.error || 'Không xác định') };
+                    }
+                })
+                .catch(function() {
+                    self.isTestingEmail = false;
+                    self.emailResult = { ok: false, msg: 'Email ❌ Lỗi kết nối' };
+                });
+            },
 
-            // DDNS
-            enable_ddns: false,
-            ddns_rate_limit: 60,
-            ddns_token_limit: 5,
-            enable_ddns_bruteforce: true,
-            ddns_bruteforce_threshold: 10,
-            ddns_bruteforce_window: 3600,
-            ddns_bruteforce_ban_duration: 3600,
 
-            // DNSSEC
-            enable_dnssec: false,
-            dnssec_auto_resign: true,
 
-            // SSL
-            enable_auto_ssl: true,
-            enable_client_ssl_trigger: true,
-            ssl_auto_renew_days: 7,
-            enable_php_for_domain: true,
-
-            // DNS Templates
-            enable_dns_templates: true,
-            enable_user_custom_templates: false,
-            user_template_limit: 10,
-
-            // Client Notification
-            enable_client_notification: false,
-            notification_email_template: '',
-            notify_on_zone_create: true,
-            notify_on_record_change: true,
-            notify_on_zone_delete: true,
-
-            // Admin Alert / Webhook
-            enable_telegram_alert: false,
-            telegram_bot_token: '',
-            telegram_chat_id: '',
-            enable_email_alert: false,
-            alert_email_addresses: '',
-            alert_cooldown: 900,
-            alert_failed_threshold: 5,
-            alert_unreachable_threshold: 3,
-            alert_queue_backlog_threshold: 100,
-
-            // UI
-            show_domain_service_link: true,
-            show_under_domain_menu: true,
-            nav_menu_order: 20,
-            show_in_domain_sidebar: true,
-
-            // Performance
-            fetch_from_ns_on_load: false,
-            fetch_from_ns_on_load_admin: false,
-            cache_refresh_ttl: 720,
-            large_db_mode: false,
-            client_rate_limit: 30,
-
-            // Data Retention
-            snapshot_retention_count: 30,
-            queue_completed_retention_days: 30,
-            drift_auto_fix: false,
-
-            // Queue
-            cron_interval: 60,
-            job_timeout: 30,
-            max_retry_attempts: 5,
-            stale_lock_timeout: 300,
-            worker_max_runtime: 55,
-            conflict_window: 180,
-
-            // Security
-            restrict_subaccounts: true,
-            audit_trail_retention_days: 365,
-            sync_log_retention_days: 90,
-            record_history_retention_days: 90,
-
-            // License
-            license_key: '',
-            license_server_url: 'https://license.hvn.vn/api/v1/check',
-            license_grace_days: 3,
-            license_check_interval: 7,
-            license_last_check: '26/02/2026 02:00',
-            license_status: 'Active',
-            license_error_message: '',
-
-            // Upsell
-            upsell_enable: false,
-            upsell_dnssec_addon_id: 0,
-            upsell_ddns_addon_id: 0,
-            upsell_quota_addon_ids: '',
-            upsell_display_price: true,
-            upsell_custom_url: '',
-            upsell_description: '',
-        },
-
-        saveSettings() {
-            this.isSaving = true;
-            setTimeout(() => {
-                this.isSaving = false;
-                this.savedMsg = true;
-                setTimeout(() => { this.savedMsg = false; }, 3000);
-            }, 800);
-        },
-
-        checkLicense() {
-            const btn = event.currentTarget;
-            const icon = btn.querySelector('i');
-            icon.classList.add('hvn-spin');
-            setTimeout(() => {
-                icon.classList.remove('hvn-spin');
-                this.s.license_status = 'Active';
-                this.s.license_last_check = new Date().toLocaleString('vi-VN');
-                alert('License hợp lệ! Trạng thái: Active');
-            }, 1200);
-        }
-    }));
+            checkLicense: function() {
+                var self = this;
+                var btn  = event.currentTarget;
+                var icon = btn.querySelector('i');
+                icon.classList.add('hvn-spin');
+                setTimeout(function() {
+                    icon.classList.remove('hvn-spin');
+                    self.s.license_status    = 'Active';
+                    self.s.license_last_check = new Date().toLocaleString('vi-VN');
+                    window._hvnToast('success', 'License hợp lệ', 'Trạng thái: Active');
+                }, 1200);
+            }
+        };
+    });
 });
 {/literal}
 </script>

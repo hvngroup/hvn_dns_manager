@@ -2,8 +2,21 @@
     <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
         <h2><i class="bi bi-journal-check"></i> Lịch sử Đồng bộ (Sync Logs)</h2>
         <div>
-            <button class="hvn-btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
-            <button class="hvn-btn hvn-btn-warning hvn-ms-2" @click="alert('Đang thử kết nối lại toàn bộ job thất bại...')"><i class="bi bi-arrow-repeat"></i> Retry All Failed (12)</button>
+            <button class="hvn-btn btn-outline-success" @click="exportCsv()"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
+            <button
+                class="hvn-btn hvn-btn-warning hvn-ms-2"
+                @click="retryAllFailed()"
+                :disabled="retrying"
+                x-show="failedCount > 0"
+            >
+                <i class="bi bi-arrow-repeat"></i>
+                <span x-text="retrying ? 'Đang reset...' : 'Retry All Failed (' + failedCount + ')'"></span>
+            </button>
+            <button
+                class="hvn-btn hvn-btn-primary hvn-ms-2"
+                @click="runPendingJobs()"
+                :disabled="syncing"
+            ><i class="bi bi-play-circle"></i> <span x-text="syncing ? 'Đang đồng bộ...' : 'Đồng bộ Pending'"></span></button>
         </div>
     </div>
 
@@ -25,9 +38,9 @@
                 <div class="hvn-col-md-2">
                     <select class="hvn-form-select" x-model="filterServer">
                         <option value="">Tất cả Server</option>
-                        <option value="dns1.hvn.vn">dns1.hvn.vn</option>
-                        <option value="dns2.hvn.vn">dns2.hvn.vn</option>
-                        <option value="dns3.hvn.vn">dns3.hvn.vn</option>
+                        {foreach from=$serverHostnames item=hostname}
+                        <option value="{$hostname|escape:'htmlall'}">{$hostname|escape:'htmlall'}</option>
+                        {/foreach}
                     </select>
                 </div>
                 <div class="hvn-col-md-2">
@@ -37,6 +50,7 @@
                         <option value="EDIT_RECORD">EDIT_RECORD</option>
                         <option value="DELETE_RECORD">DELETE_RECORD</option>
                         <option value="ENABLE_DNSSEC">ENABLE_DNSSEC</option>
+                        <option value="APPLY_TEMPLATE">APPLY_TEMPLATE</option>
                     </select>
                 </div>
                 <div class="hvn-col-md-3 hvn-text-end hvn-d-flex hvn-align-items-center hvn-justify-content-end" style="gap:6px;">
@@ -99,17 +113,18 @@
                                 <td class="hvn-ps-3 hvn-text-muted" x-text="'#' + log.id"></td>
                                 <td x-text="log.time"></td>
                                 <td>
-                                    <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain" x-text="log.domain"></a>
+                                    <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain_id" x-text="log.domain"></a>
                                 </td>
                                 <td>
-                                    <div class="hvn-fw-bold" x-text="log.action"></div>
-                                    <div class="small hvn-text-muted" x-text="log.details"></div>
+                                    <div class="hvn-fw-bold" x-text="log.action || '—'"></div>
+                                    <div class="small hvn-text-muted" x-text="log.details || ''"></div>
                                 </td>
                                 <td x-text="log.server"></td>
                                 <td>
                                     <template x-if="log.status === 'complete'"><span class="hvn-badge hvn-bg-success">✅ Complete</span></template>
                                     <template x-if="log.status === 'failed'"><span class="hvn-badge hvn-bg-danger">❌ Failed</span></template>
                                     <template x-if="log.status === 'pending'"><span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡 Pending</span></template>
+                                    <template x-if="log.status === 'cancelled'"><span class="hvn-badge hvn-bg-secondary">⛔ Cancelled</span></template>
                                     <div class="small hvn-text-danger" x-text="log.error_brief"></div>
                                 </td>
                                 <td x-text="log.ms || '--'"></td>
@@ -171,6 +186,10 @@
 </style>
 
 <script>
+    var HVNDNS_SYNC_LOGS   = {$syncLogsJson};
+    var HVNDNS_MODULE_LINK = '{$modulelink}';
+</script>
+<script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('syncLogsData', () => ({
@@ -179,100 +198,53 @@ document.addEventListener('alpine:init', () => {
         currentPage: 1,
         sortBy: 'id',
         sortDir: 'desc',
+        syncing: false,
+        retrying: false,
 
-        allLogs: [
-            {id:4521,time:'2026-02-27 14:32',domain:'myblog.net',    action:'DELETE_RECORD',details:'A @ 1.2.3.4',         server:'dns3.hvn.vn',status:'failed',  error_brief:'Connection timeout',ms:null},
-            {id:4520,time:'2026-02-27 14:31',domain:'shop.vn',       action:'ADD_RECORD',   details:'A mail 203.0.1.10',  server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:89},
-            {id:4519,time:'2026-02-27 14:31',domain:'shop.vn',       action:'ADD_RECORD',   details:'A mail 203.0.1.10',  server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:92},
-            {id:4518,time:'2026-02-27 14:31',domain:'shop.vn',       action:'ADD_RECORD',   details:'A mail 203.0.1.10',  server:'dns3.hvn.vn',status:'failed',  error_brief:'Connection timeout',ms:null},
-            {id:4517,time:'2026-02-27 14:28',domain:'techstore.io',  action:'EDIT_RECORD',  details:'MX @ mail.ts.io.',   server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:110},
-            {id:4516,time:'2026-02-27 14:25',domain:'startup.dev',   action:'ADD_RECORD',   details:'TXT @ v=spf1 ...',   server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:76},
-            {id:4515,time:'2026-02-27 14:20',domain:'myfashion.vn',  action:'DELETE_RECORD',details:'CNAME www',           server:'dns1.hvn.vn',status:'failed',  error_brief:'Auth failed',ms:null},
-            {id:4514,time:'2026-02-27 14:18',domain:'eatventure.com',action:'ADD_RECORD',   details:'A api 10.0.0.5',     server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:55},
-            {id:4513,time:'2026-02-27 14:15',domain:'saas-platform.io',action:'EDIT_RECORD',details:'A @ 198.51.100.1',  server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:88},
-            {id:4512,time:'2026-02-27 14:10',domain:'travel-vn.vn',  action:'ADD_RECORD',   details:'MX @ smtp.tv.vn.',   server:'dns2.hvn.vn',status:'failed',  error_brief:'DA api error 500',ms:null},
-            {id:4511,time:'2026-02-27 14:08',domain:'cloudhosting.net',action:'ADD_RECORD', details:'AAAA @ 2001:db8::1',server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:134},
-            {id:4510,time:'2026-02-27 14:05',domain:'newproject.xyz',action:'ADD_RECORD',   details:'A @ 203.0.113.5',    server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:67},
-            {id:4509,time:'2026-02-27 14:01',domain:'digitalagency.com',action:'EDIT_RECORD',details:'CNAME cdn',         server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:91},
-            {id:4508,time:'2026-02-27 13:58',domain:'elearning.edu.vn',action:'DELETE_RECORD',details:'A old.srv',       server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:45},
-            {id:4507,time:'2026-02-27 13:55',domain:'media-hub.net', action:'ADD_RECORD',   details:'TXT dkim2048',       server:'dns3.hvn.vn',status:'failed',  error_brief:'Timed out 30s',ms:null},
-            {id:4506,time:'2026-02-27 13:52',domain:'fintech-app.io',action:'EDIT_RECORD',  details:'A @ 100.20.30.40',   server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:102},
-            {id:4505,time:'2026-02-27 13:50',domain:'realty.com.vn', action:'ADD_RECORD',   details:'CAA 0 issue le.org', server:'dns1.hvn.vn',status:'pending', error_brief:'',ms:null},
-            {id:4504,time:'2026-02-27 13:47',domain:'game-portal.net',action:'DELETE_RECORD',details:'A beta',            server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:58},
-            {id:4503,time:'2026-02-27 13:44',domain:'healthclinic.vn',action:'ADD_RECORD',  details:'MX 10 mail.hc.vn.', server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:79},
-            {id:4502,time:'2026-02-27 13:41',domain:'autoparts.shop',action:'EDIT_RECORD',  details:'TXT spf update',     server:'dns2.hvn.vn',status:'failed',  error_brief:'ssh: no route',ms:null},
-            {id:4501,time:'2026-02-27 13:39',domain:'logistics-pro.com',action:'ADD_RECORD',details:'A cdn 1.2.3.200',   server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:61},
-            {id:4500,time:'2026-02-27 13:36',domain:'myportfolio.dev',action:'EDIT_RECORD', details:'CNAME @ www2',       server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:84},
-            {id:4499,time:'2026-02-27 13:33',domain:'petshop-hanoi.vn',action:'ADD_RECORD', details:'A @ 203.0.113.9',    server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:95},
-            {id:4498,time:'2026-02-27 13:30',domain:'farmfresh.net', action:'DELETE_RECORD',details:'CNAME alias-old',    server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:53},
-            {id:4497,time:'2026-02-27 13:27',domain:'cryptotrade.io',action:'ADD_RECORD',   details:'TXT _ stripe-verif', server:'dns3.hvn.vn',status:'pending', error_brief:'',ms:null},
-            {id:4496,time:'2026-02-27 13:24',domain:'beauty-salon.vn',action:'EDIT_RECORD', details:'A @ 198.51.100.7',   server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:70},
-            {id:4495,time:'2026-02-27 13:21',domain:'b2b-marketplace.com',action:'ADD_RECORD',details:'NS ns2.hvn.vn.', server:'dns2.hvn.vn',status:'failed',  error_brief:'Permission denied',ms:null},
-            {id:4494,time:'2026-02-27 13:18',domain:'artgallery.xyz',action:'DELETE_RECORD',details:'A staging',          server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:47},
-            {id:4493,time:'2026-02-27 13:15',domain:'insurtech.io',  action:'ADD_RECORD',   details:'AAAA @ 2001:db8::9',server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:121},
-            {id:4492,time:'2026-02-27 13:12',domain:'sme-erp.net',   action:'EDIT_RECORD',  details:'MX @ mx2.sme.net.', server:'dns2.hvn.vn',status:'failed',  error_brief:'Timeout 15s',ms:null},
-            {id:4491,time:'2026-02-27 13:09',domain:'homeremodel.com',action:'ADD_RECORD',  details:'TXT acme-challenge',server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:63},
-            {id:4490,time:'2026-02-27 13:06',domain:'kidsedu.vn',    action:'DELETE_RECORD',details:'A dev.kidsedu.vn',   server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:44},
-            {id:4489,time:'2026-02-27 13:03',domain:'fitness-app.io',action:'EDIT_RECORD',  details:'CNAME api v2',       server:'dns2.hvn.vn',status:'pending', error_brief:'',ms:null},
-            {id:4488,time:'2026-02-27 13:00',domain:'vietfood-export.com',action:'ADD_RECORD',details:'A @ 203.0.0.88', server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:81},
-            {id:4487,time:'2026-02-27 12:57',domain:'coworkspace.net',action:'ADD_RECORD',  details:'MX 20 mx.cw.net.',  server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:74},
-            {id:4486,time:'2026-02-27 12:54',domain:'smartfarm.vn',  action:'EDIT_RECORD',  details:'A iot 10.0.1.50',   server:'dns1.hvn.vn',status:'failed',  error_brief:'ssl error handshake',ms:null},
-            {id:4485,time:'2026-02-27 12:51',domain:'nftmarket.xyz',action:'ADD_RECORD',    details:'TXT nft-verify',     server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:66},
-            {id:4484,time:'2026-02-27 12:48',domain:'rental-management.com',action:'EDIT_RECORD',details:'A @ 45.77.1.2',server:'dns3.hvn.vn',status:'failed', error_brief:'Max retries exceeded',ms:null},
-            {id:4483,time:'2026-02-27 12:45',domain:'pharmacy-online.vn',action:'DELETE_RECORD',details:'CNAME old-cdn', server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:52},
-            {id:4482,time:'2026-02-27 12:42',domain:'social-analytics.io',action:'ADD_RECORD',details:'A metrics 10.1.1.1',server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:87},
-            {id:4481,time:'2026-02-27 12:39',domain:'green-energy.net',action:'EDIT_RECORD',details:'TXT dmarc v1',      server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:69},
-            {id:4480,time:'2026-02-27 12:36',domain:'airservice.vn', action:'ADD_RECORD',   details:'SRV _sip._tcp 5060',server:'dns1.hvn.vn',status:'pending', error_brief:'',ms:null},
-            {id:4479,time:'2026-02-27 12:33',domain:'dataops-hub.dev',action:'EDIT_RECORD', details:'CNAME grafana',      server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:93},
-            {id:4478,time:'2026-02-27 12:30',domain:'legalpro.com.vn',action:'ADD_RECORD',  details:'A @ 203.0.113.50',  server:'dns3.hvn.vn',status:'failed',  error_brief:'DA 403 Forbidden',ms:null},
-            {id:4477,time:'2026-02-27 12:27',domain:'example.com',   action:'ENABLE_DNSSEC',details:'KSK algo13',        server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:310},
-            {id:4476,time:'2026-02-27 12:24',domain:'techstore.io',  action:'ADD_RECORD',   details:'CAA 0 issue pki.io',server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:58},
-            {id:4475,time:'2026-02-27 12:21',domain:'startup.dev',   action:'DELETE_RECORD',details:'A preview',          server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:41},
-            {id:4474,time:'2026-02-27 12:18',domain:'shop.vn',       action:'EDIT_RECORD',  details:'A @ 103.1.2.200',   server:'dns3.hvn.vn',status:'failed',  error_brief:'Connection refused',ms:null},
-            {id:4473,time:'2026-02-27 12:15',domain:'myblog.net',    action:'ADD_RECORD',   details:'TXT google-verify',  server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:77},
-            {id:4472,time:'2026-02-27 12:12',domain:'saas-platform.io',action:'ADD_RECORD', details:'CNAME status.io',   server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:85},
-            {id:4471,time:'2026-02-27 12:09',domain:'cloudhosting.net',action:'EDIT_RECORD',details:'A db 192.168.1.10', server:'dns3.hvn.vn',status:'pending', error_brief:'',ms:null},
-            {id:4470,time:'2026-02-27 12:06',domain:'digitalagency.com',action:'DELETE_RECORD',details:'AAAA test-ipv6',server:'dns2.hvn.vn',status:'complete',error_brief:'',ms:48},
-            {id:4469,time:'2026-02-27 12:03',domain:'fintech-app.io',action:'ADD_RECORD',   details:'A pay 198.51.10.1', server:'dns1.hvn.vn',status:'complete',error_brief:'',ms:99},
-            {id:4468,time:'2026-02-27 12:00',domain:'game-portal.net',action:'EDIT_RECORD', details:'CNAME cdn2 cf.net.', server:'dns3.hvn.vn',status:'complete',error_brief:'',ms:72},
-        ],
+        allLogs: HVNDNS_SYNC_LOGS,
+
+        get failedCount() {
+            return this.allLogs.filter(function(l) {
+                return l.status === 'failed';
+            }).length;
+        },
 
         get filteredLogs() {
-            const filtered = this.allLogs.filter(l => {
-                if (this.filterDomain && !l.domain.includes(this.filterDomain)) return false;
+            var filtered = this.allLogs.filter(function(l) {
+                if (this.filterDomain && l.domain.indexOf(this.filterDomain) === -1) return false;
                 if (this.filterStatus && l.status !== this.filterStatus) return false;
                 if (this.filterServer && l.server !== this.filterServer) return false;
                 if (this.filterAction && l.action !== this.filterAction) return false;
                 return true;
-            });
-            const key = this.sortBy;
-            const dir = this.sortDir === 'asc' ? 1 : -1;
-            return filtered.sort((a, b) => {
-                const av = a[key] ?? '';
-                const bv = b[key] ?? '';
+            }.bind(this));
+            var key = this.sortBy;
+            var dir = this.sortDir === 'asc' ? 1 : -1;
+            return filtered.sort(function(a, b) {
+                var av = a[key] !== undefined ? a[key] : '';
+                var bv = b[key] !== undefined ? b[key] : '';
                 if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
                 return String(av).localeCompare(String(bv)) * dir;
             });
         },
 
-        setSort(col) {
+        setSort: function(col) {
             if (this.sortBy === col) {
                 this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
             } else {
                 this.sortBy = col;
-                this.sortDir = col === 'id' || col === 'time' ? 'desc' : 'asc';
+                this.sortDir = (col === 'id' || col === 'time') ? 'desc' : 'asc';
             }
             this.currentPage = 1;
         },
 
-        sortIcon(col) {
+        sortIcon: function(col) {
             if (this.sortBy !== col) return '⇅';
             return this.sortDir === 'asc' ? '▲' : '▼';
         },
 
         get pagedLogs() {
             if (!this.perPage) return this.filteredLogs;
-            const start = (this.currentPage - 1) * this.perPage;
+            var start = (this.currentPage - 1) * this.perPage;
             return this.filteredLogs.slice(start, start + this.perPage);
         },
 
@@ -280,16 +252,163 @@ document.addEventListener('alpine:init', () => {
             if (!this.perPage) return 1;
             return Math.max(1, Math.ceil(this.filteredLogs.length / this.perPage));
         },
+        
+        retryAllFailed: async function() {
+            var count = this.failedCount;
+            if (count === 0) {
+                window._hvnToast('warning', 'Không có job FAILED', 'Không có job nào cần retry.');
+                return;
+            }
+            var ok = await window._hvnConfirm({
+                title:        'Retry tất cả ' + count + ' job FAILED?',
+                message:      'Các job FAILED sẽ được reset về PENDING.\nChúng sẽ được xử lý khi bấm "Đồng bộ Pending".',
+                variant:      'warning',
+                confirmLabel: 'Reset ' + count + ' job',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
 
-        retryJob(log) {
-            if (!confirm('Thu lai job #' + log.id + ' tren server ' + log.server + '?')) return;
-            log.status = 'pending';
-            log.error_brief = 'retrying...';
-            setTimeout(() => {
-                log.status = 'complete';
-                log.error_brief = '';
-                log.ms = Math.floor(Math.random() * 100) + 30;
-            }, 1000);
+            var self = this;
+            self.retrying = true;
+
+            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'method=retryAllFailed'
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                self.retrying = false;
+                if (data.success) {
+                    self.allLogs.forEach(function(l) {
+                        if (l.status === 'failed') {
+                            l.status = 'pending';
+                            l.error_brief = '';
+                        }
+                    });
+                    window._hvnToast('success', 'Reset thành công', data.message || '');
+                } else {
+                    window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                }
+            })
+            .catch(function() {
+                self.retrying = false;
+                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+            });
+        },
+
+        retryJob: async function(log) {
+            var ok = await window._hvnConfirm({
+                title:        'Retry job #' + log.id + '?',
+                message:      'Job sẽ được reset về PENDING và xử lý khi bấm "Đồng bộ Pending".',
+                variant:      'warning',
+                confirmLabel: 'Retry',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
+            var self = this;
+            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'method=retryJob&job_id=' + log.id
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    log.status = 'pending';
+                    log.error_brief = '';
+                    window._hvnToast('success', 'Job đã reset', data.message || 'Job #' + log.id + ' đã về PENDING.');
+                } else {
+                    window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                }
+            })
+            .catch(function() {
+                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+            });
+        },
+
+        exportCsv: function() {
+            var rows = this.filteredLogs;
+            if (!rows.length) {
+                window._hvnToast('warning', 'Không có dữ liệu', 'Không có bản ghi nào phù hợp bộ lọc để export.');
+                return;
+            }
+
+            // Header
+            var headers = ['ID', 'Thoi gian', 'Domain', 'Action', 'Chi tiet', 'Server', 'Trang thai', 'Loi', 'ms'];
+
+            // Escape cell: bọc nháy kép, escape nháy kép bên trong
+            var esc = function(val) {
+                if (val === null || val === undefined) return '';
+                return '"' + String(val).replace(/"/g, '""') + '"';
+            };
+
+            var lines = [headers.map(esc).join(',')];
+            rows.forEach(function(l) {
+                lines.push([
+                    l.id,
+                    esc(l.time),
+                    esc(l.domain),
+                    esc(l.action),
+                    esc(l.details),
+                    esc(l.server),
+                    esc(l.status),
+                    esc(l.error_brief),
+                    l.ms !== null && l.ms !== undefined ? l.ms : ''
+                ].join(','));
+            });
+
+            // BOM UTF-8 để Excel đọc được tiếng Việt
+            var bom = '\uFEFF';
+            var csvContent = bom + lines.join('\r\n');
+            var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            var now = new Date();
+            var ts = now.getFullYear()
+                + ('0'+(now.getMonth()+1)).slice(-2)
+                + ('0'+now.getDate()).slice(-2)
+                + '_'
+                + ('0'+now.getHours()).slice(-2)
+                + ('0'+now.getMinutes()).slice(-2);
+            a.href = url;
+            a.download = 'sync_logs_' + ts + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        },
+
+        runPendingJobs: async function() {
+            var ok = await window._hvnConfirm({
+                title:        'Chạy job PENDING?',
+                message:      'Toàn bộ job đang PENDING sẽ được đồng bộ ngay.\nJob FAILED sẽ không bị ảnh hưởng.',
+                variant:      'info',
+                confirmLabel: 'Đồng bộ ngay',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
+            var self = this;
+            self.syncing = true;
+            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'method=runPendingJobs'
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                self.syncing = false;
+                if (data.success) {
+                    window._hvnToast('success', 'Đồng bộ hoàn tất', (data.message || '') + ' — Đã xử lý: ' + (data.processed || 0) + ' job');
+                    setTimeout(function() { window.location.reload(); }, 1200);
+                } else {
+                    window._hvnToast('error', 'Lỗi đồng bộ', data.error || 'Lỗi không xác định');
+                }
+            })
+            .catch(function() {
+                self.syncing = false;
+                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+            });
         }
     }));
 });

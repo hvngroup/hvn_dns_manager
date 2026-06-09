@@ -7,26 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 class QueueJob extends Model
 {
     protected $table = 'mod_hvndns_queue';
-    
+    public $timestamps = false;
+
     protected $fillable = [
-        'batch_id', 
-        'domain_id', 
-        'server_id', 
-        'action', 
-        'payload', 
-        'status', 
-        'priority', 
-        'attempts', 
-        'max_attempts', 
-        'next_retry_at', 
-        'locked_by', 
-        'locked_at', 
-        'error_message', 
-        'error_type', 
-        'actor_type', 
-        'actor_id', 
-        'scheduled_at', 
-        'started_at', 
+        'batch_id',
+        'domain_id',
+        'server_id',
+        'action',
+        'payload',
+        'status',
+        'priority',
+        'attempts',
+        'max_attempts',
+        'next_retry_at',
+        'locked_by',
+        'locked_at',
+        'error_message',
+        'error_type',
+        'actor_type',
+        'actor_id',
+        'scheduled_at',
+        'started_at',
         'completed_at'
     ];
 

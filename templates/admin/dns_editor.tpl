@@ -1,4 +1,11 @@
-<!-- Kế thừa/Tái sử dụng template dns_editor của Client nhưng thêm Admin View -->
+<!-- Admin DNS Editor — dữ liệu thật từ DB -->
+{if !$domain}
+    <div class="alert alert-danger hvn-mb-4">
+        <i class="bi bi-exclamation-triangle-fill hvn-me-2"></i>
+        <strong>Lỗi:</strong> {$editorError|default:'Domain không tồn tại hoặc thiếu tham số domain_id.'|escape:'htmlall'}
+        <a href="?module=hvn_dns_manager&action=domains" class="hvn-btn btn-outline-danger btn-sm hvn-ms-3">← Về danh sách</a>
+    </div>
+{else}
 <div class="hvn-dns-admin hvn-dns-editor" x-data="adminDnsEditor()">
     
     <!-- Admin Warning Banner -->
@@ -7,7 +14,7 @@
         <div class="flex-grow-1">
             <h6 class="hvn-mb-1 hvn-fw-bold hvn-text-dark">ADMIN MODE — Chế độ Quản trị</h6>
             <div class="hvn-mb-0 hvn-text-dark">
-                Đang quản lý cấu hình DNS mang tên <strong>{$domain.domain}</strong> thuộc về Khách hàng: <a href="clientssummary.php?userid={$domain.client_id}" class="hvn-fw-bold">{$domain.client_name} (#{$domain.client_id})</a>
+                Đang quản lý DNS: <strong>{$domain.domain|escape:'htmlall'}</strong> — Khách hàng: <a href="clientssummary.php?userid={$domain.client_id|escape:'htmlall'}" class="hvn-fw-bold">{$domain.client_name|escape:'htmlall'} (#{$domain.client_id|escape:'htmlall'})</a>
             </div>
             <ul class="hvn-mb-0 small hvn-text-dark hvn-mt-1 hvn-ps-3">
                 <li>Bỏ qua Rate Limit. Các thao tác sẽ Override dữ liệu nếu Client đang chỉnh sửa (Conflict Resolution: Admin-Priority).</li>
@@ -23,7 +30,7 @@
             <div class="btn-group">
                 <button class="hvn-btn hvn-btn-primary" @click="openAddModal()"><i class="bi bi-plus-lg"></i> Thêm bản ghi</button>
                 <a href="?module=hvn_dns_manager&action=snapshot_rollback&domain={$domain.domain}" class="hvn-btn btn-outline-secondary" title="Khôi phục Zone từ Snapshot"><i class="bi bi-skip-backward-fill"></i> Rollback</a>
-                <button class="hvn-btn btn-outline-secondary" onclick="alert('Đang tạo Snapshot thủ công...')" title="Tạo ngay 1 bản lưu trạng thái hiện tại"><i class="bi bi-camera-fill"></i> Snapshot</button>
+                <button class="hvn-btn btn-outline-secondary" @click="takeSnapshot()" title="Tạo ngay 1 bản lưu trạng thái hiện tại"><i class="bi bi-camera-fill"></i> Snapshot</button>
                 <a href="?module=hvn_dns_manager&action=audit_trail&domain={$domain.domain}" class="hvn-btn btn-outline-secondary" title="Xem lịch sử thay đổi của tên miền này"><i class="bi bi-clipboard2-data"></i> History</a>
             </div>
             <div class="hvn-text-end">
@@ -182,77 +189,184 @@
 </div>
 
 <script>
-    var _adminRecords = {$recordsJson|default:'[{"id":1,"type":"A","name":"@","value":"203.0.113.10","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":2,"type":"MX","name":"@","value":"mail.example.com.","priority":10,"ttl":3600,"is_system":false,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":3,"type":"CNAME","name":"www","value":"example.com.","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"syncing"},{"id":4,"type":"TXT","name":"@","value":"v=spf1 include:mailgun.org ~all","ttl":600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"complete"},{"id":5,"type":"NS","name":"@","value":"ns1.hvn.vn.","ttl":86400,"is_system":true,"is_locked":true,"pending_delete":false,"sync_status":"complete"},{"id":6,"type":"AAAA","name":"ipv6","value":"2001:db8::1","ttl":3600,"is_system":false,"is_locked":false,"pending_delete":false,"sync_status":"failed"}]'};
+    var _adminRecords  = {$recordsJson|default:'[]'};
+    var _hvnDomainName = "{$domain.domain|escape:'javascript'}";
+    var _hvnDomainId   = {$domainId|default:0};
+    var _hvnModuleLink = "{$modulelink|escape:'javascript'}";
+    var _hvnCsrfToken  = "{$token|escape:'javascript'}";
 </script>
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
+
+    // ── Helper fetch admin AJAX ──────────────────────────────────────────
+    async function adminAjax(method, body) {
+        // Gửi token qua body để WHMCS admin verify (addonmodules.php tự check session)
+        var payload = Object.assign({}, body, { token: _hvnCsrfToken });
+
+        var res = await fetch(_hvnModuleLink + '&action=ajax&method=' + method, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        return await res.json();
+    }
+
+    // ── recordModal: override submitRecord để gọi API thật ──────────────
+    // Ghi đè component gốc từ record_modal.tpl
+    Alpine.data('recordModal', () => ({
+        open: false,
+        isEdit: false,
+        submitting: false,
+        form: { type: '', name: '@', ttl: '3600', value: '', priority: 10, weight: 20, port: 443, caa_tag: 'issue' },
+        errors: {},
+
+        openModal(detail) {
+            this.errors = {};
+            this.submitting = false;
+            this.isEdit = !!detail.isEdit;
+            if (detail.isEdit && detail.record) {
+                var r = detail.record;
+                this.form = {
+                    id: r.id,
+                    type: r.type || '',
+                    name: r.name || '@',
+                    ttl: String(r.ttl || 3600),
+                    value: r.value || '',
+                    priority: r.priority || 10,
+                    weight: r.weight || 20,
+                    port: r.port || 443,
+                    caa_tag: r.caa_tag || 'issue'
+                };
+            } else {
+                this.form = { type: detail.prefillType || '', name: '@', ttl: '3600', value: '', priority: 10, weight: 20, port: 443, caa_tag: 'issue' };
+            }
+            this.open = true;
+            document.body.style.overflow = 'hidden';
+        },
+
+        close() {
+            if (this.submitting) return;
+            this.open = false;
+            document.body.style.overflow = '';
+        },
+
+        validate() {
+            this.errors = {};
+            if (!this.form.type)  { this.errors.type  = 'Vui lòng chọn loại bản ghi.'; }
+            if (!this.form.name || this.form.name.trim() === '')  { this.errors.name  = 'Tên không được trống.'; }
+            if (!this.form.value || this.form.value.trim() === '') { this.errors.value = 'Giá trị không được trống.'; }
+            return Object.keys(this.errors).length === 0;
+        },
+
+        async submitRecord() {
+            if (!this.validate()) return;
+            this.submitting = true;
+
+            try {
+                var method = this.isEdit ? 'adminEditRecord' : 'adminAddRecord';
+                var payload = {
+                    domain_id: _hvnDomainId,
+                    type:      this.form.type,
+                    name:      this.form.name,
+                    value:     this.form.value,
+                    ttl:       parseInt(this.form.ttl) || 3600,
+                    priority:  this.form.priority,
+                    weight:    this.form.weight,
+                    port:      this.form.port,
+                };
+                if (this.isEdit) {
+                    payload.record_id = this.form.id;
+                }
+
+                var data = await adminAjax(method, payload);
+
+                if (!data.success) {
+                    this.errors.general = (data.error && data.error.message) ? data.error.message : 'Lỗi không xác định';
+                    this.submitting = false;
+                    return;
+                }
+
+                window.dispatchEvent(new CustomEvent('record-saved', {
+                    detail: {
+                        isEdit:    this.isEdit,
+                        record_id: data.data ? data.data.record_id : null,
+                        record:    { ...this.form, id: this.isEdit ? this.form.id : (data.data ? data.data.record_id : Date.now()), sync_status: 'syncing' }
+                    }
+                }));
+
+                this.submitting = false;
+                this.close();
+            } catch (e) {
+                this.errors.general = 'Lỗi kết nối. Vui lòng thử lại.';
+                this.submitting = false;
+            }
+        }
+    }));
+
+    // ── adminDnsEditor ───────────────────────────────────────────────────
     Alpine.data('adminDnsEditor', () => ({
         searchQuery: '',
         records: _adminRecords,
         expandedGroups: ['A', 'MX', 'CNAME', 'TXT', 'SRV', 'NS', 'CAA', 'AAAA'],
-
-        // Canonical order for record types
         _typeOrder: ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA'],
 
-        get filteredRecords() {
-            if (this.searchQuery === '') return this.records;
-            const text = this.searchQuery.toLowerCase();
-            return this.records.filter(r =>
-                r.name.toLowerCase().includes(text) ||
-                r.value.toLowerCase().includes(text) ||
-                r.type.toLowerCase().includes(text)
-            );
+        init() {
+            // Lắng nghe event record-saved từ modal
+            var self = this;
+            window.addEventListener('record-saved', function(e) {
+                var d = e.detail;
+                if (d.isEdit) {
+                    // Cập nhật record hiện có
+                    for (var i = 0; i < self.records.length; i++) {
+                        if (self.records[i].id === d.record.id) {
+                            self.records[i] = Object.assign({}, self.records[i], d.record, { sync_status: 'syncing' });
+                            break;
+                        }
+                    }
+                } else {
+                    // Thêm record mới
+                    self.records.unshift(Object.assign({ is_system: false, is_locked: false, pending_delete: false }, d.record));
+                }
+            });
         },
 
-        // Group filteredRecords by type, maintain canonical order
+        get filteredRecords() {
+            if (!this.searchQuery) return this.records;
+            var text = this.searchQuery.toLowerCase();
+            return this.records.filter(function(r) {
+                return r.name.toLowerCase().indexOf(text) >= 0
+                    || r.value.toLowerCase().indexOf(text) >= 0
+                    || r.type.toLowerCase().indexOf(text) >= 0;
+            });
+        },
+
         get recordsByType() {
-            const map = {};
-            this.filteredRecords.forEach(r => {
+            var map = {};
+            this.filteredRecords.forEach(function(r) {
                 if (!map[r.type]) map[r.type] = [];
                 map[r.type].push(r);
             });
-            // Order: canonical first, then unknowns alphabetically
-            const knownOrder = this._typeOrder.filter(t => map[t]);
-            const others = Object.keys(map).filter(t => !this._typeOrder.includes(t)).sort();
-            return [...knownOrder, ...others].map(type => ({ type, records: map[type] }));
+            var self = this;
+            var known = this._typeOrder.filter(function(t) { return map[t]; });
+            var others = Object.keys(map).filter(function(t) { return self._typeOrder.indexOf(t) < 0; }).sort();
+            return known.concat(others).map(function(type) { return { type: type, records: map[type] }; });
         },
 
         toggleGroup(type) {
-            const idx = this.expandedGroups.indexOf(type);
-            if (idx >= 0) {
-                this.expandedGroups.splice(idx, 1);
-            } else {
-                this.expandedGroups.push(type);
-            }
+            var idx = this.expandedGroups.indexOf(type);
+            if (idx >= 0) { this.expandedGroups.splice(idx, 1); }
+            else { this.expandedGroups.push(type); }
         },
 
         typeColor(type) {
-            const colors = {
-                'A':    '#0d6efd',
-                'AAAA': '#6610f2',
-                'CNAME':'#20c997',
-                'MX':   '#fd7e14',
-                'TXT':  '#6f42c1',
-                'NS':   '#6c757d',
-                'SRV':  '#0dcaf0',
-                'CAA':  '#dc3545',
-            };
-            return colors[type] || '#495057';
+            var c = { A:'#0d6efd', AAAA:'#6610f2', CNAME:'#20c997', MX:'#fd7e14', TXT:'#6f42c1', NS:'#6c757d', SRV:'#0dcaf0', CAA:'#dc3545' };
+            return c[type] || '#495057';
         },
 
         typeLabel(type) {
-            const labels = {
-                'A':    'IPv4 Address',
-                'AAAA': 'IPv6 Address',
-                'CNAME':'Canonical Name',
-                'MX':   'Mail Exchange',
-                'TXT':  'Text Record',
-                'NS':   'Name Server',
-                'SRV':  'Service Record',
-                'CAA':  'CA Authorization',
-            };
-            return labels[type] || type + ' Record';
+            var l = { A:'IPv4 Address', AAAA:'IPv6 Address', CNAME:'Canonical Name', MX:'Mail Exchange', TXT:'Text Record', NS:'Name Server', SRV:'Service Record', CAA:'CA Authorization' };
+            return l[type] || type + ' Record';
         },
 
         openAddModal(prefillType) {
@@ -260,21 +374,63 @@ document.addEventListener('alpine:init', () => {
                 detail: { isEdit: false, prefillType: prefillType || '' }
             }));
         },
+
         openEditModal(record) {
-            window.dispatchEvent(new CustomEvent('open-record-modal', { detail: { isEdit: true, record: record } }));
+            window.dispatchEvent(new CustomEvent('open-record-modal', {
+                detail: { isEdit: true, record: record }
+            }));
         },
-        deleteRecord(record) {
-            if (confirm('Admin Privilege: Xoa vinh vien ban ghi ' + record.name + ' (' + record.type + ')?')) {
-                record.pending_delete = true;
-                setTimeout(() => {
-                    this.records = this.records.filter(r => r.id !== record.id);
-                }, 1000);
+
+        takeSnapshot() {
+            window._hvnToast('info', 'Snapshot', 'Đang tạo Snapshot thủ công...');
+        },
+
+        async deleteRecord(record) {
+            var ok = await window._hvnConfirm({
+                title:        'Xóa bản ghi?',
+                message:      'Admin: Xóa vĩnh viễn bản ghi ' + record.type + ' ' + record.name + '?\nViệc xóa trực tiếp sẽ override cả cấu hình đang pending của Client.',
+                variant:      'danger',
+                confirmLabel: 'Xóa vĩnh viễn',
+                cancelLabel:  'Hủy'
+            });
+            if (!ok) return;
+            
+            record.pending_delete = true;
+
+            var data = await adminAjax('adminDeleteRecord', {
+                domain_id: _hvnDomainId,
+                record_id: record.id
+            });
+
+            if (data.success) {
+                // Đánh dấu pending_delete, polling sẽ tự xóa sau khi COMPLETE
+                // Hoặc xóa ngay khỏi UI
+                var self = this;
+                setTimeout(function() {
+                    self.records = self.records.filter(function(r) { return r.id !== record.id; });
+                }, 1500);
+            } else {
+                record.pending_delete = false;
+                window._hvnToast('error', 'Lỗi', data.error?.message || 'Không xác định');
             }
         },
-        toggleLock(record) {
-            alert((record.is_locked ? 'KHOA' : 'MO KHOA') + ' ban ghi thanh cong.');
+
+        async toggleLock(record) {
+            var data = await adminAjax('adminToggleLock', {
+                record_id: record.id,
+                is_locked: record.is_locked
+            });
+
+            if (!data.success) {
+                // Revert nếu lỗi
+                record.is_locked = !record.is_locked;
+                window._hvnToast('error', 'Lỗi đổi trạng thái', data.error?.message || 'Không xác định');
+            } else {
+                window._hvnToast('success', 'Thành công', 'Đã lưu trạng thái Lock bản ghi.');
+            }
         }
     }));
 });
 {/literal}
 </script>
+{/if}
