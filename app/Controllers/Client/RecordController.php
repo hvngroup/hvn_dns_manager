@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Controllers\Client;
 
+defined("WHMCS") or die("Access Denied");
+
 use WHMCS\Database\Capsule;
 // ← XÓA: use MJ\DnsManager\Contracts\JobInterface;  (không cần nữa)
 use MJ\DnsManager\Models\Domain;

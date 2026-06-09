@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Gateway;
 
+defined("WHMCS") or die("Access Denied");
+
 /**
  * DAResponseParser — Helper class to normalize DirectAdmin API responses 
  * (specifically DNS records) into standard WHMCS format mapping.

@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Services;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Models\AuditTrail;
 use MJ\DnsManager\Models\Domain;
 use MJ\DnsManager\Models\Template;

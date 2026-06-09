@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Services;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Models\Record;
 use MJ\DnsManager\Helpers\SettingsHelper;
 

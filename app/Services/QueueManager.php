@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Services;
 
+defined("WHMCS") or die("Access Denied");
+
 // ← XÓA: use MJ\DnsManager\Contracts\JobInterface;
 use MJ\DnsManager\Models\QueueJob;
 use MJ\DnsManager\Models\Server;

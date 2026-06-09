@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Helpers;
 
+defined("WHMCS") or die("Access Denied");
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class SettingsHelper

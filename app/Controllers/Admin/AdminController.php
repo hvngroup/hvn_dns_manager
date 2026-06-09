@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Controllers\Admin;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Services\DashboardService;
 use MJ\DnsManager\Services\ZoneManager;
 use MJ\DnsManager\Services\RecordManager;

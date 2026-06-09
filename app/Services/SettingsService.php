@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Services;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Helpers\SettingsHelper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 

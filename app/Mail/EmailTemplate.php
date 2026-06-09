@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Mail;
 
+defined("WHMCS") or die("Access Denied");
+
 /**
  * EmailTemplate — HTML wrapper cho tất cả email gửi từ MJ DNS Manager.
  *

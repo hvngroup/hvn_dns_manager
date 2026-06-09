@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Gateway;
 
+defined("WHMCS") or die("Access Denied");
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;

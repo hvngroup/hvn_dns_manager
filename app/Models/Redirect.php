@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Models;
 
+defined("WHMCS") or die("Access Denied");
+
 use Illuminate\Database\Eloquent\Model;
 
 class Redirect extends Model

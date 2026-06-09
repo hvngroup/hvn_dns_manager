@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Controllers\Client;
 
+defined("WHMCS") or die("Access Denied");
+
 use WHMCS\Database\Capsule;
 use MJ\DnsManager\Models\Domain;
 use MJ\DnsManager\Services\TemplateService;

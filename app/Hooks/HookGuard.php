@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Hooks;
 
+defined("WHMCS") or die("Access Denied");
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**

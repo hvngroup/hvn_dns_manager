@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Validators;
 
+defined("WHMCS") or die("Access Denied");
+
 /**
  * DnsRecordValidator — Validate DNS record data trước khi lưu vào DB và Queue.
  *

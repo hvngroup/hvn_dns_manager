@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Controllers\Admin;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Models\Template;
 use Illuminate\Database\Capsule\Manager as Capsule;
 

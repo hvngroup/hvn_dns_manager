@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Contracts;
 
+defined("WHMCS") or die("Access Denied");
+
 interface JobInterface
 {
     const ACTION_ADD_RECORD        = 'ADD_RECORD';

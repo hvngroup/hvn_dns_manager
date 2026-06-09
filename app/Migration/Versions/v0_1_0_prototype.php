@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Migration\Versions;
 
+defined("WHMCS") or die("Access Denied");
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class v0_1_0_prototype

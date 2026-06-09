@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Validators;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Models\Record;
 
 /**

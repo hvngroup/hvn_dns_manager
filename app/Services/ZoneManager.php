@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Services;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Gateway\DAGateway;
 use MJ\DnsManager\Models\QueueJob;
 use MJ\DnsManager\Models\Server;

@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Controllers\Client;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Services\EmailForwardService;
 
 /**

@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Hooks;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Models\Domain;
 use MJ\DnsManager\Models\Template;
 use MJ\DnsManager\Services\QueueManager;

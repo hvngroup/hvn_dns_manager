@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Security;
 
+defined("WHMCS") or die("Access Denied");
+
 class InputSanitizer
 {
     /**

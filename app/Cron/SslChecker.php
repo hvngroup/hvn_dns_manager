@@ -2,6 +2,8 @@
 
 namespace MJ\DnsManager\Cron;
 
+defined("WHMCS") or die("Access Denied");
+
 use MJ\DnsManager\Gateway\DAGateway;
 use MJ\DnsManager\Models\Domain;
 use MJ\DnsManager\Models\QueueJob;
