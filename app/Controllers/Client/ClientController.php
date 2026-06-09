@@ -20,10 +20,6 @@ class ClientController
     {
         $userId = isset($_SESSION['uid']) ? (int) $_SESSION['uid'] : 0;
 
-        if ($action === 'record_edit') {
-            return $this->showRecordEdit($params);
-        }
-
         $domainId = isset($_REQUEST['domain_id']) ? (int) $_REQUEST['domain_id'] : 0;
 
         if ($domainId > 0) {
@@ -39,48 +35,6 @@ class ClientController
     private function getModuleLink($params)
     {
         return isset($params['modulelink']) ? $params['modulelink'] : 'index.php?m=mj_dns_manager';
-    }
-
-    /**
-     * Màn hình record edit riêng rẽ
-     */
-    private function showRecordEdit($params)
-    {
-        $moduleLink = $this->getModuleLink($params);
-        $domainId   = isset($_REQUEST['domain_id']) ? (int) $_REQUEST['domain_id'] : 1;
-        $recordId   = isset($_REQUEST['record_id']) ? (int) $_REQUEST['record_id'] : 0;
-
-        $domainInfo = array('id' => $domainId, 'domain' => 'example.com');
-        $recordJson = 'null';
-
-        if ($recordId > 0) {
-            $mockRecord = array(
-                'id'       => $recordId,
-                'type'     => 'A',
-                'name'     => '@',
-                'value'    => '103.45.67.89',
-                'ttl'      => 3600,
-                'priority' => 10,
-                'weight'   => 0,
-                'port'     => 443,
-            );
-            $recordJson = json_encode($mockRecord);
-        }
-
-        return array(
-            'pagetitle'    => ($recordId ? 'Sửa' : 'Thêm') . ' Bản ghi DNS',
-            'breadcrumb'   => array(
-                'index.php?m=mj_dns_manager' => 'Domain Manager',
-                '#'                           => 'Bản ghi',
-            ),
-            'templatefile' => 'templates/client/record_edit',
-            'requirelogin' => true,
-            'vars'         => array(
-                'modulelink' => $moduleLink,
-                'domain'     => $domainInfo,
-                'recordJson' => $recordJson,
-            ),
-        );
     }
 
     /**
@@ -138,9 +92,6 @@ class ClientController
             'requirelogin' => true,
             'vars'         => array(
                 'modulelink'  => $moduleLink,
-                'plan_name'   => 'DNS Standard',
-                'service_status' => 'Active',
-                'expiry_date' => '27/02/2027',
                 'domains'     => $domains,
                 'default_ns1' => isset($ns[0]) ? $ns[0] : '',
                 'default_ns2' => isset($ns[1]) ? $ns[1] : '',
@@ -167,13 +118,13 @@ class ClientController
             'id'              => $domainId,
             'domain'          => $domainParams->domain,
             'status'          => $domainParams->status,
-            'dnssec_enabled'  => false,
-            'ssl_status'      => 'active',
+            'dnssec_enabled'  => (bool) ($domainParams->dnssec && $domainParams->dnssec->is_enabled),
+            'ssl_status'      => $domainParams->ssl_status ?: 'unknown',
             'records_count'   => 0,
             'redirects_count' => 0,
             'email_fwds_count' => 0,
-            'has_dnssec_addon' => true,
-            'has_ddns_addon'   => true,
+            'has_dnssec_addon' => \MJ\DnsManager\Services\FeatureGate::canClientUseDnssec($userId),
+            'has_ddns_addon'   => \MJ\DnsManager\Services\FeatureGate::canClientUseDdns($userId),
             'dnssec'           => array(),
         );
 
