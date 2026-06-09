@@ -22,7 +22,7 @@ Mọi thao tác thay đổi DNS PHẢI đi qua hàng đợi (Queue). KHÔNG BAO 
 `DAGateway::testConnection()` được gọi từ Admin Controller khi bấm nút "Test Connection" — đây là hành động diagnostic có chủ đích.
 
 ## Fan-out Multi-Server
-- `QueueManager::dispatch()` LUÔN query `ServerRegistry::getActiveServers()`
+- `QueueManager::dispatch()` LUÔN query `Server::where('is_active', true)`
 - Tạo N sub-jobs độc lập (1 job/server) với cùng `batch_id` (UUID v4)
 - Mỗi sub-job có `server_id` riêng, `status` riêng, retry riêng
 - KHÔNG hardcode số lượng server, KHÔNG giả định số server cố định
