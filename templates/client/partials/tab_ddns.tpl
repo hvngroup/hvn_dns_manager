@@ -75,9 +75,9 @@
     </div>
     <div style="display:flex;margin-top:10px;">
         <input type="text" class="form-control form-control-sm"
-               x-bind:value="'/modules/addons/hvn_dns_manager/ddns.php?token=' + ddnsNewRawToken" readonly
+               x-bind:value="'/modules/addons/mj_dns_manager/ddns.php?token=' + ddnsNewRawToken" readonly
                style="height:31px;font-size:12px;font-family:monospace;background:#fff;border-radius:6px 0 0 6px;">
-        <button x-on:click="navigator.clipboard.writeText('/modules/addons/hvn_dns_manager/ddns.php?token=' + ddnsNewRawToken)"
+        <button x-on:click="navigator.clipboard.writeText('/modules/addons/mj_dns_manager/ddns.php?token=' + ddnsNewRawToken)"
             style="height:31px;padding:0 12px;font-size:14px;font-weight:600;background:#f59e0b;border:1px solid #f59e0b;border-radius:0 6px 6px 0;color:#fff;cursor:pointer;white-space:nowrap;">
             <i class="bi bi-clipboard"></i> Copy
         </button>

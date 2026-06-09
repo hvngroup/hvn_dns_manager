@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Snapshot extends Model
 {
-    protected $table = 'mod_hvndns_snapshots';
+    protected $table = 'tbl_mj_dns_snapshots';
     
     protected $fillable = [
         'domain_id', 

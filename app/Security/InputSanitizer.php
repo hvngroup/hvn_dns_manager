@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Security;
+namespace MJ\DnsManager\Security;
 
 class InputSanitizer
 {

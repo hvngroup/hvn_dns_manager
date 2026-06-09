@@ -1,13 +1,13 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 
 class Server extends Model
 {
-    protected $table = 'mod_hvndns_servers';
+    protected $table = 'tbl_mj_dns_servers';
 
     protected $fillable = [
         'hostname',

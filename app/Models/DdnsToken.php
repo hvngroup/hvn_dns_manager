@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class DdnsToken extends Model
 {
-    protected $table = 'mod_hvndns_ddns_tokens';
+    protected $table = 'tbl_mj_dns_ddns_tokens';
     
     protected $fillable = [
         'domain_id', 

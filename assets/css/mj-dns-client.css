@@ -1,16 +1,16 @@
 /* =========================================================================
-   HVN DNS Manager — Client Area Design System v1.0
+   MJ DNS Manager — Client Area Design System v1.0
    =========================================================================
-   Scoped under .hvn-dns-client to avoid conflicts with WHMCS theme CSS.
+   Scoped under .mj-dns-client to avoid conflicts with WHMCS theme CSS.
    Covers: typography, inputs, buttons, cards, tables, tabs, badges, alerts.
    
-   Import after hvndns_common.css (provides CSS variables & utilities).
+   Import after mj-dns-common.css (provides CSS variables & utilities).
    ========================================================================= */
 
 /* =======================================================================
-   CLIENT DESIGN TOKENS (extends :root tokens from hvndns_common.css)
+   CLIENT DESIGN TOKENS (extends :root tokens from mj-dns-common.css)
    ======================================================================= */
-.hvn-dns-client {
+.mj-dns-client {
     /* Brand colors */
     --cl-primary:        #ea4544;
     --cl-primary-hover:  #d32f2f;
@@ -70,7 +70,7 @@
 /* =======================================================================
    1. BASE RESET & TYPOGRAPHY
    ======================================================================= */
-.hvn-dns-client {
+.mj-dns-client {
     font-family: var(--cl-font);
     font-size: 14px;
     line-height: 1.6;
@@ -79,21 +79,21 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.hvn-dns-client *,
-.hvn-dns-client *::before,
-.hvn-dns-client *::after {
+.mj-dns-client *,
+.mj-dns-client *::before,
+.mj-dns-client *::after {
     box-sizing: border-box;
 }
 
 /* Font: Inter loaded via <link> tag in template for performance */
 
 /* Headings */
-.hvn-dns-client h1,
-.hvn-dns-client h2,
-.hvn-dns-client h3,
-.hvn-dns-client h4,
-.hvn-dns-client h5,
-.hvn-dns-client h6 {
+.mj-dns-client h1,
+.mj-dns-client h2,
+.mj-dns-client h3,
+.mj-dns-client h4,
+.mj-dns-client h5,
+.mj-dns-client h6 {
     font-weight: 700;
     line-height: 1.3;
     color: var(--cl-text);
@@ -101,24 +101,24 @@
     margin-bottom: 0.5rem;
 }
 
-.hvn-dns-client h2 { font-size: 20px; }
-.hvn-dns-client h3 { font-size: 18px; }
-.hvn-dns-client h4 { font-size: 16px; }
-.hvn-dns-client h5 { font-size: 15px; }
+.mj-dns-client h2 { font-size: 20px; }
+.mj-dns-client h3 { font-size: 18px; }
+.mj-dns-client h4 { font-size: 16px; }
+.mj-dns-client h5 { font-size: 15px; }
 
 /* Links */
-.hvn-dns-client a {
+.mj-dns-client a {
     color: var(--cl-primary);
     text-decoration: none;
     transition: color var(--cl-transition);
 }
-.hvn-dns-client a:hover {
+.mj-dns-client a:hover {
     color: var(--cl-primary-hover);
 }
 
 /* Monospace */
-.hvn-dns-client .cl-mono,
-.hvn-dns-client .font-monospace {
+.mj-dns-client .cl-mono,
+.mj-dns-client .font-monospace {
     font-family: var(--cl-font-mono) !important;
     font-size: 13px;
 }
@@ -126,7 +126,7 @@
 /* =======================================================================
    2. BACK LINK
    ======================================================================= */
-.hvn-dns-client .cl-back-link {
+.mj-dns-client .cl-back-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -140,7 +140,7 @@
     margin-bottom: 1rem;
     border: 1px solid transparent;
 }
-.hvn-dns-client .cl-back-link:hover {
+.mj-dns-client .cl-back-link:hover {
     color: var(--cl-text);
     background: var(--cl-surface);
     border-color: var(--cl-border);
@@ -150,7 +150,7 @@
 /* =======================================================================
    3. CARD COMPONENT
    ======================================================================= */
-.hvn-dns-client .cl-card {
+.mj-dns-client .cl-card {
     background: var(--cl-surface);
     border: 1px solid var(--cl-border);
     border-radius: var(--cl-radius-lg);
@@ -158,11 +158,11 @@
     overflow: hidden;
     transition: box-shadow var(--cl-transition);
 }
-.hvn-dns-client .cl-card:hover {
+.mj-dns-client .cl-card:hover {
     box-shadow: var(--cl-shadow);
 }
 
-.hvn-dns-client .cl-card-header {
+.mj-dns-client .cl-card-header {
     padding: 16px 20px;
     background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
     border-bottom: 1px solid var(--cl-border);
@@ -172,7 +172,7 @@
     gap: 12px;
 }
 
-.hvn-dns-client .cl-card-title {
+.mj-dns-client .cl-card-title {
     font-size: 15px;
     font-weight: 700;
     color: var(--cl-text);
@@ -181,23 +181,23 @@
     gap: 8px;
     margin: 0;
 }
-.hvn-dns-client .cl-card-title i {
+.mj-dns-client .cl-card-title i {
     color: var(--cl-primary);
     font-size: 17px;
 }
 
-.hvn-dns-client .cl-card-body {
+.mj-dns-client .cl-card-body {
     padding: 20px;
 }
 
-.hvn-dns-client .cl-card-footer {
+.mj-dns-client .cl-card-footer {
     padding: 12px 20px;
     background: var(--cl-surface-2);
     border-top: 1px solid var(--cl-border);
 }
 
 /* Domain info card — special styling */
-.hvn-dns-client .cl-domain-card {
+.mj-dns-client .cl-domain-card {
     background: linear-gradient(135deg, #fff 0%, #fafbff 100%);
     border: 1.5px solid var(--cl-border);
     border-radius: var(--cl-radius-xl);
@@ -206,7 +206,7 @@
     margin-bottom: 24px;
 }
 
-.hvn-dns-client .cl-domain-name {
+.mj-dns-client .cl-domain-name {
     font-size: 22px;
     font-weight: 800;
     color: var(--cl-text);
@@ -215,13 +215,13 @@
     gap: 10px;
     margin-bottom: 16px;
 }
-.hvn-dns-client .cl-domain-name i {
+.mj-dns-client .cl-domain-name i {
     color: var(--cl-primary);
     font-size: 24px;
 }
 
 /* Domain list cards */
-.hvn-dns-client .cl-domain-list-card {
+.mj-dns-client .cl-domain-list-card {
     background: var(--cl-surface);
     border: 1px solid var(--cl-border);
     border-radius: var(--cl-radius-lg);
@@ -230,17 +230,17 @@
     transition: all var(--cl-transition);
     height: 100%;
 }
-.hvn-dns-client .cl-domain-list-card:hover {
+.mj-dns-client .cl-domain-list-card:hover {
     border-color: var(--cl-primary);
     box-shadow: var(--cl-shadow), 0 0 0 3px var(--cl-primary-ring);
     transform: translateY(-2px);
 }
 
-.hvn-dns-client .cl-domain-list-card .cl-card-body {
+.mj-dns-client .cl-domain-list-card .cl-card-body {
     padding: 20px;
 }
 
-.hvn-dns-client .cl-domain-list-card .cl-card-footer {
+.mj-dns-client .cl-domain-list-card .cl-card-footer {
     padding: 12px 20px;
     text-align: right;
 }
@@ -248,7 +248,7 @@
 /* =======================================================================
    4. BUTTON SYSTEM
    ======================================================================= */
-.hvn-dns-client .cl-btn {
+.mj-dns-client .cl-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -267,24 +267,24 @@
     user-select: none;
     letter-spacing: 0.1px;
 }
-.hvn-dns-client .cl-btn:active {
+.mj-dns-client .cl-btn:active {
     transform: scale(0.97);
 }
-.hvn-dns-client .cl-btn:disabled,
-.hvn-dns-client .cl-btn[disabled] {
+.mj-dns-client .cl-btn:disabled,
+.mj-dns-client .cl-btn[disabled] {
     opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
 }
 
 /* Primary */
-.hvn-dns-client .cl-btn-primary {
+.mj-dns-client .cl-btn-primary {
     background: var(--cl-primary);
     border-color: var(--cl-primary);
     color: #fff;
     box-shadow: 0 2px 6px var(--cl-primary-ring);
 }
-.hvn-dns-client .cl-btn-primary:hover {
+.mj-dns-client .cl-btn-primary:hover {
     background: var(--cl-primary-hover);
     border-color: var(--cl-primary-hover);
     box-shadow: 0 4px 12px var(--cl-primary-ring);
@@ -293,107 +293,107 @@
 }
 
 /* Secondary - outline muted */
-.hvn-dns-client .cl-btn-secondary {
+.mj-dns-client .cl-btn-secondary {
     background: var(--cl-surface);
     border-color: var(--cl-border);
     color: var(--cl-text-secondary);
 }
-.hvn-dns-client .cl-btn-secondary:hover {
+.mj-dns-client .cl-btn-secondary:hover {
     background: var(--cl-surface-hover);
     border-color: #cbd5e1;
     color: var(--cl-text);
 }
 
 /* Success */
-.hvn-dns-client .cl-btn-success {
+.mj-dns-client .cl-btn-success {
     background: var(--cl-success);
     border-color: var(--cl-success);
     color: #fff;
 }
-.hvn-dns-client .cl-btn-success:hover {
+.mj-dns-client .cl-btn-success:hover {
     background: #15803d;
     border-color: #15803d;
     color: #fff;
 }
 
 /* Danger */
-.hvn-dns-client .cl-btn-danger {
+.mj-dns-client .cl-btn-danger {
     background: var(--cl-danger);
     border-color: var(--cl-danger);
     color: #fff;
 }
-.hvn-dns-client .cl-btn-danger:hover {
+.mj-dns-client .cl-btn-danger:hover {
     background: #b91c1c;
     border-color: #b91c1c;
     color: #fff;
 }
 
 /* Ghost primary */
-.hvn-dns-client .cl-btn-ghost {
+.mj-dns-client .cl-btn-ghost {
     background: transparent;
     border-color: var(--cl-primary);
     color: var(--cl-primary);
 }
-.hvn-dns-client .cl-btn-ghost:hover {
+.mj-dns-client .cl-btn-ghost:hover {
     background: var(--cl-primary-light);
 }
 
 /* Ghost danger */
-.hvn-dns-client .cl-btn-ghost-danger {
+.mj-dns-client .cl-btn-ghost-danger {
     background: transparent;
     border-color: var(--cl-danger);
     color: var(--cl-danger);
 }
-.hvn-dns-client .cl-btn-ghost-danger:hover {
+.mj-dns-client .cl-btn-ghost-danger:hover {
     background: var(--cl-danger-bg);
 }
 
 /* Ghost muted */
-.hvn-dns-client .cl-btn-ghost-muted {
+.mj-dns-client .cl-btn-ghost-muted {
     background: transparent;
     border-color: var(--cl-border);
     color: var(--cl-text-secondary);
 }
-.hvn-dns-client .cl-btn-ghost-muted:hover {
+.mj-dns-client .cl-btn-ghost-muted:hover {
     background: var(--cl-surface-hover);
     color: var(--cl-text);
 }
 
 /* Sizes */
-.hvn-dns-client .cl-btn-sm {
+.mj-dns-client .cl-btn-sm {
     padding: 5px 10px;
     font-size: 12px;
     border-radius: var(--cl-radius-sm);
     gap: 4px;
 }
-.hvn-dns-client .cl-btn-xs {
+.mj-dns-client .cl-btn-xs {
     padding: 3px 7px;
     font-size: 11px;
     border-radius: 4px;
     gap: 3px;
 }
-.hvn-dns-client .cl-btn-icon {
+.mj-dns-client .cl-btn-icon {
     padding: 7px;
     width: 32px;
     height: 32px;
 }
-.hvn-dns-client .cl-btn-icon.cl-btn-sm {
+.mj-dns-client .cl-btn-icon.cl-btn-sm {
     padding: 5px;
     width: 26px;
     height: 26px;
 }
 
 /* Button group */
-.hvn-dns-client .cl-btn-group {
+.mj-dns-client .cl-btn-group {
     display: inline-flex;
     align-items: center;
 }
-.hvn-dns-client .cl-btn-group .cl-btn:not(:first-child) {
+.mj-dns-client .cl-btn-group .cl-btn:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left-width: 0;
 }
-.hvn-dns-client .cl-btn-group .cl-btn:not(:last-child) {
+.mj-dns-client .cl-btn-group .cl-btn:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
@@ -401,7 +401,7 @@
 /* =======================================================================
    5. FORM CONTROLS
    ======================================================================= */
-.hvn-dns-client .cl-form-label {
+.mj-dns-client .cl-form-label {
     display: block;
     font-size: 13px;
     font-weight: 600;
@@ -410,7 +410,7 @@
     letter-spacing: 0.1px;
 }
 
-.hvn-dns-client .cl-form-hint {
+.mj-dns-client .cl-form-hint {
     display: block;
     font-size: 12px;
     color: var(--cl-text-muted);
@@ -418,9 +418,9 @@
     line-height: 1.4;
 }
 
-.hvn-dns-client .cl-input,
-.hvn-dns-client .cl-select,
-.hvn-dns-client .cl-textarea {
+.mj-dns-client .cl-input,
+.mj-dns-client .cl-select,
+.mj-dns-client .cl-textarea {
     display: block;
     width: 100%;
     padding: 9px 12px;
@@ -435,18 +435,18 @@
     appearance: none;
     transition: border-color var(--cl-transition), box-shadow var(--cl-transition), background var(--cl-transition);
 }
-.hvn-dns-client .cl-input::placeholder,
-.hvn-dns-client .cl-textarea::placeholder {
+.mj-dns-client .cl-input::placeholder,
+.mj-dns-client .cl-textarea::placeholder {
     color: var(--cl-text-muted);
     font-weight: 400;
 }
-.hvn-dns-client .cl-input:hover,
-.hvn-dns-client .cl-select:hover {
+.mj-dns-client .cl-input:hover,
+.mj-dns-client .cl-select:hover {
     border-color: #cbd5e1;
 }
-.hvn-dns-client .cl-input:focus,
-.hvn-dns-client .cl-select:focus,
-.hvn-dns-client .cl-textarea:focus {
+.mj-dns-client .cl-input:focus,
+.mj-dns-client .cl-select:focus,
+.mj-dns-client .cl-textarea:focus {
     outline: none;
     border-color: var(--cl-border-focus);
     box-shadow: 0 0 0 3px var(--cl-primary-ring);
@@ -454,15 +454,15 @@
 }
 
 /* Inline-sized inputs (in table) */
-.hvn-dns-client .cl-input-sm,
-.hvn-dns-client .cl-select-sm {
+.mj-dns-client .cl-input-sm,
+.mj-dns-client .cl-select-sm {
     padding: 5px 9px;
     font-size: 12.5px;
     border-radius: var(--cl-radius-sm);
 }
 
 /* Select arrow */
-.hvn-dns-client .cl-select {
+.mj-dns-client .cl-select {
     padding-right: 32px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -471,26 +471,26 @@
 }
 
 /* Input group */
-.hvn-dns-client .cl-input-group {
+.mj-dns-client .cl-input-group {
     display: flex;
     align-items: stretch;
 }
-.hvn-dns-client .cl-input-group .cl-input,
-.hvn-dns-client .cl-input-group .cl-select {
+.mj-dns-client .cl-input-group .cl-input,
+.mj-dns-client .cl-input-group .cl-select {
     flex: 1;
     min-width: 0;
 }
-.hvn-dns-client .cl-input-group .cl-input:not(:first-child),
-.hvn-dns-client .cl-input-group .cl-select:not(:first-child) {
+.mj-dns-client .cl-input-group .cl-input:not(:first-child),
+.mj-dns-client .cl-input-group .cl-select:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-.hvn-dns-client .cl-input-group .cl-input:not(:last-child),
-.hvn-dns-client .cl-input-group .cl-select:not(:last-child) {
+.mj-dns-client .cl-input-group .cl-input:not(:last-child),
+.mj-dns-client .cl-input-group .cl-select:not(:last-child) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
-.hvn-dns-client .cl-input-addon {
+.mj-dns-client .cl-input-addon {
     display: inline-flex;
     align-items: center;
     padding: 0 10px;
@@ -500,27 +500,27 @@
     font-size: 12px;
     white-space: nowrap;
 }
-.hvn-dns-client .cl-input-addon:first-child {
+.mj-dns-client .cl-input-addon:first-child {
     border-right: 0;
     border-radius: var(--cl-radius) 0 0 var(--cl-radius);
 }
-.hvn-dns-client .cl-input-addon:last-child {
+.mj-dns-client .cl-input-addon:last-child {
     border-left: 0;
     border-radius: 0 var(--cl-radius) var(--cl-radius) 0;
 }
 
 /* Form group spacing */
-.hvn-dns-client .cl-form-group {
+.mj-dns-client .cl-form-group {
     margin-bottom: 16px;
 }
-.hvn-dns-client .cl-form-group:last-child {
+.mj-dns-client .cl-form-group:last-child {
     margin-bottom: 0;
 }
 
 /* =======================================================================
    6. TAB BAR
    ======================================================================= */
-.hvn-dns-client .cl-tab-bar {
+.mj-dns-client .cl-tab-bar {
     display: flex;
     gap: 3px;
     background: #eef1f6;
@@ -530,7 +530,7 @@
     margin-bottom: 20px;
 }
 
-.hvn-dns-client .cl-tab-btn {
+.mj-dns-client .cl-tab-btn {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -547,20 +547,20 @@
     transition: all var(--cl-transition);
     letter-spacing: 0.1px;
 }
-.hvn-dns-client .cl-tab-btn:hover {
+.mj-dns-client .cl-tab-btn:hover {
     background: rgba(255,255,255,0.7);
     color: var(--cl-text);
 }
-.hvn-dns-client .cl-tab-btn.cl-tab-active {
+.mj-dns-client .cl-tab-btn.cl-tab-active {
     background: var(--cl-surface);
     color: var(--cl-primary);
     box-shadow: var(--cl-shadow-sm);
 }
-.hvn-dns-client .cl-tab-btn i {
+.mj-dns-client .cl-tab-btn i {
     font-size: 15px;
 }
 
-.hvn-dns-client .cl-tab-count {
+.mj-dns-client .cl-tab-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -578,7 +578,7 @@
 /* =======================================================================
    7. TABLE
    ======================================================================= */
-.hvn-dns-client .cl-table-wrap {
+.mj-dns-client .cl-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: var(--cl-radius-lg);
@@ -586,17 +586,17 @@
     background: var(--cl-surface);
 }
 
-.hvn-dns-client .cl-table {
+.mj-dns-client .cl-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13.5px;
 }
 
-.hvn-dns-client .cl-table thead tr {
+.mj-dns-client .cl-table thead tr {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
-.hvn-dns-client .cl-table th {
+.mj-dns-client .cl-table th {
     padding: 12px 8px;
     font-size: 13px;
     font-weight: 600;
@@ -608,7 +608,7 @@
     text-transform: none;
 }
 
-.hvn-dns-client .cl-table td {
+.mj-dns-client .cl-table td {
     padding: 12px 8px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle;
@@ -616,33 +616,33 @@
     font-size: 13.5px;
 }
 
-.hvn-dns-client .cl-table tbody tr:last-child td {
+.mj-dns-client .cl-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.hvn-dns-client .cl-table tbody tr {
+.mj-dns-client .cl-table tbody tr {
     transition: background var(--cl-transition);
 }
-.hvn-dns-client .cl-table tbody tr:hover td {
+.mj-dns-client .cl-table tbody tr:hover td {
     background: #fafbff;
 }
 
 /* Inline edit row highlight */
-.hvn-dns-client .cl-row-editing td {
+.mj-dns-client .cl-row-editing td {
     background: #fffbeb !important;
 }
-.hvn-dns-client .cl-row-adding td {
+.mj-dns-client .cl-row-adding td {
     background: #f0fdf4 !important;
 }
 
 /* Empty state row */
-.hvn-dns-client .cl-table-empty {
+.mj-dns-client .cl-table-empty {
     text-align: center;
     padding: 40px 20px;
     color: var(--cl-text-muted);
     font-size: 14px;
 }
-.hvn-dns-client .cl-table-empty i {
+.mj-dns-client .cl-table-empty i {
     display: block;
     font-size: 36px;
     margin-bottom: 10px;
@@ -652,7 +652,7 @@
 /* =======================================================================
    8. BADGES (DNS type + status)
    ======================================================================= */
-.hvn-dns-client .cl-badge {
+.mj-dns-client .cl-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -666,34 +666,34 @@
 }
 
 /* Status badges */
-.hvn-dns-client .cl-badge-success {
+.mj-dns-client .cl-badge-success {
     background: var(--cl-success-bg);
     color: var(--cl-success);
     border: 1px solid var(--cl-success-border);
 }
-.hvn-dns-client .cl-badge-warning {
+.mj-dns-client .cl-badge-warning {
     background: var(--cl-warning-bg);
     color: var(--cl-warning);
     border: 1px solid var(--cl-warning-border);
 }
-.hvn-dns-client .cl-badge-danger {
+.mj-dns-client .cl-badge-danger {
     background: var(--cl-danger-bg);
     color: var(--cl-danger);
     border: 1px solid var(--cl-danger-border);
 }
-.hvn-dns-client .cl-badge-info {
+.mj-dns-client .cl-badge-info {
     background: var(--cl-info-bg);
     color: var(--cl-info);
     border: 1px solid var(--cl-info-border);
 }
-.hvn-dns-client .cl-badge-muted {
+.mj-dns-client .cl-badge-muted {
     background: #f1f5f9;
     color: #64748b;
     border: 1px solid #e2e8f0;
 }
 
 /* DNS Record type badges */
-.hvn-dns-client .cl-dns-badge {
+.mj-dns-client .cl-dns-badge {
     display: inline-flex;
     align-items: center;
     padding: 3px 8px;
@@ -704,17 +704,17 @@
     letter-spacing: 0.4px;
     text-transform: uppercase;
 }
-.hvn-dns-client .cl-dns-a     { background: #1d6fd8; }
-.hvn-dns-client .cl-dns-aaaa  { background: #0891b2; }
-.hvn-dns-client .cl-dns-cname { background: #7c3aed; }
-.hvn-dns-client .cl-dns-mx    { background: #b45309; }
-.hvn-dns-client .cl-dns-txt   { background: #16a34a; }
-.hvn-dns-client .cl-dns-srv   { background: #dc2626; }
-.hvn-dns-client .cl-dns-ns    { background: #475569; }
-.hvn-dns-client .cl-dns-caa   { background: #1e293b; }
+.mj-dns-client .cl-dns-a     { background: #1d6fd8; }
+.mj-dns-client .cl-dns-aaaa  { background: #0891b2; }
+.mj-dns-client .cl-dns-cname { background: #7c3aed; }
+.mj-dns-client .cl-dns-mx    { background: #b45309; }
+.mj-dns-client .cl-dns-txt   { background: #16a34a; }
+.mj-dns-client .cl-dns-srv   { background: #dc2626; }
+.mj-dns-client .cl-dns-ns    { background: #475569; }
+.mj-dns-client .cl-dns-caa   { background: #1e293b; }
 
 /* Status indicator (dot) */
-.hvn-dns-client .cl-status-dot {
+.mj-dns-client .cl-status-dot {
     display: inline-block;
     width: 7px;
     height: 7px;
@@ -722,10 +722,10 @@
     margin-right: 5px;
     flex-shrink: 0;
 }
-.hvn-dns-client .cl-status-live    { background: var(--cl-success); box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
-.hvn-dns-client .cl-status-syncing { background: var(--cl-warning); animation: cl-pulse 1.2s ease-in-out infinite; }
-.hvn-dns-client .cl-status-failed  { background: var(--cl-danger); }
-.hvn-dns-client .cl-status-pending { background: #94a3b8; }
+.mj-dns-client .cl-status-live    { background: var(--cl-success); box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
+.mj-dns-client .cl-status-syncing { background: var(--cl-warning); animation: cl-pulse 1.2s ease-in-out infinite; }
+.mj-dns-client .cl-status-failed  { background: var(--cl-danger); }
+.mj-dns-client .cl-status-pending { background: #94a3b8; }
 
 @keyframes cl-pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -735,29 +735,29 @@
 /* =======================================================================
    9. PROGRESS BAR
    ======================================================================= */
-.hvn-dns-client .cl-progress {
+.mj-dns-client .cl-progress {
     height: 8px;
     background: #e2e8f0;
     border-radius: var(--cl-radius-pill);
     overflow: hidden;
 }
-.hvn-dns-client .cl-progress-bar {
+.mj-dns-client .cl-progress-bar {
     height: 100%;
     border-radius: var(--cl-radius-pill);
     transition: width 0.5s ease;
     background: linear-gradient(90deg, var(--cl-primary), #f87171);
 }
-.hvn-dns-client .cl-progress-bar.cl-progress-warning {
+.mj-dns-client .cl-progress-bar.cl-progress-warning {
     background: linear-gradient(90deg, var(--cl-warning), #fbbf24);
 }
-.hvn-dns-client .cl-progress-bar.cl-progress-danger {
+.mj-dns-client .cl-progress-bar.cl-progress-danger {
     background: linear-gradient(90deg, var(--cl-danger), #f87171);
 }
 
 /* =======================================================================
    10. ALERT / CALLOUT
    ======================================================================= */
-.hvn-dns-client .cl-alert {
+.mj-dns-client .cl-alert {
     display: flex;
     gap: 12px;
     padding: 14px 16px;
@@ -767,25 +767,25 @@
     line-height: 1.5;
     margin-bottom: 16px;
 }
-.hvn-dns-client .cl-alert-icon {
+.mj-dns-client .cl-alert-icon {
     font-size: 18px;
     flex-shrink: 0;
     margin-top: 1px;
 }
-.hvn-dns-client .cl-alert-info    { background: var(--cl-info-bg);    border-color: var(--cl-info-border);    color: #075985; }
-.hvn-dns-client .cl-alert-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #166534; }
-.hvn-dns-client .cl-alert-warning { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); color: #92400e; }
-.hvn-dns-client .cl-alert-danger  { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
+.mj-dns-client .cl-alert-info    { background: var(--cl-info-bg);    border-color: var(--cl-info-border);    color: #075985; }
+.mj-dns-client .cl-alert-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #166534; }
+.mj-dns-client .cl-alert-warning { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); color: #92400e; }
+.mj-dns-client .cl-alert-danger  { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
 
-.hvn-dns-client .cl-alert-info .cl-alert-icon    { color: var(--cl-info); }
-.hvn-dns-client .cl-alert-success .cl-alert-icon { color: var(--cl-success); }
-.hvn-dns-client .cl-alert-warning .cl-alert-icon { color: var(--cl-warning); }
-.hvn-dns-client .cl-alert-danger .cl-alert-icon  { color: var(--cl-danger); }
+.mj-dns-client .cl-alert-info .cl-alert-icon    { color: var(--cl-info); }
+.mj-dns-client .cl-alert-success .cl-alert-icon { color: var(--cl-success); }
+.mj-dns-client .cl-alert-warning .cl-alert-icon { color: var(--cl-warning); }
+.mj-dns-client .cl-alert-danger .cl-alert-icon  { color: var(--cl-danger); }
 
 /* =======================================================================
    11. SECTION TOOLBAR (filter + action row above table)
    ======================================================================= */
-.hvn-dns-client .cl-toolbar {
+.mj-dns-client .cl-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -793,20 +793,20 @@
     flex-wrap: wrap;
     margin-bottom: 14px;
 }
-.hvn-dns-client .cl-toolbar-left {
+.mj-dns-client .cl-toolbar-left {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
 }
-.hvn-dns-client .cl-toolbar-right {
+.mj-dns-client .cl-toolbar-right {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 /* Filter label */
-.hvn-dns-client .cl-filter-label {
+.mj-dns-client .cl-filter-label {
     font-size: 12px;
     font-weight: 600;
     color: var(--cl-text-muted);
@@ -816,7 +816,7 @@
 /* =======================================================================
    12. INLINE EDIT FORM (inputs inside table cells)
    ======================================================================= */
-.hvn-dns-client .cl-cell-input {
+.mj-dns-client .cl-cell-input {
     display: block;
     width: 100%;
     padding: 5px 8px;
@@ -828,16 +828,16 @@
     border-radius: var(--cl-radius-sm);
     transition: border-color var(--cl-transition), box-shadow var(--cl-transition);
 }
-.hvn-dns-client .cl-cell-input:focus {
+.mj-dns-client .cl-cell-input:focus {
     outline: none;
     border-color: var(--cl-primary);
     box-shadow: 0 0 0 2px var(--cl-primary-ring);
 }
-.hvn-dns-client .cl-cell-input.cl-mono {
+.mj-dns-client .cl-cell-input.cl-mono {
     font-family: var(--cl-font-mono) !important;
 }
 
-.hvn-dns-client .cl-cell-select {
+.mj-dns-client .cl-cell-select {
     padding: 5px 28px 5px 8px;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -847,7 +847,7 @@
 /* =======================================================================
    13. SPINNER
    ======================================================================= */
-.hvn-dns-client .cl-spinner {
+.mj-dns-client .cl-spinner {
     display: inline-block;
     width: 14px;
     height: 14px;
@@ -857,12 +857,12 @@
     animation: cl-spin 0.65s linear infinite;
     flex-shrink: 0;
 }
-.hvn-dns-client .cl-spinner-sm {
+.mj-dns-client .cl-spinner-sm {
     width: 12px;
     height: 12px;
     border-width: 2px;
 }
-.hvn-dns-client .cl-spinner-lg {
+.mj-dns-client .cl-spinner-lg {
     width: 22px;
     height: 22px;
     border-width: 3px;
@@ -873,29 +873,29 @@
 }
 
 /* Rotate icon (sync button) */
-.hvn-dns-client .cl-spin-icon {
+.mj-dns-client .cl-spin-icon {
     animation: cl-spin 1.2s linear infinite;
 }
 
 /* =======================================================================
    14. STATUS CHIP (Live / Syncing / Pending / Failed)
    ======================================================================= */
-.hvn-dns-client .cl-status {
+.mj-dns-client .cl-status {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     font-size: 12px;
     font-weight: 600;
 }
-.hvn-dns-client .cl-status-complete { color: var(--cl-success); }
-.hvn-dns-client .cl-status-syncing  { color: var(--cl-warning); }
-.hvn-dns-client .cl-status-pending  { color: var(--cl-text-muted); }
-.hvn-dns-client .cl-status-failed   { color: var(--cl-danger); }
+.mj-dns-client .cl-status-complete { color: var(--cl-success); }
+.mj-dns-client .cl-status-syncing  { color: var(--cl-warning); }
+.mj-dns-client .cl-status-pending  { color: var(--cl-text-muted); }
+.mj-dns-client .cl-status-failed   { color: var(--cl-danger); }
 
 /* =======================================================================
    15. SECTION HEADER (above each tab content)
    ======================================================================= */
-.hvn-dns-client .cl-section {
+.mj-dns-client .cl-section {
     background: var(--cl-surface);
     border: 1px solid var(--cl-border);
     border-radius: var(--cl-radius-lg);
@@ -903,7 +903,7 @@
     overflow: hidden;
 }
 
-.hvn-dns-client .cl-section-header {
+.mj-dns-client .cl-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -912,7 +912,7 @@
     border-bottom: 1px solid var(--cl-border);
 }
 
-.hvn-dns-client .cl-section-title {
+.mj-dns-client .cl-section-title {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -921,18 +921,18 @@
     color: var(--cl-text);
     margin: 0;
 }
-.hvn-dns-client .cl-section-title i {
+.mj-dns-client .cl-section-title i {
     color: var(--cl-primary);
 }
 
-.hvn-dns-client .cl-section-body {
+.mj-dns-client .cl-section-body {
     padding: 0;
 }
 
 /* =======================================================================
    16. NAMESERVER INFO CARD
    ======================================================================= */
-.hvn-dns-client .cl-ns-card {
+.mj-dns-client .cl-ns-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -943,7 +943,7 @@
     border-radius: var(--cl-radius-lg);
     margin-top: 20px;
 }
-.hvn-dns-client .cl-ns-label {
+.mj-dns-client .cl-ns-label {
     font-size: 13px;
     font-weight: 700;
     color: var(--cl-text);
@@ -952,8 +952,8 @@
     gap: 7px;
     margin-bottom: 4px;
 }
-.hvn-dns-client .cl-ns-label i { color: #2563eb; }
-.hvn-dns-client .cl-ns-value {
+.mj-dns-client .cl-ns-label i { color: #2563eb; }
+.mj-dns-client .cl-ns-value {
     font-family: var(--cl-font-mono);
     font-size: 13px;
     color: #374151;
@@ -963,20 +963,20 @@
 /* =======================================================================
    17. DOMAIN QUOTA DISPLAY
    ======================================================================= */
-.hvn-dns-client .cl-quota-row {
+.mj-dns-client .cl-quota-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 6px;
     font-size: 13px;
 }
-.hvn-dns-client .cl-quota-label { color: var(--cl-text-secondary); font-weight: 500; }
-.hvn-dns-client .cl-quota-value { font-weight: 700; color: var(--cl-text); }
+.mj-dns-client .cl-quota-label { color: var(--cl-text-secondary); font-weight: 500; }
+.mj-dns-client .cl-quota-value { font-weight: 700; color: var(--cl-text); }
 
 /* =======================================================================
    18. CHIP TAGS (DNSSEC / SSL status)
    ======================================================================= */
-.hvn-dns-client .cl-chip {
+.mj-dns-client .cl-chip {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -987,14 +987,14 @@
     color: #fff;
     letter-spacing: 0.2px;
 }
-.hvn-dns-client .cl-chip-active  { background: linear-gradient(135deg, #16a34a, #15803d); }
-.hvn-dns-client .cl-chip-pending { background: linear-gradient(135deg, #d97706, #b45309); }
-.hvn-dns-client .cl-chip-off     { background: linear-gradient(135deg, #475569, #334155); }
+.mj-dns-client .cl-chip-active  { background: linear-gradient(135deg, #16a34a, #15803d); }
+.mj-dns-client .cl-chip-pending { background: linear-gradient(135deg, #d97706, #b45309); }
+.mj-dns-client .cl-chip-off     { background: linear-gradient(135deg, #475569, #334155); }
 
 /* =======================================================================
    19. EMPTY STATE
    ======================================================================= */
-.hvn-dns-client .cl-empty-state {
+.mj-dns-client .cl-empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1002,19 +1002,19 @@
     padding: 48px 24px;
     text-align: center;
 }
-.hvn-dns-client .cl-empty-state-icon {
+.mj-dns-client .cl-empty-state-icon {
     font-size: 48px;
     color: var(--cl-border);
     margin-bottom: 16px;
     line-height: 1;
 }
-.hvn-dns-client .cl-empty-state-title {
+.mj-dns-client .cl-empty-state-title {
     font-size: 16px;
     font-weight: 700;
     color: var(--cl-text);
     margin-bottom: 6px;
 }
-.hvn-dns-client .cl-empty-state-desc {
+.mj-dns-client .cl-empty-state-desc {
     font-size: 13px;
     color: var(--cl-text-secondary);
     max-width: 320px;
@@ -1026,7 +1026,7 @@
    20. ANIMATIONS & TRANSITIONS
    ======================================================================= */
 /* Page fade-in */
-.hvn-dns-client {
+.mj-dns-client {
     animation: cl-fade-in 0.25s ease both;
 }
 @keyframes cl-fade-in {
@@ -1038,21 +1038,21 @@
 [x-cloak] { display: none !important; }
 
 /* Scrollbar (webkit) */
-.hvn-dns-client ::-webkit-scrollbar {
+.mj-dns-client ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
-.hvn-dns-client ::-webkit-scrollbar-track { background: transparent; }
-.hvn-dns-client ::-webkit-scrollbar-thumb {
+.mj-dns-client ::-webkit-scrollbar-track { background: transparent; }
+.mj-dns-client ::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,0.14);
     border-radius: 3px;
 }
-.hvn-dns-client ::-webkit-scrollbar-thumb:hover {
+.mj-dns-client ::-webkit-scrollbar-thumb:hover {
     background: rgba(0,0,0,0.24);
 }
 
 /* Selection */
-.hvn-dns-client ::selection {
+.mj-dns-client ::selection {
     background: var(--cl-primary-ring);
 }
 
@@ -1060,20 +1060,20 @@
    21. RESPONSIVE
    ======================================================================= */
 @media (max-width: 640px) {
-    .hvn-dns-client .cl-dns-badge { font-size: 10px; padding: 2px 6px; }
-    .hvn-dns-client .cl-tab-btn   { padding: 7px 11px; font-size: 12px; }
-    .hvn-dns-client .cl-domain-name { font-size: 18px; }
-    .hvn-dns-client .cl-toolbar   { flex-direction: column; align-items: stretch; }
-    .hvn-dns-client .cl-toolbar-right { justify-content: flex-end; }
-    .hvn-dns-client .cl-ns-card   { flex-direction: column; align-items: flex-start; }
+    .mj-dns-client .cl-dns-badge { font-size: 10px; padding: 2px 6px; }
+    .mj-dns-client .cl-tab-btn   { padding: 7px 11px; font-size: 12px; }
+    .mj-dns-client .cl-domain-name { font-size: 18px; }
+    .mj-dns-client .cl-toolbar   { flex-direction: column; align-items: stretch; }
+    .mj-dns-client .cl-toolbar-right { justify-content: flex-end; }
+    .mj-dns-client .cl-ns-card   { flex-direction: column; align-items: flex-start; }
 }
 
 /* =======================================================================
-   22. COMPAT ALIASES — map old Bootstrap classes within .hvn-dns-client
+   22. COMPAT ALIASES — map old Bootstrap classes within .mj-dns-client
        (makes old templates work while we migrate to cl-* classes)
    ======================================================================= */
-.hvn-dns-client .btn.btn-primary,
-.hvn-dns-client .btn-primary {
+.mj-dns-client .btn.btn-primary,
+.mj-dns-client .btn-primary {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 8px 16px; font-family: var(--cl-font); font-size: 14px; font-weight: 600;
     border: 1.5px solid var(--cl-primary); border-radius: var(--cl-radius);
@@ -1081,79 +1081,79 @@
     transition: all var(--cl-transition);
     box-shadow: 0 2px 6px var(--cl-primary-ring);
 }
-.hvn-dns-client .btn.btn-primary:hover, .hvn-dns-client .btn-primary:hover {
+.mj-dns-client .btn.btn-primary:hover, .mj-dns-client .btn-primary:hover {
     background: var(--cl-primary-hover); border-color: var(--cl-primary-hover);
     box-shadow: 0 4px 12px var(--cl-primary-ring); transform: translateY(-1px);
 }
 
-.hvn-dns-client .btn.btn-sm { padding: 5px 10px !important; font-size: 12px !important; border-radius: var(--cl-radius-sm) !important; }
-.hvn-dns-client .btn.btn-xs { padding: 3px 7px !important; font-size: 11px !important; }
+.mj-dns-client .btn.btn-sm { padding: 5px 10px !important; font-size: 12px !important; border-radius: var(--cl-radius-sm) !important; }
+.mj-dns-client .btn.btn-xs { padding: 3px 7px !important; font-size: 11px !important; }
 
-.hvn-dns-client .btn.btn-success    { background: var(--cl-success); border-color: var(--cl-success); color: #fff; }
-.hvn-dns-client .btn.btn-success:hover { background: #15803d; border-color: #15803d; color: #fff; }
-.hvn-dns-client .btn.btn-outline-secondary {
+.mj-dns-client .btn.btn-success    { background: var(--cl-success); border-color: var(--cl-success); color: #fff; }
+.mj-dns-client .btn.btn-success:hover { background: #15803d; border-color: #15803d; color: #fff; }
+.mj-dns-client .btn.btn-outline-secondary {
     background: var(--cl-surface); border: 1.5px solid var(--cl-border); color: var(--cl-text-secondary);
     transition: all var(--cl-transition);
 }
-.hvn-dns-client .btn.btn-outline-secondary:hover { background: var(--cl-surface-hover); color: var(--cl-text); }
-.hvn-dns-client .btn.btn-outline-danger {
+.mj-dns-client .btn.btn-outline-secondary:hover { background: var(--cl-surface-hover); color: var(--cl-text); }
+.mj-dns-client .btn.btn-outline-danger {
     background: transparent; border: 1.5px solid var(--cl-danger); color: var(--cl-danger);
 }
-.hvn-dns-client .btn.btn-outline-danger:hover { background: var(--cl-danger-bg); }
+.mj-dns-client .btn.btn-outline-danger:hover { background: var(--cl-danger-bg); }
 
-.hvn-dns-client .form-control,
-.hvn-dns-client .form-select {
+.mj-dns-client .form-control,
+.mj-dns-client .form-select {
     display: block; width: 100%; padding: 8px 12px;
     font-family: var(--cl-font); font-size: 13.5px; color: var(--cl-text);
     background: var(--cl-surface); border: 1.5px solid var(--cl-border);
     border-radius: var(--cl-radius); appearance: none;
     transition: border-color var(--cl-transition), box-shadow var(--cl-transition);
 }
-.hvn-dns-client .form-control:focus,
-.hvn-dns-client .form-select:focus {
+.mj-dns-client .form-control:focus,
+.mj-dns-client .form-select:focus {
     outline: none; border-color: var(--cl-border-focus);
     box-shadow: 0 0 0 3px var(--cl-primary-ring);
 }
-.hvn-dns-client .form-control-sm,
-.hvn-dns-client .form-select-sm { padding: 5px 8px !important; font-size: 12px !important; }
+.mj-dns-client .form-control-sm,
+.mj-dns-client .form-select-sm { padding: 5px 8px !important; font-size: 12px !important; }
 
 /* Badge compat */
-.hvn-dns-client .badge {
+.mj-dns-client .badge {
     display: inline-flex; align-items: center; gap: 3px;
     padding: 3px 9px; font-size: 11px; font-weight: 700;
     border-radius: 5px; white-space: nowrap; line-height: 1.4;
 }
-.hvn-dns-client .badge.bg-success { background: var(--cl-success-bg) !important; color: var(--cl-success) !important; border: 1px solid var(--cl-success-border); }
-.hvn-dns-client .badge.bg-warning { background: var(--cl-warning-bg) !important; color: var(--cl-warning) !important; border: 1px solid var(--cl-warning-border); }
-.hvn-dns-client .badge.bg-danger  { background: var(--cl-danger-bg)  !important; color: var(--cl-danger)  !important; border: 1px solid var(--cl-danger-border); }
-.hvn-dns-client .badge.bg-light   { background: #f1f5f9 !important; color: var(--cl-text-secondary) !important; border: 1px solid var(--cl-border); }
-.hvn-dns-client .badge.bg-warning.text-dark { color: var(--cl-warning) !important; }
+.mj-dns-client .badge.bg-success { background: var(--cl-success-bg) !important; color: var(--cl-success) !important; border: 1px solid var(--cl-success-border); }
+.mj-dns-client .badge.bg-warning { background: var(--cl-warning-bg) !important; color: var(--cl-warning) !important; border: 1px solid var(--cl-warning-border); }
+.mj-dns-client .badge.bg-danger  { background: var(--cl-danger-bg)  !important; color: var(--cl-danger)  !important; border: 1px solid var(--cl-danger-border); }
+.mj-dns-client .badge.bg-light   { background: #f1f5f9 !important; color: var(--cl-text-secondary) !important; border: 1px solid var(--cl-border); }
+.mj-dns-client .badge.bg-warning.text-dark { color: var(--cl-warning) !important; }
 
 /* Card compat */
-.hvn-dns-client .card {
+.mj-dns-client .card {
     background: var(--cl-surface); border: 1px solid var(--cl-border);
     border-radius: var(--cl-radius-lg); box-shadow: var(--cl-shadow-sm);
     overflow: hidden;
 }
-.hvn-dns-client .card-body { padding: 20px; }
-.hvn-dns-client .card-header {
+.mj-dns-client .card-body { padding: 20px; }
+.mj-dns-client .card-header {
     padding: 14px 20px; background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
     border-bottom: 1px solid var(--cl-border);
 }
-.hvn-dns-client .card-footer {
+.mj-dns-client .card-footer {
     padding: 12px 20px; background: var(--cl-surface-2);
     border-top: 1px solid var(--cl-border);
 }
-.hvn-dns-client .card-title {
+.mj-dns-client .card-title {
     font-size: 16px; font-weight: 700; color: var(--cl-text); margin-bottom: 4px;
 }
 
 /* Table compat */
-.hvn-dns-client .table {
+.mj-dns-client .table {
     width: 100%; border-collapse: collapse; font-size: 13.5px;
 }
-.hvn-dns-client .table thead tr { background: #f8f9fb; }
-.hvn-dns-client .table th {
+.mj-dns-client .table thead tr { background: #f8f9fb; }
+.mj-dns-client .table th {
     padding: 12px 8px;
     font-size: 13px;
     font-weight: 600;
@@ -1163,96 +1163,96 @@
     letter-spacing: 0;
     text-transform: none;
 }
-.hvn-dns-client .table td {
+.mj-dns-client .table td {
     padding: 12px 8px;
     border-bottom: 1px solid #f1f5f9;
     vertical-align: middle; color: var(--cl-text);
     font-size: 13.5px;
 }
-.hvn-dns-client .table-hover tbody tr:hover td { background: #fafbff; }
-.hvn-dns-client .table-light thead tr { background: #f8f9fb; }
-.hvn-dns-client .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.hvn-dns-client .align-middle td,
-.hvn-dns-client .align-middle th { vertical-align: middle; }
+.mj-dns-client .table-hover tbody tr:hover td { background: #fafbff; }
+.mj-dns-client .table-light thead tr { background: #f8f9fb; }
+.mj-dns-client .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.mj-dns-client .align-middle td,
+.mj-dns-client .align-middle th { vertical-align: middle; }
 
 /* Alert compat */
-.hvn-dns-client .alert {
+.mj-dns-client .alert {
     padding: 14px 16px; border-radius: var(--cl-radius); border: 1px solid transparent;
     font-size: 13.5px; margin-bottom: 16px;
 }
-.hvn-dns-client .alert-info    { background: var(--cl-info-bg);    border-color: var(--cl-info-border);    color: #075985; }
-.hvn-dns-client .alert-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #166534; }
-.hvn-dns-client .alert-warning { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); color: #92400e; }
-.hvn-dns-client .alert-danger  { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
+.mj-dns-client .alert-info    { background: var(--cl-info-bg);    border-color: var(--cl-info-border);    color: #075985; }
+.mj-dns-client .alert-success { background: var(--cl-success-bg); border-color: var(--cl-success-border); color: #166534; }
+.mj-dns-client .alert-warning { background: var(--cl-warning-bg); border-color: var(--cl-warning-border); color: #92400e; }
+.mj-dns-client .alert-danger  { background: var(--cl-danger-bg);  border-color: var(--cl-danger-border);  color: #991b1b; }
 
 /* Progress compat */
-.hvn-dns-client .progress {
+.mj-dns-client .progress {
     height: 8px; background: #e2e8f0;
     border-radius: var(--cl-radius-pill); overflow: hidden;
 }
-.hvn-dns-client .progress-bar {
+.mj-dns-client .progress-bar {
     height: 100%; border-radius: var(--cl-radius-pill); transition: width 0.5s ease;
     background: linear-gradient(90deg, var(--cl-primary), #f87171);
 }
-.hvn-dns-client .progress-bar.bg-warning { background: linear-gradient(90deg, var(--cl-warning), #fbbf24); }
-.hvn-dns-client .progress-bar.bg-danger  { background: linear-gradient(90deg, var(--cl-danger), #f87171); }
-.hvn-dns-client .progress-bar.bg-primary { background: linear-gradient(90deg, var(--cl-primary), #f87171); }
+.mj-dns-client .progress-bar.bg-warning { background: linear-gradient(90deg, var(--cl-warning), #fbbf24); }
+.mj-dns-client .progress-bar.bg-danger  { background: linear-gradient(90deg, var(--cl-danger), #f87171); }
+.mj-dns-client .progress-bar.bg-primary { background: linear-gradient(90deg, var(--cl-primary), #f87171); }
 
 /* Input group compat */
-.hvn-dns-client .input-group {
+.mj-dns-client .input-group {
     display: flex; align-items: stretch;
 }
-.hvn-dns-client .input-group > .form-control { flex: 1; min-width: 0; }
-.hvn-dns-client .input-group > .form-control:not(:last-child) {
+.mj-dns-client .input-group > .form-control { flex: 1; min-width: 0; }
+.mj-dns-client .input-group > .form-control:not(:last-child) {
     border-top-right-radius: 0; border-bottom-right-radius: 0;
 }
-.hvn-dns-client .input-group-text {
+.mj-dns-client .input-group-text {
     display: inline-flex; align-items: center;
     padding: 0 9px; background: var(--cl-surface-2);
     border: 1.5px solid var(--cl-border); border-left: 0;
     border-radius: 0 var(--cl-radius) var(--cl-radius) 0;
     color: var(--cl-text-muted); font-size: 12px;
 }
-.hvn-dns-client .input-group-sm > .form-control { padding: 4px 8px; font-size: 12px; }
+.mj-dns-client .input-group-sm > .form-control { padding: 4px 8px; font-size: 12px; }
 
 /* Spinner compat */
-.hvn-dns-client .spinner-border {
+.mj-dns-client .spinner-border {
     display: inline-block; width: 16px; height: 16px;
     border: 2px solid currentColor; border-right-color: transparent;
     border-radius: 50%; animation: cl-spin 0.65s linear infinite;
 }
-.hvn-dns-client .spinner-border-sm { width: 12px !important; height: 12px !important; border-width: 2px; }
+.mj-dns-client .spinner-border-sm { width: 12px !important; height: 12px !important; border-width: 2px; }
 
 /* Inline edit highlight */
-.hvn-dns-client .hvn-inline-edit td { background: #fffbeb !important; }
-.hvn-dns-client .hvn-inline-add  td { background: #f0fdf4 !important; }
-.hvn-dns-client .hvn-inline-edit .form-control,
-.hvn-dns-client .hvn-inline-edit .form-select,
-.hvn-dns-client .hvn-inline-add  .form-control,
-.hvn-dns-client .hvn-inline-add  .form-select {
+.mj-dns-client .mj-inline-edit td { background: #fffbeb !important; }
+.mj-dns-client .mj-inline-add  td { background: #f0fdf4 !important; }
+.mj-dns-client .mj-inline-edit .form-control,
+.mj-dns-client .mj-inline-edit .form-select,
+.mj-dns-client .mj-inline-add  .form-control,
+.mj-dns-client .mj-inline-add  .form-select {
     font-size: 12px !important; padding: 4px 7px !important;
 }
 
 /* Btn-group compat */
-.hvn-dns-client .btn-group {
+.mj-dns-client .btn-group {
     display: inline-flex; align-items: center;
 }
-.hvn-dns-client .btn-group .btn:not(:first-child) {
+.mj-dns-client .btn-group .btn:not(:first-child) {
     border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0;
 }
-.hvn-dns-client .btn-group .btn:not(:last-child) {
+.mj-dns-client .btn-group .btn:not(:last-child) {
     border-top-right-radius: 0; border-bottom-right-radius: 0;
 }
 
 /* Spin compat */
-.hvn-dns-client .spin { animation: cl-spin 1.2s linear infinite; }
+.mj-dns-client .spin { animation: cl-spin 1.2s linear infinite; }
 
-/* Tab bar compat (existing hvn-tab-* classes) */
-.hvn-dns-client .hvn-tab-bar {
+/* Tab bar compat (existing mj-tab-* classes) */
+.mj-dns-client .mj-tab-bar {
     display: flex; gap: 3px; background: #eef1f6;
     border-radius: var(--cl-radius-lg); padding: 5px; flex-wrap: wrap;
 }
-.hvn-dns-client .hvn-tab-btn {
+.mj-dns-client .mj-tab-btn {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 8px 16px; font-family: var(--cl-font); font-size: 13px;
     font-weight: 600; color: var(--cl-text-secondary);
@@ -1260,14 +1260,14 @@
     border-radius: var(--cl-radius); cursor: pointer;
     white-space: nowrap; transition: all var(--cl-transition);
 }
-.hvn-dns-client .hvn-tab-btn:hover {
+.mj-dns-client .mj-tab-btn:hover {
     background: rgba(255,255,255,0.7); color: var(--cl-text);
 }
-.hvn-dns-client .hvn-tab-active {
+.mj-dns-client .mj-tab-active {
     background: var(--cl-surface) !important; color: var(--cl-primary) !important;
     box-shadow: var(--cl-shadow-sm) !important;
 }
-.hvn-dns-client .hvn-tab-count {
+.mj-dns-client .mj-tab-count {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 18px; height: 18px; padding: 0 5px;
     border-radius: var(--cl-radius-pill);
@@ -1276,17 +1276,17 @@
 }
 
 /* DNS type badge compat */
-.hvn-dns-client .badge-dns {
+.mj-dns-client .badge-dns {
     display: inline-flex; align-items: center;
     padding: 3px 8px; font-size: 11px; font-weight: 800;
     border-radius: 5px; color: #fff !important;
     letter-spacing: 0.4px;
 }
-.hvn-dns-client .hvn-badge-a    { background: #1d6fd8 !important; }
-.hvn-dns-client .hvn-badge-aaaa { background: #0891b2 !important; }
-.hvn-dns-client .hvn-badge-cname{ background: #7c3aed !important; }
-.hvn-dns-client .hvn-badge-mx   { background: #b45309 !important; }
-.hvn-dns-client .hvn-badge-txt  { background: #16a34a !important; }
-.hvn-dns-client .hvn-badge-srv  { background: #dc2626 !important; }
-.hvn-dns-client .hvn-badge-ns   { background: #475569 !important; }
-.hvn-dns-client .hvn-badge-caa  { background: #1e293b !important; }
+.mj-dns-client .mj-badge-a    { background: #1d6fd8 !important; }
+.mj-dns-client .mj-badge-aaaa { background: #0891b2 !important; }
+.mj-dns-client .mj-badge-cname{ background: #7c3aed !important; }
+.mj-dns-client .mj-badge-mx   { background: #b45309 !important; }
+.mj-dns-client .mj-badge-txt  { background: #16a34a !important; }
+.mj-dns-client .mj-badge-srv  { background: #dc2626 !important; }
+.mj-dns-client .mj-badge-ns   { background: #475569 !important; }
+.mj-dns-client .mj-badge-caa  { background: #1e293b !important; }

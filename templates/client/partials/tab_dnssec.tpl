@@ -42,7 +42,7 @@
                         <td style="padding:10px 14px;font-weight:700;color:#5E636E;background:#f8f9fa;width:180px;white-space:nowrap;">Key Tag</td>
                         <td style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
                             <span id="ds-keytag" style="font-family:monospace;color:#1e293b;">12345</span>
-                            <a href="javascript:void(0)" onclick="hvnCopyDnssec('ds-keytag')"
+                            <a href="javascript:void(0)" onclick="mjDnsCopyDnssec('ds-keytag')"
                                style="font-size:12px;color:#ea4544;text-decoration:none;font-weight:600;">Copy</a>
                         </td>
                     </tr>
@@ -50,7 +50,7 @@
                         <td style="padding:10px 14px;font-weight:700;color:#5E636E;background:#f8f9fa;">Algorithm</td>
                         <td style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
                             <span id="ds-algo" style="font-family:monospace;color:#1e293b;">13 (ECDSA P-256)</span>
-                            <a href="javascript:void(0)" onclick="hvnCopyDnssec('ds-algo')"
+                            <a href="javascript:void(0)" onclick="mjDnsCopyDnssec('ds-algo')"
                                style="font-size:12px;color:#ea4544;text-decoration:none;font-weight:600;">Copy</a>
                         </td>
                     </tr>
@@ -58,7 +58,7 @@
                         <td style="padding:10px 14px;font-weight:700;color:#5E636E;background:#f8f9fa;">Digest Type</td>
                         <td style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
                             <span id="ds-dtype" style="font-family:monospace;color:#1e293b;">2 (SHA-256)</span>
-                            <a href="javascript:void(0)" onclick="hvnCopyDnssec('ds-dtype')"
+                            <a href="javascript:void(0)" onclick="mjDnsCopyDnssec('ds-dtype')"
                                style="font-size:12px;color:#ea4544;text-decoration:none;font-weight:600;">Copy</a>
                         </td>
                     </tr>
@@ -66,7 +66,7 @@
                         <td style="padding:10px 14px;font-weight:700;color:#5E636E;background:#f8f9fa;">Digest</td>
                         <td style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
                             <span id="ds-digest" style="font-family:monospace;color:#1e293b;word-break:break-all;">49FD46E6C4B45C55D4AC99182315ADF13E2A8B6072BFF1C57EA35B03E10D9B58</span>
-                            <a href="javascript:void(0)" onclick="hvnCopyDnssec('ds-digest')"
+                            <a href="javascript:void(0)" onclick="mjDnsCopyDnssec('ds-digest')"
                                style="font-size:12px;color:#ea4544;text-decoration:none;font-weight:600;white-space:nowrap;">Copy</a>
                         </td>
                     </tr>
@@ -74,7 +74,7 @@
                         <td style="padding:10px 14px;font-weight:700;color:#5E636E;background:#f0f4ff;">DS Record (Full)</td>
                         <td style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
                             <span id="ds-full" style="font-family:monospace;color:#1e293b;font-size:12px;word-break:break-all;">{$domain.domain}. IN DS 12345 13 2 49FD46E6C4B45C55D4AC...</span>
-                            <a href="javascript:void(0)" onclick="hvnCopyDnssec('ds-full')"
+                            <a href="javascript:void(0)" onclick="mjDnsCopyDnssec('ds-full')"
                                style="font-size:12px;color:#ea4544;text-decoration:none;font-weight:600;white-space:nowrap;">Copy</a>
                         </td>
                     </tr>
@@ -82,7 +82,7 @@
             </table>
         </div>
 
-        <button onclick="hvnCopyAllDnssec()"
+        <button onclick="mjDnsCopyAllDnssec()"
             style="height:32px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font-size:14px;background:#fff;border:1px solid #dee2e6;border-radius:6px;color:#6c757d;cursor:pointer;margin-bottom:20px;transition:all .18s;"
             onmouseover="this.style.borderColor='#adb5bd';this.style.color='#343a40';" onmouseout="this.style.borderColor='#dee2e6';this.style.color='#6c757d';">
             <i class="bi bi-clipboard"></i> Copy tất cả
@@ -116,13 +116,13 @@
 
 {literal}
 <script>
-function hvnCopyDnssec(elementId) {
+function mjDnsCopyDnssec(elementId) {
     var text = document.getElementById(elementId).innerText.trim();
     navigator.clipboard.writeText(text).then(function() {
         showToast('Đã copy', 'Dữ liệu đã được lưu vào khay nhớ tạm.', 'success');
     });
 }
-function hvnCopyAllDnssec() {
+function mjDnsCopyAllDnssec() {
     var fields = ['ds-keytag', 'ds-algo', 'ds-dtype', 'ds-digest', 'ds-full'];
     var all = fields.map(function(id) {
         var el = document.getElementById(id);

@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Contracts;
+namespace MJ\DnsManager\Contracts;
 
 interface JobInterface
 {

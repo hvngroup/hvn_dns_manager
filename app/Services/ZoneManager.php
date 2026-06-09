@@ -1,11 +1,11 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Models\SyncLog;
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Models\SyncLog;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ZoneManager

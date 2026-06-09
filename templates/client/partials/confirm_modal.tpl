@@ -2,7 +2,7 @@
 {literal}
 <style>
 /* ── Confirm Modal Overlay ── */
-.hvn-modal-overlay {
+.mj-modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.45);
@@ -12,21 +12,21 @@
     justify-content: center;
     padding: 16px;
 }
-.hvn-modal {
+.mj-modal {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.18);
     max-width: 460px;
     width: 100%;
     overflow: hidden;
-    animation: hvn-modal-in 0.18s ease;
+    animation: mj-modal-in 0.18s ease;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
-@keyframes hvn-modal-in {
+@keyframes mj-modal-in {
     from { opacity: 0; transform: translateY(-10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-.hvn-modal-header {
+.mj-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -35,12 +35,12 @@
     background: #fff;
     font-family: 'Inter', sans-serif;
 }
-.hvn-modal-header-left {
+.mj-modal-header-left {
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.hvn-modal-icon {
+.mj-modal-icon {
     width: 28px;
     height: 28px;
     border-radius: 6px;
@@ -50,16 +50,16 @@
     font-size: 15px;
     flex-shrink: 0;
 }
-.hvn-modal-icon-danger  { background: #fee2e2; color: #dc2626; }
-.hvn-modal-icon-warning { background: #fef3c7; color: #d97706; }
-.hvn-modal-icon-info    { background: #dbeafe; color: #2563eb; }
-.hvn-modal-title {
+.mj-modal-icon-danger  { background: #fee2e2; color: #dc2626; }
+.mj-modal-icon-warning { background: #fef3c7; color: #d97706; }
+.mj-modal-icon-info    { background: #dbeafe; color: #2563eb; }
+.mj-modal-title {
     font-size: 16px;
     font-weight: 700;
     color: #202124;
     line-height: 1.3;
 }
-.hvn-modal-close {
+.mj-modal-close {
     width: 28px;
     height: 28px;
     border: none;
@@ -74,8 +74,8 @@
     transition: all 0.15s;
     flex-shrink: 0;
 }
-.hvn-modal-close:hover { background: #f1f5f9; color: #475569; }
-.hvn-modal-body {
+.mj-modal-close:hover { background: #f1f5f9; color: #475569; }
+.mj-modal-body {
     padding: 18px 16px;
     color: #495057;
     font-size: 14px;
@@ -83,7 +83,7 @@
     white-space: pre-line;
     border-bottom: 1px solid #e9ecef;
 }
-.hvn-modal-footer {
+.mj-modal-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -91,7 +91,7 @@
     padding: 14px 16px;
     background: #fff;
 }
-.hvn-modal-btn {
+.mj-modal-btn {
     height: 44px;
     padding: 8px 16px;
     border-radius: 6px;
@@ -106,22 +106,22 @@
     line-height: 1;
     white-space: nowrap;
 }
-.hvn-modal-btn-cancel {
+.mj-modal-btn-cancel {
     background: #fff;
     color: #495057;
     border: 1px solid #dee2e6;
 }
-.hvn-modal-btn-cancel:hover { background: #f8f9fa; border-color: #adb5bd; }
-.hvn-modal-btn-ok-danger  { background: #dc2626; color: #fff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,.25); }
-.hvn-modal-btn-ok-danger:hover  { background: #b91c1c; }
-.hvn-modal-btn-ok-warning { background: #d97706; color: #fff; border: none; box-shadow: 0 2px 6px rgba(217,119,6,.25); }
-.hvn-modal-btn-ok-warning:hover { background: #b45309; }
-.hvn-modal-btn-ok-info    { background: #2563eb; color: #fff; border: none; box-shadow: 0 2px 6px rgba(37,99,235,.25); }
-.hvn-modal-btn-ok-info:hover    { background: #1d4ed8; }
+.mj-modal-btn-cancel:hover { background: #f8f9fa; border-color: #adb5bd; }
+.mj-modal-btn-ok-danger  { background: #dc2626; color: #fff; border: none; box-shadow: 0 2px 6px rgba(220,38,38,.25); }
+.mj-modal-btn-ok-danger:hover  { background: #b91c1c; }
+.mj-modal-btn-ok-warning { background: #d97706; color: #fff; border: none; box-shadow: 0 2px 6px rgba(217,119,6,.25); }
+.mj-modal-btn-ok-warning:hover { background: #b45309; }
+.mj-modal-btn-ok-info    { background: #2563eb; color: #fff; border: none; box-shadow: 0 2px 6px rgba(37,99,235,.25); }
+.mj-modal-btn-ok-info:hover    { background: #1d4ed8; }
 </style>
 
-<div id="hvn-confirm-modal-root" x-data="hvnConfirmModal()">
-    <div class="hvn-modal-overlay"
+<div id="mj-confirm-modal-root" x-data="mjDnsConfirmModal()">
+    <div class="mj-modal-overlay"
          x-show="show"
          x-transition:enter="transition"
          x-transition:enter-start="opacity-0"
@@ -131,34 +131,34 @@
          x-transition:leave-end="opacity-0"
          style="display:none"
          @click.self="onCancel()">
-        <div class="hvn-modal" @click.stop>
+        <div class="mj-modal" @click.stop>
 
             <!-- Header: icon + title + close button -->
-            <div class="hvn-modal-header">
-                <div class="hvn-modal-header-left">
-                    <div class="hvn-modal-icon" :class="'hvn-modal-icon-' + variant">
+            <div class="mj-modal-header">
+                <div class="mj-modal-header-left">
+                    <div class="mj-modal-icon" :class="'mj-modal-icon-' + variant">
                         <i class="bi"
                            :class="variant === 'danger' ? 'bi-trash3-fill' : (variant === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill')"></i>
                     </div>
-                    <h5 class="hvn-modal-title" x-text="title"></h5>
+                    <h5 class="mj-modal-title" x-text="title"></h5>
                 </div>
-                <button class="hvn-modal-close" @click="onCancel()" type="button" title="Đóng">
+                <button class="mj-modal-close" @click="onCancel()" type="button" title="Đóng">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
             <!-- Body -->
-            <div class="hvn-modal-body" x-text="msg"></div>
+            <div class="mj-modal-body" x-text="msg"></div>
 
             <!-- Footer -->
-            <div class="hvn-modal-footer">
-                <button class="hvn-modal-btn hvn-modal-btn-cancel"
+            <div class="mj-modal-footer">
+                <button class="mj-modal-btn mj-modal-btn-cancel"
                         @click="onCancel()"
                         x-text="cancelText"
                         type="button">
                 </button>
-                <button class="hvn-modal-btn"
-                        :class="'hvn-modal-btn-ok-' + variant"
+                <button class="mj-modal-btn"
+                        :class="'mj-modal-btn-ok-' + variant"
                         @click="onOk()"
                         x-text="okText"
                         type="button">
@@ -171,7 +171,7 @@
 
 <script>
     document.addEventListener('alpine:init', function() {
-        Alpine.data('hvnConfirmModal', function() {
+        Alpine.data('mjDnsConfirmModal', function() {
             return {
                 show: false,
                 title: '',
@@ -217,11 +217,11 @@
     });
 
     /**
-     * hvnConfirm(opts) — Thay thế confirm() native
+     * mjDnsConfirm(opts) — Thay thế confirm() native
      * opts: { title, msg, variant: 'danger'|'warning'|'info', okText, cancelText }
      * Returns: Promise<boolean>
      */
-    function hvnConfirm(opts) {
+    function mjDnsConfirm(opts) {
         return new Promise(function(resolve) {
             function handler(e) {
                 window.removeEventListener('confirm-result', handler);

@@ -1,9 +1,9 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Helpers\SettingsHelper;
 
 /**
  * QuotaChecker — Kiểm tra giới hạn record trước khi cho phép thêm mới.

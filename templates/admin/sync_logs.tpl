@@ -1,10 +1,10 @@
-<div class="hvn-dns-admin hvn-sync-logs" x-data="syncLogsData()">
-    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
+<div class="mj-dns-admin mj-sync-logs" x-data="syncLogsData()">
+    <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-mb-4">
         <h2><i class="bi bi-journal-check"></i> Lịch sử Đồng bộ (Sync Logs)</h2>
         <div>
-            <button class="hvn-btn btn-outline-success" @click="exportCsv()"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
+            <button class="mj-btn btn-outline-success" @click="exportCsv()"><i class="bi bi-file-earmark-spreadsheet"></i> Export CSV</button>
             <button
-                class="hvn-btn hvn-btn-warning hvn-ms-2"
+                class="mj-btn mj-btn-warning mj-ms-2"
                 @click="retryAllFailed()"
                 :disabled="retrying"
                 x-show="failedCount > 0"
@@ -13,7 +13,7 @@
                 <span x-text="retrying ? 'Đang reset...' : 'Retry All Failed (' + failedCount + ')'"></span>
             </button>
             <button
-                class="hvn-btn hvn-btn-primary hvn-ms-2"
+                class="mj-btn mj-btn-primary mj-ms-2"
                 @click="runPendingJobs()"
                 :disabled="syncing"
             ><i class="bi bi-play-circle"></i> <span x-text="syncing ? 'Đang đồng bộ...' : 'Đồng bộ Pending'"></span></button>
@@ -21,30 +21,30 @@
     </div>
 
     <!-- Toolbar Filters -->
-    <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4 hvn-bg-light">
-        <div class="hvn-card-body hvn-py-3">
-            <div class="hvn-row g-2 hvn-align-items-center">
-                <div class="hvn-col-md-3">
-                    <input type="text" class="hvn-form-control" placeholder="Tên miền (VD: myblog.net)..." x-model="filterDomain">
+    <div class="mj-card mj-shadow-sm mj-border-0 mj-mb-4 mj-bg-light">
+        <div class="mj-card-body mj-py-3">
+            <div class="mj-row g-2 mj-align-items-center">
+                <div class="mj-col-md-3">
+                    <input type="text" class="mj-form-control" placeholder="Tên miền (VD: myblog.net)..." x-model="filterDomain">
                 </div>
-                <div class="hvn-col-md-2">
-                    <select class="hvn-form-select" x-model="filterStatus">
+                <div class="mj-col-md-2">
+                    <select class="mj-form-select" x-model="filterStatus">
                         <option value="">Tất cả trạng thái</option>
                         <option value="complete">✅ Complete</option>
                         <option value="pending">🟡 Pending</option>
                         <option value="failed">❌ Failed</option>
                     </select>
                 </div>
-                <div class="hvn-col-md-2">
-                    <select class="hvn-form-select" x-model="filterServer">
+                <div class="mj-col-md-2">
+                    <select class="mj-form-select" x-model="filterServer">
                         <option value="">Tất cả Server</option>
                         {foreach from=$serverHostnames item=hostname}
                         <option value="{$hostname|escape:'htmlall'}">{$hostname|escape:'htmlall'}</option>
                         {/foreach}
                     </select>
                 </div>
-                <div class="hvn-col-md-2">
-                    <select class="hvn-form-select" x-model="filterAction">
+                <div class="mj-col-md-2">
+                    <select class="mj-form-select" x-model="filterAction">
                         <option value="">Tất cả Action</option>
                         <option value="ADD_RECORD">ADD_RECORD</option>
                         <option value="EDIT_RECORD">EDIT_RECORD</option>
@@ -53,89 +53,89 @@
                         <option value="APPLY_TEMPLATE">APPLY_TEMPLATE</option>
                     </select>
                 </div>
-                <div class="hvn-col-md-3 hvn-text-end hvn-d-flex hvn-align-items-center hvn-justify-content-end" style="gap:6px;">
-                    <label class="hvn-small hvn-text-muted" style="white-space:nowrap;">Hiển:</label>
-                    <select class="hvn-form-select" style="width:90px;" x-model.number="perPage">
+                <div class="mj-col-md-3 mj-text-end mj-d-flex mj-align-items-center mj-justify-content-end" style="gap:6px;">
+                    <label class="mj-small mj-text-muted" style="white-space:nowrap;">Hiển:</label>
+                    <select class="mj-form-select" style="width:90px;" x-model.number="perPage">
                         <option value="100">100</option>
                         <option value="200">200</option>
                         <option value="500">500</option>
                         <option value="0">Tất cả</option>
                     </select>
-                    <button class="hvn-btn hvn-btn-primary"><i class="bi bi-funnel"></i> Lọc</button>
-                    <button class="hvn-btn hvn-btn-outline-secondary" @click="filterDomain=''; filterStatus=''; filterServer=''; filterAction=''; currentPage=1;"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    <button class="mj-btn mj-btn-primary"><i class="bi bi-funnel"></i> Lọc</button>
+                    <button class="mj-btn mj-btn-outline-secondary" @click="filterDomain=''; filterStatus=''; filterServer=''; filterAction=''; currentPage=1;"><i class="bi bi-arrow-counterclockwise"></i></button>
                 </div>
             </div>
-            <div class="hvn-row hvn-mt-2 g-2">
-                <div class="hvn-col-md-4 hvn-d-flex hvn-align-items-center">
-                    <span class="hvn-me-2 small">Từ:</span> <input type="date" class="hvn-form-control hvn-form-control-sm">
+            <div class="mj-row mj-mt-2 g-2">
+                <div class="mj-col-md-4 mj-d-flex mj-align-items-center">
+                    <span class="mj-me-2 small">Từ:</span> <input type="date" class="mj-form-control mj-form-control-sm">
                 </div>
-                <div class="hvn-col-md-4 hvn-d-flex hvn-align-items-center">
-                    <span class="hvn-me-2 small">Đến:</span> <input type="date" class="hvn-form-control hvn-form-control-sm">
+                <div class="mj-col-md-4 mj-d-flex mj-align-items-center">
+                    <span class="mj-me-2 small">Đến:</span> <input type="date" class="mj-form-control mj-form-control-sm">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Main Table (full-width) -->
-    <div class="hvn-card hvn-shadow-sm hvn-border-0">
-        <div class="hvn-card-body hvn-p-0">
+    <div class="mj-card mj-shadow-sm mj-border-0">
+        <div class="mj-card-body mj-p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle hvn-mb-0 font-monospace" style="font-size: 12px">
+                <table class="table table-hover align-middle mj-mb-0 font-monospace" style="font-size: 12px">
                     <thead class="table-light">
                         <tr>
-                            <th class="hvn-ps-3 hvn-sortable" @click="setSort('id')">
+                            <th class="mj-ps-3 mj-sortable" @click="setSort('id')">
                                 ID <span x-text="sortIcon('id')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('time')">
+                            <th class="mj-sortable" @click="setSort('time')">
                                 Thời gian <span x-text="sortIcon('time')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('domain')">
+                            <th class="mj-sortable" @click="setSort('domain')">
                                 Domain <span x-text="sortIcon('domain')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('action')">
+                            <th class="mj-sortable" @click="setSort('action')">
                                 Action <span x-text="sortIcon('action')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('server')">
+                            <th class="mj-sortable" @click="setSort('server')">
                                 Server <span x-text="sortIcon('server')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('status')">
+                            <th class="mj-sortable" @click="setSort('status')">
                                 Status <span x-text="sortIcon('status')"></span>
                             </th>
-                            <th class="hvn-sortable" @click="setSort('ms')">
+                            <th class="mj-sortable" @click="setSort('ms')">
                                 ms <span x-text="sortIcon('ms')"></span>
                             </th>
-                            <th class="hvn-text-end hvn-pe-3"></th>
+                            <th class="mj-text-end mj-pe-3"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <template x-for="log in pagedLogs" :key="log.id">
                             <tr>
-                                <td class="hvn-ps-3 hvn-text-muted" x-text="'#' + log.id"></td>
+                                <td class="mj-ps-3 mj-text-muted" x-text="'#' + log.id"></td>
                                 <td x-text="log.time"></td>
                                 <td>
-                                    <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + log.domain_id" x-text="log.domain"></a>
+                                    <a :href="'?module=mj_dns_manager&action=admin_dns_editor&domain_id=' + log.domain_id" x-text="log.domain"></a>
                                 </td>
                                 <td>
-                                    <div class="hvn-fw-bold" x-text="log.action || '—'"></div>
-                                    <div class="small hvn-text-muted" x-text="log.details || ''"></div>
+                                    <div class="mj-fw-bold" x-text="log.action || '—'"></div>
+                                    <div class="small mj-text-muted" x-text="log.details || ''"></div>
                                 </td>
                                 <td x-text="log.server"></td>
                                 <td>
-                                    <template x-if="log.status === 'complete'"><span class="hvn-badge hvn-bg-success">✅ Complete</span></template>
-                                    <template x-if="log.status === 'failed'"><span class="hvn-badge hvn-bg-danger">❌ Failed</span></template>
-                                    <template x-if="log.status === 'pending'"><span class="hvn-badge hvn-bg-warning hvn-text-dark">🟡 Pending</span></template>
-                                    <template x-if="log.status === 'cancelled'"><span class="hvn-badge hvn-bg-secondary">⛔ Cancelled</span></template>
-                                    <div class="small hvn-text-danger" x-text="log.error_brief"></div>
+                                    <template x-if="log.status === 'complete'"><span class="mj-badge mj-bg-success">✅ Complete</span></template>
+                                    <template x-if="log.status === 'failed'"><span class="mj-badge mj-bg-danger">❌ Failed</span></template>
+                                    <template x-if="log.status === 'pending'"><span class="mj-badge mj-bg-warning mj-text-dark">🟡 Pending</span></template>
+                                    <template x-if="log.status === 'cancelled'"><span class="mj-badge mj-bg-secondary">⛔ Cancelled</span></template>
+                                    <div class="small mj-text-danger" x-text="log.error_brief"></div>
                                 </td>
                                 <td x-text="log.ms || '--'"></td>
-                                <td class="hvn-text-end hvn-pe-3">
+                                <td class="mj-text-end mj-pe-3">
                                     <template x-if="log.status === 'failed'">
-                                        <button class="hvn-btn btn-sm btn-outline-warning hvn-me-1" @click="retryJob(log)">
+                                        <button class="mj-btn btn-sm btn-outline-warning mj-me-1" @click="retryJob(log)">
                                             <i class="bi bi-arrow-repeat"></i>
                                         </button>
                                     </template>
-                                    <a :href="'?module=hvn_dns_manager&action=sync_log_detail&id=' + log.id"
-                                       class="hvn-btn btn-sm btn-light border text-decoration-none">
+                                    <a :href="'?module=mj_dns_manager&action=sync_log_detail&id=' + log.id"
+                                       class="mj-btn btn-sm btn-light border text-decoration-none">
                                         <i class="bi bi-search"></i> Chi tiết
                                     </a>
                                 </td>
@@ -147,21 +147,21 @@
         </div>
     </div>
 
-    <nav class="hvn-mt-3 hvn-d-flex hvn-align-items-center hvn-justify-content-between">
-        <div class="hvn-small hvn-text-muted">
+    <nav class="mj-mt-3 mj-d-flex mj-align-items-center mj-justify-content-between">
+        <div class="mj-small mj-text-muted">
             Hiển <span x-text="pagedLogs.length"></span> / <span x-text="filteredLogs.length"></span> bản ghi
         </div>
-        <ul class="hvn-pagination hvn-pagination-sm hvn-mb-0">
-            <li class="hvn-page-item" :class="currentPage === 1 ? 'hvn-disabled' : ''">
-                <a class="hvn-page-link" href="#" @click.prevent="currentPage > 1 && currentPage--">&#8592;</a>
+        <ul class="mj-pagination mj-pagination-sm mj-mb-0">
+            <li class="mj-page-item" :class="currentPage === 1 ? 'mj-disabled' : ''">
+                <a class="mj-page-link" href="#" @click.prevent="currentPage > 1 && currentPage--">&#8592;</a>
             </li>
             <template x-for="p in totalPages" :key="p">
-                <li class="hvn-page-item" :class="p === currentPage ? 'hvn-active' : ''">
-                    <a class="hvn-page-link" href="#" @click.prevent="currentPage = p" x-text="p"></a>
+                <li class="mj-page-item" :class="p === currentPage ? 'mj-active' : ''">
+                    <a class="mj-page-link" href="#" @click.prevent="currentPage = p" x-text="p"></a>
                 </li>
             </template>
-            <li class="hvn-page-item" :class="currentPage === totalPages ? 'hvn-disabled' : ''">
-                <a class="hvn-page-link" href="#" @click.prevent="currentPage < totalPages && currentPage++">&#8594;</a>
+            <li class="mj-page-item" :class="currentPage === totalPages ? 'mj-disabled' : ''">
+                <a class="mj-page-link" href="#" @click.prevent="currentPage < totalPages && currentPage++">&#8594;</a>
             </li>
         </ul>
     </nav>
@@ -169,15 +169,15 @@
 
 <style>
 {literal}
-.hvn-sortable {
+.mj-sortable {
     cursor: pointer;
     user-select: none;
     white-space: nowrap;
 }
-.hvn-sortable:hover {
+.mj-sortable:hover {
     background-color: rgba(0,0,0,.06);
 }
-.hvn-sortable span {
+.mj-sortable span {
     font-size: 10px;
     opacity: 0.6;
     margin-left: 2px;
@@ -186,8 +186,8 @@
 </style>
 
 <script>
-    var HVNDNS_SYNC_LOGS   = {$syncLogsJson};
-    var HVNDNS_MODULE_LINK = '{$modulelink}';
+    var MJDNS_SYNC_LOGS   = {$syncLogsJson};
+    var MJDNS_MODULE_LINK = '{$modulelink}';
 </script>
 <script>
 {literal}
@@ -201,7 +201,7 @@ document.addEventListener('alpine:init', () => {
         syncing: false,
         retrying: false,
 
-        allLogs: HVNDNS_SYNC_LOGS,
+        allLogs: MJDNS_SYNC_LOGS,
 
         get failedCount() {
             return this.allLogs.filter(function(l) {
@@ -256,10 +256,10 @@ document.addEventListener('alpine:init', () => {
         retryAllFailed: async function() {
             var count = this.failedCount;
             if (count === 0) {
-                window._hvnToast('warning', 'Không có job FAILED', 'Không có job nào cần retry.');
+                window._mjDnsToast('warning', 'Không có job FAILED', 'Không có job nào cần retry.');
                 return;
             }
-            var ok = await window._hvnConfirm({
+            var ok = await window._mjDnsConfirm({
                 title:        'Retry tất cả ' + count + ' job FAILED?',
                 message:      'Các job FAILED sẽ được reset về PENDING.\nChúng sẽ được xử lý khi bấm "Đồng bộ Pending".',
                 variant:      'warning',
@@ -271,7 +271,7 @@ document.addEventListener('alpine:init', () => {
             var self = this;
             self.retrying = true;
 
-            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+            fetch(MJDNS_MODULE_LINK + '&action=ajax', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'method=retryAllFailed'
@@ -286,19 +286,19 @@ document.addEventListener('alpine:init', () => {
                             l.error_brief = '';
                         }
                     });
-                    window._hvnToast('success', 'Reset thành công', data.message || '');
+                    window._mjDnsToast('success', 'Reset thành công', data.message || '');
                 } else {
-                    window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                    window._mjDnsToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
                 }
             })
             .catch(function() {
                 self.retrying = false;
-                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+                window._mjDnsToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
             });
         },
 
         retryJob: async function(log) {
-            var ok = await window._hvnConfirm({
+            var ok = await window._mjDnsConfirm({
                 title:        'Retry job #' + log.id + '?',
                 message:      'Job sẽ được reset về PENDING và xử lý khi bấm "Đồng bộ Pending".',
                 variant:      'warning',
@@ -307,7 +307,7 @@ document.addEventListener('alpine:init', () => {
             });
             if (!ok) return;
             var self = this;
-            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+            fetch(MJDNS_MODULE_LINK + '&action=ajax', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'method=retryJob&job_id=' + log.id
@@ -317,20 +317,20 @@ document.addEventListener('alpine:init', () => {
                 if (data.success) {
                     log.status = 'pending';
                     log.error_brief = '';
-                    window._hvnToast('success', 'Job đã reset', data.message || 'Job #' + log.id + ' đã về PENDING.');
+                    window._mjDnsToast('success', 'Job đã reset', data.message || 'Job #' + log.id + ' đã về PENDING.');
                 } else {
-                    window._hvnToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
+                    window._mjDnsToast('error', 'Lỗi', data.error || 'Lỗi không xác định');
                 }
             })
             .catch(function() {
-                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+                window._mjDnsToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
             });
         },
 
         exportCsv: function() {
             var rows = this.filteredLogs;
             if (!rows.length) {
-                window._hvnToast('warning', 'Không có dữ liệu', 'Không có bản ghi nào phù hợp bộ lọc để export.');
+                window._mjDnsToast('warning', 'Không có dữ liệu', 'Không có bản ghi nào phù hợp bộ lọc để export.');
                 return;
             }
 
@@ -380,7 +380,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         runPendingJobs: async function() {
-            var ok = await window._hvnConfirm({
+            var ok = await window._mjDnsConfirm({
                 title:        'Chạy job PENDING?',
                 message:      'Toàn bộ job đang PENDING sẽ được đồng bộ ngay.\nJob FAILED sẽ không bị ảnh hưởng.',
                 variant:      'info',
@@ -390,7 +390,7 @@ document.addEventListener('alpine:init', () => {
             if (!ok) return;
             var self = this;
             self.syncing = true;
-            fetch(HVNDNS_MODULE_LINK + '&action=ajax', {
+            fetch(MJDNS_MODULE_LINK + '&action=ajax', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'method=runPendingJobs'
@@ -399,15 +399,15 @@ document.addEventListener('alpine:init', () => {
             .then(function(data) {
                 self.syncing = false;
                 if (data.success) {
-                    window._hvnToast('success', 'Đồng bộ hoàn tất', (data.message || '') + ' — Đã xử lý: ' + (data.processed || 0) + ' job');
+                    window._mjDnsToast('success', 'Đồng bộ hoàn tất', (data.message || '') + ' — Đã xử lý: ' + (data.processed || 0) + ' job');
                     setTimeout(function() { window.location.reload(); }, 1200);
                 } else {
-                    window._hvnToast('error', 'Lỗi đồng bộ', data.error || 'Lỗi không xác định');
+                    window._mjDnsToast('error', 'Lỗi đồng bộ', data.error || 'Lỗi không xác định');
                 }
             })
             .catch(function() {
                 self.syncing = false;
-                window._hvnToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
+                window._mjDnsToast('error', 'Lỗi kết nối', 'Vui lòng thử lại.');
             });
         }
     }));

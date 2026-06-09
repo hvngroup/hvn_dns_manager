@@ -1,8 +1,8 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+use MJ\DnsManager\Helpers\SettingsHelper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class SettingsService
@@ -13,7 +13,7 @@ class SettingsService
 
     public function getSettingsForPage(): array
     {
-        $rows = Capsule::table('mod_hvndns_settings')->get();
+        $rows = Capsule::table('tbl_mj_dns_settings')->get();
         $settings = [];
         foreach ($rows as $row) {
             $settings[$row->setting_key] = $row->setting_val;
@@ -335,7 +335,7 @@ class SettingsService
             }
 
             $notif = new NotificationService();
-            $subject = '[HVN DNS] Test Email Alert — ' . date('d/m/Y H:i:s');
+            $subject = '[MJ DNS] Test Email Alert — ' . date('d/m/Y H:i:s');
             $fields = [
                 'Job ID' => '#999 (Test)',
                 'Action' => 'EDIT_RECORD',
@@ -372,7 +372,7 @@ class SettingsService
                     }
                 } else {
                     $fromDomain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'whmcs.local';
-                    $headers = 'From: HVN DNS Manager <noreply@' . $fromDomain . '>' . "\r\n"
+                    $headers = 'From: MJ DNS Manager <noreply@' . $fromDomain . '>' . "\r\n"
                         . 'Content-Type: text/html; charset=UTF-8' . "\r\n"
                         . 'MIME-Version: 1.0' . "\r\n";
                     if (@mail($email, $subject, $htmlBody, $headers)) {
@@ -383,7 +383,7 @@ class SettingsService
                 }
             }
 
-            logActivity('HVN DNS Manager: Test email sent to: ' . implode(', ', $sentTo)
+            logActivity('MJ DNS Manager: Test email sent to: ' . implode(', ', $sentTo)
                 . (empty($failed) ? '' : ' | Failed: ' . implode(', ', $failed)));
 
             if (!empty($sentTo)) {

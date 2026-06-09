@@ -1,8 +1,8 @@
 <?php
 
-namespace HvnGroup\DnsManager\Validators;
+namespace MJ\DnsManager\Validators;
 
-use HvnGroup\DnsManager\Contracts\JobInterface;
+use MJ\DnsManager\Contracts\JobInterface;
 
 class JobValidator
 {

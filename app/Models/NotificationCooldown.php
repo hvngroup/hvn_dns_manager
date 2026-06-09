@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class NotificationCooldown extends Model
 {
-    protected $table = 'mod_hvndns_notification_cooldowns';
+    protected $table = 'tbl_mj_dns_notification_cooldowns';
     
     protected $fillable = [
         'rule_id', 

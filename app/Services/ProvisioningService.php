@@ -1,10 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\AuditTrail;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Template;
+use MJ\DnsManager\Models\AuditTrail;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Template;
 
 /**
  * ProvisioningService — Handles the full lifecycle of DNS zone provisioning.
@@ -27,7 +27,7 @@ class ProvisioningService
      *
      * Called by: AfterModuleCreate hook.
      * Steps:
-     *   1. Create/find domain record in mod_hvndns_domains.
+     *   1. Create/find domain record in tbl_mj_dns_domains.
      *   2. Build CREATE_ZONE payload from default template.
      *   3. Dispatch CREATE_ZONE job to queue (returns batch_id immediately).
      *   4. Write audit trail.
@@ -71,7 +71,7 @@ class ProvisioningService
                 null
             );
         } catch (\RuntimeException $e) {
-            logActivity("HVN DNS Manager: Cannot dispatch CREATE_ZONE for {$domainName} — " . $e->getMessage());
+            logActivity("MJ DNS Manager: Cannot dispatch CREATE_ZONE for {$domainName} — " . $e->getMessage());
             return ['success' => false, 'error' => $e->getMessage()];
         }
 
@@ -90,7 +90,7 @@ class ProvisioningService
             'notes' => "Auto-provisioned via domain registration. Queue batch_id: {$batchId}",
         ]);
 
-        logActivity("HVN DNS Manager: CREATE_ZONE dispatched for {$domainName} (batch: {$batchId})");
+        logActivity("MJ DNS Manager: CREATE_ZONE dispatched for {$domainName} (batch: {$batchId})");
 
         return ['success' => true, 'batch_id' => $batchId, 'domain_id' => $domain->id];
     }
@@ -117,12 +117,12 @@ class ProvisioningService
         $domain = Domain::where('domain', $domainName)->first();
 
         if (!$domain) {
-            logActivity("HVN DNS Manager: Terminate — domain not found: {$domainName}");
+            logActivity("MJ DNS Manager: Terminate — domain not found: {$domainName}");
             return ['success' => true]; // Already gone, treat as success
         }
 
         // Soft-delete: mark as terminated (do NOT hard-delete — grace period from Settings)
-        $graceDays = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('grace_period_days', 30);
+        $graceDays = \MJ\DnsManager\Helpers\SettingsHelper::getInt('grace_period_days', 30);
         $domain->update([
             'status' => 'terminated',
             'terminated_at' => date('Y-m-d H:i:s'),
@@ -140,7 +140,7 @@ class ProvisioningService
                 null
             );
         } catch (\RuntimeException $e) {
-            logActivity("HVN DNS Manager: Cannot dispatch DELETE_ZONE for {$domainName} — " . $e->getMessage());
+            logActivity("MJ DNS Manager: Cannot dispatch DELETE_ZONE for {$domainName} — " . $e->getMessage());
             return ['success' => false, 'error' => $e->getMessage()];
         }
 
@@ -157,7 +157,7 @@ class ProvisioningService
             'notes' => "Terminated. DELETE_ZONE batch_id: {$batchId}. Grace period {$graceDays} days.",
         ]);
 
-        logActivity("HVN DNS Manager: DELETE_ZONE dispatched for {$domainName} (batch: {$batchId})");
+        logActivity("MJ DNS Manager: DELETE_ZONE dispatched for {$domainName} (batch: {$batchId})");
 
         return ['success' => true, 'batch_id' => $batchId];
     }
@@ -192,7 +192,7 @@ class ProvisioningService
             'ip_address' => '127.0.0.1',
         ]);
 
-        logActivity("HVN DNS Manager: Domain suspended — {$domainName}");
+        logActivity("MJ DNS Manager: Domain suspended — {$domainName}");
 
         return ['success' => true];
     }
@@ -226,7 +226,7 @@ class ProvisioningService
             'ip_address' => '127.0.0.1',
         ]);
 
-        logActivity("HVN DNS Manager: Domain unsuspended — {$domainName}");
+        logActivity("MJ DNS Manager: Domain unsuspended — {$domainName}");
 
         return ['success' => true];
     }
@@ -248,11 +248,11 @@ class ProvisioningService
     private function buildCreateZonePayload(string $domainName, ?Template $template): array
     {
         // Đọc từ Settings thay vì hardcode
-        $ns1 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', 'dns1.hvn.vn');
-        $ns2 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', 'dns2.hvn.vn');
-        $ns3 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', 'dns3.hvn.vn');
-        $ns4 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', '');
-        $ns5 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', '');
+        $ns1 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', 'dns1.hvn.vn');
+        $ns2 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', 'dns2.hvn.vn');
+        $ns3 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', 'dns3.hvn.vn');
+        $ns4 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', '');
+        $ns5 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', '');
 
         $baseRecords = array_filter([
             $ns1 ? ['type' => 'NS', 'name' => '@', 'value' => $ns1, 'ttl' => 86400] : null,
@@ -332,19 +332,19 @@ class ProvisioningService
 
                     localAPI('UpdateDomain', [
                         'domainid'    => $domainId,
-                        'nameserver1' => \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', 'dns1.hvn.vn'),
-                        'nameserver2' => \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', 'dns2.hvn.vn'),
-                        'nameserver3' => \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', 'dns3.hvn.vn'),
-                        'nameserver4' => \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', ''),
-                        'nameserver5' => \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', ''),
+                        'nameserver1' => \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', 'dns1.hvn.vn'),
+                        'nameserver2' => \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', 'dns2.hvn.vn'),
+                        'nameserver3' => \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', 'dns3.hvn.vn'),
+                        'nameserver4' => \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', ''),
+                        'nameserver5' => \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', ''),
                     ]);
 
-                    logActivity("HVN DNS Manager: Updated WHMCS nameservers for {$domainName}");
+                    logActivity("MJ DNS Manager: Updated WHMCS nameservers for {$domainName}");
                 }
             }
         } catch (\Exception $e) {
             // Non-critical — log and continue
-            logActivity("HVN DNS Manager: Could not update WHMCS nameservers for {$domainName}: " . $e->getMessage());
+            logActivity("MJ DNS Manager: Could not update WHMCS nameservers for {$domainName}: " . $e->getMessage());
         }
     }
 }

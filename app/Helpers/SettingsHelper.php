@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Helpers;
+namespace MJ\DnsManager\Helpers;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -12,7 +12,7 @@ class SettingsHelper
     {
         if (self::$cache === null) {
             try {
-                $settings = Capsule::table('mod_hvndns_settings')->get();
+                $settings = Capsule::table('tbl_mj_dns_settings')->get();
                 self::$cache = [];
                 foreach ($settings as $setting) {
                     self::$cache[$setting->setting_key] = $setting->setting_val;
@@ -33,11 +33,11 @@ class SettingsHelper
     public static function set($key, $value)
     {
         self::loadCache();
-        $exists = Capsule::table('mod_hvndns_settings')->where('setting_key', $key)->exists();
+        $exists = Capsule::table('tbl_mj_dns_settings')->where('setting_key', $key)->exists();
         if ($exists) {
-            Capsule::table('mod_hvndns_settings')->where('setting_key', $key)->update(['setting_val' => $value]);
+            Capsule::table('tbl_mj_dns_settings')->where('setting_key', $key)->update(['setting_val' => $value]);
         } else {
-            Capsule::table('mod_hvndns_settings')->insert([
+            Capsule::table('tbl_mj_dns_settings')->insert([
                 'setting_key' => $key,
                 'setting_val' => $value
             ]);

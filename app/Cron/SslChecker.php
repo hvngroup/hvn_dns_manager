@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Cron;
+namespace MJ\DnsManager\Cron;
 
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Services\QueueManager;
 
 /**
  * SslChecker — Chạy trong AfterCronJob, thực hiện 2 việc:
@@ -48,12 +48,12 @@ class SslChecker
     public function run(): void
     {
         // Không chạy nếu admin tắt tính năng auto SSL
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_auto_ssl', true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_auto_ssl', true)) {
             return;
         }
 
         // Đọc số ngày renewal từ Settings
-        $this->renewBeforeDays = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('ssl_auto_renew_days', 30);
+        $this->renewBeforeDays = \MJ\DnsManager\Helpers\SettingsHelper::getInt('ssl_auto_renew_days', 30);
 
         $server = Server::where('is_active', true)
             ->where('role', 'primary')
@@ -98,7 +98,7 @@ class SslChecker
                 $response = $gateway->getSslInfo($domain->domain);
 
                 if (!$response->isSuccess()) {
-                    logActivity("HVN DNS Manager [SslChecker]: getSslInfo failed for '{$domain->domain}' — " . ($response->errorMessage ?? 'unknown error'));
+                    logActivity("MJ DNS Manager [SslChecker]: getSslInfo failed for '{$domain->domain}' — " . ($response->errorMessage ?? 'unknown error'));
                     continue;
                 }
 
@@ -121,13 +121,13 @@ class SslChecker
 
                     // Alert Telegram + Email via NotificationService — tuân theo toggle settings
                     try {
-                        $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                        $notif = new \MJ\DnsManager\Services\NotificationService();
                         $notif->notifySslFailed($domain->domain);
                     } catch (\Exception $e) {
                         // Silent — không để notification crash SslChecker
                     }
 
-                    logActivity("HVN DNS Manager [SslChecker]: '{$domain->domain}' — cert not issued and not in retry queue. Marked failed.");
+                    logActivity("MJ DNS Manager [SslChecker]: '{$domain->domain}' — cert not issued and not in retry queue. Marked failed.");
                     continue;
                 }
 
@@ -142,9 +142,9 @@ class SslChecker
                     'ssl_expires_at' => $expiresAt,
                 ]);
 
-                logActivity("HVN DNS Manager [SslChecker]: '{$domain->domain}' — cert active, expires {$expiresAt}.");
+                logActivity("MJ DNS Manager [SslChecker]: '{$domain->domain}' — cert active, expires {$expiresAt}.");
             } catch (\Throwable $e) {
-                logActivity("HVN DNS Manager [SslChecker]: Exception syncing '{$domain->domain}' — " . $e->getMessage());
+                logActivity("MJ DNS Manager [SslChecker]: Exception syncing '{$domain->domain}' — " . $e->getMessage());
             }
         }
     }
@@ -201,9 +201,9 @@ class SslChecker
                 // Set pending ngay để không trigger renewal lại lần sau
                 $domain->update(['ssl_status' => 'pending']);
 
-                logActivity("HVN DNS Manager [SslChecker]: '{$domain->domain}' — RENEW_SSL dispatched (expires {$domain->ssl_expires_at}).");
+                logActivity("MJ DNS Manager [SslChecker]: '{$domain->domain}' — RENEW_SSL dispatched (expires {$domain->ssl_expires_at}).");
             } catch (\Throwable $e) {
-                logActivity("HVN DNS Manager [SslChecker]: Renewal exception for '{$domain->domain}' — " . $e->getMessage());
+                logActivity("MJ DNS Manager [SslChecker]: Renewal exception for '{$domain->domain}' — " . $e->getMessage());
             }
         }
     }

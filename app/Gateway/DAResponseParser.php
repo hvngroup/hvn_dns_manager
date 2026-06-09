@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Gateway;
+namespace MJ\DnsManager\Gateway;
 
 /**
  * DAResponseParser — Helper class to normalize DirectAdmin API responses 
@@ -12,7 +12,7 @@ class DAResponseParser
      * Parse DA record format → WHMCS record format
      *
      * @param array $daRecord A single record array from DA's API response
-     * @return array Standardized array matching mod_hvndns_records structure
+     * @return array Standardized array matching tbl_mj_dns_records structure
      */
     public static function parseRecord(array $daRecord): array
     {

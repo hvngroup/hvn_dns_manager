@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Migration\Versions;
+namespace MJ\DnsManager\Migration\Versions;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -10,9 +10,9 @@ class v0_1_0_prototype
     {
         $schema = Capsule::schema();
 
-        // 1. mod_hvndns_schema_version
-        if (!$schema->hasTable('mod_hvndns_schema_version')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_schema_version (
+        // 1. tbl_mj_dns_schema_version
+        if (!$schema->hasTable('tbl_mj_dns_schema_version')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_schema_version (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 version VARCHAR(20) NOT NULL,
                 description VARCHAR(255) NULL,
@@ -21,9 +21,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 3B. mod_hvndns_settings
-        if (!$schema->hasTable('mod_hvndns_settings')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_settings (
+        // 3B. tbl_mj_dns_settings
+        if (!$schema->hasTable('tbl_mj_dns_settings')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_settings (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 setting_key VARCHAR(100) NOT NULL,
                 setting_val TEXT NULL,
@@ -33,9 +33,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 4. mod_hvndns_servers
-        if (!$schema->hasTable('mod_hvndns_servers')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_servers (
+        // 4. tbl_mj_dns_servers
+        if (!$schema->hasTable('tbl_mj_dns_servers')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_servers (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 hostname VARCHAR(255) NOT NULL,
                 ip_address VARCHAR(45) NOT NULL,
@@ -61,9 +61,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 5. mod_hvndns_domains
-        if (!$schema->hasTable('mod_hvndns_domains')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_domains (
+        // 5. tbl_mj_dns_domains
+        if (!$schema->hasTable('tbl_mj_dns_domains')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_domains (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain VARCHAR(253) NOT NULL,
                 whmcs_domain_id INT UNSIGNED NULL COMMENT 'tbldomains.id (domain registration)',
@@ -85,9 +85,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 6. mod_hvndns_records
-        if (!$schema->hasTable('mod_hvndns_records')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_records (
+        // 6. tbl_mj_dns_records
+        if (!$schema->hasTable('tbl_mj_dns_records')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_records (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 type ENUM('A','AAAA','CNAME','MX','TXT','SRV','NS','CAA','PTR') NOT NULL,
@@ -104,13 +104,13 @@ class v0_1_0_prototype
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_domain_type (domain_id, type),
                 INDEX idx_domain_name (domain_id, name),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 7. mod_hvndns_queue
-        if (!$schema->hasTable('mod_hvndns_queue')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_queue (
+        // 7. tbl_mj_dns_queue
+        if (!$schema->hasTable('tbl_mj_dns_queue')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_queue (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 batch_id CHAR(36) NOT NULL,
                 domain_id INT UNSIGNED NOT NULL,
@@ -137,14 +137,14 @@ class v0_1_0_prototype
                 INDEX idx_domain_status (domain_id, status),
                 INDEX idx_server_status (server_id, status),
                 INDEX idx_locked (locked_by, locked_at),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id),
-                FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id),
+                FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 8. mod_hvndns_sync_logs
-        if (!$schema->hasTable('mod_hvndns_sync_logs')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_sync_logs (
+        // 8. tbl_mj_dns_sync_logs
+        if (!$schema->hasTable('tbl_mj_dns_sync_logs')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_sync_logs (
                 id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 queue_id INT UNSIGNED NOT NULL,
                 server_id INT UNSIGNED NOT NULL,
@@ -160,14 +160,14 @@ class v0_1_0_prototype
                 INDEX idx_queue (queue_id),
                 INDEX idx_server_time (server_id, created_at),
                 INDEX idx_success_time (success, created_at),
-                FOREIGN KEY (queue_id) REFERENCES mod_hvndns_queue(id),
-                FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+                FOREIGN KEY (queue_id) REFERENCES tbl_mj_dns_queue(id),
+                FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 9. mod_hvndns_audit_trail
-        if (!$schema->hasTable('mod_hvndns_audit_trail')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_audit_trail (
+        // 9. tbl_mj_dns_audit_trail
+        if (!$schema->hasTable('tbl_mj_dns_audit_trail')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_audit_trail (
                 id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 actor_type ENUM('client','admin','system','api') NOT NULL,
                 actor_id INT UNSIGNED NULL,
@@ -192,9 +192,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 10. mod_hvndns_record_history
-        if (!$schema->hasTable('mod_hvndns_record_history')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_record_history (
+        // 10. tbl_mj_dns_record_history
+        if (!$schema->hasTable('tbl_mj_dns_record_history')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_record_history (
                 id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 record_id INT UNSIGNED NOT NULL,
                 domain_id INT UNSIGNED NOT NULL,
@@ -217,9 +217,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 11. mod_hvndns_snapshots
-        if (!$schema->hasTable('mod_hvndns_snapshots')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_snapshots (
+        // 11. tbl_mj_dns_snapshots
+        if (!$schema->hasTable('tbl_mj_dns_snapshots')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_snapshots (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 snapshot_type ENUM('scheduled','pre_bulk','pre_template','manual') NOT NULL DEFAULT 'scheduled',
@@ -230,13 +230,13 @@ class v0_1_0_prototype
                 created_by_id INT UNSIGNED NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 INDEX idx_domain_time (domain_id, created_at),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 12. mod_hvndns_templates
-        if (!$schema->hasTable('mod_hvndns_templates')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_templates (
+        // 12. tbl_mj_dns_templates
+        if (!$schema->hasTable('tbl_mj_dns_templates')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_templates (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
                 description TEXT NULL,
@@ -250,9 +250,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 14. mod_hvndns_dnssec
-        if (!$schema->hasTable('mod_hvndns_dnssec')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_dnssec (
+        // 14. tbl_mj_dns_dnssec
+        if (!$schema->hasTable('tbl_mj_dns_dnssec')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_dnssec (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 is_enabled TINYINT(1) NOT NULL DEFAULT 0,
@@ -266,13 +266,13 @@ class v0_1_0_prototype
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 UNIQUE INDEX uniq_domain (domain_id),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 15. mod_hvndns_ddns_tokens
-        if (!$schema->hasTable('mod_hvndns_ddns_tokens')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_ddns_tokens (
+        // 15. tbl_mj_dns_ddns_tokens
+        if (!$schema->hasTable('tbl_mj_dns_ddns_tokens')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_ddns_tokens (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 subdomain VARCHAR(255) NOT NULL DEFAULT '@',
@@ -286,13 +286,13 @@ class v0_1_0_prototype
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE INDEX uniq_token_hash (token_hash),
                 INDEX idx_domain (domain_id),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 16. mod_hvndns_redirects
-        if (!$schema->hasTable('mod_hvndns_redirects')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_redirects (
+        // 16. tbl_mj_dns_redirects
+        if (!$schema->hasTable('tbl_mj_dns_redirects')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_redirects (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 source_path VARCHAR(255) NOT NULL DEFAULT '/',
@@ -303,13 +303,13 @@ class v0_1_0_prototype
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_domain (domain_id),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 17. mod_hvndns_email_forwards
-        if (!$schema->hasTable('mod_hvndns_email_forwards')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_email_forwards (
+        // 17. tbl_mj_dns_email_forwards
+        if (!$schema->hasTable('tbl_mj_dns_email_forwards')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_email_forwards (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 source_local VARCHAR(255) NOT NULL,
@@ -318,13 +318,13 @@ class v0_1_0_prototype
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 INDEX idx_domain (domain_id),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 18. mod_hvndns_drift_reports
-        if (!$schema->hasTable('mod_hvndns_drift_reports')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_drift_reports (
+        // 18. tbl_mj_dns_drift_reports
+        if (!$schema->hasTable('tbl_mj_dns_drift_reports')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_drift_reports (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 domain_id INT UNSIGNED NOT NULL,
                 drift_type ENUM('missing_on_da','added_on_da','modified') NOT NULL,
@@ -337,13 +337,13 @@ class v0_1_0_prototype
                 resolved_at DATETIME NULL,
                 INDEX idx_domain (domain_id),
                 INDEX idx_status (status),
-                FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+                FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 19. mod_hvndns_ip_blacklist
-        if (!$schema->hasTable('mod_hvndns_ip_blacklist')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_ip_blacklist (
+        // 19. tbl_mj_dns_ip_blacklist
+        if (!$schema->hasTable('tbl_mj_dns_ip_blacklist')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_ip_blacklist (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 ip_address VARCHAR(45) NOT NULL,
                 reason VARCHAR(255) NOT NULL,
@@ -354,9 +354,9 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // 20. mod_hvndns_notification_cooldowns
-        if (!$schema->hasTable('mod_hvndns_notification_cooldowns')) {
-            Capsule::statement("CREATE TABLE mod_hvndns_notification_cooldowns (
+        // 20. tbl_mj_dns_notification_cooldowns
+        if (!$schema->hasTable('tbl_mj_dns_notification_cooldowns')) {
+            Capsule::statement("CREATE TABLE tbl_mj_dns_notification_cooldowns (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 rule_id VARCHAR(50) NOT NULL,
                 target_id VARCHAR(50) NOT NULL DEFAULT 'global',
@@ -365,28 +365,28 @@ class v0_1_0_prototype
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         }
 
-        // ── Patch: Add nameservers column to mod_hvndns_servers (idempotent) ──
-        if ($schema->hasTable('mod_hvndns_servers')) {
-            if (!$schema->hasColumn('mod_hvndns_servers', 'nameservers')) {
-                Capsule::statement("ALTER TABLE mod_hvndns_servers ADD COLUMN nameservers TEXT NULL COMMENT 'JSON array of nameservers e.g. [\"ns1.hvn.vn\",\"ns2.hvn.vn\"]' AFTER notes");
+        // ── Patch: Add nameservers column to tbl_mj_dns_servers (idempotent) ──
+        if ($schema->hasTable('tbl_mj_dns_servers')) {
+            if (!$schema->hasColumn('tbl_mj_dns_servers', 'nameservers')) {
+                Capsule::statement("ALTER TABLE tbl_mj_dns_servers ADD COLUMN nameservers TEXT NULL COMMENT 'JSON array of nameservers e.g. [\"ns1.hvn.vn\",\"ns2.hvn.vn\"]' AFTER notes");
             }
         }
 
-        // ── Patch: Mở rộng ENUM action trong mod_hvndns_queue ─────────────────
+        // ── Patch: Mở rộng ENUM action trong tbl_mj_dns_queue ─────────────────
         // Thêm FETCH_DS_RECORDS và APPLY_TEMPLATE vào ENUM
         // Idempotent: kiểm tra xem APPLY_TEMPLATE đã có trong ENUM chưa trước khi ALTER
-        if ($schema->hasTable('mod_hvndns_queue')) {
+        if ($schema->hasTable('tbl_mj_dns_queue')) {
             $enumDef = Capsule::selectOne(
                 "SELECT COLUMN_TYPE FROM information_schema.COLUMNS
                   WHERE TABLE_SCHEMA = DATABASE()
-                    AND TABLE_NAME = 'mod_hvndns_queue'
+                    AND TABLE_NAME = 'tbl_mj_dns_queue'
                     AND COLUMN_NAME = 'action'"
             );
             $currentEnum = $enumDef ? (string) $enumDef->COLUMN_TYPE : '';
 
             if (strpos($currentEnum, 'APPLY_TEMPLATE') === false) {
                 Capsule::statement(
-                    "ALTER TABLE mod_hvndns_queue
+                    "ALTER TABLE tbl_mj_dns_queue
                      MODIFY COLUMN action
                      ENUM('ADD_RECORD','EDIT_RECORD','DELETE_RECORD','CREATE_ZONE','DELETE_ZONE',
                           'CREATE_REDIRECT','EDIT_REDIRECT','DELETE_REDIRECT',
@@ -398,12 +398,12 @@ class v0_1_0_prototype
             }
         }
 
-        // ── Patch: Add synced_at column to mod_hvndns_email_forwards (idempotent) ──
+        // ── Patch: Add synced_at column to tbl_mj_dns_email_forwards (idempotent) ──
         // Đánh dấu thời điểm forwarder được đồng bộ thành công lên DA server.
         // NULL = chưa sync (pending), NOT NULL = đã sync thành công.
-        if ($schema->hasTable('mod_hvndns_email_forwards')) {
-            if (!$schema->hasColumn('mod_hvndns_email_forwards', 'synced_at')) {
-                Capsule::statement("ALTER TABLE mod_hvndns_email_forwards ADD COLUMN synced_at DATETIME NULL DEFAULT NULL COMMENT 'Thời điểm sync thành công lên DA. NULL = chưa sync.' AFTER is_catchall");
+        if ($schema->hasTable('tbl_mj_dns_email_forwards')) {
+            if (!$schema->hasColumn('tbl_mj_dns_email_forwards', 'synced_at')) {
+                Capsule::statement("ALTER TABLE tbl_mj_dns_email_forwards ADD COLUMN synced_at DATETIME NULL DEFAULT NULL COMMENT 'Thời điểm sync thành công lên DA. NULL = chưa sync.' AFTER is_catchall");
             }
         }
     }
@@ -412,23 +412,23 @@ class v0_1_0_prototype
     {
         $schema = Capsule::schema();
         // Drop in reverse order of foreign key dependencies
-        $schema->dropIfExists('mod_hvndns_notification_cooldowns');
-        $schema->dropIfExists('mod_hvndns_ip_blacklist');
-        $schema->dropIfExists('mod_hvndns_drift_reports');
-        $schema->dropIfExists('mod_hvndns_email_forwards');
-        $schema->dropIfExists('mod_hvndns_redirects');
-        $schema->dropIfExists('mod_hvndns_ddns_tokens');
-        $schema->dropIfExists('mod_hvndns_dnssec');
-        $schema->dropIfExists('mod_hvndns_templates');
-        $schema->dropIfExists('mod_hvndns_snapshots');
-        $schema->dropIfExists('mod_hvndns_record_history');
-        $schema->dropIfExists('mod_hvndns_audit_trail');
-        $schema->dropIfExists('mod_hvndns_sync_logs');
-        $schema->dropIfExists('mod_hvndns_queue');
-        $schema->dropIfExists('mod_hvndns_records');
-        $schema->dropIfExists('mod_hvndns_domains');
-        $schema->dropIfExists('mod_hvndns_servers');
-        $schema->dropIfExists('mod_hvndns_settings');
-        $schema->dropIfExists('mod_hvndns_schema_version');
+        $schema->dropIfExists('tbl_mj_dns_notification_cooldowns');
+        $schema->dropIfExists('tbl_mj_dns_ip_blacklist');
+        $schema->dropIfExists('tbl_mj_dns_drift_reports');
+        $schema->dropIfExists('tbl_mj_dns_email_forwards');
+        $schema->dropIfExists('tbl_mj_dns_redirects');
+        $schema->dropIfExists('tbl_mj_dns_ddns_tokens');
+        $schema->dropIfExists('tbl_mj_dns_dnssec');
+        $schema->dropIfExists('tbl_mj_dns_templates');
+        $schema->dropIfExists('tbl_mj_dns_snapshots');
+        $schema->dropIfExists('tbl_mj_dns_record_history');
+        $schema->dropIfExists('tbl_mj_dns_audit_trail');
+        $schema->dropIfExists('tbl_mj_dns_sync_logs');
+        $schema->dropIfExists('tbl_mj_dns_queue');
+        $schema->dropIfExists('tbl_mj_dns_records');
+        $schema->dropIfExists('tbl_mj_dns_domains');
+        $schema->dropIfExists('tbl_mj_dns_servers');
+        $schema->dropIfExists('tbl_mj_dns_settings');
+        $schema->dropIfExists('tbl_mj_dns_schema_version');
     }
 }

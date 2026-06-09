@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Template extends Model
 {
-    protected $table = 'mod_hvndns_templates';
+    protected $table = 'tbl_mj_dns_templates';
     
     protected $fillable = [
         'name', 

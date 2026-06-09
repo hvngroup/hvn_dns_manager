@@ -1,136 +1,136 @@
-<div class="hvn-dns-admin hvn-server-edit" x-data="serverEditor()">
-    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
+<div class="mj-dns-admin mj-server-edit" x-data="serverEditor()">
+    <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-mb-4">
         <h2>
-            <a href="{$modulelink}&action=servers" class="text-decoration-none hvn-text-muted hvn-me-2"><i class="bi bi-arrow-left"></i></a>
+            <a href="{$modulelink}&action=servers" class="text-decoration-none mj-text-muted mj-me-2"><i class="bi bi-arrow-left"></i></a>
             <i class="bi bi-server"></i> <span x-text="isEdit ? 'Sửa Server DirectAdmin' : 'Thêm Server DirectAdmin'"></span>
         </h2>
     </div>
 
     {* Flash message *}
     {if $flash}
-    <div class="hvn-alert hvn-alert-{if $flash.type === 'success'}success{else}danger{/if} hvn-alert-dismissible hvn-fade hvn-show hvn-mb-4" role="alert">
-        <i class="bi bi-{if $flash.type === 'success'}check-circle{else}exclamation-triangle{/if} hvn-me-2"></i>
+    <div class="mj-alert mj-alert-{if $flash.type === 'success'}success{else}danger{/if} mj-alert-dismissible mj-fade mj-show mj-mb-4" role="alert">
+        <i class="bi bi-{if $flash.type === 'success'}check-circle{else}exclamation-triangle{/if} mj-me-2"></i>
         {$flash.message|escape:'htmlall'}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {/if}
 
-    <div class="hvn-card hvn-shadow-sm hvn-border-0">
-        <div class="hvn-card-body hvn-p-4">
+    <div class="mj-card mj-shadow-sm mj-border-0">
+        <div class="mj-card-body mj-p-4">
             <form method="POST" action="{$modulelink}&action=server_edit" @submit.prevent="saveServer($event)">
                 <input type="hidden" name="token" value="{$token}">
                 <input type="hidden" name="id" value="{$serverId}" :value="form.id || {$serverId}">
 
-                <div class="hvn-row hvn-mb-3">
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label">Hostname <span class="hvn-text-danger">*</span></label>
-                        <input type="text" class="hvn-form-control font-monospace" name="hostname" x-model="form.hostname" required placeholder="dns4.hvn.vn">
-                        <div class="form-text hvn-text-muted small"><i class="bi bi-info-circle"></i> Tên hiển thị cho khách hàng (không hiện IP)</div>
+                <div class="mj-row mj-mb-3">
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label">Hostname <span class="mj-text-danger">*</span></label>
+                        <input type="text" class="mj-form-control font-monospace" name="hostname" x-model="form.hostname" required placeholder="dns4.hvn.vn">
+                        <div class="form-text mj-text-muted small"><i class="bi bi-info-circle"></i> Tên hiển thị cho khách hàng (không hiện IP)</div>
                     </div>
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label">Địa chỉ IP <span class="hvn-text-danger">*</span></label>
-                        <input type="text" class="hvn-form-control font-monospace" name="ip_address" x-model="form.ip_address" required placeholder="103.xx.xx.13">
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label">Địa chỉ IP <span class="mj-text-danger">*</span></label>
+                        <input type="text" class="mj-form-control font-monospace" name="ip_address" x-model="form.ip_address" required placeholder="103.xx.xx.13">
                     </div>
                 </div>
 
-                <div class="hvn-row hvn-mb-4">
-                    <div class="hvn-col-md-3">
-                        <label class="hvn-form-label">Port <span class="hvn-text-danger">*</span></label>
-                        <input type="number" class="hvn-form-control font-monospace" name="port" x-model="form.port" required min="1" max="65535">
+                <div class="mj-row mj-mb-4">
+                    <div class="mj-col-md-3">
+                        <label class="mj-form-label">Port <span class="mj-text-danger">*</span></label>
+                        <input type="number" class="mj-form-control font-monospace" name="port" x-model="form.port" required min="1" max="65535">
                     </div>
-                    <div class="hvn-col-md-3 hvn-d-flex hvn-align-items-center hvn-mt-3">
-                        <div class="form-check form-switch hvn-mt-2">
+                    <div class="mj-col-md-3 mj-d-flex mj-align-items-center mj-mt-3">
+                        <div class="form-check form-switch mj-mt-2">
                             <input class="form-check-input" type="checkbox" id="useSsl" x-model="form.use_ssl" name="use_ssl" value="1">
-                            <label class="form-check-label hvn-cursor-pointer" for="useSsl">Sử dụng SSL (HTTPS)</label>
+                            <label class="form-check-label mj-cursor-pointer" for="useSsl">Sử dụng SSL (HTTPS)</label>
                         </div>
                     </div>
                 </div>
 
-                <h6 class="hvn-border-bottom hvn-pb-2 hvn-mb-3 hvn-mt-4 hvn-text-primary hvn-fw-bold"><i class="bi bi-shield-lock hvn-me-1"></i> Thông tin đăng nhập DirectAdmin</h6>
-                <div class="hvn-row hvn-mb-4">
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label">Username <span class="hvn-text-danger">*</span></label>
-                        <input type="text" class="hvn-form-control font-monospace" name="username" x-model="form.username" required>
+                <h6 class="mj-border-bottom mj-pb-2 mj-mb-3 mj-mt-4 mj-text-primary mj-fw-bold"><i class="bi bi-shield-lock mj-me-1"></i> Thông tin đăng nhập DirectAdmin</h6>
+                <div class="mj-row mj-mb-4">
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label">Username <span class="mj-text-danger">*</span></label>
+                        <input type="text" class="mj-form-control font-monospace" name="username" x-model="form.username" required>
                     </div>
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label">Password <span x-show="!isEdit" class="hvn-text-danger">*</span></label>
-                        <input type="password" class="hvn-form-control font-monospace" name="password" x-model="form.password" :required="!isEdit" placeholder="••••••••">
-                        <div class="form-text hvn-text-muted small"><i class="bi bi-lock-fill"></i> Mật khẩu mã hóa AES-256. <span x-show="isEdit" class="hvn-fw-bold hvn-text-warning">Để trống nếu giữ nguyên.</span></div>
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label">Password <span x-show="!isEdit" class="mj-text-danger">*</span></label>
+                        <input type="password" class="mj-form-control font-monospace" name="password" x-model="form.password" :required="!isEdit" placeholder="••••••••">
+                        <div class="form-text mj-text-muted small"><i class="bi bi-lock-fill"></i> Mật khẩu mã hóa AES-256. <span x-show="isEdit" class="mj-fw-bold mj-text-warning">Để trống nếu giữ nguyên.</span></div>
                     </div>
                 </div>
 
-                <h6 class="hvn-border-bottom hvn-pb-2 hvn-mb-3 hvn-mt-4 hvn-text-primary hvn-fw-bold"><i class="bi bi-globe hvn-me-1"></i> Nameservers</h6>
-                <div class="hvn-mb-4">
-                    <label class="hvn-form-label">Danh sách Nameserver <span class="hvn-text-danger">*</span></label>
-                    <textarea class="hvn-form-control font-monospace" name="nameservers" rows="4"
+                <h6 class="mj-border-bottom mj-pb-2 mj-mb-3 mj-mt-4 mj-text-primary mj-fw-bold"><i class="bi bi-globe mj-me-1"></i> Nameservers</h6>
+                <div class="mj-mb-4">
+                    <label class="mj-form-label">Danh sách Nameserver <span class="mj-text-danger">*</span></label>
+                    <textarea class="mj-form-control font-monospace" name="nameservers" rows="4"
                         x-model="form.nameservers"
                         placeholder="ns1.da-apac03.hvn.vn&#10;ns2.da-apac03.hvn.vn&#10;ns3.hvn.vn (tuỳ chọn)"></textarea>
-                    <div class="form-text hvn-text-muted small">
+                    <div class="form-text mj-text-muted small">
                         <i class="bi bi-info-circle"></i> Mỗi NS một dòng. <strong>Dòng 1 = NS1, Dòng 2 = NS2</strong> — DirectAdmin yêu cầu ít nhất 2 NS để tạo zone.
                     </div>
                 </div>
 
-                <h6 class="hvn-border-bottom hvn-pb-2 hvn-mb-3 hvn-mt-4 hvn-text-primary hvn-fw-bold"><i class="bi bi-hdd-network hvn-me-1"></i> Cấu hình luồng xử lý (Queue)</h6>
+                <h6 class="mj-border-bottom mj-pb-2 mj-mb-3 mj-mt-4 mj-text-primary mj-fw-bold"><i class="bi bi-hdd-network mj-me-1"></i> Cấu hình luồng xử lý (Queue)</h6>
 
-                <div class="hvn-row hvn-mb-3">
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label hvn-d-block">Vai trò <span class="hvn-text-danger">*</span></label>
-                        <div class="form-check form-check-inline hvn-mt-1">
+                <div class="mj-row mj-mb-3">
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label mj-d-block">Vai trò <span class="mj-text-danger">*</span></label>
+                        <div class="form-check form-check-inline mj-mt-1">
                             <input class="form-check-input" type="radio" name="is_primary" id="roleSec" value="0" :checked="!form.is_primary" @change="form.is_primary = false">
-                            <label class="form-check-label hvn-cursor-pointer" for="roleSec">Secondary</label>
+                            <label class="form-check-label mj-cursor-pointer" for="roleSec">Secondary</label>
                         </div>
-                        <div class="form-check form-check-inline hvn-mt-1">
+                        <div class="form-check form-check-inline mj-mt-1">
                             <input class="form-check-input" type="radio" name="is_primary" id="rolePri" value="1" :checked="form.is_primary" @change="form.is_primary = true">
-                            <label class="form-check-label hvn-cursor-pointer hvn-fw-bold hvn-text-primary" for="rolePri">Primary <i class="bi bi-star-fill hvn-text-warning small"></i></label>
+                            <label class="form-check-label mj-cursor-pointer mj-fw-bold mj-text-primary" for="rolePri">Primary <i class="bi bi-star-fill mj-text-warning small"></i></label>
                         </div>
-                        <div class="form-text hvn-text-muted small"><i class="bi bi-info-circle"></i> Chỉ định 1 Primary cho Zone Transfer.</div>
+                        <div class="form-text mj-text-muted small"><i class="bi bi-info-circle"></i> Chỉ định 1 Primary cho Zone Transfer.</div>
                     </div>
-                    <div class="hvn-col-md-6">
-                        <label class="hvn-form-label">Max Concurrent Jobs <span class="hvn-text-danger">*</span></label>
-                        <input type="number" class="hvn-form-control font-monospace" name="max_concurrent_jobs" x-model="form.max_concurrent_jobs" required min="1" max="500">
-                        <div class="form-text hvn-text-muted small">Khuyến nghị 50-100 (tùy thuộc tải DA).</div>
+                    <div class="mj-col-md-6">
+                        <label class="mj-form-label">Max Concurrent Jobs <span class="mj-text-danger">*</span></label>
+                        <input type="number" class="mj-form-control font-monospace" name="max_concurrent_jobs" x-model="form.max_concurrent_jobs" required min="1" max="500">
+                        <div class="form-text mj-text-muted small">Khuyến nghị 50-100 (tùy thuộc tải DA).</div>
                     </div>
                 </div>
 
-                <div class="hvn-mb-4">
-                    <label class="hvn-form-label">Ghi chú nội bộ</label>
-                    <textarea class="hvn-form-control" rows="2" name="notes" x-model="form.notes" placeholder="VD: Server DC Viettel..."></textarea>
+                <div class="mj-mb-4">
+                    <label class="mj-form-label">Ghi chú nội bộ</label>
+                    <textarea class="mj-form-control" rows="2" name="notes" x-model="form.notes" placeholder="VD: Server DC Viettel..."></textarea>
                 </div>
 
                 <!-- Test Connection Result Area -->
                 <template x-if="testStatus !== null">
-                    <div class="hvn-card hvn-mb-4 hvn-border-2" :class="{literal}{ 'hvn-border-info': testStatus === 'loading', 'hvn-border-success': testStatus === 'success', 'hvn-border-danger': testStatus === 'error' }{/literal}">
-                        <div class="hvn-card-header bg-transparent hvn-py-2 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                            <strong><i class="bi bi-plug" :class="{literal}{ 'hvn-text-info': testStatus === 'loading', 'hvn-text-success': testStatus === 'success', 'hvn-text-danger': testStatus === 'error' }{/literal}"></i> Kết quả Test Connection:</strong>
+                    <div class="mj-card mj-mb-4 mj-border-2" :class="{literal}{ 'mj-border-info': testStatus === 'loading', 'mj-border-success': testStatus === 'success', 'mj-border-danger': testStatus === 'error' }{/literal}">
+                        <div class="mj-card-header bg-transparent mj-py-2 mj-d-flex mj-justify-content-between mj-align-items-center">
+                            <strong><i class="bi bi-plug" :class="{literal}{ 'mj-text-info': testStatus === 'loading', 'mj-text-success': testStatus === 'success', 'mj-text-danger': testStatus === 'error' }{/literal}"></i> Kết quả Test Connection:</strong>
                             <button type="button" class="btn-close" style="font-size: 0.6rem;" @click="testStatus = null"></button>
                         </div>
-                        <div class="hvn-card-body hvn-py-3">
+                        <div class="mj-card-body mj-py-3">
                             <template x-if="testStatus === 'loading'">
-                                <div class="hvn-text-center hvn-py-2 hvn-text-info hvn-fw-medium">
-                                    <span class="hvn-spinner-border hvn-spinner-border-sm hvn-me-2" role="status"></span> Đang kiểm tra kết nối API tới DirectAdmin...
+                                <div class="mj-text-center mj-py-2 mj-text-info mj-fw-medium">
+                                    <span class="mj-spinner-border mj-spinner-border-sm mj-me-2" role="status"></span> Đang kiểm tra kết nối API tới DirectAdmin...
                                 </div>
                             </template>
                             <template x-if="testStatus === 'success'">
-                                <pre class="hvn-mb-0 hvn-text-success hvn-fw-bold font-monospace hvn-p-2 hvn-bg-success-subtle hvn-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
+                                <pre class="mj-mb-0 mj-text-success mj-fw-bold font-monospace mj-p-2 mj-bg-success-subtle mj-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
                             </template>
                             <template x-if="testStatus === 'error'">
-                                <pre class="hvn-mb-0 hvn-text-danger hvn-fw-bold font-monospace hvn-p-2 hvn-bg-danger-subtle hvn-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
+                                <pre class="mj-mb-0 mj-text-danger mj-fw-bold font-monospace mj-p-2 mj-bg-danger-subtle mj-rounded" style="white-space: pre-wrap; font-size: 13px;" x-text="testResult"></pre>
                             </template>
                         </div>
                     </div>
                 </template>
 
                 <!-- Form Actions -->
-                <div class="hvn-d-flex hvn-justify-content-between hvn-pt-3 hvn-border-top">
-                    <button type="button" class="hvn-btn hvn-btn-outline-info" @click="testConn()" :disabled="submitting || testStatus === 'loading'">
+                <div class="mj-d-flex mj-justify-content-between mj-pt-3 mj-border-top">
+                    <button type="button" class="mj-btn mj-btn-outline-info" @click="testConn()" :disabled="submitting || testStatus === 'loading'">
                         <i class="bi bi-lightning-charge"></i> Test Connection
                     </button>
 
-                    <div class="hvn-gap-2 hvn-d-flex">
-                        <a href="{$modulelink}&action=servers" class="hvn-btn hvn-btn-outline-secondary" :class="{literal}{ 'disabled': submitting }{/literal}">Quay lại</a>
-                        <button type="submit" class="hvn-btn hvn-btn-primary" :disabled="submitting">
-                            <span x-show="!submitting"><i class="bi bi-save hvn-me-1"></i> Lưu Server</span>
-                            <span x-show="submitting"><span class="hvn-spinner-border hvn-spinner-border-sm" role="status"></span> Đang lưu...</span>
+                    <div class="mj-gap-2 mj-d-flex">
+                        <a href="{$modulelink}&action=servers" class="mj-btn mj-btn-outline-secondary" :class="{literal}{ 'disabled': submitting }{/literal}">Quay lại</a>
+                        <button type="submit" class="mj-btn mj-btn-primary" :disabled="submitting">
+                            <span x-show="!submitting"><i class="bi bi-save mj-me-1"></i> Lưu Server</span>
+                            <span x-show="submitting"><span class="mj-spinner-border mj-spinner-border-sm" role="status"></span> Đang lưu...</span>
                         </button>
                     </div>
                 </div>
@@ -140,27 +140,27 @@
 </div>
 
 <script>
-    var HVNDNS_SERVER  = {$serverJson};
-    var HVNDNS_IS_EDIT = {if $isEdit}true{else}false{/if};
-    var HVNDNS_MODULELINK = '{$modulelink|escape:'javascript'}';
+    var MJDNS_SERVER  = {$serverJson};
+    var MJDNS_IS_EDIT = {if $isEdit}true{else}false{/if};
+    var MJDNS_MODULELINK = '{$modulelink|escape:'javascript'}';
 </script>
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('serverEditor', () => ({
-        isEdit: HVNDNS_IS_EDIT,
-        form: HVNDNS_SERVER ? {
-            id:                  HVNDNS_SERVER.id,
-            hostname:            HVNDNS_SERVER.hostname,
-            ip_address:          HVNDNS_SERVER.ip_address,
-            port:                HVNDNS_SERVER.port,
-            use_ssl:             HVNDNS_SERVER.use_ssl,
-            username:            HVNDNS_SERVER.username,
+        isEdit: MJDNS_IS_EDIT,
+        form: MJDNS_SERVER ? {
+            id:                  MJDNS_SERVER.id,
+            hostname:            MJDNS_SERVER.hostname,
+            ip_address:          MJDNS_SERVER.ip_address,
+            port:                MJDNS_SERVER.port,
+            use_ssl:             MJDNS_SERVER.use_ssl,
+            username:            MJDNS_SERVER.username,
             password:            '',
-            nameservers:         HVNDNS_SERVER.nameservers || '',
-            is_primary:          HVNDNS_SERVER.is_primary,
-            max_concurrent_jobs: HVNDNS_SERVER.max_concurrent_jobs,
-            notes:               HVNDNS_SERVER.notes,
+            nameservers:         MJDNS_SERVER.nameservers || '',
+            is_primary:          MJDNS_SERVER.is_primary,
+            max_concurrent_jobs: MJDNS_SERVER.max_concurrent_jobs,
+            notes:               MJDNS_SERVER.notes,
         } : {
             id: null, hostname: '', ip_address: '', port: 2222, use_ssl: true,
             username: 'admin', password: '', nameservers: '', is_primary: false, max_concurrent_jobs: 50, notes: ''
@@ -177,11 +177,11 @@ document.addEventListener('alpine:init', () => {
 
         async testConn() {
             if (!this.form.hostname || !this.form.ip_address || !this.form.username) {
-                window._hvnToast('warning', 'Thiếu thông tin', 'Vui lòng điền đầy đủ Hostname, IP và Username để Test.');
+                window._mjDnsToast('warning', 'Thiếu thông tin', 'Vui lòng điền đầy đủ Hostname, IP và Username để Test.');
                 return;
             }
             if (!this.form.password && !this.isEdit) {
-                window._hvnToast('warning', 'Thiếu Password', 'Vui lòng nhập Password để Test.');
+                window._mjDnsToast('warning', 'Thiếu Password', 'Vui lòng nhập Password để Test.');
                 return;
             }
 
@@ -200,7 +200,7 @@ document.addEventListener('alpine:init', () => {
                     formData.append('server_id', this.form.id);
                 }
 
-                const url = HVNDNS_MODULELINK + '&action=ajax&method=testConnection';
+                const url = MJDNS_MODULELINK + '&action=ajax&method=testConnection';
                 const res  = await fetch(url, {
                     method: 'POST',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },

@@ -2,7 +2,7 @@
 
 {* ── Smarty vars → JS (ngoài literal) ── *}
 <script>
-    var HVNDNS_RECORD_CONFIG = {ldelim}
+    var MJDNS_RECORD_CONFIG = {ldelim}
         domainId: {$domain.id|intval},
         recordJson: '{$recordJson|escape:'javascript'}'
     {rdelim};
@@ -15,12 +15,12 @@ document.addEventListener('alpine:init', function() {
     Alpine.data('recordEditor', function() {
         return {
             isEdit: false,
-            domainId: HVNDNS_RECORD_CONFIG.domainId,
+            domainId: MJDNS_RECORD_CONFIG.domainId,
             form: { id: null, type: 'A', name: '', value: '', priority: 10, weight: 0, port: 443, ttl: 3600 },
             submitting: false,
 
             init: function() {
-                var json = HVNDNS_RECORD_CONFIG.recordJson;
+                var json = MJDNS_RECORD_CONFIG.recordJson;
                 if (json && json !== 'null' && json !== '') {
                     try {
                         var parsed = JSON.parse(json);
@@ -63,7 +63,7 @@ document.addEventListener('alpine:init', function() {
                         detail: { title: 'Thành công', msg: 'Đã lưu bản ghi thành công, đợi hệ thống đồng bộ', type: 'success' }
                     }));
                     setTimeout(function() {
-                        window.location.href = 'index.php?m=hvn_dns_manager&domain_id=' + self.domainId;
+                        window.location.href = 'index.php?m=mj_dns_manager&domain_id=' + self.domainId;
                     }, 800);
                 }, 800);
             }
@@ -73,10 +73,10 @@ document.addEventListener('alpine:init', function() {
 </script>
 {/literal}
 
-<div class="hvn-dns-client hvn-record-edit" x-data="recordEditor()">
+<div class="mj-dns-client mj-record-edit" x-data="recordEditor()">
     {* ── Header ── *}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a x-bind:href="'index.php?m=hvn_dns_manager&domain_id=' + domainId" class="text-decoration-none text-muted">
+        <a x-bind:href="'index.php?m=mj_dns_manager&domain_id=' + domainId" class="text-decoration-none text-muted">
             <i class="bi bi-arrow-left"></i> Quay lại cấu hình bản ghi
         </a>
     </div>
@@ -159,7 +159,7 @@ document.addEventListener('alpine:init', function() {
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-2">
-                    <a x-bind:href="'index.php?m=hvn_dns_manager&domain_id=' + domainId" class="btn btn-outline-secondary" x-bind:class="submitting && 'disabled'">Hủy</a>
+                    <a x-bind:href="'index.php?m=mj_dns_manager&domain_id=' + domainId" class="btn btn-outline-secondary" x-bind:class="submitting && 'disabled'">Hủy</a>
                     <button type="submit" class="btn btn-primary" x-bind:disabled="submitting">
                         <span x-show="!submitting"><i class="bi bi-save me-1"></i> Lưu bản ghi</span>
                         <span x-show="submitting"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang xử lý...</span>

@@ -1,21 +1,25 @@
 <?php
 /**
- * WHMCS SDK Sample Addon Module
+ * MJ - DirectAdmin DNS Manager — WHMCS Addon Module
  *
- * An addon module allows you to add additional functionality to WHMCS. It
- * can provide both client and admin facing user interfaces, as well as
- * utilise hook functionality within WHMCS.
+ * Quản lý DNS DirectAdmin theo kiến trúc Queue bất đồng bộ (async-first).
  *
- * @see https://developers.whmcs.com/addon-modules/
+ * @package    MJ\DnsManager
+ * @author     ModuleJET (HVN GROUP)
+ * @copyright  2026 HVN GROUP / ModuleJET
+ * @license    Proprietary
+ * @link       https://modulejet.com
  */
 
-if (!defined("WHMCS")) {
-    die("This file cannot be accessed directly");
+defined("WHMCS") or die("Access Denied");
+
+if (!defined('MJ_DNS_DIR')) {
+    define('MJ_DNS_DIR', __DIR__);
 }
 
-// Simple internal autoloader for HvnGroup\DnsManager namespace
+// Simple internal autoloader for MJ\DnsManager namespace
 spl_autoload_register(function ($class) {
-    $prefix = 'HvnGroup\\DnsManager\\';
+    $prefix = 'MJ\\DnsManager\\';
     $base_dir = __DIR__ . '/app/';
 
     // Does the class use the namespace prefix?
@@ -38,32 +42,40 @@ spl_autoload_register(function ($class) {
     }
 });
 
-use HvnGroup\DnsManager\Controllers\Client\ClientController;
-use HvnGroup\DnsManager\Controllers\Admin\AdminController;
+use MJ\DnsManager\Controllers\Client\ClientController;
+use MJ\DnsManager\Controllers\Admin\AdminController;
 
 /**
  * Define addon module configuration parameters.
  */
-function hvn_dns_manager_config()
+function mj_dns_manager_config()
 {
     return [
-        'name' => 'HVN - DirectAdmin DNS Manager',
+        'name' => 'MJ - DirectAdmin DNS Manager',
         'description' => 'Quản lý DNS DirectAdmin mạnh mẽ với cơ chế Queue Async',
-        'author' => 'Vuongnm',
+        'author' => '<a href="https://modulejet.com" target="_blank">ModuleJET</a>',
         'language' => 'english',
         'version' => '1.5',
-        'fields' => []
+        'fields' => [
+            'licenseKey' => [
+                'FriendlyName' => 'License Key',
+                'Type'         => 'text',
+                'Size'         => '50',
+                'Default'      => '',
+                'Description'  => 'Nhập license key ModuleJET. <a href="https://modulejet.com" target="_blank">Mua license</a>',
+            ],
+        ],
     ];
 }
 
 /**
  * Activate — Run database migration when addon is activated.
  */
-function hvn_dns_manager_activate()
+function mj_dns_manager_activate()
 {
     try {
         // ── 1. Chạy migration tạo bảng ───────────────────────────────────
-        $migration = new HvnGroup\DnsManager\Migration\Versions\v0_1_0_prototype();
+        $migration = new MJ\DnsManager\Migration\Versions\v0_1_0_prototype();
         $migration->up();
 
         // ── 2. Seed default settings ──────────────────────────────────────
@@ -206,12 +218,12 @@ function hvn_dns_manager_activate()
         ];
 
         foreach ($defaults as $key => $val) {
-            $exists = \Illuminate\Database\Capsule\Manager::table('mod_hvndns_settings')
+            $exists = \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_settings')
                 ->where('setting_key', $key)
                 ->exists();
 
             if (!$exists) {
-                \Illuminate\Database\Capsule\Manager::table('mod_hvndns_settings')->insert([
+                \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_settings')->insert([
                     'setting_key' => $key,
                     'setting_val' => $val,
                 ]);
@@ -220,7 +232,7 @@ function hvn_dns_manager_activate()
 
         return [
             'status' => 'success',
-            'description' => 'HVN DNS Manager đã kích hoạt và tạo bảng database thành công.',
+            'description' => 'MJ DNS Manager đã kích hoạt và tạo bảng database thành công.',
         ];
 
     } catch (\Exception $e) {
@@ -232,18 +244,18 @@ function hvn_dns_manager_activate()
 }
 
 /**
- * Deactivate — Drop all mod_hvndns_* tables.
+ * Deactivate — Drop all tbl_mj_dns_* tables.
  * ⚠️  Dùng cho dev/reset. Production: cân nhắc trước khi deactivate.
  */
-function hvn_dns_manager_deactivate()
+function mj_dns_manager_deactivate()
 {
     try {
-        $migration = new HvnGroup\DnsManager\Migration\Versions\v0_1_0_prototype();
+        $migration = new MJ\DnsManager\Migration\Versions\v0_1_0_prototype();
         $migration->down();
 
         return [
             'status' => 'success',
-            'description' => 'Đã xóa toàn bộ bảng mod_hvndns_*.',
+            'description' => 'Đã xóa toàn bộ bảng tbl_mj_dns_*.',
         ];
     } catch (\Exception $e) {
         return [
@@ -256,7 +268,7 @@ function hvn_dns_manager_deactivate()
 /**
  * Upgrade.
  */
-function hvn_dns_manager_upgrade($vars)
+function mj_dns_manager_upgrade($vars)
 {
     $version = $vars['version'];
 }
@@ -264,7 +276,7 @@ function hvn_dns_manager_upgrade($vars)
 /**
  * Client Area Output.
  */
-function hvn_dns_manager_clientarea($vars)
+function mj_dns_manager_clientarea($vars)
 {
     $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
@@ -275,7 +287,7 @@ function hvn_dns_manager_clientarea($vars)
 /**
  * Admin Area Output.
  */
-function hvn_dns_manager_output($vars)
+function mj_dns_manager_output($vars)
 {
     $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 

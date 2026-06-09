@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class IpBlacklist extends Model
 {
-    protected $table = 'mod_hvndns_ip_blacklist';
+    protected $table = 'tbl_mj_dns_ip_blacklist';
     
     protected $fillable = [
         'ip_address', 

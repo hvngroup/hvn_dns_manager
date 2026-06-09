@@ -1,11 +1,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
-    <link rel="stylesheet" href="/modules/addons/hvn_dns_manager/assets/css/hvndns_client.css">
+    <link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-common.css">
+    <link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-client.css">
 
     {* ── Smarty variables → JS config ── *}
     <script>
-        var HVNDNS_CONFIG = {ldelim}
+        var MJDNS_CONFIG = {ldelim}
             domainId:   {$domain.id|intval},
             domainName: '{$domain.domain|escape:'javascript'}',
             csrfToken:  '{$csrf_token|escape:'javascript'}',
@@ -23,13 +23,13 @@
         document.addEventListener('alpine:init', function() {
             Alpine.data('dnsEditor', function() {
                 return {
-                    domainId:   HVNDNS_CONFIG.domainId,
-                    domainName: HVNDNS_CONFIG.domainName,
-                    records:    HVNDNS_CONFIG.records,
-                    redirects:  HVNDNS_CONFIG.redirects  || [],
-                    emails:     HVNDNS_CONFIG.emails      || [],
-                    ddnsTokens: HVNDNS_CONFIG.ddnsTokens  || [],
-                    templates:  HVNDNS_CONFIG.templates   || [],
+                    domainId:   MJDNS_CONFIG.domainId,
+                    domainName: MJDNS_CONFIG.domainName,
+                    records:    MJDNS_CONFIG.records,
+                    redirects:  MJDNS_CONFIG.redirects  || [],
+                    emails:     MJDNS_CONFIG.emails      || [],
+                    ddnsTokens: MJDNS_CONFIG.ddnsTokens  || [],
+                    templates:  MJDNS_CONFIG.templates   || [],
 
                     confirmPreviewCheck: false,
                     filterType:  'all',
@@ -84,7 +84,7 @@
                     // ─────────────────────────────────────────────────────────
                     _refreshToken: function(res) {
                         if (res && res._token) {
-                            HVNDNS_CONFIG.csrfToken = res._token;
+                            MJDNS_CONFIG.csrfToken = res._token;
                         }
                     },
 
@@ -105,13 +105,13 @@
                         if (!hasPending) return;
 
                         var self = this;
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=sync_status_all', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=sync_status_all', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                             },
-                            body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId })
+                            body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId })
                         })
                         .then(function(r) { return r.json(); })
                         .then(function(res) {
@@ -145,7 +145,7 @@
                     // ─────────────────────────────────────────────────────────
                     syncZone: function() {
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title:   'Đồng bộ từ máy chủ',
                             msg:     'Bạn có chắc muốn đồng bộ lại toàn bộ bản ghi từ máy chủ? Các thiết lập chưa lưu hoặc đang lỗi có thể bị ghi đè.',
                             variant: 'warning',
@@ -158,13 +158,13 @@
                                 detail: { title: 'Đang kết nối', msg: 'Đang lấy dữ liệu mới nhất từ máy chủ...', type: 'warning' }
                             }));
 
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=sync_zone', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=sync_zone', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                    'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                                 },
-                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId })
+                                body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId })
                             })
                             .then(function(r) { return r.text(); })
                             .then(function(text) {
@@ -220,13 +220,13 @@
                             return;
                         }
                         setTimeout(function() {
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=sync_status', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=sync_status', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                    'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                                 },
-                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId, batch_id: batchId })
+                                body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId, batch_id: batchId })
                             })
                             .then(function(r) { return r.json(); })
                             .then(function(res) {
@@ -270,16 +270,16 @@
                     // ─────────────────────────────────────────────────────────
                     getTypeBadgeClass: function(type) {
                         var classes = {
-                            'A':     'hvn-badge-a',
-                            'AAAA':  'hvn-badge-aaaa',
-                            'CNAME': 'hvn-badge-cname',
-                            'MX':    'hvn-badge-mx',
-                            'TXT':   'hvn-badge-txt',
-                            'SRV':   'hvn-badge-srv',
-                            'NS':    'hvn-badge-ns',
-                            'CAA':   'hvn-badge-caa'
+                            'A':     'mj-badge-a',
+                            'AAAA':  'mj-badge-aaaa',
+                            'CNAME': 'mj-badge-cname',
+                            'MX':    'mj-badge-mx',
+                            'TXT':   'mj-badge-txt',
+                            'SRV':   'mj-badge-srv',
+                            'NS':    'mj-badge-ns',
+                            'CAA':   'mj-badge-caa'
                         };
-                        return 'badge-dns ' + (classes[type] || 'hvn-badge-ns');
+                        return 'badge-dns ' + (classes[type] || 'mj-badge-ns');
                     },
 
                     formatTTL: function(ttl) {
@@ -366,7 +366,7 @@
                         var self    = this;
                         var action  = this.addingNew ? 'add_record' : 'edit_record';
                         var payload = {
-                            domain_id: HVNDNS_CONFIG.domainId,
+                            domain_id: MJDNS_CONFIG.domainId,
                             type:      this.editForm.type,
                             name:      this.editForm.name,
                             value:     this.editForm.value,
@@ -377,11 +377,11 @@
                         };
                         if (!this.addingNew) { payload.record_id = this.editingId; }
 
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=' + action, {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=' + action, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                             },
                             body: JSON.stringify(payload)
                         })
@@ -434,7 +434,7 @@
 
                     deleteRecord: function(record) {
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title:   'Xóa bản ghi DNS',
                             msg:     'Bạn có chắc muốn xóa bản ghi:\n' + record.type + ' · ' + record.name + '\n\nHành động này sẽ được đồng bộ lên máy chủ.',
                             variant: 'danger',
@@ -443,13 +443,13 @@
                             if (!ok) return;
                             record.pending_delete = true;
                             record.sync_status    = 'syncing';
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=delete_record', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=delete_record', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                    'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                                 },
-                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId, record_id: record.id })
+                                body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId, record_id: record.id })
                             })
                             .then(function(r) { return r.json(); })
                             .then(function(res) {
@@ -540,14 +540,14 @@
                         }
                         this.savingRedirect = true;
                         var self = this;
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=add_redirect', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=add_redirect', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                             },
                             body: JSON.stringify({
-                                domain_id:       HVNDNS_CONFIG.domainId,
+                                domain_id:       MJDNS_CONFIG.domainId,
                                 source_path:     self.editRedirectForm.source,
                                 destination_url: self.editRedirectForm.destination,
                                 type:            self.editRedirectForm.type
@@ -587,7 +587,7 @@
 
                     deleteRedirect: function(redirect) {
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title:   'Xóa chuyển hướng',
                             msg:     'Bạn có chắc muốn xóa chuyển hướng:\n' + redirect.source_path + ' → ' + redirect.destination_url,
                             variant: 'danger',
@@ -596,13 +596,13 @@
                             if (!ok) return;
                             redirect.pending_delete = true;
                             redirect.sync_status    = 'syncing';
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=delete_redirect', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=delete_redirect', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                    'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                                 },
-                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId, redirect_id: redirect.id })
+                                body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId, redirect_id: redirect.id })
                             })
                             .then(function(r) { return r.json(); })
                             .then(function(res) {
@@ -676,14 +676,14 @@
 
                         self.savingEmail = true;
 
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=email_fwd_create', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=email_fwd_create', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                             },
                             body: JSON.stringify({
-                                domain_id:         HVNDNS_CONFIG.domainId,
+                                domain_id:         MJDNS_CONFIG.domainId,
                                 source_local:      srcLocal,
                                 destination_email: destEmail,
                                 is_catchall:       isCatchall ? 1 : 0
@@ -731,7 +731,7 @@
 
                     deleteEmail: function(email) {
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title:   'Xóa email forwarder',
                             msg:     'Bạn có chắc muốn xóa:\n' + email.source_email + ' → ' + email.destination_email,
                             variant: 'danger',
@@ -741,14 +741,14 @@
                             email.pending_delete = true;
                             email.sync_status    = 'pending';
 
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=email_fwd_delete', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=email_fwd_delete', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                    'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                                 },
                                 body: JSON.stringify({
-                                    domain_id:  HVNDNS_CONFIG.domainId,
+                                    domain_id:  MJDNS_CONFIG.domainId,
                                     forward_id: email.id
                                 })
                             })
@@ -803,14 +803,14 @@
                             ? 'Bật DNSSEC cho domain này? Sau khi bật bạn cần mang DS Record tới nhà đăng ký tên miền để hoàn tất.'
                             : 'Hãy XÓA DS Record tại nhà đăng ký TRƯỚC, sau đó mới tắt. Nếu tắt trước domain có thể không phân giải được.';
                         var variant = enable ? 'warning' : 'danger';
-                        hvnConfirm({ title: title, msg: msg, variant: variant, okText: enable ? 'Bật DNSSEC' : 'Tắt DNSSEC' })
+                        mjDnsConfirm({ title: title, msg: msg, variant: variant, okText: enable ? 'Bật DNSSEC' : 'Tắt DNSSEC' })
                         .then(function(ok) {
                             if (!ok) return;
                             self.dnssecLoading = true;
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=dnssec_toggle', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=dnssec_toggle', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HVNDNS_CONFIG.csrfToken },
-                                body: JSON.stringify({ domain_id: HVNDNS_CONFIG.domainId, enable: enable ? 1 : 0 })
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MJDNS_CONFIG.csrfToken },
+                                body: JSON.stringify({ domain_id: MJDNS_CONFIG.domainId, enable: enable ? 1 : 0 })
                             })
                             .then(function(r) { return r.json(); })
                             .then(function(res) {
@@ -846,9 +846,9 @@
 
                     toggleDdnsActive: function(id) {
                         var self = this;
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=ddns_toggle', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=ddns_toggle', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HVNDNS_CONFIG.csrfToken },
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MJDNS_CONFIG.csrfToken },
                             body: JSON.stringify({ token_id: id })
                         })
                         .then(function(r) { return r.json(); })
@@ -874,15 +874,15 @@
                         var token = this.ddnsTokens.find(function(t) { return t.id === id; });
                         if (!token) return;
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title: 'Xóa DDNS Token',
                             msg:   'Xóa DDNS token cho ' + token.subdomain + '?\nThiết bị sẽ không thể cập nhật IP tự động nữa.',
                             variant: 'danger', okText: 'Xóa token'
                         }).then(function(ok) {
                             if (!ok) return;
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=ddns_delete', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=ddns_delete', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HVNDNS_CONFIG.csrfToken },
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MJDNS_CONFIG.csrfToken },
                                 body: JSON.stringify({ token_id: id })
                             })
                             .then(function(r) { return r.json(); })
@@ -911,11 +911,11 @@
                         }
                         this.ddnsCreating = true;
                         var self = this;
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=ddns_create', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=ddns_create', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HVNDNS_CONFIG.csrfToken },
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MJDNS_CONFIG.csrfToken },
                             body: JSON.stringify({
-                                domain_id: HVNDNS_CONFIG.domainId,
+                                domain_id: MJDNS_CONFIG.domainId,
                                 subdomain: self.newDdnsToken.subdomain,
                                 label:     self.newDdnsToken.label
                             })
@@ -931,7 +931,7 @@
                                 return;
                             }
                             var rawToken   = res.data.raw_token;
-                            var correctUrl = window.location.origin + '/modules/addons/hvn_dns_manager/ddns.php?token=' + rawToken;
+                            var correctUrl = window.location.origin + '/modules/addons/mj_dns_manager/ddns.php?token=' + rawToken;
                             var newToken   = Object.assign({}, res.data, { showDetail: true, token_url: correctUrl });
                             self.ddnsTokens.unshift(newToken);
                             self.ddnsNewRawToken        = rawToken;
@@ -951,15 +951,15 @@
 
                     regenerateDdnsToken: function(id) {
                         var self = this;
-                        hvnConfirm({
+                        mjDnsConfirm({
                             title: 'Tạo lại DDNS Token',
                             msg:   'URL cũ sẽ không còn hoạt động. Bạn cần cập nhật lại cấu hình trên thiết bị.',
                             variant: 'warning', okText: 'Tạo lại token'
                         }).then(function(ok) {
                             if (!ok) return;
-                            fetch('/modules/addons/hvn_dns_manager/ajax.php?action=ddns_regenerate', {
+                            fetch('/modules/addons/mj_dns_manager/ajax.php?action=ddns_regenerate', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': HVNDNS_CONFIG.csrfToken },
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': MJDNS_CONFIG.csrfToken },
                                 body: JSON.stringify({ token_id: id })
                             })
                             .then(function(r) { return r.json(); })
@@ -972,7 +972,7 @@
                                     return;
                                 }
                                 var rawToken   = res.data.raw_token;
-                                var correctUrl = window.location.origin + '/modules/addons/hvn_dns_manager/ddns.php?token=' + rawToken;
+                                var correctUrl = window.location.origin + '/modules/addons/mj_dns_manager/ddns.php?token=' + rawToken;
                                 var idx = self.ddnsTokens.findIndex(function(t) { return t.id === id; });
                                 if (idx !== -1) {
                                     self.ddnsTokens[idx] = Object.assign({}, res.data, { showDetail: true, token_url: correctUrl });
@@ -1037,14 +1037,14 @@
 
                         self.applyingTemplate = true;
 
-                        fetch('/modules/addons/hvn_dns_manager/ajax.php?action=apply_template', {
+                        fetch('/modules/addons/mj_dns_manager/ajax.php?action=apply_template', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-Token': HVNDNS_CONFIG.csrfToken
+                                'X-CSRF-Token': MJDNS_CONFIG.csrfToken
                             },
                             body: JSON.stringify({
-                                domain_id:   HVNDNS_CONFIG.domainId,
+                                domain_id:   MJDNS_CONFIG.domainId,
                                 template_id: self.previewTemplateId
                             })
                         })
@@ -1095,9 +1095,9 @@
 
     {* ══════════════════════════ HTML ══════════════════════════ *}
 
-    <div class="hvn-dns-client" x-data="dnsEditor()">
+    <div class="mj-dns-client" x-data="dnsEditor()">
 
-        <a href="index.php?m=hvn_dns_manager" class="cl-back-link">
+        <a href="index.php?m=mj_dns_manager" class="cl-back-link">
             <i class="bi bi-arrow-left"></i> Quay lại danh sách domain
         </a>
 

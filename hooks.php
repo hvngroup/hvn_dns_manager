@@ -1,10 +1,10 @@
 <?php
 
 /**
- * HVN DNS Manager — WHMCS Hook Entry Point
+ * MJ DNS Manager — WHMCS Hook Entry Point
  *
  * Flow hiện tại (Phase 1 MVP):
- *   AcceptOrder  → Insert vào mod_hvndns_domains + mod_hvndns_queue
+ *   AcceptOrder  → Insert vào tbl_mj_dns_domains + tbl_mj_dns_queue
  *                → QueueWorker::runOnce() xử lý ngay lập tức
  *                → Nếu thất bại: job ở lại queue để retry
  *
@@ -17,9 +17,9 @@ if (!defined('WHMCS')) {
     die('This file cannot be accessed directly');
 }
 
-// Simple internal autoloader for HvnGroup\DnsManager namespace
+// Simple internal autoloader for MJ\DnsManager namespace
 spl_autoload_register(function ($class) {
-    $prefix = 'HvnGroup\\DnsManager\\';
+    $prefix = 'MJ\\DnsManager\\';
     $base_dir = __DIR__ . '/app/';
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
@@ -32,20 +32,20 @@ spl_autoload_register(function ($class) {
     }
 });
 
-use HvnGroup\DnsManager\Hooks\AcceptOrderHook;
-use HvnGroup\DnsManager\Cron\QueueWorker;
-use HvnGroup\DnsManager\Migration\Versions\v0_1_0_prototype;
+use MJ\DnsManager\Hooks\AcceptOrderHook;
+use MJ\DnsManager\Cron\QueueWorker;
+use MJ\DnsManager\Migration\Versions\v0_1_0_prototype;
 
 // ─── Module Activation ────────────────────────────────────────────────────────
 
 add_hook('AddonActivation', 1, function ($vars) {
-    if ($vars['module'] === 'hvn_dns_manager') {
+    if ($vars['module'] === 'mj_dns_manager') {
         try {
             $migration = new v0_1_0_prototype();
             $migration->up();
-            logActivity('HVN DNS Manager: Database migrations completed successfully.');
+            logActivity('MJ DNS Manager: Database migrations completed successfully.');
         } catch (\Exception $e) {
-            logActivity('HVN DNS Manager Error: Migration failed — ' . $e->getMessage());
+            logActivity('MJ DNS Manager Error: Migration failed — ' . $e->getMessage());
             return ['status' => 'error', 'description' => 'Could not run migrations: ' . $e->getMessage()];
         }
     }
@@ -54,9 +54,9 @@ add_hook('AddonActivation', 1, function ($vars) {
 // ─── Client Area Navigation ───────────────────────────────────────────────────
 
 add_hook('ClientAreaPrimaryNavbar', 1, function ($primaryNavbar) {
-    $primaryNavbar->addChild('HVN Domain Manager', [
+    $primaryNavbar->addChild('MJ - DirectAdmin DNS Manager', [
         'label' => 'Domain Manager',
-        'uri' => 'index.php?m=hvn_dns_manager',
+        'uri' => 'index.php?m=mj_dns_manager',
         'order' => 20,
     ]);
 });
@@ -71,13 +71,13 @@ add_hook('ClientAreaPrimaryNavbar', 1, function ($primaryNavbar) {
  *
  * Điều kiện để hook này hoạt động:
  *   - WHMCS crons/cron.php phải được setup chạy định kỳ
- *   - Bảng mod_hvndns_queue phải tồn tại (migration đã chạy)
+ *   - Bảng tbl_mj_dns_queue phải tồn tại (migration đã chạy)
  *   - Phải có ít nhất 1 server với role=primary và is_active=1
  */
 add_hook('AfterCronJob', 1, function ($vars) {
     // Guard: bảng queue phải tồn tại trước khi chạy
     try {
-        if (!\WHMCS\Database\Capsule::schema()->hasTable('mod_hvndns_queue')) {
+        if (!\WHMCS\Database\Capsule::schema()->hasTable('tbl_mj_dns_queue')) {
             return;
         }
     } catch (\Exception $e) {
@@ -88,23 +88,23 @@ add_hook('AfterCronJob', 1, function ($vars) {
         $worker = new QueueWorker();
         $worker->run();
     } catch (\Throwable $e) {
-        logActivity('HVN DNS Manager [AfterCronJob Error]: ' . $e->getMessage()
+        logActivity('MJ DNS Manager [AfterCronJob Error]: ' . $e->getMessage()
             . ' in ' . basename($e->getFile()) . ':' . $e->getLine());
     }
 
     try {
-        $sslChecker = new \HvnGroup\DnsManager\Cron\SslChecker();
+        $sslChecker = new \MJ\DnsManager\Cron\SslChecker();
         $sslChecker->run();
     } catch (\Throwable $e) {
-        logActivity('HVN DNS Manager [SslChecker Error]: ' . $e->getMessage()
+        logActivity('MJ DNS Manager [SslChecker Error]: ' . $e->getMessage()
             . ' in ' . basename($e->getFile()) . ':' . $e->getLine());
     }
 
     try {
-        $driftChecker = new \HvnGroup\DnsManager\Cron\DriftChecker();
+        $driftChecker = new \MJ\DnsManager\Cron\DriftChecker();
         $driftChecker->run();
     } catch (\Throwable $e) {
-        logActivity('HVN DNS Manager [DriftChecker Error]: ' . $e->getMessage()
+        logActivity('MJ DNS Manager [DriftChecker Error]: ' . $e->getMessage()
             . ' in ' . basename($e->getFile()) . ':' . $e->getLine());
     }
 });
@@ -116,7 +116,7 @@ add_hook('AfterCronJob', 1, function ($vars) {
  *
  * Flow:
  *   1. Get domain items from the order
- *   2. Insert into mod_hvndns_domains + mod_hvndns_queue (PENDING)
+ *   2. Insert into tbl_mj_dns_domains + tbl_mj_dns_queue (PENDING)
  *   3. Call QueueWorker::runOnce() to process immediately (best-effort)
  *   4. If DA API fails: job stays PENDING, AfterCronJob sẽ retry
  */

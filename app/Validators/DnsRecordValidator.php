@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Validators;
+namespace MJ\DnsManager\Validators;
 
 /**
  * DnsRecordValidator — Validate DNS record data trước khi lưu vào DB và Queue.
@@ -8,7 +8,7 @@ namespace HvnGroup\DnsManager\Validators;
  * Tuân thủ SPEC.md Section 9.3 và AGENT.md Section 2.3.
  * Mọi input từ Client/Admin PHẢI đi qua validator này trước khi dispatch.
  *
- * @package HvnGroup\DnsManager\Validators
+ * @package MJ\DnsManager\Validators
  * @since   1.0.0
  */
 class DnsRecordValidator

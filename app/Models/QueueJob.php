@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class QueueJob extends Model
 {
-    protected $table = 'mod_hvndns_queue';
+    protected $table = 'tbl_mj_dns_queue';
     public $timestamps = false;
 
     protected $fillable = [

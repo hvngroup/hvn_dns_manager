@@ -1,17 +1,17 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Client;
+namespace MJ\DnsManager\Controllers\Client;
 
 use WHMCS\Database\Capsule;
-// ← XÓA: use HvnGroup\DnsManager\Contracts\JobInterface;  (không cần nữa)
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Services\QueueManager;
-use HvnGroup\DnsManager\Validators\DnsRecordValidator;
-use HvnGroup\DnsManager\Validators\ConflictValidator;
-use HvnGroup\DnsManager\Security\InputSanitizer;
-use HvnGroup\DnsManager\Helpers\AuditLogger;
+// ← XÓA: use MJ\DnsManager\Contracts\JobInterface;  (không cần nữa)
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Validators\DnsRecordValidator;
+use MJ\DnsManager\Validators\ConflictValidator;
+use MJ\DnsManager\Security\InputSanitizer;
+use MJ\DnsManager\Helpers\AuditLogger;
 
 class RecordController
 {
@@ -81,7 +81,7 @@ class RecordController
     private function addRecord(array $input, $userId)
     {
         // Kiểm tra module có bị admin tắt không
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_editor', true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_editor', true)) {
             return $this->errorResponse('DISABLED', 'Tính năng DNS Editor hiện đang bị vô hiệu hóa.');
         }
 
@@ -97,7 +97,7 @@ class RecordController
 
         // Kiểm tra admin có cho phép thêm loại record này không
         $allowKey = 'allow_modify_' . strtolower($type);
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
             return $this->errorResponse('NOT_ALLOWED', "Bạn không có quyền thêm bản ghi loại {$type}.");
         }
 
@@ -109,7 +109,7 @@ class RecordController
         $port     = ($input['port'] ?? '') !== '' ? (int) $input['port'] : null;
 
         // ── HVND-62: Kiểm tra Quota ───────────────────────────────────────────
-        $totalLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
+        $totalLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
         if ($totalLimit > 0) {
             $currentTotal = Record::where('domain_id', $domainId)
                 ->where('pending_delete', 0)
@@ -124,7 +124,7 @@ class RecordController
         }
 
         $typeKey   = strtolower($type) . '_record_limit';
-        $typeLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
+        $typeLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
         if ($typeLimit > 0) {
             $currentTypeCount = Record::where('domain_id', $domainId)
                 ->where('type', $type)
@@ -226,7 +226,7 @@ class RecordController
 
         // Kiểm tra admin có cho phép chỉnh sửa loại record này không
         $allowKey = 'allow_modify_' . strtolower($record->type);
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
             return $this->errorResponse('NOT_ALLOWED', "Bạn không có quyền chỉnh sửa bản ghi loại {$record->type}.");
         }
 
@@ -454,7 +454,7 @@ class RecordController
         // Async-first: KHÔNG gọi DA trong request lifecycle của client.
         // Dispatch job SYNC_ZONE để QueueWorker pull zone từ DA về DB; client
         // poll trạng thái qua action 'sync_status' với batch_id trả về.
-        $qm = new \HvnGroup\DnsManager\Services\QueueManager();
+        $qm = new \MJ\DnsManager\Services\QueueManager();
         $batchId = $qm->dispatch(
             $domainId,
             'SYNC_ZONE',

@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class SyncLog extends Model
 {
-    protected $table = 'mod_hvndns_sync_logs';
+    protected $table = 'tbl_mj_dns_sync_logs';
     
     protected $fillable = [
         'queue_id', 

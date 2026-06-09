@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Cron;
+namespace MJ\DnsManager\Cron;
 
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Models\SyncLog;
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Models\SyncLog;
 
 /**
  * QueueWorker — Processes pending DNS queue jobs and executes them via DAGateway.
@@ -32,7 +32,7 @@ class QueueWorker
     public function __construct()
     {
         $this->startTime = microtime(true);
-        $this->maxRunTime = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('worker_max_runtime', 55);
+        $this->maxRunTime = \MJ\DnsManager\Helpers\SettingsHelper::getInt('worker_max_runtime', 55);
     }
 
     /**
@@ -54,10 +54,10 @@ class QueueWorker
         $this->processJobs();
 
         try {
-            $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+            $notif = new \MJ\DnsManager\Services\NotificationService();
             $notif->checkBacklogAlert();
         } catch (\Throwable $e) {
-            logActivity('HVN DNS Manager [QueueWorker]: checkBacklogAlert exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [QueueWorker]: checkBacklogAlert exception — ' . $e->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class QueueWorker
      */
     private function recoverStaleJobs(): void
     {
-        $staleSeconds = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('stale_lock_timeout', 300);
+        $staleSeconds = \MJ\DnsManager\Helpers\SettingsHelper::getInt('stale_lock_timeout', 300);
         $staleThreshold = date('Y-m-d H:i:s', strtotime('-' . $staleSeconds . ' seconds'));
 
         $staleJobs = QueueJob::where('status', 'SYNCING')
@@ -118,7 +118,7 @@ class QueueWorker
         }
 
         if ($staleJobs->count() > 0) {
-            logActivity("HVN DNS Manager [QueueWorker]: Recovered {$staleJobs->count()} stale SYNCING jobs.");
+            logActivity("MJ DNS Manager [QueueWorker]: Recovered {$staleJobs->count()} stale SYNCING jobs.");
         }
     }
 
@@ -136,7 +136,7 @@ class QueueWorker
     {
         $now = $this->nowStr();
 
-        $query = \Illuminate\Database\Capsule\Manager::table('mod_hvndns_queue')
+        $query = \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_queue')
             ->where('status', 'FAILED')
             ->whereRaw('attempts < max_attempts');
 
@@ -158,7 +158,7 @@ class QueueWorker
 
         if ($count > 0) {
             $mode = $this->forceRun ? ' [force]' : '';
-            logActivity("HVN DNS Manager [QueueWorker]: Reset {$count} FAILED job(s) to PENDING for retry{$mode}.");
+            logActivity("MJ DNS Manager [QueueWorker]: Reset {$count} FAILED job(s) to PENDING for retry{$mode}.");
         }
     }
 
@@ -170,7 +170,7 @@ class QueueWorker
      */
     private function processJobs(): void
     {
-        $serverIds = \Illuminate\Database\Capsule\Manager::table('mod_hvndns_servers')
+        $serverIds = \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_servers')
             ->where('is_active', 1)
             ->orderBy('sort_order')
             ->pluck('id')
@@ -178,7 +178,7 @@ class QueueWorker
 
         foreach ($serverIds as $serverId) {
             if ($this->isTimeLimitReached()) {
-                logActivity('HVN DNS Manager [QueueWorker]: Time limit reached, stopping.');
+                logActivity('MJ DNS Manager [QueueWorker]: Time limit reached, stopping.');
                 break;
             }
 
@@ -244,7 +244,7 @@ class QueueWorker
             // Flush phần job thặng dư sang FAILED để không làm mất Time Limit của server khỏe đang đợi đằng sau.
             if ($server->last_error_at && $server->last_error_at >= $batchStartedAt) {
                 if ($server->backoff_until && $server->backoff_until > $this->nowStr()) {
-                    logActivity("HVN DNS Manager [QueueWorker]: Server {$server->id} entered backoff mode during this batch. Flushing remaining PENDING jobs and moving to next server.");
+                    logActivity("MJ DNS Manager [QueueWorker]: Server {$server->id} entered backoff mode during this batch. Flushing remaining PENDING jobs and moving to next server.");
                     $this->flushServerPendingJobs($server);
                     break;
                 }
@@ -272,7 +272,7 @@ class QueueWorker
         $now = $this->nowStr();
         $backoffMinutes = 2; // Reset lại sau 2 phút — đợi server backoff tạm kết thúc
 
-        $count = \Illuminate\Database\Capsule\Manager::table('mod_hvndns_queue')
+        $count = \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_queue')
             ->where('status', 'PENDING')
             ->where('server_id', $server->id)
             ->whereRaw('attempts < max_attempts')
@@ -285,7 +285,7 @@ class QueueWorker
             ]);
 
         // Jobs đã hết lượt retry — đánh dấu PERMANENTLY_FAILED
-        \Illuminate\Database\Capsule\Manager::table('mod_hvndns_queue')
+        \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_queue')
             ->where('status', 'PENDING')
             ->where('server_id', $server->id)
             ->whereRaw('attempts >= max_attempts')
@@ -298,7 +298,7 @@ class QueueWorker
             ]);
 
         if ($count > 0) {
-            logActivity("HVN DNS Manager [QueueWorker]: Flushed {$count} PENDING jobs of server #{$server->id} to FAILED (next retry in {$backoffMinutes}min).");
+            logActivity("MJ DNS Manager [QueueWorker]: Flushed {$count} PENDING jobs of server #{$server->id} to FAILED (next retry in {$backoffMinutes}min).");
         }
     }
 
@@ -330,7 +330,7 @@ class QueueWorker
         $domain = Domain::find($job->domain_id);
 
         if (!$domain) {
-            $this->failJob($job, $server, 'Domain record not found in mod_hvndns_domains.', 0, false);
+            $this->failJob($job, $server, 'Domain record not found in tbl_mj_dns_domains.', 0, false);
             return;
         }
 
@@ -430,9 +430,9 @@ class QueueWorker
      * @param  DAGateway $gateway
      * @param  string    $domainName
      * @param  array     $payload
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleEditRecord(DAGateway $gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleEditRecord(DAGateway $gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         $payload = $this->correctOldRecordForServer($gateway, $domainName, $payload);
 
@@ -502,14 +502,14 @@ class QueueWorker
                 $correctValue = $this->normalizeDaRecordValue($nameTypeMatches[0]['value'] ?? '', $targetType);
                 $payload['old_record']['value'] = $correctValue;
 
-                logActivity("HVN DNS Manager [QueueWorker]: EDIT_RECORD — auto-corrected old_record.value from '{$targetValue}' to '{$correctValue}' for server match.");
+                logActivity("MJ DNS Manager [QueueWorker]: EDIT_RECORD — auto-corrected old_record.value from '{$targetValue}' to '{$correctValue}' for server match.");
             } else {
                 // Multiple records with same name+type, none match old value
                 $cnt = count($nameTypeMatches);
-                logActivity("HVN DNS Manager [QueueWorker]: EDIT_RECORD — WARNING: {$cnt} records match name='{$targetName}' type='{$targetType}' but none match old value '{$targetValue}'. Proceeding with original payload.");
+                logActivity("MJ DNS Manager [QueueWorker]: EDIT_RECORD — WARNING: {$cnt} records match name='{$targetName}' type='{$targetType}' but none match old value '{$targetValue}'. Proceeding with original payload.");
             }
         } catch (\Throwable $e) {
-            logActivity('HVN DNS Manager [QueueWorker]: correctOldRecordForServer failed — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [QueueWorker]: correctOldRecordForServer failed — ' . $e->getMessage());
         }
 
         return $payload;
@@ -586,19 +586,19 @@ class QueueWorker
      * @param  string    $domainName
      * @param  array     $payload
      * @param  QueueJob  $job
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleDeleteRecord(DAGateway $gateway, string $domainName, array $payload, QueueJob $job): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleDeleteRecord(DAGateway $gateway, string $domainName, array $payload, QueueJob $job): \MJ\DnsManager\Gateway\DAResponse
     {
         $response = $gateway->deleteRecord($domainName, $payload);
 
         if ($response->isSuccess() && isset($payload['record_id'])) {
             try {
-                \HvnGroup\DnsManager\Models\Record::where('id', (int) $payload['record_id'])
+                \MJ\DnsManager\Models\Record::where('id', (int) $payload['record_id'])
                     ->where('pending_delete', 1)
                     ->delete();
             } catch (\Exception $e) {
-                logActivity("HVN DNS Manager [QueueWorker]: Warning — could not hard-delete record #{$payload['record_id']} from DB after DA delete. " . $e->getMessage());
+                logActivity("MJ DNS Manager [QueueWorker]: Warning — could not hard-delete record #{$payload['record_id']} from DB after DA delete. " . $e->getMessage());
             }
         }
 
@@ -615,9 +615,9 @@ class QueueWorker
      * @param  DAGateway $gateway
      * @param  string    $domainName
      * @param  array     $payload
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleCreateZone(DAGateway $gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleCreateZone(DAGateway $gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         // Gọi CMD_API_DOMAIN action=create — DA tạo domain + zone DNS cùng lúc
         $domainResponse = $gateway->createDomain($domainName, $payload);
@@ -638,9 +638,9 @@ class QueueWorker
      * @param  DAGateway $gateway
      * @param  string    $domainName
      * @param  array     $payload
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleAddRecord(DAGateway $gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleAddRecord(DAGateway $gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         return $gateway->addRecord($domainName, $payload);
     }
@@ -673,13 +673,13 @@ class QueueWorker
             // Notify client khi zone DNS được khởi tạo thành công
             if ($job->actor_type === 'client' && (int) $job->actor_id > 0) {
                 try {
-                    $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                    $notif = new \MJ\DnsManager\Services\NotificationService();
                     $notif->notifyClientZoneCreated(
                         (int) $job->actor_id,
                         $domain->domain
                     );
                 } catch (\Exception $e) {
-                    logActivity('HVN DNS Manager [QueueWorker]: notifyClientZoneCreated exception — ' . $e->getMessage());
+                    logActivity('MJ DNS Manager [QueueWorker]: notifyClientZoneCreated exception — ' . $e->getMessage());
                 }
             }
         }
@@ -712,7 +712,7 @@ class QueueWorker
                 }
 
                 if ($recordType !== '') {
-                    $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                    $notif = new \MJ\DnsManager\Services\NotificationService();
                     $notif->notifyClientRecordChanged(
                         (int) $job->actor_id,
                         $domain->domain,
@@ -723,7 +723,7 @@ class QueueWorker
                     );
                 }
             } catch (\Exception $e) {
-                logActivity('HVN DNS Manager [QueueWorker]: client email exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [QueueWorker]: client email exception — ' . $e->getMessage());
             }
         }
     }
@@ -767,13 +767,13 @@ class QueueWorker
 
             // Admin alert (Telegram + Email) via NotificationService
             try {
-                $domainObj  = \HvnGroup\DnsManager\Models\Domain::find($job->domain_id);
+                $domainObj  = \MJ\DnsManager\Models\Domain::find($job->domain_id);
                 $domainName = $domainObj ? $domainObj->domain : 'N/A (domain_id=' . $job->domain_id . ')';
                 $payload    = is_array($job->payload) ? $job->payload : (array) json_decode((string) $job->payload, true);
                 $recordType = strtoupper((string) (isset($payload['type']) ? $payload['type'] : (isset($payload['record_type']) ? $payload['record_type'] : '')));
                 $recordName = (string) (isset($payload['name']) ? $payload['name'] : (isset($payload['record_name']) ? $payload['record_name'] : ''));
 
-                $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                $notif = new \MJ\DnsManager\Services\NotificationService();
                 $notif->notifyJobPermanentlyFailed(
                     $job->id,
                     $job->action,
@@ -786,7 +786,7 @@ class QueueWorker
                     $recordName
                 );
             } catch (\Exception $e) {
-                logActivity('HVN DNS Manager [QueueWorker]: admin fail notification exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [QueueWorker]: admin fail notification exception — ' . $e->getMessage());
             }
         } elseif ($isConnectionError) {
             // ── Lỗi kết nối → instant failover ───────────────────────────────
@@ -805,13 +805,13 @@ class QueueWorker
 
             // Admin alert via NotificationService
             try {
-                $domainObj  = \HvnGroup\DnsManager\Models\Domain::find($job->domain_id);
+                $domainObj  = \MJ\DnsManager\Models\Domain::find($job->domain_id);
                 $domainName = $domainObj ? $domainObj->domain : 'N/A (domain_id=' . $job->domain_id . ')';
                 $payload    = is_array($job->payload) ? $job->payload : (array) json_decode((string) $job->payload, true);
                 $recordType = strtoupper((string) (isset($payload['type']) ? $payload['type'] : (isset($payload['record_type']) ? $payload['record_type'] : '')));
                 $recordName = (string) (isset($payload['name']) ? $payload['name'] : (isset($payload['record_name']) ? $payload['record_name'] : ''));
 
-                $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                $notif = new \MJ\DnsManager\Services\NotificationService();
                 $notif->notifyJobPermanentlyFailed(
                     $job->id,
                     $job->action,
@@ -824,7 +824,7 @@ class QueueWorker
                     $recordName
                 );
             } catch (\Exception $e) {
-                logActivity('HVN DNS Manager [QueueWorker]: connection fail notification exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [QueueWorker]: connection fail notification exception — ' . $e->getMessage());
             }
         } else {
             // ── Lỗi logic → retry bình thường ────────────────────────────────
@@ -838,14 +838,14 @@ class QueueWorker
             ]);
         }
 
-        logActivity("HVN DNS Manager [QueueWorker]: Job #{$job->id} ({$job->action}) failed (attempt {$attempts}/{$job->max_attempts}) — {$errorMessage}");
+        logActivity("MJ DNS Manager [QueueWorker]: Job #{$job->id} ({$job->action}) failed (attempt {$attempts}/{$job->max_attempts}) — {$errorMessage}");
 
         if (!$skipTriggerCheck) {
             try {
-                $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                $notif = new \MJ\DnsManager\Services\NotificationService();
                 $notif->triggerCheck($server->id);
             } catch (\Throwable $e) {
-                logActivity('HVN DNS Manager [NotificationService]: triggerCheck exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [NotificationService]: triggerCheck exception — ' . $e->getMessage());
             }
         }
     }
@@ -866,7 +866,7 @@ class QueueWorker
             }
 
             if (!$response->isSuccess() || !isset($response->data['records'])) {
-                logActivity("HVN DNS Manager [QueueWorker]: pullZoneRecords failed for '{$domainName}' — " . ($response->errorMessage ?? 'No records returned'));
+                logActivity("MJ DNS Manager [QueueWorker]: pullZoneRecords failed for '{$domainName}' — " . ($response->errorMessage ?? 'No records returned'));
                 return;
             }
 
@@ -933,20 +933,20 @@ class QueueWorker
             }
 
             \WHMCS\Database\Capsule::beginTransaction();
-            \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+            \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
                 ->where('is_locked', 0)
                 ->delete();
             if (!empty($newRecordsData)) {
-                \HvnGroup\DnsManager\Models\Record::insert($newRecordsData);
+                \MJ\DnsManager\Models\Record::insert($newRecordsData);
             }
             \WHMCS\Database\Capsule::commit();
 
-            logActivity("HVN DNS Manager [QueueWorker]: Pulled " . count($newRecordsData) . " records for '{$domainName}' after CREATE_ZONE.");
+            logActivity("MJ DNS Manager [QueueWorker]: Pulled " . count($newRecordsData) . " records for '{$domainName}' after CREATE_ZONE.");
         } catch (\Throwable $e) {
             if (\WHMCS\Database\Capsule::connection()->transactionLevel() > 0) {
                 \WHMCS\Database\Capsule::rollBack();
             }
-            logActivity("HVN DNS Manager [QueueWorker]: pullZoneRecords exception for '{$domainName}' — " . $e->getMessage());
+            logActivity("MJ DNS Manager [QueueWorker]: pullZoneRecords exception for '{$domainName}' — " . $e->getMessage());
             // Không throw — CREATE_ZONE vẫn được tính là COMPLETE
         }
     }
@@ -954,7 +954,7 @@ class QueueWorker
     /**
      * Handle CREATE_REDIRECT action.
      */
-    private function handleCreateRedirect(DAGateway $gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleCreateRedirect(DAGateway $gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         return $gateway->createRedirect(
             $domainName,
@@ -968,7 +968,7 @@ class QueueWorker
      * Handle DELETE_REDIRECT action.
      * Sau khi DA xác nhận xóa → hard delete trong DB.
      */
-    private function handleDeleteRedirect(DAGateway $gateway, string $domainName, array $payload, QueueJob $job): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleDeleteRedirect(DAGateway $gateway, string $domainName, array $payload, QueueJob $job): \MJ\DnsManager\Gateway\DAResponse
     {
         $response = $gateway->deleteRedirect(
             $domainName,
@@ -977,10 +977,10 @@ class QueueWorker
 
         if ($response->isSuccess() && isset($payload['redirect_id'])) {
             try {
-                \HvnGroup\DnsManager\Models\Redirect::where('id', (int) $payload['redirect_id'])
+                \MJ\DnsManager\Models\Redirect::where('id', (int) $payload['redirect_id'])
                     ->delete();
             } catch (\Exception $e) {
-                logActivity("HVN DNS Manager [QueueWorker]: Warning — could not hard-delete redirect #{$payload['redirect_id']} from DB after DA delete. " . $e->getMessage());
+                logActivity("MJ DNS Manager [QueueWorker]: Warning — could not hard-delete redirect #{$payload['redirect_id']} from DB after DA delete. " . $e->getMessage());
             }
         }
 
@@ -1021,9 +1021,9 @@ class QueueWorker
      *
      * @param  DAGateway $gateway
      * @param  string    $domainName
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleRenewSsl(DAGateway $gateway, string $domainName): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleRenewSsl(DAGateway $gateway, string $domainName): \MJ\DnsManager\Gateway\DAResponse
     {
         return $gateway->renewSsl($domainName);
     }
@@ -1034,26 +1034,26 @@ class QueueWorker
      * để lấy DS Record về lưu vào DB cho client xem.
      */
     private function handleEnableDnssec(
-        \HvnGroup\DnsManager\Gateway\DAGateway $gateway,
+        \MJ\DnsManager\Gateway\DAGateway $gateway,
         string $domainName,
-        \HvnGroup\DnsManager\Models\Domain $domain
-    ): \HvnGroup\DnsManager\Gateway\DAResponse {
+        \MJ\DnsManager\Models\Domain $domain
+    ): \MJ\DnsManager\Gateway\DAResponse {
         $response = $gateway->enableDnssec($domainName);
 
         if ($response->isSuccess()) {
             // Cập nhật trạng thái is_enabled = 1 vào DB ngay
-            \HvnGroup\DnsManager\Models\Dnssec::updateOrCreate(
+            \MJ\DnsManager\Models\Dnssec::updateOrCreate(
                 array('domain_id' => $domain->id),
                 array('is_enabled' => 1)
             );
 
             // Dispatch thêm job FETCH_DS_RECORDS để lấy DS Record về
             try {
-                $server = \HvnGroup\DnsManager\Models\Server::where('role', 'primary')
+                $server = \MJ\DnsManager\Models\Server::where('role', 'primary')
                     ->where('is_active', 1)
                     ->first();
                 if ($server) {
-                    \HvnGroup\DnsManager\Models\QueueJob::create(array(
+                    \MJ\DnsManager\Models\QueueJob::create(array(
                         'batch_id'    => $this->generateUuid(),
                         'domain_id'   => $domain->id,
                         'server_id'   => $server->id,
@@ -1070,7 +1070,7 @@ class QueueWorker
                     ));
                 }
             } catch (\Throwable $e) {
-                logActivity('HVN DNS Manager [QueueWorker]: ENABLE_DNSSEC — could not dispatch FETCH_DS_RECORDS: ' . $e->getMessage());
+                logActivity('MJ DNS Manager [QueueWorker]: ENABLE_DNSSEC — could not dispatch FETCH_DS_RECORDS: ' . $e->getMessage());
             }
         }
 
@@ -1082,14 +1082,14 @@ class QueueWorker
      * Sau khi DA disable thành công → cập nhật is_enabled = 0 trong DB.
      */
     private function handleDisableDnssec(
-        \HvnGroup\DnsManager\Gateway\DAGateway $gateway,
+        \MJ\DnsManager\Gateway\DAGateway $gateway,
         string $domainName,
-        \HvnGroup\DnsManager\Models\Domain $domain
-    ): \HvnGroup\DnsManager\Gateway\DAResponse {
+        \MJ\DnsManager\Models\Domain $domain
+    ): \MJ\DnsManager\Gateway\DAResponse {
         $response = $gateway->disableDnssec($domainName);
 
         if ($response->isSuccess()) {
-            \HvnGroup\DnsManager\Models\Dnssec::where('domain_id', $domain->id)
+            \MJ\DnsManager\Models\Dnssec::where('domain_id', $domain->id)
                 ->update(array(
                     'is_enabled'  => 0,
                     'key_tag'     => null,
@@ -1106,18 +1106,18 @@ class QueueWorker
     /**
      * Handle FETCH_DS_RECORDS action.
      * Lấy DS Record từ DA sau khi enable DNSSEC thành công
-     * → lưu vào mod_hvndns_dnssec để client xem và copy sang Registrar.
+     * → lưu vào tbl_mj_dns_dnssec để client xem và copy sang Registrar.
      */
     private function handleFetchDsRecords(
-        \HvnGroup\DnsManager\Gateway\DAGateway $gateway,
+        \MJ\DnsManager\Gateway\DAGateway $gateway,
         string $domainName,
-        \HvnGroup\DnsManager\Models\Domain $domain
-    ): \HvnGroup\DnsManager\Gateway\DAResponse {
+        \MJ\DnsManager\Models\Domain $domain
+    ): \MJ\DnsManager\Gateway\DAResponse {
         $response = $gateway->getDsRecords($domainName);
 
         if ($response->isSuccess()) {
             $data = $response->data;
-            \HvnGroup\DnsManager\Models\Dnssec::updateOrCreate(
+            \MJ\DnsManager\Models\Dnssec::updateOrCreate(
                 array('domain_id' => $domain->id),
                 array(
                     'is_enabled'    => 1,
@@ -1212,10 +1212,10 @@ class QueueWorker
      * @param  DAGateway $gateway
      * @param  string    $domainName
      * @param  array     $payload    Chứa key 'records' — array records cần add lên DA
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
     private function handleApplyTemplate(
-        \HvnGroup\DnsManager\Gateway\DAGateway $gateway,
+        \MJ\DnsManager\Gateway\DAGateway $gateway,
         $domainName,
         array $payload
     ) {
@@ -1224,7 +1224,7 @@ class QueueWorker
             : array();
 
         if (empty($records)) {
-            return \HvnGroup\DnsManager\Gateway\DAResponse::fail(
+            return \MJ\DnsManager\Gateway\DAResponse::fail(
                 'empty_template_payload',
                 'APPLY_TEMPLATE payload không có records.',
                 array(),
@@ -1327,7 +1327,7 @@ class QueueWorker
             $errorMsg = 'APPLY_TEMPLATE: ' . count($addErrors) . '/' . count($records)
                 . ' records failed. First error: ' . $addErrors[0];
 
-            return \HvnGroup\DnsManager\Gateway\DAResponse::fail(
+            return \MJ\DnsManager\Gateway\DAResponse::fail(
                 'apply_template_partial_fail',
                 $errorMsg,
                 array('errors' => $addErrors),
@@ -1347,7 +1347,7 @@ class QueueWorker
             return $lastResponse;
         }
 
-        return \HvnGroup\DnsManager\Gateway\DAResponse::ok(array('applied' => count($records)), 200, 0);
+        return \MJ\DnsManager\Gateway\DAResponse::ok(array('applied' => count($records)), 200, 0);
     }
 
     // ─────────────────────────────────────────────────────────
@@ -1360,19 +1360,19 @@ class QueueWorker
      * Payload: { source_local, destination_email, email_forward_id, is_catchall }
      * Gọi DA API tạo email forwarder, sau khi thành công đánh dấu synced_at trong DB.
      *
-     * @param  \HvnGroup\DnsManager\Gateway\DAGateway $gateway
+     * @param  \MJ\DnsManager\Gateway\DAGateway $gateway
      * @param  string $domainName
      * @param  array  $payload
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleCreateEmailFwd($gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleCreateEmailFwd($gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         $sourceLocal = $payload['user'] ?? '';
         $destEmail   = $payload['email'] ?? '';
         $forwardId   = (int) ($payload['email_forward_id'] ?? 0);
 
         if ($sourceLocal === '' || $destEmail === '') {
-            return \HvnGroup\DnsManager\Gateway\DAResponse::fail(
+            return \MJ\DnsManager\Gateway\DAResponse::fail(
                 'invalid_payload',
                 'CREATE_EMAIL_FWD payload thiếu user hoặc email.',
                 [],
@@ -1385,7 +1385,7 @@ class QueueWorker
 
         if ($response->isSuccess() && $forwardId > 0) {
             // Đánh dấu forwarder đã sync thành công
-            \HvnGroup\DnsManager\Models\EmailForward::where('id', $forwardId)
+            \MJ\DnsManager\Models\EmailForward::where('id', $forwardId)
                 ->update(['synced_at' => $this->nowStr()]);
         }
 
@@ -1398,18 +1398,18 @@ class QueueWorker
      * Payload: { source_local, email_forward_id }
      * Gọi DA API xóa email forwarder, sau khi thành công xóa record khỏi DB.
      *
-     * @param  \HvnGroup\DnsManager\Gateway\DAGateway $gateway
+     * @param  \MJ\DnsManager\Gateway\DAGateway $gateway
      * @param  string $domainName
      * @param  array  $payload
-     * @return \HvnGroup\DnsManager\Gateway\DAResponse
+     * @return \MJ\DnsManager\Gateway\DAResponse
      */
-    private function handleDeleteEmailFwd($gateway, string $domainName, array $payload): \HvnGroup\DnsManager\Gateway\DAResponse
+    private function handleDeleteEmailFwd($gateway, string $domainName, array $payload): \MJ\DnsManager\Gateway\DAResponse
     {
         $sourceLocal = $payload['user'] ?? '';
         $forwardId   = (int) ($payload['email_forward_id'] ?? 0);
 
         if ($sourceLocal === '') {
-            return \HvnGroup\DnsManager\Gateway\DAResponse::fail(
+            return \MJ\DnsManager\Gateway\DAResponse::fail(
                 'invalid_payload',
                 'DELETE_EMAIL_FWD payload thiếu user.',
                 [],
@@ -1422,7 +1422,7 @@ class QueueWorker
 
         if ($response->isSuccess() && $forwardId > 0) {
             // Xóa forwarder khỏi DB sau khi DA xác nhận xóa thành công
-            \HvnGroup\DnsManager\Models\EmailForward::where('id', $forwardId)->delete();
+            \MJ\DnsManager\Models\EmailForward::where('id', $forwardId)->delete();
         }
 
         return $response;

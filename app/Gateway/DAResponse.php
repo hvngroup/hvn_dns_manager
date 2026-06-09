@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Gateway;
+namespace MJ\DnsManager\Gateway;
 
 /**
  * Standardized response object for all DirectAdmin API calls.

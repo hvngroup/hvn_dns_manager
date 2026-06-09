@@ -1,11 +1,11 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\DdnsToken;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+use MJ\DnsManager\Models\DdnsToken;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Helpers\SettingsHelper;
 
 class DdnsService
 {
@@ -90,7 +90,7 @@ class DdnsService
 
         // Notify client
             try {
-                $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                $notif = new \MJ\DnsManager\Services\NotificationService();
                 $notif->notifyClientDdnsTokenCreated(
                     $userId,
                     $domain->domain,
@@ -98,7 +98,7 @@ class DdnsService
                     $label
                 );
             } catch (\Exception $e) {
-                logActivity('HVN DNS Manager [DdnsService]: notifyClientDdnsTokenCreated exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [DdnsService]: notifyClientDdnsTokenCreated exception — ' . $e->getMessage());
             }
 
         // Trả về raw token 1 lần duy nhất — sau đó không thể xem lại
@@ -219,8 +219,8 @@ class DdnsService
         if (!empty($_SERVER['HTTP_HOST'])) {
             $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
             $host = rtrim($_SERVER['HTTP_HOST'], '/');
-            return $scheme . '://' . $host . '/modules/addons/hvn_dns_manager/ddns.php';
+            return $scheme . '://' . $host . '/modules/addons/mj_dns_manager/ddns.php';
         }
-        return '/modules/addons/hvn_dns_manager/ddns.php';
+        return '/modules/addons/mj_dns_manager/ddns.php';
     }
 }

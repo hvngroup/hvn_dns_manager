@@ -1,8 +1,8 @@
 <?php
 
-namespace HvnGroup\DnsManager\Helpers;
+namespace MJ\DnsManager\Helpers;
 
-use HvnGroup\DnsManager\Models\AuditTrail;
+use MJ\DnsManager\Models\AuditTrail;
 
 /**
  * AuditLogger — Helper trung tâm ghi nhật ký kiểm toán.
@@ -203,7 +203,7 @@ class AuditLogger
             ], $data));
         } catch (\Throwable $e) {
             // Không throw — audit log không được làm crash business logic
-            logActivity('HVN DNS Manager [AuditLogger]: Failed to write audit log — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [AuditLogger]: Failed to write audit log — ' . $e->getMessage());
         }
     }
 

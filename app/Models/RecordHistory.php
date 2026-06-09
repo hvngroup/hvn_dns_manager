@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class RecordHistory extends Model
 {
-    protected $table = 'mod_hvndns_record_history';
+    protected $table = 'tbl_mj_dns_record_history';
     
     protected $fillable = [
         'record_id', 

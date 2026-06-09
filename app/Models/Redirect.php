@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Redirect extends Model
 {
-    protected $table = 'mod_hvndns_redirects';
+    protected $table = 'tbl_mj_dns_redirects';
 
     protected $fillable = [
         'domain_id',

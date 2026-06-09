@@ -1,10 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Dnssec;
-use HvnGroup\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Dnssec;
+use MJ\DnsManager\Services\QueueManager;
 
 class DnssecService
 {
@@ -45,7 +45,7 @@ class DnssecService
     public function toggle(int $domainId, int $userId, bool $enable): array
     {
         // Kiểm tra admin có bật tính năng DNSSEC không (mode: off/free/paid)
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode')) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::isModeEnabled('dnssec_mode')) {
             return array('success' => false, 'error' => 'Tính năng DNSSEC chưa được kích hoạt trên hệ thống.');
         }
 

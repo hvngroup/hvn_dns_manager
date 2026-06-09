@@ -1,6 +1,6 @@
 <?php
 
-namespace HvnGroup\DnsManager\Hooks;
+namespace MJ\DnsManager\Hooks;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -43,7 +43,7 @@ trait HookGuard
         // Guard 2: Valid FQDN
         if (!self::isValidFqdn($domainName)) {
             if (!empty($domainName)) {
-                logActivity("HVN DNS Manager [{$hookName}]: Skipped '{$domainName}' — not a valid FQDN.");
+                logActivity("MJ DNS Manager [{$hookName}]: Skipped '{$domainName}' — not a valid FQDN.");
             }
             return false;
         }
@@ -142,7 +142,7 @@ trait HookGuard
 
             return $row ? (array) $row : null;
         } catch (\Exception $e) {
-            logActivity("HVN DNS Manager [{$hookName}]: DB lookup failed for domain #{$domainId} — " . $e->getMessage());
+            logActivity("MJ DNS Manager [{$hookName}]: DB lookup failed for domain #{$domainId} — " . $e->getMessage());
             return null;
         }
     }

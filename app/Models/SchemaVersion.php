@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class SchemaVersion extends Model
 {
-    protected $table = 'mod_hvndns_schema_version';
+    protected $table = 'tbl_mj_dns_schema_version';
     protected $fillable = ['version', 'description'];
     
     public $timestamps = false;

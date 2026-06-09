@@ -1,12 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class EmailForward extends Model
 {
-    protected $table = 'mod_hvndns_email_forwards';
+    protected $table = 'tbl_mj_dns_email_forwards';
 
     protected $fillable = [
         'domain_id',
