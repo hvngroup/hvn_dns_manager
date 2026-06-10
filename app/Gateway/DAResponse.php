@@ -1,6 +1,8 @@
 <?php
 
-namespace HvnGroup\DnsManager\Gateway;
+namespace MJ\DnsManager\Gateway;
+
+defined("WHMCS") or die("Access Denied");
 
 /**
  * Standardized response object for all DirectAdmin API calls.

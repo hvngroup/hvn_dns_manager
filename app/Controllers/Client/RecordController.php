@@ -1,17 +1,18 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Client;
+namespace MJ\DnsManager\Controllers\Client;
+
+defined("WHMCS") or die("Access Denied");
 
 use WHMCS\Database\Capsule;
-// ← XÓA: use HvnGroup\DnsManager\Contracts\JobInterface;  (không cần nữa)
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Services\QueueManager;
-use HvnGroup\DnsManager\Validators\DnsRecordValidator;
-use HvnGroup\DnsManager\Validators\ConflictValidator;
-use HvnGroup\DnsManager\Security\InputSanitizer;
-use HvnGroup\DnsManager\Helpers\AuditLogger;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Validators\DnsRecordValidator;
+use MJ\DnsManager\Validators\ConflictValidator;
+use MJ\DnsManager\Security\InputSanitizer;
+use MJ\DnsManager\Helpers\AuditLogger;
 
 class RecordController
 {
@@ -81,7 +82,7 @@ class RecordController
     private function addRecord(array $input, $userId)
     {
         // Kiểm tra module có bị admin tắt không
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_editor', true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_editor', true)) {
             return $this->errorResponse('DISABLED', 'Tính năng DNS Editor hiện đang bị vô hiệu hóa.');
         }
 
@@ -97,7 +98,7 @@ class RecordController
 
         // Kiểm tra admin có cho phép thêm loại record này không
         $allowKey = 'allow_modify_' . strtolower($type);
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
             return $this->errorResponse('NOT_ALLOWED', "Bạn không có quyền thêm bản ghi loại {$type}.");
         }
 
@@ -109,7 +110,7 @@ class RecordController
         $port     = ($input['port'] ?? '') !== '' ? (int) $input['port'] : null;
 
         // ── HVND-62: Kiểm tra Quota ───────────────────────────────────────────
-        $totalLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
+        $totalLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
         if ($totalLimit > 0) {
             $currentTotal = Record::where('domain_id', $domainId)
                 ->where('pending_delete', 0)
@@ -124,7 +125,7 @@ class RecordController
         }
 
         $typeKey   = strtolower($type) . '_record_limit';
-        $typeLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
+        $typeLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
         if ($typeLimit > 0) {
             $currentTypeCount = Record::where('domain_id', $domainId)
                 ->where('type', $type)
@@ -226,7 +227,7 @@ class RecordController
 
         // Kiểm tra admin có cho phép chỉnh sửa loại record này không
         $allowKey = 'allow_modify_' . strtolower($record->type);
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool($allowKey, true)) {
             return $this->errorResponse('NOT_ALLOWED', "Bạn không có quyền chỉnh sửa bản ghi loại {$record->type}.");
         }
 
@@ -449,95 +450,26 @@ class RecordController
     private function syncZone(array $input, $userId)
     {
         $domainId = (int) ($input['domain_id'] ?? 0);
-        $domain = $this->getDomainOrError($domainId, $userId);
+        $this->getDomainOrError($domainId, $userId);
 
-        $server = \HvnGroup\DnsManager\Models\Server::where('role', 'primary')
-            ->where('is_active', 1)->first();
-        if (!$server) {
-            throw new \Exception('Không tìm thấy Active Primary Server.');
-        }
+        // Async-first: KHÔNG gọi DA trong request lifecycle của client.
+        // Dispatch job SYNC_ZONE để QueueWorker pull zone từ DA về DB; client
+        // poll trạng thái qua action 'sync_status' với batch_id trả về.
+        $qm = new \MJ\DnsManager\Services\QueueManager();
+        $batchId = $qm->dispatch(
+            $domainId,
+            'SYNC_ZONE',
+            [],
+            5,
+            'client',
+            $userId
+        );
 
-        try {
-            $gateway = new \HvnGroup\DnsManager\Gateway\DAGateway($server);
-            $response = $gateway->getZone($domain->domain);
-
-            if (!$response->isSuccess() || !isset($response->data['records'])) {
-                throw new \Exception('Không thể đồng bộ DNS từ máy chủ: ' . ($response->errorMessage ?? 'Lỗi không xác định'));
-            }
-
-            $newRecordsData = [];
-            foreach ($response->data['records'] as $rec) {
-                $type = strtoupper((string) ($rec['type'] ?? ''));
-                if (!in_array($type, DnsRecordValidator::ALLOWED_TYPES))
-                    continue;
-
-                $name = (string) ($rec['name'] ?? '');
-                if ($name === $domain->domain . '.') {
-                    $name = '@';
-                } else {
-                    $name = str_replace('.' . $domain->domain . '.', '', $name);
-                }
-
-                $value = (string) ($rec['value'] ?? '');
-                $ttl = (int) ($rec['ttl'] ?? 3600);
-                $priority = null;
-                $weight = null;
-                $port = null;
-
-                if ($type === 'MX') {
-                    $parts = explode(' ', $value, 2);
-                    if (count($parts) === 2) {
-                        $priority = (int) $parts[0];
-                        $value = trim($parts[1]);
-                    }
-                } elseif ($type === 'SRV') {
-                    $parts = explode(' ', $value, 3);
-                    if (count($parts) === 3) {
-                        $weight = (int) $parts[0];
-                        $port = (int) $parts[1];
-                        $value = trim($parts[2]);
-                    }
-                    if (isset($rec['priority']))
-                        $priority = (int) $rec['priority'];
-                }
-
-                $newRecordsData[] = [
-                    'domain_id' => $domainId,
-                    'type' => $type,
-                    'name' => $name,
-                    'value' => $value,
-                    'ttl' => $ttl,
-                    'priority' => $priority,
-                    'weight' => $weight,
-                    'port' => $port,
-                    'is_system' => in_array($type, ['NS', 'SOA']) ? 1 : 0,
-                    'is_locked' => 0,
-                    'pending_delete' => 0,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ];
-            }
-
-            Capsule::beginTransaction();
-            Record::where('domain_id', $domainId)->where('is_locked', 0)->delete();
-            if (!empty($newRecordsData)) {
-                Record::insert($newRecordsData);
-            }
-            Capsule::commit();
-
-            $records = Record::where('domain_id', $domainId)->orderBy('type')->orderBy('name')->get();
-
-            return [
-                'success' => true,
-                'data' => ['records' => $records->toArray()],
-                'message' => 'Đã đồng bộ DNS thành công.',
-            ];
-        } catch (\Throwable $e) {
-            if (Capsule::connection()->transactionLevel() > 0) {
-                Capsule::rollBack();
-            }
-            throw $e;
-        }
+        return [
+            'success' => true,
+            'data' => ['batch_id' => $batchId],
+            'message' => 'Đang đồng bộ bản ghi từ máy chủ. Vui lòng đợi trong giây lát.',
+        ];
     }
 
     private function getAllRecords(array $input, $userId)

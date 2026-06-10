@@ -1,7 +1,7 @@
 <?php
 
 /**
- * HVN DNS Manager — Dedicated Cron Worker Entry Point
+ * MJ DNS Manager — Dedicated Cron Worker Entry Point
  *
  * Requirements:
  * - WHMCS 8.x
@@ -9,7 +9,7 @@
  * 
  * Usage:
  * Set up a system cronjob to run this file every minute.
- * * * * * php -q /path/to/whmcs/modules/addons/hvn_dns_manager/cron/queue_worker.php
+ * * * * * php -q /path/to/whmcs/modules/addons/mj_dns_manager/cron/queue_worker.php
  */
 
 // Define WHMCS context
@@ -33,9 +33,9 @@ if (php_sapi_name() !== 'cli') {
     die("FATAL: This script can only be run from the command line.\n");
 }
 
-// Simple internal autoloader for HvnGroup\DnsManager namespace
+// Simple internal autoloader for MJ\DnsManager namespace
 spl_autoload_register(function ($class) {
-    $prefix = 'HvnGroup\\DnsManager\\';
+    $prefix = 'MJ\\DnsManager\\';
     $base_dir = dirname(__DIR__) . '/app/';
 
     $len = strlen($prefix);
@@ -51,7 +51,7 @@ spl_autoload_register(function ($class) {
     }
 });
 
-use HvnGroup\DnsManager\Cron\QueueWorker;
+use MJ\DnsManager\Cron\QueueWorker;
 
 // Execute the worker
 try {
@@ -59,7 +59,7 @@ try {
     $worker->run();
 } catch (\Throwable $e) {
     if (function_exists('logActivity')) {
-        logActivity('HVN DNS Manager [Cron Fatal Error]: ' . $e->getMessage());
+        logActivity('MJ DNS Manager [Cron Fatal Error]: ' . $e->getMessage());
     }
     echo "Worker failed: " . $e->getMessage() . "\n";
     exit(1);

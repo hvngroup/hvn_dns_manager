@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\Template;
-use HvnGroup\DnsManager\Helpers\AuditLogger;
-use HvnGroup\DnsManager\Security\InputSanitizer;
-use HvnGroup\DnsManager\Validators\DnsRecordValidator;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\Template;
+use MJ\DnsManager\Helpers\AuditLogger;
+use MJ\DnsManager\Security\InputSanitizer;
+use MJ\DnsManager\Validators\DnsRecordValidator;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
@@ -256,9 +258,9 @@ class TemplateService
 
     private function replacePlaceholders($str, $domainName, $defaultIp)
     {
-        $ns1 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', '');
-        $ns2 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', '');
-        $ns3 = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', '');
+        $ns1 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', '');
+        $ns2 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', '');
+        $ns3 = \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', '');
 
         $replacements = array(
             '{{domain}}' => $domainName,
@@ -274,7 +276,7 @@ class TemplateService
     private function resolveDefaultIp()
     {
         try {
-            $server = \HvnGroup\DnsManager\Models\Server::where('role', 'primary')
+            $server = \MJ\DnsManager\Models\Server::where('role', 'primary')
                 ->where('is_active', 1)
                 ->first();
             if ($server && !empty($server->ip)) {

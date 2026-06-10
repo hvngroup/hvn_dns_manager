@@ -1,11 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-// ← XÓA: use HvnGroup\DnsManager\Contracts\JobInterface;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Validators\JobValidator;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Validators\JobValidator;
 
 class QueueManager
 {
@@ -49,7 +50,7 @@ class QueueManager
 
         // ── 3. INSERT vào queue (Fan-out) ─────────────────────────────────
         $batchId = $this->generateUuid();
-        $maxAttempts = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('max_retry_attempts', 5);
+        $maxAttempts = \MJ\DnsManager\Helpers\SettingsHelper::getInt('max_retry_attempts', 5);
 
         foreach ($servers as $server) {
             QueueJob::create([

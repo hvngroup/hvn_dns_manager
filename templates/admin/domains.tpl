@@ -1,20 +1,20 @@
-<div class="hvn-dns-admin hvn-domains" x-data="domainList()">
-    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
+<div class="mj-dns-admin mj-domains" x-data="domainList()">
+    <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-mb-4">
         <h2><i class="bi bi-globe"></i> Quản lý Domain</h2>
     </div>
 
     <!-- Toolbar Filters -->
-    <div class="hvn-card hvn-shadow-sm hvn-border-0 hvn-mb-4 hvn-bg-light">
-        <div class="hvn-card-body hvn-py-3">
-            <div class="hvn-row g-2 hvn-align-items-center">
-                <div class="hvn-col-md-4">
-                    <div class="hvn-input-group">
-                        <span class="hvn-input-group-text hvn-bg-white"><i class="bi bi-search"></i></span>
-                        <input type="text" class="hvn-form-control" placeholder="Tìm kiếm tên miền..." x-model="filters.search" @input.debounce.500ms="fetchDomains()">
+    <div class="mj-card mj-shadow-sm mj-border-0 mj-mb-4 mj-bg-light">
+        <div class="mj-card-body mj-py-3">
+            <div class="mj-row g-2 mj-align-items-center">
+                <div class="mj-col-md-4">
+                    <div class="mj-input-group">
+                        <span class="mj-input-group-text mj-bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="mj-form-control" placeholder="Tìm kiếm tên miền..." x-model="filters.search" @input.debounce.500ms="fetchDomains()">
                     </div>
                 </div>
-                <div class="hvn-col-md-2">
-                    <select class="hvn-form-select" x-model="filters.status" @change="fetchDomains()">
+                <div class="mj-col-md-2">
+                    <select class="mj-form-select" x-model="filters.status" @change="fetchDomains()">
                         <option value="">Tất cả trạng thái</option>
                         <option value="active">🟢 Active</option>
                         <option value="pending">🟡 Pending</option>
@@ -22,75 +22,75 @@
                         <option value="terminated">🔴 Terminated</option>
                     </select>
                 </div>
-                <div class="hvn-col-md-2">
-                    <select class="hvn-form-select" x-model="filters.server" @change="fetchDomains()">
+                <div class="mj-col-md-2">
+                    <select class="mj-form-select" x-model="filters.server" @change="fetchDomains()">
                         <option value="">Tất cả Server</option>
                     </select>
                 </div>
-                <div class="hvn-col-md-2 hvn-d-flex hvn-align-items-center">
-                    <div class="hvn-form-check hvn-form-switch hvn-mb-0">
-                        <input class="hvn-form-check-input" type="checkbox" id="errorOnly" x-model="filters.errorOnly" @change="fetchDomains()">
-                        <label class="hvn-form-check-label hvn-text-danger" for="errorOnly">Chỉ domain có lỗi</label>
+                <div class="mj-col-md-2 mj-d-flex mj-align-items-center">
+                    <div class="mj-form-check mj-form-switch mj-mb-0">
+                        <input class="mj-form-check-input" type="checkbox" id="errorOnly" x-model="filters.errorOnly" @change="fetchDomains()">
+                        <label class="mj-form-check-label mj-text-danger" for="errorOnly">Chỉ domain có lỗi</label>
                     </div>
                 </div>
-                <div class="hvn-col-md-2 hvn-text-end hvn-d-flex hvn-justify-content-end hvn-align-items-center hvn-gap-1">
-                    <select class="hvn-form-select" style="width:auto;" x-model="perPage" @change="currentPage=1; fetchDomains()">
+                <div class="mj-col-md-2 mj-text-end mj-d-flex mj-justify-content-end mj-align-items-center mj-gap-1">
+                    <select class="mj-form-select" style="width:auto;" x-model="perPage" @change="currentPage=1; fetchDomains()">
                         <option value="25">25/trang</option>
                         <option value="50" selected>50/trang</option>
                         <option value="100">100/trang</option>
                     </select>
-                    <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i></button>
+                    <button class="mj-btn mj-btn-sm mj-btn-outline-secondary" @click="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Domain Table -->
-    <div class="hvn-card hvn-shadow-sm hvn-border-0">
-        <div class="hvn-card-body hvn-p-0">
-            <div class="hvn-table-responsive" style="overflow: visible;">
-                <table class="hvn-table hvn-table-hover hvn-align-middle hvn-mb-0">
-                    <thead class="hvn-table-light">
+    <div class="mj-card mj-shadow-sm mj-border-0">
+        <div class="mj-card-body mj-p-0">
+            <div class="mj-table-responsive" style="overflow: visible;">
+                <table class="mj-table mj-table-hover mj-align-middle mj-mb-0">
+                    <thead class="mj-table-light">
                         <tr>
-                            <th class="hvn-ps-4" style="cursor:pointer;white-space:nowrap;" @click="sortBy('domain')">
+                            <th class="mj-ps-4" style="cursor:pointer;white-space:nowrap;" @click="sortBy('domain')">
                                 Domain
-                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                <span class="mj-text-muted" style="font-size:.7rem;">
                                     <span x-text="sortCol === 'domain' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
                                 </span>
                             </th>
                             <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('client_name')">
                                 Khách hàng
-                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                <span class="mj-text-muted" style="font-size:.7rem;">
                                     <span x-text="sortCol === 'client_name' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
                                 </span>
                             </th>
-                            <th class="hvn-text-center" style="cursor:pointer;white-space:nowrap;" @click="sortBy('records_count')">
+                            <th class="mj-text-center" style="cursor:pointer;white-space:nowrap;" @click="sortBy('records_count')">
                                 Records
-                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                <span class="mj-text-muted" style="font-size:.7rem;">
                                     <span x-text="sortCol === 'records_count' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
                                 </span>
                             </th>
                             <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('failed_jobs')">
                                 Sync gần nhất
-                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                <span class="mj-text-muted" style="font-size:.7rem;">
                                     <span x-text="sortCol === 'failed_jobs' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
                                 </span>
                             </th>
                             <th style="cursor:pointer;white-space:nowrap;" @click="sortBy('status')">
                                 Trạng thái
-                                <span class="hvn-text-muted" style="font-size:.7rem;">
+                                <span class="mj-text-muted" style="font-size:.7rem;">
                                     <span x-text="sortCol === 'status' ? (sortDir === 'asc' ? '&#9650;' : '&#9660;') : '&#8597;'"></span>
                                 </span>
                             </th>
-                            <th class="hvn-text-end hvn-pe-4">Hành động</th>
+                            <th class="mj-text-end mj-pe-4">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Loading State -->
                         <template x-if="loading">
                             <tr>
-                                <td colspan="6" class="hvn-text-center py-5 hvn-text-muted">
-                                    <div class="hvn-spinner-border hvn-text-primary hvn-mb-2" role="status"></div>
+                                <td colspan="6" class="mj-text-center py-5 mj-text-muted">
+                                    <div class="mj-spinner-border mj-text-primary mj-mb-2" role="status"></div>
                                     <br>Đang tải dữ liệu...
                                 </td>
                             </tr>
@@ -99,8 +99,8 @@
                         <!-- Empty State -->
                         <template x-if="!loading && domains.length === 0">
                             <tr>
-                                <td colspan="6" class="hvn-text-center py-5 hvn-text-muted">
-                                    <i class="bi bi-inbox fs-1 hvn-d-block hvn-mb-3"></i>
+                                <td colspan="6" class="mj-text-center py-5 mj-text-muted">
+                                    <i class="bi bi-inbox fs-1 mj-d-block mj-mb-3"></i>
                                     Không tìm thấy dữ liệu phù hợp với bộ lọc hiện tại.
                                 </td>
                             </tr>
@@ -110,28 +110,28 @@
                         <template x-if="!loading && domains.length > 0">
                             <template x-for="domain in domains" :key="domain.id">
                                 <tr :style="syncingId === domain.id ? 'background: rgba(13,110,253,0.05);' : ''">
-                                    <td class="hvn-ps-4 font-monospace hvn-fw-bold">
-                                        <a :href="'?module=hvn_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="text-decoration-none">
+                                    <td class="mj-ps-4 font-monospace mj-fw-bold">
+                                        <a :href="'?module=mj_dns_manager&action=admin_dns_editor&domain_id=' + domain.id" class="text-decoration-none">
                                             <span x-text="domain.domain"></span>
                                         </a>
                                     </td>
                                     <td>
                                         <a :href="'clientssummary.php?userid=' + domain.client_id" class="text-decoration-none" target="_blank">
-                                            <span x-text="domain.client_name"></span> <span class="hvn-text-muted small">#<span x-text="domain.client_id"></span></span>
+                                            <span x-text="domain.client_name"></span> <span class="mj-text-muted small">#<span x-text="domain.client_id"></span></span>
                                         </a>
                                     </td>
-                                    <td class="hvn-text-center" x-text="domain.records_count"></td>
+                                    <td class="mj-text-center" x-text="domain.records_count"></td>
                                     <td>
                                         <div x-text="domain.last_sync"></div>
                                         <template x-if="domain.failed_jobs > 0">
-                                            <div class="hvn-text-danger small"><i class="bi bi-exclamation-triangle"></i> <span x-text="domain.failed_jobs"></span> fail</div>
+                                            <div class="mj-text-danger small"><i class="bi bi-exclamation-triangle"></i> <span x-text="domain.failed_jobs"></span> fail</div>
                                         </template>
                                     </td>
                                     <td>
                                         <!-- Đang force re-sync: hiện spinner -->
                                         <template x-if="syncingId === domain.id">
-                                            <span class="hvn-badge" style="background:#0d6efd;color:#fff;">
-                                                <span class="hvn-spinner-border hvn-spinner-border-sm" style="width:.7rem;height:.7rem;" role="status"></span>
+                                            <span class="mj-badge" style="background:#0d6efd;color:#fff;">
+                                                <span class="mj-spinner-border mj-spinner-border-sm" style="width:.7rem;height:.7rem;" role="status"></span>
                                                 Re-syncing...
                                             </span>
                                         </template>
@@ -139,41 +139,41 @@
                                         <template x-if="syncingId !== domain.id && domain.status === 'active'">
                                             <span>
                                                 <template x-if="domain.sync_status === 'complete'">
-                                                    <span class="hvn-badge hvn-bg-success">&#x1F7E2; Active</span>
+                                                    <span class="mj-badge mj-bg-success">&#x1F7E2; Active</span>
                                                 </template>
                                                 <template x-if="domain.sync_status === 'syncing'">
-                                                    <span class="hvn-badge hvn-bg-info"><span class="hvn-spinner-border hvn-spinner-border-sm" role="status" style="width:.75rem;height:.75rem;"></span> Syncing</span>
+                                                    <span class="mj-badge mj-bg-info"><span class="mj-spinner-border mj-spinner-border-sm" role="status" style="width:.75rem;height:.75rem;"></span> Syncing</span>
                                                 </template>
                                                 <template x-if="domain.sync_status === 'failed'">
-                                                    <span class="hvn-badge hvn-bg-warning hvn-text-dark">&#x1F7E1; Sync Failed</span>
+                                                    <span class="mj-badge mj-bg-warning mj-text-dark">&#x1F7E1; Sync Failed</span>
                                                 </template>
                                             </span>
                                         </template>
                                         <template x-if="syncingId !== domain.id && domain.status !== 'active'">
-                                            <span class="hvn-badge hvn-bg-danger" x-text="domain.status"></span>
+                                            <span class="mj-badge mj-bg-danger" x-text="domain.status"></span>
                                         </template>
                                     </td>
-                                    <td class="hvn-text-end hvn-pe-4" style="white-space: nowrap;">
+                                    <td class="mj-text-end mj-pe-4" style="white-space: nowrap;">
                                         <a :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"
-                                           class="hvn-btn hvn-btn-sm hvn-btn-blue hvn-me-1">
+                                           class="mj-btn mj-btn-sm mj-btn-blue mj-me-1">
                                             <i class="bi bi-sliders"></i> DNS
                                         </a>
-                                        <div class="hvn-dropdown hvn-d-inline-block" style="position: relative;">
-                                            <button class="hvn-btn hvn-btn-sm hvn-btn-outline-secondary hvn-dropdown-toggle"
+                                        <div class="mj-dropdown mj-d-inline-block" style="position: relative;">
+                                            <button class="mj-btn mj-btn-sm mj-btn-outline-secondary mj-dropdown-toggle"
                                                     type="button"
                                                     :disabled="syncingId === domain.id"
                                                     @click.stop="openDropdown($event)">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
-                                            <ul class="hvn-dropdown-menu hvn-dropdown-menu-end">
-                                                <li><a class="hvn-dropdown-item" :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"><i class="bi bi-sliders hvn-text-primary"></i> S&#x1EED;a DNS Records</a></li>
-                                                <li><a class="hvn-dropdown-item" href="#" @click.prevent="forceResync(domain)"><i class="bi bi-arrow-repeat hvn-text-warning"></i> Force Re-sync</a></li>
-                                                <li><a class="hvn-dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
-                                                <li><a class="hvn-dropdown-item" href="#" @click.prevent="checkSsl(domain)">
-                                                    <i class="bi bi-shield-lock hvn-text-info"></i> Check SSL
+                                            <ul class="mj-dropdown-menu mj-dropdown-menu-end">
+                                                <li><a class="mj-dropdown-item" :href="'{$modulelink}&action=admin_dns_editor&domain_id=' + domain.id"><i class="bi bi-sliders mj-text-primary"></i> S&#x1EED;a DNS Records</a></li>
+                                                <li><a class="mj-dropdown-item" href="#" @click.prevent="forceResync(domain)"><i class="bi bi-arrow-repeat mj-text-warning"></i> Force Re-sync</a></li>
+                                                <li><a class="mj-dropdown-item" href="#"><i class="bi bi-journal-text"></i> Xem Audit Trail</a></li>
+                                                <li><a class="mj-dropdown-item" href="#" @click.prevent="checkSsl(domain)">
+                                                    <i class="bi bi-shield-lock mj-text-info"></i> Check SSL
                                                 </a></li>
-                                                <li><a class="hvn-dropdown-item" href="#" @click.prevent="checkDrift(domain)">
-                                                    <i class="bi bi-arrow-left-right hvn-text-warning"></i> Check Drift
+                                                <li><a class="mj-dropdown-item" href="#" @click.prevent="checkDrift(domain)">
+                                                    <i class="bi bi-arrow-left-right mj-text-warning"></i> Check Drift
                                                 </a></li>
                                             </ul>
                                         </div>
@@ -187,19 +187,19 @@
         </div>
         
         <!-- Pagination -->
-        <div class="hvn-card-footer hvn-bg-white hvn-py-3 hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-            <div class="hvn-text-muted hvn-small">
+        <div class="mj-card-footer mj-bg-white mj-py-3 mj-d-flex mj-justify-content-between mj-align-items-center">
+            <div class="mj-text-muted mj-small">
                 Hiển thị <span x-text="domains.length"></span> / <span x-text="totalRecords"></span> domain
                 &nbsp;&bull;&nbsp; Trang <span x-text="currentPage"></span>/<span x-text="totalPages"></span>
             </div>
             <nav aria-label="Page navigation" x-show="totalPages > 1">
-                <ul class="hvn-pagination hvn-pagination-sm hvn-mb-0">
-                    <li class="hvn-page-item" :class="{literal}{'hvn-disabled': currentPage === 1}{/literal}">
-                        <a class="hvn-page-link" href="#" @click.prevent="goToPage(currentPage - 1)">&laquo;</a>
+                <ul class="mj-pagination mj-pagination-sm mj-mb-0">
+                    <li class="mj-page-item" :class="{literal}{'mj-disabled': currentPage === 1}{/literal}">
+                        <a class="mj-page-link" href="#" @click.prevent="goToPage(currentPage - 1)">&laquo;</a>
                     </li>
-                    <li class="hvn-page-item hvn-active"><a class="hvn-page-link" href="#" x-text="currentPage"></a></li>
-                    <li class="hvn-page-item" :class="{literal}{'hvn-disabled': currentPage === totalPages}{/literal}">
-                        <a class="hvn-page-link" href="#" @click.prevent="goToPage(currentPage + 1)">&raquo;</a>
+                    <li class="mj-page-item mj-active"><a class="mj-page-link" href="#" x-text="currentPage"></a></li>
+                    <li class="mj-page-item" :class="{literal}{'mj-disabled': currentPage === totalPages}{/literal}">
+                        <a class="mj-page-link" href="#" @click.prevent="goToPage(currentPage + 1)">&raquo;</a>
                     </li>
                 </ul>
             </nav>
@@ -208,20 +208,20 @@
 </div>
 
 <script>
-    var HVNDNS_DOMAINS_INIT = {$domainsJson};
-    var HVNDNS_TOTAL_DOMAINS = {$totalDomains};
-    var HVNDNS_TOTAL_PAGES = {$totalPages};
-    var HVNDNS_CURRENT_PAGE = {$currentPage};
+    var MJDNS_DOMAINS_INIT = {$domainsJson};
+    var MJDNS_TOTAL_DOMAINS = {$totalDomains};
+    var MJDNS_TOTAL_PAGES = {$totalPages};
+    var MJDNS_CURRENT_PAGE = {$currentPage};
 </script>
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
     Alpine.data('domainList', () => ({
         loading: false,
-        domains: HVNDNS_DOMAINS_INIT,
-        totalRecords: HVNDNS_TOTAL_DOMAINS,
-        totalPages: HVNDNS_TOTAL_PAGES,
-        currentPage: HVNDNS_CURRENT_PAGE,
+        domains: MJDNS_DOMAINS_INIT,
+        totalRecords: MJDNS_TOTAL_DOMAINS,
+        totalPages: MJDNS_TOTAL_PAGES,
+        currentPage: MJDNS_CURRENT_PAGE,
         perPage: 50,
         syncingId: null,
         sortCol: 'domain',
@@ -270,9 +270,9 @@ document.addEventListener('alpine:init', () => {
         openDropdown(event) {
             var btn = event.currentTarget;
             var menu = btn.nextElementSibling;
-            var isOpen = menu.classList.contains('hvn-show');
-            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
-                m.classList.remove('hvn-show');
+            var isOpen = menu.classList.contains('mj-show');
+            document.querySelectorAll('.mj-dropdown-menu.mj-show').forEach(function(m) {
+                m.classList.remove('mj-show');
                 m.style.position = '';
                 m.style.top = '';
                 m.style.right = '';
@@ -286,15 +286,15 @@ document.addEventListener('alpine:init', () => {
                 menu.style.right = (window.innerWidth - rect.right) + 'px';
                 menu.style.left = 'auto';
                 menu.style.minWidth = '200px';
-                menu.classList.add('hvn-show');
+                menu.classList.add('mj-show');
             }
         },
 
         async forceResync(domain) {
             if (this.syncingId !== null) return;
             this.syncingId = domain.id;
-            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
-                m.classList.remove('hvn-show');
+            document.querySelectorAll('.mj-dropdown-menu.mj-show').forEach(function(m) {
+                m.classList.remove('mj-show');
             });
             try {
                 await new Promise(r => setTimeout(r, 2500));
@@ -330,12 +330,12 @@ document.addEventListener('alpine:init', () => {
 
         // ── Check SSL per domain ──────────────────────────────────────────
         async checkSsl(domain) {
-            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
-                m.classList.remove('hvn-show');
+            document.querySelectorAll('.mj-dropdown-menu.mj-show').forEach(function(m) {
+                m.classList.remove('mj-show');
             });
 
             var res = await fetch(
-                '?module=hvn_dns_manager&action=ajax&method=runSslCheck',
+                '?module=mj_dns_manager&action=ajax&method=runSslCheck',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -345,19 +345,19 @@ document.addEventListener('alpine:init', () => {
             var data = await res.json();
 
             if (data.success) {
-                window._hvnToast('success', 'Kiểm tra SSL OK', data.message);
+                window._mjDnsToast('success', 'Kiểm tra SSL OK', data.message);
             } else {
-                window._hvnToast('error', 'Lỗi kiểm tra SSL', data.error || 'Lỗi không xác định');
+                window._mjDnsToast('error', 'Lỗi kiểm tra SSL', data.error || 'Lỗi không xác định');
             }
         },
 
         // ── Check Drift per domain ────────────────────────────────────────
         async checkDrift(domain) {
-            document.querySelectorAll('.hvn-dropdown-menu.hvn-show').forEach(function(m) {
-                m.classList.remove('hvn-show');
+            document.querySelectorAll('.mj-dropdown-menu.mj-show').forEach(function(m) {
+                m.classList.remove('mj-show');
             });
 
-            var ok = await window._hvnConfirm({
+            var ok = await window._mjDnsConfirm({
                 title:        'Check Drift: ' + domain.domain + '?',
                 message:      'Hệ thống sẽ so sánh records trong WHMCS với DirectAdmin.\n(Thao tác này mất vài giây)',
                 variant:      'info',
@@ -367,7 +367,7 @@ document.addEventListener('alpine:init', () => {
             if (!ok) return;
 
             var res = await fetch(
-                '?module=hvn_dns_manager&action=ajax&method=runDriftCheck',
+                '?module=mj_dns_manager&action=ajax&method=runDriftCheck',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -380,12 +380,12 @@ document.addEventListener('alpine:init', () => {
                 var msg = data.message;
                 if (data.drifts && data.drifts.length > 0) {
                     msg += '\n\nĐã phát hiện lệch dữ liệu, xem tại Drift Reports.';
-                    window._hvnToast('warning', 'Phát hiện lệch dữ liệu', msg, 6000);
+                    window._mjDnsToast('warning', 'Phát hiện lệch dữ liệu', msg, 6000);
                 } else {
-                    window._hvnToast('success', 'Đồng bộ hoàn hảo', msg);
+                    window._mjDnsToast('success', 'Đồng bộ hoàn hảo', msg);
                 }
             } else {
-                window._hvnToast('error', 'Lỗi kiểm tra Drift', data.error || 'Lỗi không xác định');
+                window._mjDnsToast('error', 'Lỗi kiểm tra Drift', data.error || 'Lỗi không xác định');
             }
         },
     }));

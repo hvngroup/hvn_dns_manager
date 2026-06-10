@@ -1,12 +1,14 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Models\SyncLog;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Models\SyncLog;
 
 class DashboardService
 {

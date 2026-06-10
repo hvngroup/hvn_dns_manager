@@ -1,12 +1,14 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
+
+defined("WHMCS") or die("Access Denied");
 
 use Illuminate\Database\Eloquent\Model;
 
 class DriftReport extends Model
 {
-    protected $table = 'mod_hvndns_drift_reports';
+    protected $table = 'tbl_mj_dns_drift_reports';
     
     protected $fillable = [
         'domain_id', 

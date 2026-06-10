@@ -1,11 +1,13 @@
 <?php
 
-namespace HvnGroup\DnsManager\Hooks;
+namespace MJ\DnsManager\Hooks;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Template;
-use HvnGroup\DnsManager\Services\QueueManager;
-use HvnGroup\DnsManager\Cron\QueueWorker;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Template;
+use MJ\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Cron\QueueWorker;
 use WHMCS\Database\Capsule;
 
 /**
@@ -13,8 +15,8 @@ use WHMCS\Database\Capsule;
  *
  * Flow:
  *   1. Extract domain items from the accepted order
- *   2. Insert into mod_hvndns_domains (idempotent)
- *   3. Dispatch CREATE_ZONE job to mod_hvndns_queue (PENDING)
+ *   2. Insert into tbl_mj_dns_domains (idempotent)
+ *   3. Dispatch CREATE_ZONE job to tbl_mj_dns_queue (PENDING)
  *   4. Call QueueWorker::runOnce() to process immediately (best-effort)
  *
  * Error handling:
@@ -42,7 +44,7 @@ class AcceptOrderHook
             $userId = (int) ($params['userid'] ?? Capsule::table('tblorders')->where('id', $orderId)->value('userid'));
 
             if ($userId === 0) {
-                logActivity("HVN DNS Manager [AcceptOrder]: Could not determine userid for order #{$orderId}");
+                logActivity("MJ DNS Manager [AcceptOrder]: Could not determine userid for order #{$orderId}");
                 return;
             }
 
@@ -53,12 +55,12 @@ class AcceptOrderHook
                     ->select(['id', 'userid', 'domain', 'status'])
                     ->get();
             } catch (\Exception $e) {
-                logActivity("HVN DNS Manager [AcceptOrder]: Failed to query domains for order #{$orderId} — " . $e->getMessage());
+                logActivity("MJ DNS Manager [AcceptOrder]: Failed to query domains for order #{$orderId} — " . $e->getMessage());
                 return;
             }
 
             if ($domainItems->isEmpty()) {
-                logActivity("HVN DNS Manager [AcceptOrder]: Order #{$orderId} has no domain registrations. Skipped silently.");
+                logActivity("MJ DNS Manager [AcceptOrder]: Order #{$orderId} has no domain registrations. Skipped silently.");
                 return; // No domain items in this order, skip silently
             }
 
@@ -72,7 +74,7 @@ class AcceptOrderHook
 
                 // Guard: must be valid FQDN
                 if (!self::isValidFqdn($domainName)) {
-                    logActivity("HVN DNS Manager [AcceptOrder]: Skipped '{$domainName}' — not a valid FQDN.");
+                    logActivity("MJ DNS Manager [AcceptOrder]: Skipped '{$domainName}' — not a valid FQDN.");
                     continue;
                 }
 
@@ -105,21 +107,21 @@ class AcceptOrderHook
                         null
                     );
 
-                    logActivity("HVN DNS Manager [AcceptOrder]: CREATE_ZONE queued for '{$domainName}' (batch: {$batchId})");
+                    logActivity("MJ DNS Manager [AcceptOrder]: CREATE_ZONE queued for '{$domainName}' (batch: {$batchId})");
 
                     // Step 4: Try to process immediately (best-effort, non-blocking)
                     try {
                         $worker->runOnce($batchId);
                     } catch (\Exception $e) {
                         // DA server offline or error → job stays PENDING for cron retry
-                        logActivity("HVN DNS Manager [AcceptOrder]: Immediate sync failed for '{$domainName}' — will retry via cron. Error: " . $e->getMessage());
+                        logActivity("MJ DNS Manager [AcceptOrder]: Immediate sync failed for '{$domainName}' — will retry via cron. Error: " . $e->getMessage());
                     }
                 } catch (\Exception $e) {
-                    logActivity("HVN DNS Manager [AcceptOrder]: Exception for '{$domainName}' — " . $e->getMessage());
+                    logActivity("MJ DNS Manager [AcceptOrder]: Exception for '{$domainName}' — " . $e->getMessage());
                 }
             }
         } catch (\Throwable $t) {
-            logActivity("HVN DNS Manager [CRITICAL ERROR in AcceptOrder]: " . $t->getMessage() . " at " . basename($t->getFile()) . ':' . $t->getLine());
+            logActivity("MJ DNS Manager [CRITICAL ERROR in AcceptOrder]: " . $t->getMessage() . " at " . basename($t->getFile()) . ':' . $t->getLine());
         }
     }
 }

@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Helpers\AuditLogger;
-use HvnGroup\DnsManager\Validators\DnsRecordValidator;
-use HvnGroup\DnsManager\Security\InputSanitizer;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Helpers\AuditLogger;
+use MJ\DnsManager\Validators\DnsRecordValidator;
+use MJ\DnsManager\Security\InputSanitizer;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class RecordManager
@@ -131,7 +133,7 @@ class RecordManager
             $port = ($input['port'] ?? '') !== '' ? (int) $input['port'] : null;
 
             // ── HVND-62: Kiểm tra Quota (admin path) ─────────────────────────────────
-            $totalLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
+            $totalLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50);
             if ($totalLimit > 0) {
                 $currentTotal = Record::where('domain_id', $domainId)
                     ->where('pending_delete', 0)
@@ -145,7 +147,7 @@ class RecordManager
             }
 
             $typeKey   = strtolower($type) . '_record_limit';
-            $typeLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
+            $typeLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt($typeKey, 0);
             if ($typeLimit > 0) {
                 $currentTypeCount = Record::where('domain_id', $domainId)
                     ->where('type', $type)

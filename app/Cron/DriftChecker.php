@@ -1,12 +1,14 @@
 <?php
 
-namespace HvnGroup\DnsManager\Cron;
+namespace MJ\DnsManager\Cron;
 
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\DriftReport;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Models\Server;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\DriftReport;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Models\Server;
 
 /**
  * DriftChecker — Detect discrepancies between WHMCS and DirectAdmin.
@@ -48,7 +50,7 @@ class DriftChecker
             ->first();
 
         if (!$server) {
-            logActivity('HVN DNS Manager [DriftChecker]: No active primary server found. Skipping.');
+            logActivity('MJ DNS Manager [DriftChecker]: No active primary server found. Skipping.');
             return;
         }
 
@@ -57,7 +59,7 @@ class DriftChecker
         $this->scanDomains($gateway);
 
         logActivity(
-            "HVN DNS Manager [DriftChecker]: Forced scan complete — {$this->scanned} domains scanned, " .
+            "MJ DNS Manager [DriftChecker]: Forced scan complete — {$this->scanned} domains scanned, " .
                 "{$this->driftCount} domain(s) with drift detected."
         );
     }
@@ -77,7 +79,7 @@ class DriftChecker
             ->first();
 
         if (!$server) {
-            logActivity('HVN DNS Manager [DriftChecker]: No active primary server found. Skipping.');
+            logActivity('MJ DNS Manager [DriftChecker]: No active primary server found. Skipping.');
             return;
         }
 
@@ -86,7 +88,7 @@ class DriftChecker
         $this->scanDomains($gateway);
 
         logActivity(
-            "HVN DNS Manager [DriftChecker]: Scan complete — {$this->scanned} domains scanned, " .
+            "MJ DNS Manager [DriftChecker]: Scan complete — {$this->scanned} domains scanned, " .
                 "{$this->driftCount} domain(s) with drift detected."
         );
     }
@@ -117,7 +119,7 @@ class DriftChecker
         }
 
         logActivity(
-            "HVN DNS Manager [DriftChecker]: Manual scan '{$domain->domain}' — " .
+            "MJ DNS Manager [DriftChecker]: Manual scan '{$domain->domain}' — " .
                 count($drifts) . " drift(s) detected."
         );
 
@@ -142,7 +144,7 @@ class DriftChecker
 
         foreach ($domains as $domain) {
             if ($this->isTimeLimitReached()) {
-                logActivity('HVN DNS Manager [DriftChecker]: Time limit reached, stopping early.');
+                logActivity('MJ DNS Manager [DriftChecker]: Time limit reached, stopping early.');
                 break;
             }
 
@@ -162,7 +164,7 @@ class DriftChecker
 
             if (!$response->isSuccess() || !isset($response->data['records'])) {
                 logActivity(
-                    "HVN DNS Manager [DriftChecker]: getZone failed for '{$domain->domain}' — " .
+                    "MJ DNS Manager [DriftChecker]: getZone failed for '{$domain->domain}' — " .
                         ($response->errorMessage ?? 'no records returned')
                 );
                 return;
@@ -183,29 +185,29 @@ class DriftChecker
 
             // Auto-fix if setting drift_auto_fix = true
             // Only fixes REMOVED_ON_DA (WHMCS is source of truth → push to DA)
-            if (\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('drift_auto_fix', false)) {
+            if (\MJ\DnsManager\Helpers\SettingsHelper::getBool('drift_auto_fix', false)) {
                 $this->autoFix($domain->id, $drifts);
             }
 
             logActivity(
-                "HVN DNS Manager [DriftChecker]: '{$domain->domain}' — " .
+                "MJ DNS Manager [DriftChecker]: '{$domain->domain}' — " .
                     count($drifts) . " drift(s) detected."
             );
 
             // ── Notify domain owner (client) about drift ──────────────────
             try {
-                $notif = new \HvnGroup\DnsManager\Services\NotificationService();
+                $notif = new \MJ\DnsManager\Services\NotificationService();
                 $notif->notifyDriftDetected(
                     (int) ($domain->whmcs_user_id ?? 0),
                     $domain->domain,
                     $drifts
                 );
             } catch (\Exception $e) {
-                logActivity('HVN DNS Manager [DriftChecker]: drift notification exception — ' . $e->getMessage());
+                logActivity('MJ DNS Manager [DriftChecker]: drift notification exception — ' . $e->getMessage());
             }
         } catch (\Throwable $e) {
             logActivity(
-                "HVN DNS Manager [DriftChecker]: Exception scanning '{$domain->domain}' — " .
+                "MJ DNS Manager [DriftChecker]: Exception scanning '{$domain->domain}' — " .
                     $e->getMessage()
             );
         }
@@ -325,7 +327,7 @@ class DriftChecker
             );
         }
 
-        \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')->insert($rows);
+        \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')->insert($rows);
     }
 
     /**
@@ -413,8 +415,8 @@ class DriftChecker
     private function isDue(): bool
     {
         try {
-            $hours   = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('drift_check_interval_hours', 24);
-            $lastRun = \HvnGroup\DnsManager\Helpers\SettingsHelper::get('drift_last_run', '');
+            $hours   = \MJ\DnsManager\Helpers\SettingsHelper::getInt('drift_check_interval_hours', 24);
+            $lastRun = \MJ\DnsManager\Helpers\SettingsHelper::get('drift_last_run', '');
 
             if (empty($lastRun)) {
                 return true;
@@ -429,7 +431,7 @@ class DriftChecker
     private function updateLastRunTime(): void
     {
         try {
-            \HvnGroup\DnsManager\Helpers\SettingsHelper::set('drift_last_run', date('Y-m-d H:i:s'));
+            \MJ\DnsManager\Helpers\SettingsHelper::set('drift_last_run', date('Y-m-d H:i:s'));
         } catch (\Throwable $e) {
             // Silent
         }
@@ -447,7 +449,7 @@ class DriftChecker
      */
     private function autoFix(int $domainId, array $drifts): void
     {
-        $qm = new \HvnGroup\DnsManager\Services\QueueManager();
+        $qm = new \MJ\DnsManager\Services\QueueManager();
 
         foreach ($drifts as $d) {
             if ($d['drift_type'] !== 'REMOVED_ON_DA') {
@@ -474,12 +476,12 @@ class DriftChecker
                 $qm->dispatch($domainId, 'ADD_RECORD', $payload, 3, 'system', null);
 
                 logActivity(
-                    "HVN DNS Manager [DriftChecker]: Auto-fix dispatched ADD_RECORD " .
+                    "MJ DNS Manager [DriftChecker]: Auto-fix dispatched ADD_RECORD " .
                         "{$local['type']} {$local['name']} for domain #{$domainId}."
                 );
             } catch (\Throwable $e) {
                 logActivity(
-                    "HVN DNS Manager [DriftChecker]: Auto-fix failed for " .
+                    "MJ DNS Manager [DriftChecker]: Auto-fix failed for " .
                         "{$local['type']} {$local['name']} — " . $e->getMessage()
                 );
             }

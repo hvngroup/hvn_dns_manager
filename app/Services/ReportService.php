@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Models\SyncLog;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Models\SyncLog;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Helpers\SettingsHelper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ReportService
@@ -99,7 +101,7 @@ class ReportService
             $beforePending = QueueJob::whereIn('status', ['PENDING', 'SYNCING'])->count();
             $beforeFailed = QueueJob::whereIn('status', ['FAILED', 'PERMANENTLY_FAILED'])->count();
 
-            $worker = new \HvnGroup\DnsManager\Cron\QueueWorker();
+            $worker = new \MJ\DnsManager\Cron\QueueWorker();
             $worker->run(true);
 
             $afterPending = QueueJob::whereIn('status', ['PENDING', 'SYNCING'])->count();
@@ -149,7 +151,7 @@ class ReportService
                 'completed_at' => null,
             ]);
 
-            logActivity("HVN DNS Manager: Admin manually retried Job #{$jobId} ({$job->action}) — reset to PENDING.");
+            logActivity("MJ DNS Manager: Admin manually retried Job #{$jobId} ({$job->action}) — reset to PENDING.");
             return ['success' => true, 'message' => "Job #{$jobId} đã được reset về PENDING. Bấm \"Đồng bộ Pending\" để chạy ngay."];
         } catch (\Throwable $e) {
             return ['success' => false, 'error' => $e->getMessage()];
@@ -176,7 +178,7 @@ class ReportService
                     'completed_at'  => null,
                 ]);
 
-            logActivity("HVN DNS Manager: Admin retried all failed jobs — {$count} jobs reset to PENDING.");
+            logActivity("MJ DNS Manager: Admin retried all failed jobs — {$count} jobs reset to PENDING.");
 
             return [
                 'success' => true,
@@ -212,7 +214,7 @@ class ReportService
                 'locked_at'     => null,
             ]);
 
-            logActivity("HVN DNS Manager: Admin cancelled Job #{$jobId} ({$job->action}) — status set to CANCELLED.");
+            logActivity("MJ DNS Manager: Admin cancelled Job #{$jobId} ({$job->action}) — status set to CANCELLED.");
 
             return ['success' => true, 'message' => "Job #{$jobId} đã được hủy thành công."];
         } catch (\Throwable $e) {
@@ -226,7 +228,7 @@ class ReportService
 
     public function getAuditLogs(): array
     {
-        $logs = Capsule::table('mod_hvndns_audit_trail')->orderByDesc('id')->limit(200)->get();
+        $logs = Capsule::table('tbl_mj_dns_audit_trail')->orderByDesc('id')->limit(200)->get();
         $result = [];
         foreach ($logs as $row) {
             $old = json_decode($row->old_value ?? 'null', true);
@@ -259,7 +261,7 @@ class ReportService
         if ($id <= 0) {
             return ['log' => null, 'error' => 'Thiếu tham số id.'];
         }
-        $row = Capsule::table('mod_hvndns_audit_trail')->where('id', $id)->first();
+        $row = Capsule::table('tbl_mj_dns_audit_trail')->where('id', $id)->first();
         if (!$row) {
             return ['log' => null, 'error' => "Audit entry #{$id} không tồn tại."];
         }
@@ -320,8 +322,8 @@ class ReportService
 
     public function getDriftReports(): array
     {
-        $reports = Capsule::table('mod_hvndns_drift_reports as dr')
-            ->join('mod_hvndns_domains as d', 'dr.domain_id', '=', 'd.id')
+        $reports = Capsule::table('tbl_mj_dns_drift_reports as dr')
+            ->join('tbl_mj_dns_domains as d', 'dr.domain_id', '=', 'd.id')
             ->select(['dr.id', 'dr.domain_id', 'd.domain', 'dr.drift_type', 'dr.record_type', 'dr.record_name', 'dr.local_value', 'dr.remote_value', 'dr.status', 'dr.detected_at', 'dr.resolved_at'])
             ->orderBy('dr.detected_at', 'desc')->limit(1000)->get();
 
@@ -381,7 +383,7 @@ class ReportService
             if (!$server)
                 return ['success' => false, 'error' => 'Không có primary server active'];
 
-            $checker = new \HvnGroup\DnsManager\Cron\DriftChecker();
+            $checker = new \MJ\DnsManager\Cron\DriftChecker();
             $drifts = $checker->scanSingleDomain($server, $domain);
             $count = count($drifts);
 
@@ -407,7 +409,7 @@ class ReportService
             if (!$server)
                 return ['success' => false, 'error' => 'Không có primary server active'];
 
-            $checker = new \HvnGroup\DnsManager\Cron\DriftChecker();
+            $checker = new \MJ\DnsManager\Cron\DriftChecker();
             $drifts = $checker->scanSingleDomain($server, $domain);
             $count = count($drifts);
 
@@ -423,11 +425,11 @@ class ReportService
     public function runDriftScanAll(): array
     {
         try {
-            $checker = new \HvnGroup\DnsManager\Cron\DriftChecker();
+            $checker = new \MJ\DnsManager\Cron\DriftChecker();
             $checker->runForced();
 
-            $openCount = Capsule::table('mod_hvndns_drift_reports')->where('status', 'pending')->count();
-            $domainCount = Capsule::table('mod_hvndns_drift_reports')->where('status', 'pending')->distinct('domain_id')->count('domain_id');
+            $openCount = Capsule::table('tbl_mj_dns_drift_reports')->where('status', 'pending')->count();
+            $domainCount = Capsule::table('tbl_mj_dns_drift_reports')->where('status', 'pending')->distinct('domain_id')->count('domain_id');
 
             return [
                 'success' => true,
@@ -488,7 +490,7 @@ class ReportService
     {
         try {
             // ── 1. Load drift row ─────────────────────────────────────────
-            $drift = \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+            $drift = \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
                 ->where('id', $driftId)
                 ->first();
 
@@ -500,7 +502,7 @@ class ReportService
             }
 
             // ── 2. Load domain ────────────────────────────────────────────
-            $domain = \HvnGroup\DnsManager\Models\Domain::find($drift->domain_id);
+            $domain = \MJ\DnsManager\Models\Domain::find($drift->domain_id);
             if (!$domain) {
                 return ['success' => false, 'error' => 'Domain không tồn tại trong WHMCS.'];
             }
@@ -525,7 +527,7 @@ class ReportService
                     return $this->driftDeleteWhmcs($drift, $domain, $localArr);
 
                 case 'ignore':
-                    \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+                    \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
                         ->where('id', $driftId)
                         ->update(['status' => 'ignored', 'resolved_at' => date('Y-m-d H:i:s')]);
                     return ['success' => true, 'message' => 'Đã bỏ qua.'];
@@ -571,7 +573,7 @@ class ReportService
         try {
             if ($drift->drift_type === 'added_on_da') {
                 // Tạo record mới trong WHMCS — không dispatch queue (đã có trên DA)
-                \HvnGroup\DnsManager\Models\Record::create([
+                \MJ\DnsManager\Models\Record::create([
                     'domain_id' => $domain->id,
                     'type' => $type,
                     'name' => $name,
@@ -590,7 +592,7 @@ class ReportService
                 if (!$localArr) {
                     return ['success' => false, 'error' => 'Không có local_value để tìm record WHMCS.'];
                 }
-                $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+                $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
                     ->where('type', $type)
                     ->where('name', $name)
                     ->where('value', $localArr['value'] ?? '')
@@ -598,7 +600,7 @@ class ReportService
 
                 if (!$record) {
                     // Không tìm thấy exact match — tìm theo type+name
-                    $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+                    $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
                         ->where('type', $type)
                         ->where('name', $name)
                         ->first();
@@ -627,13 +629,13 @@ class ReportService
             }
 
             // Đánh dấu drift đã giải quyết
-            \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+            \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
                 ->where('id', $drift->id)
                 ->update(['status' => 'resolved', 'resolved_at' => date('Y-m-d H:i:s')]);
 
             \Illuminate\Database\Capsule\Manager::commit();
 
-            logActivity("HVN DNS Manager [DriftResolve]: PULL {$type} {$name} @ {$domain->domain} — drift #{$drift->id} resolved.");
+            logActivity("MJ DNS Manager [DriftResolve]: PULL {$type} {$name} @ {$domain->domain} — drift #{$drift->id} resolved.");
 
             return ['success' => true, 'message' => "Pull thành công: {$type} {$name} đã được cập nhật vào WHMCS."];
 
@@ -666,20 +668,20 @@ class ReportService
         }
 
         // Tìm record trong WHMCS để lấy record_id
-        $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+        $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
             ->where('type', $type)
             ->where('name', $name)
             ->where('value', $value)
             ->first();
 
         if (!$record) {
-            $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+            $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
                 ->where('type', $type)
                 ->where('name', $name)
                 ->first();
         }
 
-        $qm = new \HvnGroup\DnsManager\Services\QueueManager();
+        $qm = new \MJ\DnsManager\Services\QueueManager();
 
         if ($drift->drift_type === 'missing_on_da') {
             // Record có trong WHMCS nhưng DA mất → dispatch ADD_RECORD
@@ -722,11 +724,11 @@ class ReportService
         }
 
         // Đánh dấu drift resolved ngay (queue sẽ xử lý async)
-        \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+        \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
             ->where('id', $drift->id)
             ->update(['status' => 'resolved', 'resolved_at' => date('Y-m-d H:i:s')]);
 
-        logActivity("HVN DNS Manager [DriftResolve]: PUSH {$type} {$name} @ {$domain->domain} — batch {$batchId}, drift #{$drift->id} resolved.");
+        logActivity("MJ DNS Manager [DriftResolve]: PUSH {$type} {$name} @ {$domain->domain} — batch {$batchId}, drift #{$drift->id} resolved.");
 
         return ['success' => true, 'message' => $msg, 'batch_id' => $batchId];
     }
@@ -752,7 +754,7 @@ class ReportService
 
         // Dispatch DELETE_RECORD với record_id = 0 (record không tồn tại trong WHMCS)
         // QueueWorker sẽ gọi DAGateway::deleteRecord() dựa trên payload type+name+value
-        $qm = new \HvnGroup\DnsManager\Services\QueueManager();
+        $qm = new \MJ\DnsManager\Services\QueueManager();
         $payload = [
             'record_id' => 0,  // Không có record trong WHMCS — worker chỉ cần xóa trên DA
             'type' => $type,
@@ -765,11 +767,11 @@ class ReportService
 
         $batchId = $qm->dispatch($domain->id, 'DELETE_RECORD', $payload, 1, 'admin', null);
 
-        \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+        \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
             ->where('id', $drift->id)
             ->update(['status' => 'resolved', 'resolved_at' => date('Y-m-d H:i:s')]);
 
-        logActivity("HVN DNS Manager [DriftResolve]: DELETE_DA {$type} {$name} @ {$domain->domain} — batch {$batchId}, drift #{$drift->id} resolved.");
+        logActivity("MJ DNS Manager [DriftResolve]: DELETE_DA {$type} {$name} @ {$domain->domain} — batch {$batchId}, drift #{$drift->id} resolved.");
 
         return ['success' => true, 'message' => "Xóa DA: {$type} {$name} đã được queue xóa trên DirectAdmin.", 'batch_id' => $batchId];
     }
@@ -789,14 +791,14 @@ class ReportService
         $name = $drift->record_name;
         $value = $localArr['value'] ?? '';
 
-        $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+        $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
             ->where('type', $type)
             ->where('name', $name)
             ->where('value', $value)
             ->first();
 
         if (!$record) {
-            $record = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domain->id)
+            $record = \MJ\DnsManager\Models\Record::where('domain_id', $domain->id)
                 ->where('type', $type)
                 ->where('name', $name)
                 ->first();
@@ -809,7 +811,7 @@ class ReportService
                 $record->delete();
             }
 
-            \Illuminate\Database\Capsule\Manager::table('mod_hvndns_drift_reports')
+            \Illuminate\Database\Capsule\Manager::table('tbl_mj_dns_drift_reports')
                 ->where('id', $drift->id)
                 ->update(['status' => 'resolved', 'resolved_at' => date('Y-m-d H:i:s')]);
 
@@ -820,14 +822,14 @@ class ReportService
             throw $e;
         }
 
-        logActivity("HVN DNS Manager [DriftResolve]: DELETE_WHMCS {$type} {$name} @ {$domain->domain} — drift #{$drift->id} resolved.");
+        logActivity("MJ DNS Manager [DriftResolve]: DELETE_WHMCS {$type} {$name} @ {$domain->domain} — drift #{$drift->id} resolved.");
 
         return ['success' => true, 'message' => "Đã xóa {$type} {$name} khỏi WHMCS DB."];
     }
 
     private function getPrimaryServer()
     {
-        return \HvnGroup\DnsManager\Models\Server::where('is_active', true)
+        return \MJ\DnsManager\Models\Server::where('is_active', true)
             ->where('role', 'primary')->orderBy('sort_order')->first();
     }
 

@@ -1,7 +1,7 @@
 {* toast.tpl — Toast notification component (Alpine) — Pure CSS, no Bootstrap *}
 {literal}
 <style>
-.hvn-toast-wrap {
+.mj-toast-wrap {
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -11,7 +11,7 @@
     gap: 10px;
     pointer-events: none;
 }
-.hvn-toast {
+.mj-toast {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -26,12 +26,12 @@
     pointer-events: all;
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.hvn-toast[x-show] { transition: opacity 0.3s ease, transform 0.3s ease; }
-.hvn-toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-.hvn-toast-body { flex: 1; }
-.hvn-toast-title { font-weight: 700; margin-bottom: 2px; }
-.hvn-toast-msg  { opacity: 0.92; }
-.hvn-toast-close {
+.mj-toast[x-show] { transition: opacity 0.3s ease, transform 0.3s ease; }
+.mj-toast-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.mj-toast-body { flex: 1; }
+.mj-toast-title { font-weight: 700; margin-bottom: 2px; }
+.mj-toast-msg  { opacity: 0.92; }
+.mj-toast-close {
     background: none;
     border: none;
     color: rgba(255,255,255,0.8);
@@ -42,15 +42,15 @@
     flex-shrink: 0;
     transition: color 0.15s;
 }
-.hvn-toast-close:hover { color: #fff; }
+.mj-toast-close:hover { color: #fff; }
 /* Type colors */
-.hvn-toast-success { background: linear-gradient(135deg, #16a34a, #15803d); }
-.hvn-toast-danger  { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-.hvn-toast-warning { background: linear-gradient(135deg, #d97706, #b45309); }
-.hvn-toast-info    { background: linear-gradient(135deg, #0284c7, #0369a1); }
+.mj-toast-success { background: linear-gradient(135deg, #16a34a, #15803d); }
+.mj-toast-danger  { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.mj-toast-warning { background: linear-gradient(135deg, #d97706, #b45309); }
+.mj-toast-info    { background: linear-gradient(135deg, #0284c7, #0369a1); }
 </style>
 
-<div class="hvn-toast-wrap" x-data="{
+<div class="mj-toast-wrap" x-data="{
     show: false,
     title: '',
     msg: '',
@@ -65,8 +65,8 @@
         this.timeout = setTimeout(() => { this.show = false; }, 4000);
     }
 }" @show-toast.window="showToastHandler($event)">
-    <div class="hvn-toast"
-         :class="'hvn-toast-' + type"
+    <div class="mj-toast"
+         :class="'mj-toast-' + type"
          x-show="show"
          x-transition:enter="transition"
          x-transition:enter-start="opacity-0"
@@ -75,12 +75,12 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          style="display:none">
-        <div class="hvn-toast-icon" x-text="type === 'danger' ? '✕' : (type === 'warning' ? '⚠' : (type === 'info' ? 'ℹ' : '✓'))"></div>
-        <div class="hvn-toast-body">
-            <div class="hvn-toast-title" x-text="title"></div>
-            <div class="hvn-toast-msg" x-html="msg"></div>
+        <div class="mj-toast-icon" x-text="type === 'danger' ? '✕' : (type === 'warning' ? '⚠' : (type === 'info' ? 'ℹ' : '✓'))"></div>
+        <div class="mj-toast-body">
+            <div class="mj-toast-title" x-text="title"></div>
+            <div class="mj-toast-msg" x-html="msg"></div>
         </div>
-        <button class="hvn-toast-close" @click="show = false; clearTimeout(timeout);" aria-label="Đóng">×</button>
+        <button class="mj-toast-close" @click="show = false; clearTimeout(timeout);" aria-label="Đóng">×</button>
     </div>
 </div>
 

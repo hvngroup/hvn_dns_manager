@@ -1,9 +1,11 @@
 <?php
 
-namespace HvnGroup\DnsManager\Mail;
+namespace MJ\DnsManager\Mail;
+
+defined("WHMCS") or die("Access Denied");
 
 /**
- * EmailTemplate — HTML wrapper cho tất cả email gửi từ HVN DNS Manager.
+ * EmailTemplate — HTML wrapper cho tất cả email gửi từ MJ DNS Manager.
  *
  * Áp dụng đúng template HVN Group: header ảnh, content, footer social + địa chỉ.
  * Dùng cho cả admin alert (failed job, SSL, unreachable) và client notification.
@@ -20,7 +22,7 @@ class EmailTemplate
     public static function wrap($contentHtml, $preheader = '')
     {
         if (empty($preheader)) {
-            $preheader = 'Notification from HVN DNS Manager';
+            $preheader = 'Notification from MJ DNS Manager';
         }
 
         $preheaderEscaped = htmlspecialchars($preheader);

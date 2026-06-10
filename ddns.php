@@ -6,8 +6,8 @@
  * Không yêu cầu login WHMCS — xác thực qua token.
  *
  * Cách dùng:
- *   GET /modules/addons/hvn_dns_manager/ddns.php?token={token}
- *   GET /modules/addons/hvn_dns_manager/ddns.php?token={token}&ip={override_ip}
+ *   GET /modules/addons/mj_dns_manager/ddns.php?token={token}
+ *   GET /modules/addons/mj_dns_manager/ddns.php?token={token}&ip={override_ip}
  *
  * Response (plain text, tương thích No-IP/DynDNS protocol):
  *   good {ip}     — Cập nhật thành công, IP mới là {ip}
@@ -26,7 +26,7 @@ if (!defined('WHMCS')) {
 
 // ── Autoloader ───────────────────────────────────────────────────────────────
 spl_autoload_register(function ($class) {
-    $prefix  = 'HvnGroup\\DnsManager\\';
+    $prefix  = 'MJ\\DnsManager\\';
     $baseDir = __DIR__ . '/app/';
     $len     = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
@@ -48,7 +48,7 @@ function ddns_respond($code, $ip = '')
     echo $msg;
 
     // Ghi log ngắn gọn
-    logActivity('HVN DNS Manager [DDNS]: ' . $msg . ' — IP: ' . ($_SERVER['REMOTE_ADDR'] ?? '?'));
+    logActivity('MJ DNS Manager [DDNS]: ' . $msg . ' — IP: ' . ($_SERVER['REMOTE_ADDR'] ?? '?'));
     exit;
 }
 
@@ -70,17 +70,17 @@ function ddns_get_client_ip()
 // MAIN
 // ════════════════════════════════════════════════════════════════════════════
 
-use HvnGroup\DnsManager\Models\DdnsToken;
-use HvnGroup\DnsManager\Models\IpBlacklist;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Record;
-use HvnGroup\DnsManager\Services\QueueManager;
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+use MJ\DnsManager\Models\DdnsToken;
+use MJ\DnsManager\Models\IpBlacklist;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Record;
+use MJ\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Helpers\SettingsHelper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 // ── 1. Kiểm tra module có bật không ──────────────────────────────────────────
 try {
-    $ddnsEnabled = SettingsHelper::getBool('ddns_mode', false);
+    $ddnsEnabled = \MJ\DnsManager\Services\FeatureGate::getDdnsMode() !== 'off';
     if (!$ddnsEnabled) {
         ddns_respond('dnserr');
     }
@@ -130,7 +130,7 @@ try {
     $now        = time();
 
     // Dùng bảng settings để lưu tạm rate limit state (nhẹ, không cần bảng riêng)
-    $rlRow = Capsule::table('mod_hvndns_settings')
+    $rlRow = Capsule::table('tbl_mj_dns_settings')
         ->where('setting_key', $windowKey)
         ->first();
 
@@ -157,18 +157,18 @@ try {
                 ddns_respond('abuse');
             }
             // Tăng count
-            Capsule::table('mod_hvndns_settings')
+            Capsule::table('tbl_mj_dns_settings')
                 ->where('setting_key', $windowKey)
                 ->update(['setting_val' => json_encode(['start' => $windowStart, 'count' => $count + 1])]);
         } else {
             // Window mới — reset
-            Capsule::table('mod_hvndns_settings')
+            Capsule::table('tbl_mj_dns_settings')
                 ->where('setting_key', $windowKey)
                 ->update(['setting_val' => json_encode(['start' => $now, 'count' => 1])]);
         }
     } else {
         // Lần đầu tiên
-        Capsule::table('mod_hvndns_settings')->insert([
+        Capsule::table('tbl_mj_dns_settings')->insert([
             'setting_key' => $windowKey,
             'setting_val' => json_encode(['start' => $now, 'count' => 1]),
         ]);
@@ -202,6 +202,12 @@ try {
 
 if (!$domain || $domain->status !== 'active') {
     ddns_respond('nohost');
+}
+
+// FeatureGate (per-client): DDNS phải đang bật và client có quyền dùng
+// (mode 'paid' → kiểm tra billing). Addon hết hạn → ngừng cập nhật.
+if (!\MJ\DnsManager\Services\FeatureGate::canClientUseDdns((int) $domain->whmcs_user_id)) {
+    ddns_respond('dnserr');
 }
 
 $subdomain  = $tokenRow->subdomain;
@@ -280,7 +286,7 @@ try {
         ], 1, 'system', null);
     }
 } catch (\Throwable $e) {
-    logActivity('HVN DNS Manager [DDNS]: Queue dispatch failed for ' . $fqdn . ' — ' . $e->getMessage());
+    logActivity('MJ DNS Manager [DDNS]: Queue dispatch failed for ' . $fqdn . ' — ' . $e->getMessage());
     ddns_respond('dnserr');
 }
 
@@ -296,7 +302,7 @@ try {
     // Non-critical — không cần crash
 }
 
-logActivity("HVN DNS Manager [DDNS]: Updated {$fqdn} → {$newIp} (was: " . ($record ? $record->value : 'new') . ')');
+logActivity("MJ DNS Manager [DDNS]: Updated {$fqdn} → {$newIp} (was: " . ($record ? $record->value : 'new') . ')');
 
 // ── 12. Trả về kết quả ────────────────────────────────────────────────────────
 ddns_respond('good', $newIp);

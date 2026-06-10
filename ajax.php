@@ -1,16 +1,16 @@
 <?php
 
 use WHMCS\Database\Capsule;
-use HvnGroup\DnsManager\Controllers\Client\RecordController;
+use MJ\DnsManager\Controllers\Client\RecordController;
 
 // Bắt đầu kiểm soát đầu ra (Output Buffering)
 ob_start();
 
 require_once __DIR__ . '/../../../init.php';
 
-// Autoload cho namespace HvnGroup\DnsManager
+// Autoload cho namespace MJ\DnsManager
 spl_autoload_register(function ($class) {
-    $prefix   = 'HvnGroup\\DnsManager\\';
+    $prefix   = 'MJ\\DnsManager\\';
     $base_dir = __DIR__ . '/app/';
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
@@ -124,7 +124,7 @@ try {
         case 'get_redirects':
         case 'add_redirect':
         case 'delete_redirect':
-            $controller = new \HvnGroup\DnsManager\Controllers\Client\RedirectController();
+            $controller = new \MJ\DnsManager\Controllers\Client\RedirectController();
             $response   = $controller->dispatch($action, $_REQUEST, $userId);
             $newToken   = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
             if (!empty($newToken)) {
@@ -138,7 +138,7 @@ try {
         case 'admin_record':
             // admin_record vẫn có thể dùng $_REQUEST vì JS gửi form-data hoặc JSON
             $method          = !empty($jsonInput['method']) ? $jsonInput['method'] : (isset($_REQUEST['method']) ? $_REQUEST['method'] : '');
-            $adminController = new \HvnGroup\DnsManager\Controllers\Admin\AdminController();
+            $adminController = new \MJ\DnsManager\Controllers\Admin\AdminController();
             $adminController->handleAdminRecordAjax($method);
             break;
 
@@ -155,7 +155,7 @@ try {
             // $jsonInput là input đầy đủ; nếu rỗng fallback về $_REQUEST
             $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
 
-            $templateController = new \HvnGroup\DnsManager\Controllers\Admin\TemplateController();
+            $templateController = new \MJ\DnsManager\Controllers\Admin\TemplateController();
             $response           = $templateController->dispatch($method, $input);
             ob_clean();
             echo json_encode($response);
@@ -164,7 +164,7 @@ try {
         // ── Client Apply Template ─────────────────────────────────────────
         case 'apply_template':
             $input           = !empty($jsonInput) ? $jsonInput : $_REQUEST;
-            $templateService = new \HvnGroup\DnsManager\Services\TemplateService();
+            $templateService = new \MJ\DnsManager\Services\TemplateService();
             $response        = $templateService->applyTemplate($input, $userId);
             $newToken        = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
             if (!empty($newToken)) {
@@ -180,7 +180,7 @@ try {
         case 'ddns_toggle':
         case 'ddns_delete':
         case 'ddns_regenerate':
-            $svc   = new \HvnGroup\DnsManager\Services\DdnsService();
+            $svc   = new \MJ\DnsManager\Services\DdnsService();
             $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
 
             if ($action === 'ddns_list') {
@@ -210,7 +210,7 @@ try {
             $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
 
             $emailAction = substr($action, strlen('email_fwd_')); // list / create / delete
-            $ctrl        = new \HvnGroup\DnsManager\Controllers\Client\EmailForwardController();
+            $ctrl        = new \MJ\DnsManager\Controllers\Client\EmailForwardController();
             $response    = $ctrl->dispatch($emailAction, $input, $userId);
 
             $newToken = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
@@ -225,7 +225,7 @@ try {
         case 'dnssec_status':
         case 'dnssec_toggle':
 
-            $svc   = new \HvnGroup\DnsManager\Services\DnssecService();
+            $svc   = new \MJ\DnsManager\Services\DnssecService();
             $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
 
             if ($action === 'dnssec_status') {
@@ -254,11 +254,16 @@ try {
 
 } catch (\Throwable $e) {
     ob_clean();
+    // Log chi tiết kỹ thuật phía server, KHÔNG leak ra client (05-security.md)
+    if (function_exists('logActivity')) {
+        logActivity('MJ DNS Manager AJAX error: ' . $e->getMessage()
+            . ' in ' . $e->getFile() . ':' . $e->getLine());
+    }
     echo json_encode(array(
         'success' => false,
         'error'   => array(
             'code'    => 'SERVER_ERROR',
-            'message' => $e->getMessage() . ' in ' . basename($e->getFile()) . ' trên dòng ' . $e->getLine()
+            'message' => 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
         )
     ));
 }

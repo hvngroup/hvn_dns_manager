@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
+
+defined("WHMCS") or die("Access Denied");
 
 use Illuminate\Database\Eloquent\Model;
 
 
 class Server extends Model
 {
-    protected $table = 'mod_hvndns_servers';
+    protected $table = 'tbl_mj_dns_servers';
 
     protected $fillable = [
         'hostname',
@@ -29,7 +31,9 @@ class Server extends Model
     ];
 
     protected $hidden = [
-        'password_enc'
+        'password_enc',
+        'username',
+        'ip_address'
     ];
 
     protected $casts = [

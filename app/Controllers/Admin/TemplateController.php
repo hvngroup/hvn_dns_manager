@@ -1,8 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Admin;
+namespace MJ\DnsManager\Controllers\Admin;
 
-use HvnGroup\DnsManager\Models\Template;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Template;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**

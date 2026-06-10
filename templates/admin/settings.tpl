@@ -1,130 +1,130 @@
 <script>
-    var HVNDNS_SETTINGS = {$settingsJson|default:'{}' nofilter};
+    var MJDNS_SETTINGS = {$settingsJson|default:'{}' nofilter};
 </script>
 
-<div class="hvn-dns-admin hvn-settings" x-data="settingsManager()">
-    <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-mb-4">
+<div class="mj-dns-admin mj-settings" x-data="settingsManager()">
+    <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-mb-4">
         <h2><i class="bi bi-gear-fill"></i> Cài đặt Module (Settings)</h2>
     </div>
 
-    <div class="hvn-row">
+    <div class="mj-row">
         <!-- ── Vertical Sidebar Tabs ── -->
-        <div class="hvn-col-md-3 hvn-mb-4">
-            <div class="hvn-card hvn-shadow-sm hvn-border-0">
-                <div class="hvn-list-group hvn-list-group-flush hvn-rounded" id="settingsLayoutTabs" role="tablist">
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='general'}{/literal}" @click="activeTab='general'">
-                        <i class="bi bi-sliders fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Chung</span>
+        <div class="mj-col-md-3 mj-mb-4">
+            <div class="mj-card mj-shadow-sm mj-border-0">
+                <div class="mj-list-group mj-list-group-flush mj-rounded" id="settingsLayoutTabs" role="tablist">
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='general'}{/literal}" @click="activeTab='general'">
+                        <i class="bi bi-sliders fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Chung</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='domain-policy'}{/literal}" @click="activeTab='domain-policy'">
-                        <i class="bi bi-globe fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Domain Policy</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='domain-policy'}{/literal}" @click="activeTab='domain-policy'">
+                        <i class="bi bi-globe fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Domain Policy</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='dns-editor'}{/literal}" @click="activeTab='dns-editor'">
-                        <i class="bi bi-pencil-square fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">DNS Editor</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='dns-editor'}{/literal}" @click="activeTab='dns-editor'">
+                        <i class="bi bi-pencil-square fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">DNS Editor</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='limits'}{/literal}" @click="activeTab='limits'">
-                        <i class="bi bi-bar-chart-steps fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Limits</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='limits'}{/literal}" @click="activeTab='limits'">
+                        <i class="bi bi-bar-chart-steps fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Limits</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='redirect'}{/literal}" @click="activeTab='redirect'">
-                        <i class="bi bi-link-45deg fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">URL Redirect</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='redirect'}{/literal}" @click="activeTab='redirect'">
+                        <i class="bi bi-link-45deg fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">URL Redirect</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='email'}{/literal}" @click="activeTab='email'">
-                        <i class="bi bi-envelope fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Email Forwarding</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='email'}{/literal}" @click="activeTab='email'">
+                        <i class="bi bi-envelope fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Email Forwarding</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ddns'}{/literal}" @click="activeTab='ddns'">
-                        <i class="bi bi-router fs-5 hvn-text-primary"></i> <span class="hvn-fw-bold">DDNS</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='ddns'}{/literal}" @click="activeTab='ddns'">
+                        <i class="bi bi-router fs-5 mj-text-primary"></i> <span class="mj-fw-bold">DDNS</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='dnssec'}{/literal}" @click="activeTab='dnssec'">
-                        <i class="bi bi-shield-check fs-5 hvn-text-success"></i> <span class="hvn-fw-bold">DNSSEC</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='dnssec'}{/literal}" @click="activeTab='dnssec'">
+                        <i class="bi bi-shield-check fs-5 mj-text-success"></i> <span class="mj-fw-bold">DNSSEC</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ssl'}{/literal}" @click="activeTab='ssl'">
-                        <i class="bi bi-lock fs-5 hvn-text-success"></i> <span class="hvn-fw-bold">SSL / Let's Encrypt</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='ssl'}{/literal}" @click="activeTab='ssl'">
+                        <i class="bi bi-lock fs-5 mj-text-success"></i> <span class="mj-fw-bold">SSL / Let's Encrypt</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='templates'}{/literal}" @click="activeTab='templates'">
-                        <i class="bi bi-files fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">DNS Templates</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='templates'}{/literal}" @click="activeTab='templates'">
+                        <i class="bi bi-files fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">DNS Templates</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='notify'}{/literal}" @click="activeTab='notify'">
-                        <i class="bi bi-bell fs-5 hvn-text-warning"></i> <span class="hvn-fw-bold">Notifications</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='notify'}{/literal}" @click="activeTab='notify'">
+                        <i class="bi bi-bell fs-5 mj-text-warning"></i> <span class="mj-fw-bold">Notifications</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='ui'}{/literal}" @click="activeTab='ui'">
-                        <i class="bi bi-window fs-5 hvn-text-info"></i> <span class="hvn-fw-bold">UI / Navigation</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='ui'}{/literal}" @click="activeTab='ui'">
+                        <i class="bi bi-window fs-5 mj-text-info"></i> <span class="mj-fw-bold">UI / Navigation</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='perf'}{/literal}" @click="activeTab='perf'">
-                        <i class="bi bi-speedometer2 fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Performance</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='perf'}{/literal}" @click="activeTab='perf'">
+                        <i class="bi bi-speedometer2 fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Performance</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='queue'}{/literal}" @click="activeTab='queue'">
-                        <i class="bi bi-stack fs-5 hvn-text-secondary"></i> <span class="hvn-fw-bold">Queue &amp; Cron</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='queue'}{/literal}" @click="activeTab='queue'">
+                        <i class="bi bi-stack fs-5 mj-text-secondary"></i> <span class="mj-fw-bold">Queue &amp; Cron</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='security'}{/literal}" @click="activeTab='security'">
-                        <i class="bi bi-incognito fs-5 hvn-text-danger"></i> <span class="hvn-fw-bold">Security</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='security'}{/literal}" @click="activeTab='security'">
+                        <i class="bi bi-incognito fs-5 mj-text-danger"></i> <span class="mj-fw-bold">Security</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='license'}{/literal}" @click="activeTab='license'">
-                        <i class="bi bi-key-fill fs-5 hvn-text-warning"></i> <span class="hvn-fw-bold">License</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='license'}{/literal}" @click="activeTab='license'">
+                        <i class="bi bi-key-fill fs-5 mj-text-warning"></i> <span class="mj-fw-bold">License</span>
                     </button>
-                    <button class="hvn-list-group-item hvn-list-group-item-action hvn-d-flex hvn-align-items-center gap-2" :class="{literal}{'hvn-tab-active': activeTab==='upsell'}{/literal}" @click="activeTab='upsell'">
-                        <i class="bi bi-cart-check fs-5 hvn-text-primary"></i> <span class="hvn-fw-bold">Upsell</span>
+                    <button class="mj-list-group-item mj-list-group-item-action mj-d-flex mj-align-items-center gap-2" :class="{literal}{'mj-tab-active': activeTab==='upsell'}{/literal}" @click="activeTab='upsell'">
+                        <i class="bi bi-cart-check fs-5 mj-text-primary"></i> <span class="mj-fw-bold">Upsell</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- ── Tab Content ── -->
-        <div class="hvn-col-md-9">
-            <div class="hvn-card hvn-shadow-sm hvn-border-0">
-                <div class="hvn-card-body hvn-p-0">
+        <div class="mj-col-md-9">
+            <div class="mj-card mj-shadow-sm mj-border-0">
+                <div class="mj-card-body mj-p-0">
                     <form @submit.prevent="saveSettings()" id="settingsForm">
                         <input type="hidden" name="token" value="{$token}">
-                        <div class="hvn-tab-content">
+                        <div class="mj-tab-content">
 
                             <!-- ════════════════════════════════
                                  TAB: CHUNG (Module Core)
                                  Settings #1-8
                             ════════════════════════════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='general'" id="pane-general" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-sliders hvn-text-secondary"></i> Cài đặt Chung (Module Core)</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='general'" id="pane-general" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-sliders mj-text-secondary"></i> Cài đặt Chung (Module Core)</h5>
 
                                 <!-- module_enabled -->
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Kích hoạt Module <code class="hvn-text-muted small">module_enabled</code></div>
-                                        <div class="small hvn-text-muted">Khi tắt: Client Area ẩn, Cron Worker dừng. Admin vẫn truy cập được settings.</div>
+                                        <div class="mj-fw-bold">Kích hoạt Module <code class="mj-text-muted small">module_enabled</code></div>
+                                        <div class="small mj-text-muted">Khi tắt: Client Area ẩn, Cron Worker dừng. Admin vẫn truy cập được settings.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" id="moduleEnabled" x-model="s.module_enabled">
                                     </div>
                                 </div>
 
                                 <!-- Nameservers -->
-                                <div class="hvn-mb-4">
-                                    <label class="form-label hvn-fw-bold">Nameservers mặc định <code class="hvn-text-muted small">default_nameserver_1..5</code></label>
-                                    <div class="hvn-row g-2">
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-input-group">
-                                                <span class="hvn-input-group-text small">NS1 *</span>
-                                                <input type="text" class="hvn-form-control font-monospace" x-model="s.default_nameserver_1" placeholder="dns1.hvn.vn" required>
+                                <div class="mj-mb-4">
+                                    <label class="form-label mj-fw-bold">Nameservers mặc định <code class="mj-text-muted small">default_nameserver_1..5</code></label>
+                                    <div class="mj-row g-2">
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-input-group">
+                                                <span class="mj-input-group-text small">NS1 *</span>
+                                                <input type="text" class="mj-form-control font-monospace" x-model="s.default_nameserver_1" placeholder="dns1.hvn.vn" required>
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-input-group">
-                                                <span class="hvn-input-group-text small">NS2 *</span>
-                                                <input type="text" class="hvn-form-control font-monospace" x-model="s.default_nameserver_2" placeholder="dns2.hvn.vn" required>
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-input-group">
+                                                <span class="mj-input-group-text small">NS2 *</span>
+                                                <input type="text" class="mj-form-control font-monospace" x-model="s.default_nameserver_2" placeholder="dns2.hvn.vn" required>
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-input-group">
-                                                <span class="hvn-input-group-text small">NS3</span>
-                                                <input type="text" class="hvn-form-control font-monospace" x-model="s.default_nameserver_3" placeholder="dns3.hvn.vn">
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-input-group">
+                                                <span class="mj-input-group-text small">NS3</span>
+                                                <input type="text" class="mj-form-control font-monospace" x-model="s.default_nameserver_3" placeholder="dns3.hvn.vn">
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-input-group">
-                                                <span class="hvn-input-group-text small">NS4</span>
-                                                <input type="text" class="hvn-form-control font-monospace" x-model="s.default_nameserver_4" placeholder="(tùy chọn)">
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-input-group">
+                                                <span class="mj-input-group-text small">NS4</span>
+                                                <input type="text" class="mj-form-control font-monospace" x-model="s.default_nameserver_4" placeholder="(tùy chọn)">
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-input-group">
-                                                <span class="hvn-input-group-text small">NS5</span>
-                                                <input type="text" class="hvn-form-control font-monospace" x-model="s.default_nameserver_5" placeholder="(tùy chọn)">
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-input-group">
+                                                <span class="mj-input-group-text small">NS5</span>
+                                                <input type="text" class="mj-form-control font-monospace" x-model="s.default_nameserver_5" placeholder="(tùy chọn)">
                                             </div>
                                         </div>
                                     </div>
@@ -132,11 +132,11 @@
                                 </div>
 
                                 <!-- default_ttl -->
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">TTL mặc định <code class="hvn-text-muted small">default_ttl</code></label>
-                                    <div class="hvn-input-group" style="max-width: 260px;">
-                                        <input type="number" class="hvn-form-control" x-model="s.default_ttl" min="60" max="86400">
-                                        <span class="hvn-input-group-text">giây</span>
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">TTL mặc định <code class="mj-text-muted small">default_ttl</code></label>
+                                    <div class="mj-input-group" style="max-width: 260px;">
+                                        <input type="number" class="mj-form-control" x-model="s.default_ttl" min="60" max="86400">
+                                        <span class="mj-input-group-text">giây</span>
                                     </div>
                                     <div class="form-text">Mặc định: 3600. Range: 60–86400. Áp dụng khi tạo record mới.</div>
                                 </div>
@@ -146,75 +146,75 @@
                                  TAB: DOMAIN POLICY
                                  Settings #9-15
                             ════════════════════════════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='domain-policy'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-globe hvn-text-secondary"></i> Domain Policy — Chính sách Tên miền</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='domain-policy'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-globe mj-text-secondary"></i> Domain Policy — Chính sách Tên miền</h5>
 
                                 <!-- respect_whmcs_dns -->
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tuân theo cài đặt DNS Management của WHMCS <code class="hvn-text-muted small">respect_whmcs_dns</code></div>
-                                        <div class="small hvn-text-muted">Khi bật: chỉ quản lý domain có "DNS Management = Enabled" trong WHMCS.</div>
+                                        <div class="mj-fw-bold">Tuân theo cài đặt DNS Management của WHMCS <code class="mj-text-muted small">respect_whmcs_dns</code></div>
+                                        <div class="small mj-text-muted">Khi bật: chỉ quản lý domain có "DNS Management = Enabled" trong WHMCS.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" id="respectWhmcsDns" x-model="s.respect_whmcs_dns">
                                     </div>
                                 </div>
 
                                 <!-- disable_manage_wrong_ns -->
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Chặn quản lý khi NS chưa đúng <code class="hvn-text-muted small">disable_manage_wrong_ns</code></div>
-                                        <div class="small hvn-text-muted">Client không thể sửa DNS nếu domain chưa trỏ NS về nameserver đúng. <span class="hvn-text-info">Mặc định: Bật.</span></div>
+                                        <div class="mj-fw-bold">Chặn quản lý khi NS chưa đúng <code class="mj-text-muted small">disable_manage_wrong_ns</code></div>
+                                        <div class="small mj-text-muted">Client không thể sửa DNS nếu domain chưa trỏ NS về nameserver đúng. <span class="mj-text-info">Mặc định: Bật.</span></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" id="disableManageWrongNs" x-model="s.disable_manage_wrong_ns">
                                     </div>
                                 </div>
 
                                 <!-- ns_check_method -->
-                                <div class="hvn-mb-4">
-                                    <label class="form-label hvn-fw-bold">Phương thức kiểm tra NS <code class="hvn-text-muted small">ns_check_method</code></label>
-                                    <select class="hvn-form-select" x-model="s.ns_check_method" style="max-width: 360px;">
+                                <div class="mj-mb-4">
+                                    <label class="form-label mj-fw-bold">Phương thức kiểm tra NS <code class="mj-text-muted small">ns_check_method</code></label>
+                                    <select class="mj-form-select" x-model="s.ns_check_method" style="max-width: 360px;">
                                         <option value="dns_lookup">dns_lookup — PHP dns_get_record() realtime</option>
                                         <option value="whois">whois — WHOIS lookup</option>
                                         <option value="skip">skip — Bỏ qua kiểm tra (luôn cho phép)</option>
                                     </select>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-text-muted hvn-mt-4 hvn-mb-3"><i class="bi bi-gear"></i> Auto-Provisioning Actions</h6>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <h6 class="mj-fw-bold mj-text-muted mj-mt-4 mj-mb-3"><i class="bi bi-gear"></i> Auto-Provisioning Actions</h6>
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tạo zone TRƯỚC khi đăng ký <code class="hvn-text-muted small">create_on_preregistrar</code></div>
-                                        <div class="small hvn-text-muted">Cần thiết cho .vn (VNNIC yêu cầu zone sống trước khi accept EPP register).</div>
+                                        <div class="mj-fw-bold">Tạo zone TRƯỚC khi đăng ký <code class="mj-text-muted small">create_on_preregistrar</code></div>
+                                        <div class="small mj-text-muted">Cần thiết cho .vn (VNNIC yêu cầu zone sống trước khi accept EPP register).</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.create_on_preregistrar">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tạo zone SAU khi đăng ký <code class="hvn-text-muted small">create_on_registration</code></div>
-                                        <div class="small hvn-text-muted">Hook AfterRegistrarRegistration. Tự bỏ qua nếu create_on_preregistrar đã tạo rồi.</div>
+                                        <div class="mj-fw-bold">Tạo zone SAU khi đăng ký <code class="mj-text-muted small">create_on_registration</code></div>
+                                        <div class="small mj-text-muted">Hook AfterRegistrarRegistration. Tự bỏ qua nếu create_on_preregistrar đã tạo rồi.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.create_on_registration">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tạo zone sau khi Transfer <code class="hvn-text-muted small">create_on_transfer</code></div>
+                                        <div class="mj-fw-bold">Tạo zone sau khi Transfer <code class="mj-text-muted small">create_on_transfer</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.create_on_transfer">
                                     </div>
                                 </div>
 
                                 <!-- grace_period_days -->
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">Số ngày giữ zone sau khi hủy <code class="hvn-text-muted small">grace_period_days</code></label>
-                                    <div class="hvn-input-group" style="max-width: 200px;">
-                                        <input type="number" class="hvn-form-control" x-model="s.grace_period_days" min="0" max="365">
-                                        <span class="hvn-input-group-text">ngày</span>
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">Số ngày giữ zone sau khi hủy <code class="mj-text-muted small">grace_period_days</code></label>
+                                    <div class="mj-input-group" style="max-width: 200px;">
+                                        <input type="number" class="mj-form-control" x-model="s.grace_period_days" min="0" max="365">
+                                        <span class="mj-input-group-text">ngày</span>
                                     </div>
                                     <div class="form-text">0 = xóa ngay khi terminate. Range 0–365.</div>
                                 </div>
@@ -224,94 +224,94 @@
                                  TAB: DNS EDITOR
                                  Settings #16-25 (Editor + Permissions)
                             ════════════════════════════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='dns-editor'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-pencil-square hvn-text-secondary"></i> DNS Editor &amp; Record Permissions</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='dns-editor'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-pencil-square mj-text-secondary"></i> DNS Editor &amp; Record Permissions</h5>
 
                                 <!-- enable_dns_editor -->
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật DNS Editor <code class="hvn-text-muted small">enable_dns_editor</code></div>
-                                        <div class="small hvn-text-muted">Tắt = Client không thể xem/sửa. Admin vẫn truy cập được.</div>
+                                        <div class="mj-fw-bold">Bật DNS Editor <code class="mj-text-muted small">enable_dns_editor</code></div>
+                                        <div class="small mj-text-muted">Tắt = Client không thể xem/sửa. Admin vẫn truy cập được.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_dns_editor">
                                     </div>
                                 </div>
 
                                 <!-- subdomain_limit -->
-                                <div class="hvn-mb-4">
-                                    <label class="form-label hvn-fw-bold">Giới hạn Subdomain/domain <code class="hvn-text-muted small">subdomain_limit</code></label>
-                                    <div class="hvn-input-group" style="max-width: 200px;">
-                                        <input type="number" class="hvn-form-control" x-model="s.subdomain_limit" min="-1">
-                                        <span class="hvn-input-group-text">subdomain</span>
+                                <div class="mj-mb-4">
+                                    <label class="form-label mj-fw-bold">Giới hạn Subdomain/domain <code class="mj-text-muted small">subdomain_limit</code></label>
+                                    <div class="mj-input-group" style="max-width: 200px;">
+                                        <input type="number" class="mj-form-control" x-model="s.subdomain_limit" min="-1">
+                                        <span class="mj-input-group-text">subdomain</span>
                                     </div>
                                     <div class="form-text">0 = unlimited. -1 = tắt tính năng subdomain.</div>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-mt-4 hvn-mb-3"><i class="bi bi-toggle-on"></i> Quyền Client theo Loại Record <span class="small hvn-text-muted">(Admin luôn có quyền)</span></h6>
-                                <div class="hvn-card hvn-border-0 hvn-bg-light">
-                                    <div class="hvn-card-body">
-                                        <div class="hvn-row g-3">
-                                            <div class="hvn-col-md-6 hvn-col-lg-4" x-data>
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">A</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                <h6 class="mj-fw-bold mj-mt-4 mj-mb-3"><i class="bi bi-toggle-on"></i> Quyền Client theo Loại Record <span class="small mj-text-muted">(Admin luôn có quyền)</span></h6>
+                                <div class="mj-card mj-border-0 mj-bg-light">
+                                    <div class="mj-card-body">
+                                        <div class="mj-row g-3">
+                                            <div class="mj-col-md-6 mj-col-lg-4" x-data>
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">A</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_a">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">AAAA</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">AAAA</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_aaaa">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">CNAME</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">CNAME</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_cname">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">MX</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">MX</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_mx">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">TXT</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">TXT</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_txt">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">SRV</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">SRV</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_srv">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0">CAA</label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0">CAA</label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_caa">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="hvn-col-md-6 hvn-col-lg-4">
-                                                <div class="hvn-d-flex hvn-justify-content-between hvn-align-items-center hvn-p-2 hvn-bg-white hvn-rounded hvn-shadow-sm">
-                                                    <label class="hvn-fw-bold hvn-mb-0 hvn-text-danger">NS <small class="hvn-fw-normal">(nguy hiểm)</small></label>
-                                                    <div class="form-check form-switch hvn-mb-0">
+                                            <div class="mj-col-md-6 mj-col-lg-4">
+                                                <div class="mj-d-flex mj-justify-content-between mj-align-items-center mj-p-2 mj-bg-white mj-rounded mj-shadow-sm">
+                                                    <label class="mj-fw-bold mj-mb-0 mj-text-danger">NS <small class="mj-fw-normal">(nguy hiểm)</small></label>
+                                                    <div class="form-check form-switch mj-mb-0">
                                                         <input class="form-check-input" type="checkbox" x-model="s.allow_modify_ns">
                                                     </div>
                                                 </div>
@@ -325,135 +325,135 @@
                                  TAB: LIMITS (Record Limits)
                                  Settings #26-33
                             ════════════════════════════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='limits'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-1"><i class="bi bi-bar-chart-steps hvn-text-secondary"></i> Record Limits — Giới hạn Số lượng</h5>
-                                <div class="small hvn-text-muted hvn-mb-4">Ưu tiên: Admin Override &gt; Global Settings. <code>0</code> = unlimited.</div>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='limits'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-1"><i class="bi bi-bar-chart-steps mj-text-secondary"></i> Record Limits — Giới hạn Số lượng</h5>
+                                <div class="small mj-text-muted mj-mb-4">Ưu tiên: Admin Override &gt; Global Settings. <code>0</code> = unlimited.</div>
 
                                 <!-- Total record limit -->
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tổng số bản ghi tối đa / Domain <code class="hvn-text-muted small">total_record_limit</code></div>
-                                        <div class="small hvn-text-muted">Giới hạn tổng tất cả các loại bản ghi của một tên miền.</div>
+                                        <div class="mj-fw-bold">Tổng số bản ghi tối đa / Domain <code class="mj-text-muted small">total_record_limit</code></div>
+                                        <div class="small mj-text-muted">Giới hạn tổng tất cả các loại bản ghi của một tên miền.</div>
                                     </div>
-                                    <div class="hvn-input-group" style="max-width: 200px;">
-                                        <input type="number" class="hvn-form-control" x-model="s.total_record_limit" min="0">
-                                        <span class="hvn-input-group-text">records</span>
+                                    <div class="mj-input-group" style="max-width: 200px;">
+                                        <input type="number" class="mj-form-control" x-model="s.total_record_limit" min="0">
+                                        <span class="mj-input-group-text">records</span>
                                     </div>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-mb-3">Giới hạn theo từng loại bản ghi</h6>
-                                <div class="hvn-row g-3">
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">A <code class="hvn-text-muted small">a_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.a_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                <h6 class="mj-fw-bold mj-mb-3">Giới hạn theo từng loại bản ghi</h6>
+                                <div class="mj-row g-3">
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">A <code class="mj-text-muted small">a_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.a_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">AAAA <code class="hvn-text-muted small">aaaa_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.aaaa_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">AAAA <code class="mj-text-muted small">aaaa_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.aaaa_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">CNAME <code class="hvn-text-muted small">cname_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.cname_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">CNAME <code class="mj-text-muted small">cname_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.cname_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">MX <code class="hvn-text-muted small">mx_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.mx_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">MX <code class="mj-text-muted small">mx_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.mx_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">TXT <code class="hvn-text-muted small">txt_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.txt_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">TXT <code class="mj-text-muted small">txt_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.txt_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">SRV <code class="hvn-text-muted small">srv_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.srv_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">SRV <code class="mj-text-muted small">srv_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.srv_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">CAA <code class="hvn-text-muted small">caa_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.caa_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">CAA <code class="mj-text-muted small">caa_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.caa_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6 hvn-col-lg-4">
-                                        <label class="form-label hvn-fw-bold hvn-mb-1">NS <code class="hvn-text-muted small">ns_record_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ns_record_limit" min="-1"><span class="hvn-input-group-text">records</span></div>
+                                    <div class="mj-col-md-6 mj-col-lg-4">
+                                        <label class="form-label mj-fw-bold mj-mb-1">NS <code class="mj-text-muted small">ns_record_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ns_record_limit" min="-1"><span class="mj-input-group-text">records</span></div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: URL REDIRECT #34-37 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='redirect'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-link-45deg hvn-text-secondary"></i> URL Redirect — Chuyển hướng</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='redirect'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-link-45deg mj-text-secondary"></i> URL Redirect — Chuyển hướng</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật URL Forwarding <code class="hvn-text-muted small">enable_url_redirect</code></div>
-                                        <div class="small hvn-text-muted">Cho phép client tạo chuyển hướng 301/302.</div>
+                                        <div class="mj-fw-bold">Bật URL Forwarding <code class="mj-text-muted small">enable_url_redirect</code></div>
+                                        <div class="small mj-text-muted">Cho phép client tạo chuyển hướng 301/302.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_url_redirect">
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center" :class="{literal}{'opacity-50': !s.enable_url_redirect}{/literal}">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center" :class="{literal}{'opacity-50': !s.enable_url_redirect}{/literal}">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Masked URL Forwarding <code class="hvn-text-muted small">enable_masked_redirect</code></div>
-                                        <div class="small hvn-text-muted">Cần enable_url_redirect = true. Ẩn URL đích sau iframe.</div>
+                                        <div class="mj-fw-bold">Bật Masked URL Forwarding <code class="mj-text-muted small">enable_masked_redirect</code></div>
+                                        <div class="small mj-text-muted">Cần enable_url_redirect = true. Ẩn URL đích sau iframe.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_masked_redirect" :disabled="!s.enable_url_redirect">
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-3" x-show="s.enable_masked_redirect">
-                                    <label class="form-label hvn-fw-bold">Hash Key cho Connector <code class="hvn-text-muted small">masked_hash_key</code> <span class="hvn-text-danger">*</span></label>
-                                    <input type="password" class="hvn-form-control font-monospace" x-model="s.masked_hash_key" placeholder="Tối thiểu 8 ký tự bí mật...">
-                                    <div class="form-text hvn-text-danger"><i class="bi bi-exclamation-triangle"></i> BẮT BUỘC thay đổi khỏi giá trị mặc định. Lưu encrypted trong DB.</div>
+                                <div class="mj-mb-3" x-show="s.enable_masked_redirect">
+                                    <label class="form-label mj-fw-bold">Hash Key cho Connector <code class="mj-text-muted small">masked_hash_key</code> <span class="mj-text-danger">*</span></label>
+                                    <input type="password" class="mj-form-control font-monospace" x-model="s.masked_hash_key" placeholder="Tối thiểu 8 ký tự bí mật...">
+                                    <div class="form-text mj-text-danger"><i class="bi bi-exclamation-triangle"></i> BẮT BUỘC thay đổi khỏi giá trị mặc định. Lưu encrypted trong DB.</div>
                                 </div>
 
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">Giới hạn Redirect/domain <code class="hvn-text-muted small">url_redirect_limit</code></label>
-                                    <div class="hvn-input-group" style="max-width:200px">
-                                        <input type="number" class="hvn-form-control" x-model="s.url_redirect_limit" min="0">
-                                        <span class="hvn-input-group-text">redirect</span>
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">Giới hạn Redirect/domain <code class="mj-text-muted small">url_redirect_limit</code></label>
+                                    <div class="mj-input-group" style="max-width:200px">
+                                        <input type="number" class="mj-form-control" x-model="s.url_redirect_limit" min="0">
+                                        <span class="mj-input-group-text">redirect</span>
                                     </div>
                                     <div class="form-text">0 = unlimited.</div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: EMAIL FORWARDING #38-42 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='email'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-envelope hvn-text-secondary"></i> Email Forwarding</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='email'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-envelope mj-text-secondary"></i> Email Forwarding</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Email Forwarding <code class="hvn-text-muted small">enable_email_forwarder</code></div>
+                                        <div class="mj-fw-bold">Bật Email Forwarding <code class="mj-text-muted small">enable_email_forwarder</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_email_forwarder">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Email Catch-all <code class="hvn-text-muted small">enable_email_catchall</code></div>
-                                        <div class="small hvn-text-muted">Nhận tất cả email không match forwarder.</div>
+                                        <div class="mj-fw-bold">Bật Email Catch-all <code class="mj-text-muted small">enable_email_catchall</code></div>
+                                        <div class="small mj-text-muted">Nhận tất cả email không match forwarder.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_email_catchall">
                                     </div>
                                 </div>
 
-                                <div class="hvn-row g-3 hvn-mb-3">
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Giới hạn Alias/domain <code class="hvn-text-muted small">email_forwarder_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.email_forwarder_limit" min="0"><span class="hvn-input-group-text">alias</span></div>
+                                <div class="mj-row g-3 mj-mb-3">
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Giới hạn Alias/domain <code class="mj-text-muted small">email_forwarder_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.email_forwarder_limit" min="0"><span class="mj-input-group-text">alias</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Giới hạn Destination/domain <code class="hvn-text-muted small">email_destination_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.email_destination_limit" min="0"><span class="hvn-input-group-text">địa chỉ</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Giới hạn Destination/domain <code class="mj-text-muted small">email_destination_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.email_destination_limit" min="0"><span class="mj-input-group-text">địa chỉ</span></div>
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">Email Template Xác minh Destination <code class="hvn-text-muted small">email_verify_template</code></label>
-                                    <select class="hvn-form-select" x-model="s.email_verify_template" style="max-width: 400px;">
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">Email Template Xác minh Destination <code class="mj-text-muted small">email_verify_template</code></label>
+                                    <select class="mj-form-select" x-model="s.email_verify_template" style="max-width: 400px;">
                                         <option value="">(Để trống = không yêu cầu xác minh)</option>
                                         <option value="dns_email_verify">DNS Email Verification</option>
                                     </select>
@@ -462,191 +462,191 @@
                             </div>
 
                             <!-- ════════ TAB: DDNS #43-49 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ddns'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-router hvn-text-primary"></i> Dynamic DNS (DDNS)</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='ddns'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-router mj-text-primary"></i> Dynamic DNS (DDNS)</h5>
 
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Kích hoạt Dynamic DNS (DDNS) <code class="hvn-text-muted small">enable_ddns</code></div>
-                                        <div class="small hvn-text-muted">Cho phép khách hàng sử dụng API để cập nhật IP động.</div>
+                                        <div class="mj-fw-bold">Kích hoạt Dynamic DNS (DDNS) <code class="mj-text-muted small">enable_ddns</code></div>
+                                        <div class="small mj-text-muted">Cho phép khách hàng sử dụng API để cập nhật IP động.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.ddns_mode">
                                     </div>
                                 </div>
 
-                                <div class="hvn-row g-3 hvn-mb-4">
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Rate Limit/giờ <code class="hvn-text-muted small">ddns_rate_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_rate_limit" min="1"><span class="hvn-input-group-text">req/h</span></div>
+                                <div class="mj-row g-3 mj-mb-4">
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Rate Limit/giờ <code class="mj-text-muted small">ddns_rate_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ddns_rate_limit" min="1"><span class="mj-input-group-text">req/h</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Giới hạn Token/domain <code class="hvn-text-muted small">ddns_token_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_token_limit" min="1"><span class="hvn-input-group-text">token</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Giới hạn Token/domain <code class="mj-text-muted small">ddns_token_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ddns_token_limit" min="1"><span class="mj-input-group-text">token</span></div>
                                     </div>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-mb-3"><i class="bi bi-shield-exclamation hvn-text-danger"></i> Brute Force Protection</h6>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <h6 class="mj-fw-bold mj-mb-3"><i class="bi bi-shield-exclamation mj-text-danger"></i> Brute Force Protection</h6>
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Brute Force Detection <code class="hvn-text-muted small">enable_ddns_bruteforce</code></div>
+                                        <div class="mj-fw-bold">Bật Brute Force Detection <code class="mj-text-muted small">enable_ddns_bruteforce</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_ddns_bruteforce">
                                     </div>
                                 </div>
-                                <div class="hvn-row g-3" x-show="s.enable_ddns_bruteforce">
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Ngưỡng fail <code class="hvn-text-muted small">ddns_bruteforce_threshold</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_bruteforce_threshold" min="1"><span class="hvn-input-group-text">lần</span></div>
+                                <div class="mj-row g-3" x-show="s.enable_ddns_bruteforce">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Ngưỡng fail <code class="mj-text-muted small">ddns_bruteforce_threshold</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ddns_bruteforce_threshold" min="1"><span class="mj-input-group-text">lần</span></div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Cửa sổ kiểm tra <code class="hvn-text-muted small">ddns_bruteforce_window</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_bruteforce_window" min="60"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Cửa sổ kiểm tra <code class="mj-text-muted small">ddns_bruteforce_window</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ddns_bruteforce_window" min="60"><span class="mj-input-group-text">giây</span></div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Thời gian Block IP <code class="hvn-text-muted small">ddns_bruteforce_ban_duration</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.ddns_bruteforce_ban_duration" min="60"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Thời gian Block IP <code class="mj-text-muted small">ddns_bruteforce_ban_duration</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.ddns_bruteforce_ban_duration" min="60"><span class="mj-input-group-text">giây</span></div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: DNSSEC #50-51 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='dnssec'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-shield-check hvn-text-success"></i> DNSSEC — Bảo mật tên miền</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='dnssec'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-shield-check mj-text-success"></i> DNSSEC — Bảo mật tên miền</h5>
 
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Kích hoạt DNSSEC <code class="hvn-text-muted small">dnssec_mode</code></div>
-                                        <div class="small hvn-text-muted">Cho phép khách hàng bật DNSSEC cho tên miền.</div>
+                                        <div class="mj-fw-bold">Kích hoạt DNSSEC <code class="mj-text-muted small">dnssec_mode</code></div>
+                                        <div class="small mj-text-muted">Cho phép khách hàng bật DNSSEC cho tên miền.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.dnssec_mode">
                                     </div>
                                 </div>
 
-                                <div class="hvn-mb-4 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-4 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Tự động Re-sign Zone <code class="hvn-text-muted small">dnssec_auto_resign</code></div>
-                                        <div class="small hvn-text-muted">Tự dispatch RESIGN_ZONE sau mỗi batch thay đổi record khi DNSSEC đang bật.</div>
+                                        <div class="mj-fw-bold">Tự động Re-sign Zone <code class="mj-text-muted small">dnssec_auto_resign</code></div>
+                                        <div class="small mj-text-muted">Tự dispatch RESIGN_ZONE sau mỗi batch thay đổi record khi DNSSEC đang bật.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.dnssec_auto_resign">
                                     </div>
                                 </div>
 
-                                <div class="hvn-alert hvn-alert-warning" x-show="s.dnssec_mode">
+                                <div class="mj-alert mj-alert-warning" x-show="s.dnssec_mode">
                                     <i class="bi bi-exclamation-triangle-fill"></i> Yêu cầu DA Server đã bật <code>dnssec=1</code> trong cấu hình máy chủ.
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: SSL #52-55 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ssl'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-lock hvn-text-success"></i> SSL / Let's Encrypt</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='ssl'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-lock mj-text-success"></i> SSL / Let's Encrypt</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Auto-SSL cho domain mới <code class="hvn-text-muted small">enable_auto_ssl</code></div>
-                                        <div class="small hvn-text-muted">Tự request Let's Encrypt khi tạo zone mới trên DA.</div>
+                                        <div class="mj-fw-bold">Bật Auto-SSL cho domain mới <code class="mj-text-muted small">enable_auto_ssl</code></div>
+                                        <div class="small mj-text-muted">Tự request Let's Encrypt khi tạo zone mới trên DA.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_auto_ssl">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Cho phép Client trigger SSL <code class="hvn-text-muted small">enable_client_ssl_trigger</code></div>
-                                        <div class="small hvn-text-muted">Client bấm "Yêu cầu SSL" trong Client Area để request/renew thủ công.</div>
+                                        <div class="mj-fw-bold">Cho phép Client trigger SSL <code class="mj-text-muted small">enable_client_ssl_trigger</code></div>
+                                        <div class="small mj-text-muted">Client bấm "Yêu cầu SSL" trong Client Area để request/renew thủ công.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_client_ssl_trigger">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật PHP cho domain trên DA <code class="hvn-text-muted small">enable_php_for_domain</code></div>
-                                        <div class="small hvn-text-muted">Cần cho URL Forwarding connector. DA account phải có PHP privilege.</div>
+                                        <div class="mj-fw-bold">Bật PHP cho domain trên DA <code class="mj-text-muted small">enable_php_for_domain</code></div>
+                                        <div class="small mj-text-muted">Cần cho URL Forwarding connector. DA account phải có PHP privilege.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_php_for_domain">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">Gia hạn SSL trước (ngày) <code class="hvn-text-muted small">ssl_auto_renew_days</code></label>
-                                    <div class="hvn-input-group" style="max-width:200px">
-                                        <input type="number" class="hvn-form-control" x-model="s.ssl_auto_renew_days" min="1" max="30">
-                                        <span class="hvn-input-group-text">ngày</span>
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">Gia hạn SSL trước (ngày) <code class="mj-text-muted small">ssl_auto_renew_days</code></label>
+                                    <div class="mj-input-group" style="max-width:200px">
+                                        <input type="number" class="mj-form-control" x-model="s.ssl_auto_renew_days" min="1" max="30">
+                                        <span class="mj-input-group-text">ngày</span>
                                     </div>
                                     <div class="form-text">Cron ssl_checker tự gia hạn cert khi còn ≤ N ngày trước hết hạn.</div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: DNS TEMPLATES #56-58 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='templates'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-files hvn-text-secondary"></i> DNS Templates</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='templates'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-files mj-text-secondary"></i> DNS Templates</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật DNS Templates <code class="hvn-text-muted small">enable_dns_templates</code></div>
-                                        <div class="small hvn-text-muted">Cho phép client load DNS template từ danh sách Admin tạo sẵn.</div>
+                                        <div class="mj-fw-bold">Bật DNS Templates <code class="mj-text-muted small">enable_dns_templates</code></div>
+                                        <div class="small mj-text-muted">Cho phép client load DNS template từ danh sách Admin tạo sẵn.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_dns_templates">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Cho phép User tự tạo Template <code class="hvn-text-muted small">enable_user_custom_templates</code></div>
-                                        <div class="small hvn-text-muted">Client tự tạo template từ zone hiện tại để dùng lại. <strong>Mặc định: Tắt.</strong></div>
+                                        <div class="mj-fw-bold">Cho phép User tự tạo Template <code class="mj-text-muted small">enable_user_custom_templates</code></div>
+                                        <div class="small mj-text-muted">Client tự tạo template từ zone hiện tại để dùng lại. <strong>Mặc định: Tắt.</strong></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_user_custom_templates">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3" x-show="s.enable_user_custom_templates">
-                                    <label class="form-label hvn-fw-bold">Giới hạn Template/user <code class="hvn-text-muted small">user_template_limit</code></label>
-                                    <div class="hvn-input-group" style="max-width:200px">
-                                        <input type="number" class="hvn-form-control" x-model="s.user_template_limit" min="0">
-                                        <span class="hvn-input-group-text">template</span>
+                                <div class="mj-mb-3" x-show="s.enable_user_custom_templates">
+                                    <label class="form-label mj-fw-bold">Giới hạn Template/user <code class="mj-text-muted small">user_template_limit</code></label>
+                                    <div class="mj-input-group" style="max-width:200px">
+                                        <input type="number" class="mj-form-control" x-model="s.user_template_limit" min="0">
+                                        <span class="mj-input-group-text">template</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: NOTIFICATIONS #59-63 + #81-89 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='notify'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-bell hvn-text-warning"></i> Notifications</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='notify'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-bell mj-text-warning"></i> Notifications</h5>
 
-                                <h6 class="hvn-fw-bold hvn-mb-3">📧 Client Email</h6>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <h6 class="mj-fw-bold mj-mb-3">📧 Client Email</h6>
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật Email thông báo cho Client <code class="hvn-text-muted small">enable_client_notification</code></div>
+                                        <div class="mj-fw-bold">Bật Email thông báo cho Client <code class="mj-text-muted small">enable_client_notification</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_client_notification">
                                     </div>
                                 </div>
                                 <div x-show="s.enable_client_notification">
-                                    <div class="hvn-mb-3">
-                                        <label class="form-label hvn-fw-bold">Email Template Thông báo <code class="hvn-text-muted small">notification_email_template</code></label>
-                                        <select class="hvn-form-select" x-model="s.notification_email_template" style="max-width:400px">
+                                    <div class="mj-mb-3">
+                                        <label class="form-label mj-fw-bold">Email Template Thông báo <code class="mj-text-muted small">notification_email_template</code></label>
+                                        <select class="mj-form-select" x-model="s.notification_email_template" style="max-width:400px">
                                             <option value="">(Chọn WHMCS Email Template)</option>
                                             <option value="dns_change_notify">DNS Change Notification</option>
                                         </select>
                                     </div>
-                                    <div class="hvn-row g-2 hvn-mb-3">
-                                        <div class="hvn-col-md-4">
+                                    <div class="mj-row g-2 mj-mb-3">
+                                        <div class="mj-col-md-4">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="notifyZoneCreate" x-model="s.notify_on_zone_create">
                                                 <label class="form-check-label" for="notifyZoneCreate">Tạo Zone mới</label>
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-4">
+                                        <div class="mj-col-md-4">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="notifyRecordChange" x-model="s.notify_on_record_change">
                                                 <label class="form-check-label" for="notifyRecordChange">Thay đổi Record</label>
                                             </div>
                                         </div>
-                                        <div class="hvn-col-md-4">
+                                        <div class="mj-col-md-4">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="notifyZoneDelete" x-model="s.notify_on_zone_delete">
                                                 <label class="form-check-label" for="notifyZoneDelete">Xóa Zone</label>
@@ -655,173 +655,173 @@
                                     </div>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-mt-4 hvn-mb-3">🚨 Admin Alerts (Webhook)</h6>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                                    <div><div class="hvn-fw-bold">Bật Telegram Alert <code class="hvn-text-muted small">enable_telegram_alert</code></div></div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                <h6 class="mj-fw-bold mj-mt-4 mj-mb-3">🚨 Admin Alerts (Webhook)</h6>
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
+                                    <div><div class="mj-fw-bold">Bật Telegram Alert <code class="mj-text-muted small">enable_telegram_alert</code></div></div>
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_telegram_alert">
                                     </div>
                                 </div>
                                 <div x-show="s.enable_telegram_alert">
-                                    <div class="hvn-row g-3 hvn-mb-3">
-                                        <div class="hvn-col-md-8">
-                                            <label class="form-label hvn-fw-bold small">Bot Token <code class="hvn-text-muted small">telegram_bot_token</code></label>
-                                            <input type="password" class="hvn-form-control font-monospace" x-model="s.telegram_bot_token" :placeholder="s.telegram_has_token ? '(Token đã lưu — nhập mới để thay đổi)' : '123456:ABC-DEF...'">
+                                    <div class="mj-row g-3 mj-mb-3">
+                                        <div class="mj-col-md-8">
+                                            <label class="form-label mj-fw-bold small">Bot Token <code class="mj-text-muted small">telegram_bot_token</code></label>
+                                            <input type="password" class="mj-form-control font-monospace" x-model="s.telegram_bot_token" :placeholder="s.telegram_has_token ? '(Token đã lưu — nhập mới để thay đổi)' : '123456:ABC-DEF...'">
                                         </div>
-                                        <div class="hvn-col-md-4">
-                                            <label class="form-label hvn-fw-bold small">Chat ID <code class="hvn-text-muted small">telegram_chat_id</code></label>
-                                            <input type="text" class="hvn-form-control font-monospace" x-model="s.telegram_chat_id" placeholder="-100123...">
+                                        <div class="mj-col-md-4">
+                                            <label class="form-label mj-fw-bold small">Chat ID <code class="mj-text-muted small">telegram_chat_id</code></label>
+                                            <input type="text" class="mj-form-control font-monospace" x-model="s.telegram_chat_id" placeholder="-100123...">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                                    <div><div class="hvn-fw-bold">Bật Email Alert <code class="hvn-text-muted small">enable_email_alert</code></div></div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
+                                    <div><div class="mj-fw-bold">Bật Email Alert <code class="mj-text-muted small">enable_email_alert</code></div></div>
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.enable_email_alert">
                                     </div>
                                 </div>
                                 <div x-show="s.enable_email_alert">
-                                    <div class="hvn-mb-3">
-                                        <label class="form-label hvn-fw-bold small">Email nhận Alert <code class="hvn-text-muted small">alert_email_addresses</code></label>
-                                        <input type="text" class="hvn-form-control" x-model="s.alert_email_addresses" placeholder="admin@hvn.vn, devops@hvn.vn">
+                                    <div class="mj-mb-3">
+                                        <label class="form-label mj-fw-bold small">Email nhận Alert <code class="mj-text-muted small">alert_email_addresses</code></label>
+                                        <input type="text" class="mj-form-control" x-model="s.alert_email_addresses" placeholder="admin@hvn.vn, devops@hvn.vn">
                                     </div>
                                 </div>
-                                <div class="hvn-row g-3">
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Cooldown Alert (giây) <code class="hvn-text-muted small">alert_cooldown</code></label>
-                                        <input type="number" class="hvn-form-control" x-model="s.alert_cooldown" min="60">
+                                <div class="mj-row g-3">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Cooldown Alert (giây) <code class="mj-text-muted small">alert_cooldown</code></label>
+                                        <input type="number" class="mj-form-control" x-model="s.alert_cooldown" min="60">
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Ngưỡng Job Failed <code class="hvn-text-muted small">alert_failed_threshold</code></label>
-                                        <input type="number" class="hvn-form-control" x-model="s.alert_failed_threshold" min="1">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Ngưỡng Job Failed <code class="mj-text-muted small">alert_failed_threshold</code></label>
+                                        <input type="number" class="mj-form-control" x-model="s.alert_failed_threshold" min="1">
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Ngưỡng Queue Tồn đọng <code class="hvn-text-muted small">alert_queue_backlog_threshold</code></label>
-                                        <input type="number" class="hvn-form-control" x-model="s.alert_queue_backlog_threshold" min="1">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Ngưỡng Queue Tồn đọng <code class="mj-text-muted small">alert_queue_backlog_threshold</code></label>
+                                        <input type="number" class="mj-form-control" x-model="s.alert_queue_backlog_threshold" min="1">
                                     </div>
                                 </div>
 
                                 <!-- ── Nút Test Notification ── -->
-                                <div class="hvn-mt-4 hvn-border-top hvn-pt-3">
-                                    <p class="hvn-fw-bold small hvn-mb-2">🧪 Test Notification</p>
-                                    <p class="hvn-text-muted small hvn-mb-3">Gửi tin nhắn test để xác nhận cấu hình đúng. Lưu settings trước khi test.</p>
-                                    <div class="hvn-d-flex hvn-align-items-center" style="gap:10px; flex-wrap:wrap;">
-                                        <button type="button" class="hvn-btn hvn-btn-outline-secondary"
+                                <div class="mj-mt-4 mj-border-top mj-pt-3">
+                                    <p class="mj-fw-bold small mj-mb-2">🧪 Test Notification</p>
+                                    <p class="mj-text-muted small mj-mb-3">Gửi tin nhắn test để xác nhận cấu hình đúng. Lưu settings trước khi test.</p>
+                                    <div class="mj-d-flex mj-align-items-center" style="gap:10px; flex-wrap:wrap;">
+                                        <button type="button" class="mj-btn mj-btn-outline-secondary"
                                                 @click="sendTestNotification()" :disabled="isTesting || isTestingEmail">
-                                            <i class="bi bi-telegram" :class="isTesting ? 'hvn-spin' : ''"></i>
+                                            <i class="bi bi-telegram" :class="isTesting ? 'mj-spin' : ''"></i>
                                             <span x-text="isTesting ? 'Đang gửi...' : 'Gửi test Telegram'"></span>
                                         </button>
 
-                                        <button type="button" class="hvn-btn hvn-btn-outline-primary"
+                                        <button type="button" class="mj-btn mj-btn-outline-primary"
                                                 @click="sendTestEmail()" :disabled="isTesting || isTestingEmail">
-                                            <i class="bi bi-envelope" :class="isTestingEmail ? 'hvn-spin' : ''"></i>
+                                            <i class="bi bi-envelope" :class="isTestingEmail ? 'mj-spin' : ''"></i>
                                             <span x-text="isTestingEmail ? 'Đang gửi...' : 'Gửi test Email'"></span>
                                         </button>
 
                                         <!-- Kết quả 2 nút hiển thị chung sau nút Email -->
                                         <span x-show="telegramResult.msg" class="small"
-                                            :class="telegramResult.ok ? 'hvn-text-success' : 'hvn-text-danger'"
+                                            :class="telegramResult.ok ? 'mj-text-success' : 'mj-text-danger'"
                                             x-text="telegramResult.msg"></span>
-                                        <span x-show="emailResult.msg" class="small hvn-ms-2"
-                                            :class="emailResult.ok ? 'hvn-text-success' : 'hvn-text-danger'"
+                                        <span x-show="emailResult.msg" class="small mj-ms-2"
+                                            :class="emailResult.ok ? 'mj-text-success' : 'mj-text-danger'"
                                             x-text="emailResult.msg"></span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: UI / NAVIGATION #64-67 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='ui'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-window hvn-text-info"></i> UI / Navigation</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='ui'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-window mj-text-info"></i> UI / Navigation</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Hiện link trong Domain Admin <code class="hvn-text-muted small">show_domain_service_link</code></div>
-                                        <div class="small hvn-text-muted">Hiển thị link "DNS Manager" trên trang Domain Service trong Admin Area.</div>
+                                        <div class="mj-fw-bold">Hiện link trong Domain Admin <code class="mj-text-muted small">show_domain_service_link</code></div>
+                                        <div class="small mj-text-muted">Hiển thị link "DNS Manager" trên trang Domain Service trong Admin Area.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.show_domain_service_link">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Hiện trong menu Domain (Client) <code class="hvn-text-muted small">show_under_domain_menu</code></div>
+                                        <div class="mj-fw-bold">Hiện trong menu Domain (Client) <code class="mj-text-muted small">show_under_domain_menu</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.show_under_domain_menu">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Hiện trong Sidebar Domain Detail <code class="hvn-text-muted small">show_in_domain_sidebar</code></div>
+                                        <div class="mj-fw-bold">Hiện trong Sidebar Domain Detail <code class="mj-text-muted small">show_in_domain_sidebar</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.show_in_domain_sidebar">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3">
-                                    <label class="form-label hvn-fw-bold">Thứ tự Menu <code class="hvn-text-muted small">nav_menu_order</code></label>
-                                    <input type="number" class="hvn-form-control" x-model="s.nav_menu_order" min="0" style="max-width:120px">
+                                <div class="mj-mb-3">
+                                    <label class="form-label mj-fw-bold">Thứ tự Menu <code class="mj-text-muted small">nav_menu_order</code></label>
+                                    <input type="number" class="mj-form-control" x-model="s.nav_menu_order" min="0" style="max-width:120px">
                                     <div class="form-text">Số nhỏ = hiện trước trong Client Area navigation.</div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: PERFORMANCE & CACHE #68-72, #94-96 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='perf'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-speedometer2 hvn-text-secondary"></i> Performance &amp; Cache</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='perf'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-speedometer2 mj-text-secondary"></i> Performance &amp; Cache</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Fetch từ NS mỗi lần load (Client) <code class="hvn-text-muted small">fetch_from_ns_on_load</code></div>
-                                        <div class="small hvn-text-muted">true: Gọi DA API mỗi lần client mở DNS Editor (~1s). false: Dùng DB local (&lt;50ms).</div>
+                                        <div class="mj-fw-bold">Fetch từ NS mỗi lần load (Client) <code class="mj-text-muted small">fetch_from_ns_on_load</code></div>
+                                        <div class="small mj-text-muted">true: Gọi DA API mỗi lần client mở DNS Editor (~1s). false: Dùng DB local (&lt;50ms).</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.fetch_from_ns_on_load">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Fetch từ NS mỗi lần load (Admin) <code class="hvn-text-muted small">fetch_from_ns_on_load_admin</code></div>
+                                        <div class="mj-fw-bold">Fetch từ NS mỗi lần load (Admin) <code class="mj-text-muted small">fetch_from_ns_on_load_admin</code></div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.fetch_from_ns_on_load_admin">
                                     </div>
                                 </div>
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Chế độ Database lớn <code class="hvn-text-muted small">large_db_mode</code></div>
-                                        <div class="small hvn-text-muted">Bật khi có &gt; 2000 domains. Trang Global Domains chỉ cho phép tìm kiếm, không load toàn bộ.</div>
+                                        <div class="mj-fw-bold">Chế độ Database lớn <code class="mj-text-muted small">large_db_mode</code></div>
+                                        <div class="small mj-text-muted">Bật khi có &gt; 2000 domains. Trang Global Domains chỉ cho phép tìm kiếm, không load toàn bộ.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.large_db_mode">
                                     </div>
                                 </div>
-                                <div class="hvn-row g-3 hvn-mb-4">
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">TTL Cache Zone <code class="hvn-text-muted small">cache_refresh_ttl</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.cache_refresh_ttl" min="60"><span class="hvn-input-group-text">giây</span></div>
+                                <div class="mj-row g-3 mj-mb-4">
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">TTL Cache Zone <code class="mj-text-muted small">cache_refresh_ttl</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.cache_refresh_ttl" min="60"><span class="mj-input-group-text">giây</span></div>
                                         <div class="form-text">Chỉ áp dụng khi fetch_from_ns_on_load = false. Mặc định: 720 (12 phút).</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Rate Limit Client <code class="hvn-text-muted small">client_rate_limit</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.client_rate_limit" min="1"><span class="hvn-input-group-text">thay đổi/phút</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Rate Limit Client <code class="mj-text-muted small">client_rate_limit</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.client_rate_limit" min="1"><span class="mj-input-group-text">thay đổi/phút</span></div>
                                     </div>
                                 </div>
 
-                                <h6 class="hvn-fw-bold hvn-mt-3 hvn-mb-3">🗂 Data Retention</h6>
-                                <div class="hvn-row g-3">
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Snapshot/domain <code class="hvn-text-muted small">snapshot_retention_count</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.snapshot_retention_count" min="1"><span class="hvn-input-group-text">snapshot</span></div>
+                                <h6 class="mj-fw-bold mj-mt-3 mj-mb-3">🗂 Data Retention</h6>
+                                <div class="mj-row g-3">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Snapshot/domain <code class="mj-text-muted small">snapshot_retention_count</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.snapshot_retention_count" min="1"><span class="mj-input-group-text">snapshot</span></div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small">Giữ Queue COMPLETE <code class="hvn-text-muted small">queue_completed_retention_days</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.queue_completed_retention_days" min="1"><span class="hvn-input-group-text">ngày</span></div>
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small">Giữ Queue COMPLETE <code class="mj-text-muted small">queue_completed_retention_days</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.queue_completed_retention_days" min="1"><span class="mj-input-group-text">ngày</span></div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold small hvn-text-warning">Tự động sửa Drift <code class="hvn-text-muted small">drift_auto_fix</code></label>
-                                        <div class="hvn-p-2 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold small mj-text-warning">Tự động sửa Drift <code class="mj-text-muted small">drift_auto_fix</code></label>
+                                        <div class="mj-p-2 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                             <span class="small">Push WHMCS→DA tự động</span>
-                                            <div class="form-check form-switch hvn-mb-0 hvn-ms-2">
+                                            <div class="form-check form-switch mj-mb-0 mj-ms-2">
                                                 <input class="form-check-input" type="checkbox" x-model="s.drift_auto_fix">
                                             </div>
                                         </div>
@@ -830,154 +830,154 @@
                             </div>
 
                             <!-- ════════ TAB: QUEUE & CRON #75-80 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='queue'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-stack hvn-text-secondary"></i> Queue &amp; Cron Worker</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='queue'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-stack mj-text-secondary"></i> Queue &amp; Cron Worker</h5>
 
-                                <div class="hvn-row g-3">
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Tần suất Cron <code class="hvn-text-muted small">cron_interval</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.cron_interval" min="10"><span class="hvn-input-group-text">giây</span></div>
+                                <div class="mj-row g-3">
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Tần suất Cron <code class="mj-text-muted small">cron_interval</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.cron_interval" min="10"><span class="mj-input-group-text">giây</span></div>
                                         <div class="form-text">Mặc định: 60 (1 phút). Giảm xuống 30 → sync nhanh hơn nhưng tốn CPU.</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Timeout mỗi Job <code class="hvn-text-muted small">job_timeout</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.job_timeout" min="5"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Timeout mỗi Job <code class="mj-text-muted small">job_timeout</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.job_timeout" min="5"><span class="mj-input-group-text">giây</span></div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Số lần Retry tối đa <code class="hvn-text-muted small">max_retry_attempts</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.max_retry_attempts" min="1" max="10"><span class="hvn-input-group-text">lần</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Số lần Retry tối đa <code class="mj-text-muted small">max_retry_attempts</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.max_retry_attempts" min="1" max="10"><span class="mj-input-group-text">lần</span></div>
                                         <div class="form-text">Range 1–10. Sau N lần fail → PERMANENTLY_FAILED.</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Timeout Stale Lock <code class="hvn-text-muted small">stale_lock_timeout</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.stale_lock_timeout" min="60"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Timeout Stale Lock <code class="mj-text-muted small">stale_lock_timeout</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.stale_lock_timeout" min="60"><span class="mj-input-group-text">giây</span></div>
                                         <div class="form-text">Job SYNCING quá N giây → coi là stale (cron crash) → recover.</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Thời gian chạy tối đa Worker <code class="hvn-text-muted small">worker_max_runtime</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.worker_max_runtime" min="10"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Thời gian chạy tối đa Worker <code class="mj-text-muted small">worker_max_runtime</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.worker_max_runtime" min="10"><span class="mj-input-group-text">giây</span></div>
                                         <div class="form-text">Worker tự thoát sau N giây. Nên &lt; cron_interval.</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Cửa sổ Conflict <code class="hvn-text-muted small">conflict_window</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.conflict_window" min="30"><span class="hvn-input-group-text">giây</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Cửa sổ Conflict <code class="mj-text-muted small">conflict_window</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.conflict_window" min="30"><span class="mj-input-group-text">giây</span></div>
                                         <div class="form-text">Khoảng thời gian kiểm tra xung đột khi tạo job mới cùng record.</div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: SECURITY #90-93 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='security'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-incognito hvn-text-danger"></i> Security &amp; Access Control</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='security'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-incognito mj-text-danger"></i> Security &amp; Access Control</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Giới hạn Sub-accounts <code class="hvn-text-muted small">restrict_subaccounts</code></div>
-                                        <div class="small hvn-text-muted">Sub-accounts chỉ quản lý DNS nếu tài khoản chính có quyền "Domain Management".</div>
+                                        <div class="mj-fw-bold">Giới hạn Sub-accounts <code class="mj-text-muted small">restrict_subaccounts</code></div>
+                                        <div class="small mj-text-muted">Sub-accounts chỉ quản lý DNS nếu tài khoản chính có quyền "Domain Management".</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.restrict_subaccounts">
                                     </div>
                                 </div>
 
-                                <div class="hvn-row g-3 hvn-mt-2">
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold">Lưu Audit Trail <code class="hvn-text-muted small">audit_trail_retention_days</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.audit_trail_retention_days" min="365"><span class="hvn-input-group-text">ngày</span></div>
+                                <div class="mj-row g-3 mj-mt-2">
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold">Lưu Audit Trail <code class="mj-text-muted small">audit_trail_retention_days</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.audit_trail_retention_days" min="365"><span class="mj-input-group-text">ngày</span></div>
                                         <div class="form-text">Tối thiểu 365 ngày.</div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold">Lưu Sync Logs <code class="hvn-text-muted small">sync_log_retention_days</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.sync_log_retention_days" min="1"><span class="hvn-input-group-text">ngày</span></div>
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold">Lưu Sync Logs <code class="mj-text-muted small">sync_log_retention_days</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.sync_log_retention_days" min="1"><span class="mj-input-group-text">ngày</span></div>
                                     </div>
-                                    <div class="hvn-col-md-4">
-                                        <label class="form-label hvn-fw-bold">Lưu Record History <code class="hvn-text-muted small">record_history_retention_days</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.record_history_retention_days" min="1"><span class="hvn-input-group-text">ngày</span></div>
+                                    <div class="mj-col-md-4">
+                                        <label class="form-label mj-fw-bold">Lưu Record History <code class="mj-text-muted small">record_history_retention_days</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.record_history_retention_days" min="1"><span class="mj-input-group-text">ngày</span></div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: LICENSE #97-104 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='license'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-key-fill hvn-text-warning"></i> License &amp; Bản quyền</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='license'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-key-fill mj-text-warning"></i> License &amp; Bản quyền</h5>
 
                                 <!-- Status Card -->
-                                <div class="hvn-alert hvn-d-flex hvn-align-items-center hvn-mb-4"
-                                     :class="s.license_status === 'Active' ? 'hvn-alert-success' : 'hvn-alert-danger'">
-                                    <i class="bi hvn-me-2 hvn-fs-4" :class="s.license_status === 'Active' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                                <div class="mj-alert mj-d-flex mj-align-items-center mj-mb-4"
+                                     :class="s.license_status === 'Active' ? 'mj-alert-success' : 'mj-alert-danger'">
+                                    <i class="bi mj-me-2 mj-fs-4" :class="s.license_status === 'Active' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
                                     <div>
-                                        <div class="hvn-fw-bold">Trạng thái: <span x-text="s.license_status || 'Chưa kích hoạt'"></span></div>
+                                        <div class="mj-fw-bold">Trạng thái: <span x-text="s.license_status || 'Chưa kích hoạt'"></span></div>
                                         <div class="small">Lần kiểm tra cuối: <span x-text="s.license_last_check || '—'"></span></div>
-                                        <div class="small hvn-text-danger" x-show="s.license_error_message" x-text="s.license_error_message"></div>
+                                        <div class="small mj-text-danger" x-show="s.license_error_message" x-text="s.license_error_message"></div>
                                     </div>
                                 </div>
 
-                                <div class="hvn-row g-3">
-                                    <div class="hvn-col-md-12">
-                                        <label class="form-label hvn-fw-bold">License Key <code class="hvn-text-muted small">license_key</code></label>
-                                        <input type="text" class="hvn-form-control font-monospace" x-model="s.license_key" placeholder="hvndns-XXXXXXXX">
+                                <div class="mj-row g-3">
+                                    <div class="mj-col-md-12">
+                                        <label class="form-label mj-fw-bold">License Key <code class="mj-text-muted small">license_key</code></label>
+                                        <input type="text" class="mj-form-control font-monospace" x-model="s.license_key" placeholder="MJ-DNS-XXXXXXXX">
                                     </div>
-                                    <div class="hvn-col-md-12">
-                                        <label class="form-label hvn-fw-bold">License Server URL <code class="hvn-text-muted small">license_server_url</code></label>
-                                        <input type="url" class="hvn-form-control font-monospace" x-model="s.license_server_url" placeholder="https://license.hvn.vn/api/v1/check">
+                                    <div class="mj-col-md-12">
+                                        <label class="form-label mj-fw-bold">License Server URL <code class="mj-text-muted small">license_server_url</code></label>
+                                        <input type="url" class="mj-form-control font-monospace" x-model="s.license_server_url" placeholder="https://license.hvn.vn/api/v1/check">
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Grace Days <code class="hvn-text-muted small">license_grace_days</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.license_grace_days" min="0"><span class="hvn-input-group-text">ngày</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Grace Days <code class="mj-text-muted small">license_grace_days</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.license_grace_days" min="0"><span class="mj-input-group-text">ngày</span></div>
                                         <div class="form-text">Số ngày tiếp tục dùng khi hết hạn hoặc không kết nối được server.</div>
                                     </div>
-                                    <div class="hvn-col-md-6">
-                                        <label class="form-label hvn-fw-bold">Chu kỳ kiểm tra <code class="hvn-text-muted small">license_check_interval</code></label>
-                                        <div class="hvn-input-group"><input type="number" class="hvn-form-control" x-model="s.license_check_interval" min="1"><span class="hvn-input-group-text">ngày</span></div>
+                                    <div class="mj-col-md-6">
+                                        <label class="form-label mj-fw-bold">Chu kỳ kiểm tra <code class="mj-text-muted small">license_check_interval</code></label>
+                                        <div class="mj-input-group"><input type="number" class="mj-form-control" x-model="s.license_check_interval" min="1"><span class="mj-input-group-text">ngày</span></div>
                                     </div>
                                 </div>
-                                <div class="hvn-mt-3">
-                                    <button type="button" class="hvn-btn hvn-btn-outline-primary" @click="checkLicense()">
+                                <div class="mj-mt-3">
+                                    <button type="button" class="mj-btn mj-btn-outline-primary" @click="checkLicense()">
                                         <i class="bi bi-arrow-repeat"></i> Kiểm tra License ngay
                                     </button>
                                 </div>
                             </div>
 
                             <!-- ════════ TAB: UPSELL #105-111 ════════ -->
-                            <div class="hvn-tab-pane hvn-p-4" x-show="activeTab==='upsell'" role="tabpanel">
-                                <h5 class="hvn-border-bottom hvn-pb-2 hvn-mb-4"><i class="bi bi-cart-check hvn-text-primary"></i> Upsell &amp; Addon</h5>
+                            <div class="mj-tab-pane mj-p-4" x-show="activeTab==='upsell'" role="tabpanel">
+                                <h5 class="mj-border-bottom mj-pb-2 mj-mb-4"><i class="bi bi-cart-check mj-text-primary"></i> Upsell &amp; Addon</h5>
 
-                                <div class="hvn-mb-3 hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
+                                <div class="mj-mb-3 mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
                                     <div>
-                                        <div class="hvn-fw-bold">Bật module Upsell <code class="hvn-text-muted small">upsell_enable</code></div>
-                                        <div class="small hvn-text-muted">Hiển thị gói nâng cấp/addon DNS trong Client Area.</div>
+                                        <div class="mj-fw-bold">Bật module Upsell <code class="mj-text-muted small">upsell_enable</code></div>
+                                        <div class="small mj-text-muted">Hiển thị gói nâng cấp/addon DNS trong Client Area.</div>
                                     </div>
-                                    <div class="form-check form-switch hvn-ms-3">
+                                    <div class="form-check form-switch mj-ms-3">
                                         <input class="form-check-input" type="checkbox" x-model="s.upsell_enable">
                                     </div>
                                 </div>
 
                                 <div x-show="s.upsell_enable">
-                                    <div class="hvn-row g-3 hvn-mb-3">
-                                        <div class="hvn-col-md-6">
-                                            <label class="form-label hvn-fw-bold">ID Addon DNSSEC <code class="hvn-text-muted small">upsell_dnssec_addon_id</code></label>
-                                            <input type="number" class="hvn-form-control" x-model="s.upsell_dnssec_addon_id" min="0" placeholder="0 = chưa cài đặt">
+                                    <div class="mj-row g-3 mj-mb-3">
+                                        <div class="mj-col-md-6">
+                                            <label class="form-label mj-fw-bold">ID Addon DNSSEC <code class="mj-text-muted small">upsell_dnssec_addon_id</code></label>
+                                            <input type="number" class="mj-form-control" x-model="s.upsell_dnssec_addon_id" min="0" placeholder="0 = chưa cài đặt">
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <label class="form-label hvn-fw-bold">ID Addon DDNS <code class="hvn-text-muted small">upsell_ddns_addon_id</code></label>
-                                            <input type="number" class="hvn-form-control" x-model="s.upsell_ddns_addon_id" min="0" placeholder="0 = chưa cài đặt">
+                                        <div class="mj-col-md-6">
+                                            <label class="form-label mj-fw-bold">ID Addon DDNS <code class="mj-text-muted small">upsell_ddns_addon_id</code></label>
+                                            <input type="number" class="mj-form-control" x-model="s.upsell_ddns_addon_id" min="0" placeholder="0 = chưa cài đặt">
                                         </div>
-                                        <div class="hvn-col-md-12">
-                                            <label class="form-label hvn-fw-bold">IDs Addon Quota/Limits <code class="hvn-text-muted small">upsell_quota_addon_ids</code></label>
-                                            <input type="text" class="hvn-form-control" x-model="s.upsell_quota_addon_ids" placeholder="12, 15, 22 (phân cách bằng dấu phẩy)">
+                                        <div class="mj-col-md-12">
+                                            <label class="form-label mj-fw-bold">IDs Addon Quota/Limits <code class="mj-text-muted small">upsell_quota_addon_ids</code></label>
+                                            <input type="text" class="mj-form-control" x-model="s.upsell_quota_addon_ids" placeholder="12, 15, 22 (phân cách bằng dấu phẩy)">
                                         </div>
-                                        <div class="hvn-col-md-12">
-                                            <label class="form-label hvn-fw-bold">URL tùy chỉnh <code class="hvn-text-muted small">upsell_custom_url</code></label>
-                                            <input type="url" class="hvn-form-control" x-model="s.upsell_custom_url" placeholder="https://... (để trống = dùng link mặc định)">
+                                        <div class="mj-col-md-12">
+                                            <label class="form-label mj-fw-bold">URL tùy chỉnh <code class="mj-text-muted small">upsell_custom_url</code></label>
+                                            <input type="url" class="mj-form-control" x-model="s.upsell_custom_url" placeholder="https://... (để trống = dùng link mặc định)">
                                         </div>
-                                        <div class="hvn-col-md-12">
-                                            <label class="form-label hvn-fw-bold">Mô tả Upsell <code class="hvn-text-muted small">upsell_description</code></label>
-                                            <textarea class="hvn-form-control" rows="3" x-model="s.upsell_description" placeholder="Nội dung tiếp thị nâng cấp..."></textarea>
+                                        <div class="mj-col-md-12">
+                                            <label class="form-label mj-fw-bold">Mô tả Upsell <code class="mj-text-muted small">upsell_description</code></label>
+                                            <textarea class="mj-form-control" rows="3" x-model="s.upsell_description" placeholder="Nội dung tiếp thị nâng cấp..."></textarea>
                                         </div>
-                                        <div class="hvn-col-md-6">
-                                            <div class="hvn-p-3 hvn-bg-light hvn-rounded hvn-d-flex hvn-justify-content-between hvn-align-items-center">
-                                                <div class="hvn-fw-bold small">Hiển thị giá Upsell <code class="hvn-text-muted small">upsell_display_price</code></div>
-                                                <div class="form-check form-switch hvn-mb-0 hvn-ms-2">
+                                        <div class="mj-col-md-6">
+                                            <div class="mj-p-3 mj-bg-light mj-rounded mj-d-flex mj-justify-content-between mj-align-items-center">
+                                                <div class="mj-fw-bold small">Hiển thị giá Upsell <code class="mj-text-muted small">upsell_display_price</code></div>
+                                                <div class="form-check form-switch mj-mb-0 mj-ms-2">
                                                     <input class="form-check-input" type="checkbox" x-model="s.upsell_display_price">
                                                 </div>
                                             </div>
@@ -989,10 +989,10 @@
                         </div><!-- end tab-content -->
 
                         <!-- ── Footer Save Button ── -->
-                        <div class="hvn-p-4 hvn-bg-light hvn-border-top hvn-text-end hvn-rounded-bottom">
-                            <button type="submit" class="hvn-btn hvn-btn-primary px-5" :disabled="isSaving">
+                        <div class="mj-p-4 mj-bg-light mj-border-top mj-text-end mj-rounded-bottom">
+                            <button type="submit" class="mj-btn mj-btn-primary px-5" :disabled="isSaving">
                                 <span x-show="!isSaving"><i class="bi bi-save"></i> Lưu tất cả cài đặt</span>
-                                <span x-show="isSaving"><span class="hvn-spinner-border hvn-spinner-border-sm"></span> Đang lưu...</span>
+                                <span x-show="isSaving"><span class="mj-spinner-border mj-spinner-border-sm"></span> Đang lưu...</span>
                             </button>
                         </div>
                     </form>
@@ -1000,7 +1000,7 @@
             </div>
         </div><!-- end col-md-9 -->
     </div><!-- end row -->
-</div><!-- end hvn-dns-admin -->
+</div><!-- end mj-dns-admin -->
 
 <script>
 {literal}
@@ -1035,7 +1035,7 @@ document.addEventListener('alpine:init', function() {
                 alert_unreachable_threshold: 3,
                 alert_queue_backlog_threshold: 100,
                 notify_client_on_record_create: false,
-            }, typeof HVNDNS_SETTINGS !== 'undefined' ? HVNDNS_SETTINGS : {}),
+            }, typeof MJDNS_SETTINGS !== 'undefined' ? MJDNS_SETTINGS : {}),
 
             saveSettings: function() {
                 var self = this;
@@ -1061,15 +1061,15 @@ document.addEventListener('alpine:init', function() {
                     self.isSaving = false;
                     if (res.success) {
                         self.savedMsg = true;
-                        window._hvnToast('success', 'Đã lưu', 'Cài đặt đã được lưu thành công.');
+                        window._mjDnsToast('success', 'Đã lưu', 'Cài đặt đã được lưu thành công.');
                         setTimeout(function() { self.savedMsg = false; }, 3000);
                     } else {
-                        window._hvnToast('error', 'Lỗi lưu settings', res.error || 'Không xác định');
+                        window._mjDnsToast('error', 'Lỗi lưu settings', res.error || 'Không xác định');
                     }
                 })
                 .catch(function(e) {
                     self.isSaving = false;
-                    window._hvnToast('error', 'Lỗi kết nối', 'Không thể kết nối khi lưu settings. Vui lòng thử lại.');
+                    window._mjDnsToast('error', 'Lỗi kết nối', 'Không thể kết nối khi lưu settings. Vui lòng thử lại.');
                 });
             },
 
@@ -1136,12 +1136,12 @@ document.addEventListener('alpine:init', function() {
                 var self = this;
                 var btn  = event.currentTarget;
                 var icon = btn.querySelector('i');
-                icon.classList.add('hvn-spin');
+                icon.classList.add('mj-spin');
                 setTimeout(function() {
-                    icon.classList.remove('hvn-spin');
+                    icon.classList.remove('mj-spin');
                     self.s.license_status    = 'Active';
                     self.s.license_last_check = new Date().toLocaleString('vi-VN');
-                    window._hvnToast('success', 'License hợp lệ', 'Trạng thái: Active');
+                    window._mjDnsToast('success', 'License hợp lệ', 'Trạng thái: Active');
                 }, 1200);
             }
         };
@@ -1152,10 +1152,10 @@ document.addEventListener('alpine:init', function() {
 
 <style>
 {literal}
-.hvn-tab-pane {
+.mj-tab-pane {
     display: block;
 }
-#settingsLayoutTabs .hvn-list-group-item {
+#settingsLayoutTabs .mj-list-group-item {
     border: none;
     border-bottom: 1px solid #f1f3f5;
     padding: 0.85rem 1.25rem;
@@ -1165,19 +1165,19 @@ document.addEventListener('alpine:init', function() {
     width: 100%;
     text-align: left;
 }
-#settingsLayoutTabs .hvn-list-group-item.hvn-tab-active,
-#settingsLayoutTabs .hvn-list-group-item:hover {
+#settingsLayoutTabs .mj-list-group-item.mj-tab-active,
+#settingsLayoutTabs .mj-list-group-item:hover {
     background-color: #f0f4ff;
 }
-#settingsLayoutTabs .hvn-list-group-item.hvn-tab-active {
+#settingsLayoutTabs .mj-list-group-item.mj-tab-active {
     color: #0d6efd;
     border-left: 4px solid #0d6efd;
     font-weight: 600;
 }
-.hvn-spin {
-    animation: hvn-spin-kf 1s linear infinite;
+.mj-spin {
+    animation: mj-spin-kf 1s linear infinite;
     display: inline-block;
 }
-@keyframes hvn-spin-kf { 100% { transform: rotate(360deg); } }
+@keyframes mj-spin-kf { 100% { transform: rotate(360deg); } }
 {/literal}
 </style>

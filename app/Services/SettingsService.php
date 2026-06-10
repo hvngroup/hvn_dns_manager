@@ -1,8 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Helpers\SettingsHelper;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class SettingsService
@@ -13,7 +15,7 @@ class SettingsService
 
     public function getSettingsForPage(): array
     {
-        $rows = Capsule::table('mod_hvndns_settings')->get();
+        $rows = Capsule::table('tbl_mj_dns_settings')->get();
         $settings = [];
         foreach ($rows as $row) {
             $settings[$row->setting_key] = $row->setting_val;
@@ -76,16 +78,16 @@ class SettingsService
             'email_forwarder_limit' => (int) $get('email_forwarder_limit', 5),
             'email_destination_limit' => (int) $get('email_destination_limit', 10),
             'email_verify_template' => $get('email_verify_template', ''),
-            // DDNS
-            'ddns_mode' => $b('ddns_mode', false),
+            // DDNS (mode: off/free/paid — giữ chuỗi cho dropdown admin)
+            'ddns_mode' => $get('ddns_mode', 'off'),
             'ddns_rate_limit' => (int) $get('ddns_rate_limit', 60),
             'ddns_token_limit' => (int) $get('ddns_token_limit', 5),
             'enable_ddns_bruteforce' => $b('enable_ddns_bruteforce', true),
             'ddns_bruteforce_threshold' => (int) $get('ddns_bruteforce_threshold', 10),
             'ddns_bruteforce_window' => (int) $get('ddns_bruteforce_window', 3600),
             'ddns_bruteforce_ban_duration' => (int) $get('ddns_bruteforce_ban_duration', 3600),
-            // DNSSEC
-            'dnssec_mode' => $b('dnssec_mode', false),
+            // DNSSEC (mode: off/free/paid — giữ chuỗi cho dropdown admin)
+            'dnssec_mode' => $get('dnssec_mode', 'off'),
             'dnssec_auto_resign' => $b('dnssec_auto_resign', true),
             // SSL
             'enable_auto_ssl' => $b('enable_auto_ssl', true),
@@ -335,7 +337,7 @@ class SettingsService
             }
 
             $notif = new NotificationService();
-            $subject = '[HVN DNS] Test Email Alert — ' . date('d/m/Y H:i:s');
+            $subject = '[MJ DNS] Test Email Alert — ' . date('d/m/Y H:i:s');
             $fields = [
                 'Job ID' => '#999 (Test)',
                 'Action' => 'EDIT_RECORD',
@@ -372,7 +374,7 @@ class SettingsService
                     }
                 } else {
                     $fromDomain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'whmcs.local';
-                    $headers = 'From: HVN DNS Manager <noreply@' . $fromDomain . '>' . "\r\n"
+                    $headers = 'From: MJ DNS Manager <noreply@' . $fromDomain . '>' . "\r\n"
                         . 'Content-Type: text/html; charset=UTF-8' . "\r\n"
                         . 'MIME-Version: 1.0' . "\r\n";
                     if (@mail($email, $subject, $htmlBody, $headers)) {
@@ -383,7 +385,7 @@ class SettingsService
                 }
             }
 
-            logActivity('HVN DNS Manager: Test email sent to: ' . implode(', ', $sentTo)
+            logActivity('MJ DNS Manager: Test email sent to: ' . implode(', ', $sentTo)
                 . (empty($failed) ? '' : ' | Failed: ' . implode(', ', $failed)));
 
             if (!empty($sentTo)) {

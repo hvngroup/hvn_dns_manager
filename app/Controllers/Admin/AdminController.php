@@ -1,12 +1,14 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Admin;
+namespace MJ\DnsManager\Controllers\Admin;
 
-use HvnGroup\DnsManager\Services\DashboardService;
-use HvnGroup\DnsManager\Services\ZoneManager;
-use HvnGroup\DnsManager\Services\RecordManager;
-use HvnGroup\DnsManager\Services\ReportService;
-use HvnGroup\DnsManager\Services\SettingsService;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Services\DashboardService;
+use MJ\DnsManager\Services\ZoneManager;
+use MJ\DnsManager\Services\RecordManager;
+use MJ\DnsManager\Services\ReportService;
+use MJ\DnsManager\Services\SettingsService;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class AdminController
@@ -27,9 +29,9 @@ class AdminController
         if (!$this->tablesExist()) {
             echo '<div style="margin:30px;padding:20px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px">
                 <h4>⚠️ Database chưa được khởi tạo</h4>
-                <p>Bảng <code>mod_hvndns_*</code> chưa tồn tại. Vui lòng:</p>
+                <p>Bảng <code>tbl_mj_dns_*</code> chưa tồn tại. Vui lòng:</p>
                 <ol>
-                    <li>Vào <strong>Admin &rsaquo; Addons &rsaquo; HVN DNS Manager</strong></li>
+                    <li>Vào <strong>Admin &rsaquo; Addons &rsaquo; MJ DNS Manager</strong></li>
                     <li>Bấm <strong>Deactivate</strong> rồi <strong>Activate</strong> lại module</li>
                     <li>Migration sẽ tự chạy và tạo các bảng</li>
                 </ol>
@@ -223,8 +225,8 @@ class AdminController
 
     private function actionServerEdit(): void
     {
-        $flash = $_SESSION['hvndns_flash'] ?? null;
-        unset($_SESSION['hvndns_flash']);
+        $flash = $_SESSION['mj_dns_flash'] ?? null;
+        unset($_SESSION['mj_dns_flash']);
         $this->smarty->assign('flash', $flash);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -252,7 +254,7 @@ class AdminController
         $page         = max(1, (int) ($_GET['page'] ?? 1));
         $perPage      = 50;
 
-        $query = \HvnGroup\DnsManager\Models\Domain::orderBy('domain');
+        $query = \MJ\DnsManager\Models\Domain::orderBy('domain');
         if ($search)       $query->where('domain', 'like', '%' . $search . '%');
         if ($filterStatus) $query->where('status', $filterStatus);
 
@@ -271,11 +273,11 @@ class AdminController
         $domainIds   = $domains->pluck('id')->toArray();
         $failedCounts = $lastSyncs = [];
         if (!empty($domainIds)) {
-            $failedCounts = \HvnGroup\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
+            $failedCounts = \MJ\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
                 ->whereIn('status', ['FAILED', 'PERMANENTLY_FAILED'])
                 ->selectRaw('domain_id, count(*) as cnt')->groupBy('domain_id')
                 ->pluck('cnt', 'domain_id')->toArray();
-            $lastSyncs = \HvnGroup\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
+            $lastSyncs = \MJ\DnsManager\Models\QueueJob::whereIn('domain_id', $domainIds)
                 ->whereNotNull('completed_at')
                 ->selectRaw('domain_id, max(completed_at) as last_completed')->groupBy('domain_id')
                 ->pluck('last_completed', 'domain_id')->toArray();
@@ -291,7 +293,7 @@ class AdminController
                 'domain'       => $d->domain,
                 'client_id'    => $d->whmcs_user_id,
                 'client_name'  => $clients[$d->whmcs_user_id] ?? '(Unknown)',
-                'records_count' => \HvnGroup\DnsManager\Models\Record::where('domain_id', $d->id)->count(),
+                'records_count' => \MJ\DnsManager\Models\Record::where('domain_id', $d->id)->count(),
                 'last_sync'    => $lastSync,
                 'failed_jobs'  => $failed,
                 'status'       => $d->status,
@@ -346,7 +348,7 @@ class AdminController
 
     private function actionTemplates(): void
     {
-        $templates = \HvnGroup\DnsManager\Models\Template::orderBy('is_default', 'desc')
+        $templates = \MJ\DnsManager\Models\Template::orderBy('is_default', 'desc')
             ->orderBy('name')
             ->get()
             ->map(function ($t) {
@@ -374,8 +376,8 @@ class AdminController
 
     private function actionTemplateEdit(): void
     {
-        $flash = $_SESSION['hvndns_flash'] ?? null;
-        unset($_SESSION['hvndns_flash']);
+        $flash = $_SESSION['mj_dns_flash'] ?? null;
+        unset($_SESSION['mj_dns_flash']);
         $this->smarty->assign('flash', $flash);
 
         $id       = (int) ($_GET['id'] ?? 0);
@@ -383,7 +385,7 @@ class AdminController
         $template = null;
 
         if ($isEdit) {
-            $row = \HvnGroup\DnsManager\Models\Template::find($id);
+            $row = \MJ\DnsManager\Models\Template::find($id);
             if ($row) {
                 $records = is_array($row->records_data) ? $row->records_data : [];
                 // Chuẩn hoá field: backend dùng 'priority', template_edit.tpl dùng 'prio'
@@ -495,24 +497,53 @@ class AdminController
         echo json_encode((new SettingsService())->testEmail($input));
     }
 
+    // Async-first: các nút "Run now" KHÔNG gọi DA trong request admin. Chúng chỉ
+    // ghi force-flag; AfterCronJob (cron context, được phép gọi DA) sẽ thực thi.
     private function ajaxRunSslCheck(): void
     {
-        echo json_encode((new ReportService())->runSslCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_ssl_check', $id > 0 ? (string) $id : 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch kiểm tra SSL. Kết quả cập nhật sau chu kỳ cron tiếp theo (vài phút) — tải lại trang để xem.',
+        ]);
     }
 
     private function ajaxRunDriftCheck(): void
     {
-        echo json_encode((new ReportService())->runDriftCheck((int) ($_REQUEST['domain_id'] ?? 0)));
+        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', $id > 0 ? ('id:' . $id) : 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift. Kết quả cập nhật sau chu kỳ cron tiếp theo (vài phút) — tải lại trang để xem.',
+        ]);
     }
 
     private function ajaxRunDriftScanByName(): void
     {
-        echo json_encode((new ReportService())->runDriftScanByName(trim($_REQUEST['domain'] ?? '')));
+        $name = trim($_REQUEST['domain'] ?? '');
+        if ($name === '') {
+            echo json_encode(['success' => false, 'error' => 'Thiếu tên domain.']);
+            return;
+        }
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', 'name:' . $name);
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift cho ' . $name . '. Tải lại trang sau vài phút để xem kết quả.',
+        ]);
     }
 
     private function ajaxRunDriftScanAll(): void
     {
-        echo json_encode((new ReportService())->runDriftScanAll());
+        \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', 'all');
+        echo json_encode([
+            'success' => true,
+            'data'    => ['scheduled' => true],
+            'message' => 'Đã lên lịch quét drift toàn bộ domain. Tải lại trang sau vài phút để xem kết quả.',
+        ]);
     }
 
     private function ajaxResolveDrift(): void
@@ -532,7 +563,7 @@ class AdminController
             return;
         }
 
-        echo json_encode((new \HvnGroup\DnsManager\Services\ReportService())->resolveDrift($driftId, $action));
+        echo json_encode((new \MJ\DnsManager\Services\ReportService())->resolveDrift($driftId, $action));
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -570,7 +601,7 @@ class AdminController
     private function tablesExist(): bool
     {
         try {
-            return Capsule::schema()->hasTable('mod_hvndns_queue');
+            return Capsule::schema()->hasTable('tbl_mj_dns_queue');
         } catch (\Exception $e) {
             return false;
         }
@@ -579,15 +610,15 @@ class AdminController
     // Dùng bởi ServerService::saveServer() để redirect sau khi lưu
     public function redirectToServers(string $msg): void
     {
-        $_SESSION['hvndns_flash'] = ['type' => 'success', 'message' => $msg];
-        header('Location: addonmodules.php?module=hvn_dns_manager&action=servers');
+        $_SESSION['mj_dns_flash'] = ['type' => 'success', 'message' => $msg];
+        header('Location: addonmodules.php?module=mj_dns_manager&action=servers');
         exit;
     }
 
     public function redirectToServerEdit(int $id, string $type, string $msg): void
     {
-        $_SESSION['hvndns_flash'] = ['type' => $type, 'message' => $msg];
-        $url = 'addonmodules.php?module=hvn_dns_manager&action=server_edit';
+        $_SESSION['mj_dns_flash'] = ['type' => $type, 'message' => $msg];
+        $url = 'addonmodules.php?module=mj_dns_manager&action=server_edit';
         if ($id > 0) {
             $url .= '&id=' . $id;
         }

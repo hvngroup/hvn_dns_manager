@@ -180,7 +180,7 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 - Kiểm tra giá trị mode mới (off/free/paid) qua SettingsHelper để có luồng xử lý tương ứng
 ```
 
-### 2.5. Primary-only Push
+### 2.5. Fan-out Multi-Server
 
 ```
 ❌ CẤM:
@@ -189,9 +189,10 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 - Giả định số lượng server cố định
 
 ✅ BẮT BUỘC:
-- QueueManager::dispatch() LUÔN query ServerRegistry::getActiveServers()
-- Từ N server active → Mỗi lần dispatch tạo 1 job cho Primary Server
-- Status tính từ sub-job duy nhất của Primary Server
+- QueueManager::dispatch() LUÔN query Server::where('is_active', true)
+- Từ N server active → Mỗi lần dispatch tạo N sub-job độc lập (1 job/server),
+  cùng batch_id (UUID v4); mỗi sub-job có server_id / status / retry riêng
+- Status tổng hợp từ tất cả sub-job trong cùng batch
 ```
 
 ---
@@ -546,7 +547,7 @@ class DnsRecordService
             'priority'  => $priority,
         ]);
 
-        // 6. Dispatch to queue (Primary-only Push)
+        // 6. Dispatch to queue (Fan-out Multi-Server)
         $batchId = $this->queue->dispatch(
             domainId:  $domainId,
             action:    'ADD_RECORD',

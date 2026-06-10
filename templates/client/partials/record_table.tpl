@@ -62,7 +62,7 @@
 
             {* ══════ ROW THÊM MỚI (đầu bảng) ══════ *}
             <template x-if="addingNew">
-                <tr class="hvn-inline-add">
+                <tr class="mj-inline-add">
                     <td style="padding:10px 8px;">
                         <select class="form-select form-select-sm" x-model="editForm.type">
                             <option value="A">A</option>
@@ -130,7 +130,7 @@
 
             {* ══════ DANH SÁCH RECORD ══════ *}
             <template x-for="record in filteredRecords" x-bind:key="record.id">
-                <tr x-bind:class="(record.pending_delete ? 'opacity-50' : '') + (editingId === record.id ? ' hvn-inline-edit' : '')">
+                <tr x-bind:class="(record.pending_delete ? 'opacity-50' : '') + (editingId === record.id ? ' mj-inline-edit' : '')">
 
                     {* ── Chế độ HIỂN THỊ ── *}
                     <template x-if="editingId !== record.id">

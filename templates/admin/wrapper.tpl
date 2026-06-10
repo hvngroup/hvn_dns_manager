@@ -1,19 +1,19 @@
 <!-- Include Custom Pure CSS Utilities, Google Fonts & Icons -->
-<link rel="stylesheet" href="../modules/addons/hvn_dns_manager/assets/css/hvndns_common.css?v={$smarty.now}">
+<link rel="stylesheet" href="../modules/addons/mj_dns_manager/assets/css/mj-dns-common.css?v={$smarty.now}">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
 {literal}
-    .hvn-admin-layout, .hvn-admin-layout *:not([class*="bi-"]):not([class*="fa-"]) {
+    .mj-admin-layout, .mj-admin-layout *:not([class*="bi-"]):not([class*="fa-"]) {
         font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
     }
-    .hvn-admin-layout {
+    .mj-admin-layout {
         font-size: 15px !important;
     }
-    .hvn-admin-layout .small, .hvn-admin-layout small {
+    .mj-admin-layout .small, .mj-admin-layout small {
         font-size: 0.875em !important;
     }
-    .hvn-admin-layout h1, .hvn-admin-layout h2, .hvn-admin-layout h3, .hvn-admin-layout h4, .hvn-admin-layout h5, .hvn-admin-layout h6 {
+    .mj-admin-layout h1, .mj-admin-layout h2, .mj-admin-layout h3, .mj-admin-layout h4, .mj-admin-layout h5, .mj-admin-layout h6 {
         font-weight: 600;
     }
 {/literal}
@@ -22,25 +22,25 @@
 <!-- Alpine JS -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-<div class="hvn-wrapper hvn-admin-layout hvn-container-fluid hvn-px-0">
+<div class="mj-wrapper mj-admin-layout mj-container-fluid mj-px-0">
 
 <!-- ── Global Toast Container ─────────────────────────────────────────── -->
-<div id="hvn-toast-root" x-data="hvnToastSystem()" class="hvn-toast-container">
+<div id="mj-toast-root" x-data="mjDnsToastSystem()" class="mj-toast-container">
     <template x-for="t in toasts" :key="t.id">
-        <div class="hvn-toast" :class="['hvn-toast-' + t.type, t.leaving ? 'hvn-toast-leaving' : '']" role="alert" style="position:relative;overflow:hidden;">
-            <div class="hvn-toast-icon" x-html="t.icon"></div>
-            <div class="hvn-toast-body">
-                <div class="hvn-toast-title" x-text="t.title"></div>
-                <div class="hvn-toast-message" x-show="t.message" x-text="t.message"></div>
+        <div class="mj-toast" :class="['mj-toast-' + t.type, t.leaving ? 'mj-toast-leaving' : '']" role="alert" style="position:relative;overflow:hidden;">
+            <div class="mj-toast-icon" x-html="t.icon"></div>
+            <div class="mj-toast-body">
+                <div class="mj-toast-title" x-text="t.title"></div>
+                <div class="mj-toast-message" x-show="t.message" x-text="t.message"></div>
             </div>
-            <button class="hvn-toast-close" @click="dismiss(t.id)" aria-label="Đóng">×</button>
+            <button class="mj-toast-close" @click="dismiss(t.id)" aria-label="Đóng">×</button>
         </div>
     </template>
 </div>
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
-    Alpine.data('hvnToastSystem', () => ({
+    Alpine.data('mjDnsToastSystem', () => ({
         toasts: [],
         _nextId: 1,
 
@@ -70,12 +70,12 @@ document.addEventListener('alpine:init', () => {
         init() {
             var self = this;
             // Expose global API
-            window._hvnToast = function(type, title, message, duration) {
+            window._mjDnsToast = function(type, title, message, duration) {
                 self.add(type, title, message, duration);
             };
 
             // Listen to custom event (for cross-Alpine-component usage)
-            window.addEventListener('hvn:toast', function(e) {
+            window.addEventListener('mjdns:toast', function(e) {
                 var d = e.detail || {};
                 self.add(d.type || 'info', d.title || d.message || '', d.message || '', d.duration);
             });
@@ -86,26 +86,26 @@ document.addEventListener('alpine:init', () => {
 </script>
 
 <!-- ── Global Confirm Modal ───────────────────────────────────────────── -->
-<div id="hvn-confirm-root" x-data="hvnConfirmModal()">
-    <div class="hvn-modal-backdrop" x-show="open" x-transition.opacity style="display:none;" @keydown.escape.window="cancel()" @click.self="cancel()">
-        <div class="hvn-modal-box" @click.stop>
-            <div class="hvn-modal-header">
-                <div class="hvn-modal-header-left">
-                    <div class="hvn-modal-icon" :class="'hvn-modal-icon-' + variant">
+<div id="mj-confirm-root" x-data="mjDnsConfirmModal()">
+    <div class="mj-modal-backdrop" x-show="open" x-transition.opacity style="display:none;" @keydown.escape.window="cancel()" @click.self="cancel()">
+        <div class="mj-modal-box" @click.stop>
+            <div class="mj-modal-header">
+                <div class="mj-modal-header-left">
+                    <div class="mj-modal-icon" :class="'mj-modal-icon-' + variant">
                         <i class="bi" :class="variant === 'danger' ? 'bi-trash3-fill' : (variant === 'success' ? 'bi-check-circle-fill' : (variant === 'info' ? 'bi-info-circle-fill' : 'bi-exclamation-triangle-fill'))"></i>
                     </div>
-                    <h5 class="hvn-modal-title" x-text="title" style="margin:0;align-self:center;"></h5>
+                    <h5 class="mj-modal-title" x-text="title" style="margin:0;align-self:center;"></h5>
                 </div>
-                <button class="hvn-modal-close" @click="cancel()" type="button" title="Đóng">
+                <button class="mj-modal-close" @click="cancel()" type="button" title="Đóng">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
-            <div class="hvn-modal-body">
-                <p class="hvn-modal-message" x-text="message"></p>
+            <div class="mj-modal-body">
+                <p class="mj-modal-message" x-text="message"></p>
             </div>
-            <div class="hvn-modal-footer">
-                <button class="hvn-modal-btn hvn-modal-btn-cancel" @click="cancel()" x-text="cancelLabel" type="button"></button>
-                <button class="hvn-modal-btn" :class="'hvn-modal-btn-ok-' + variant" @click="confirm()" x-text="confirmLabel" x-ref="confirmBtn" type="button"></button>
+            <div class="mj-modal-footer">
+                <button class="mj-modal-btn mj-modal-btn-cancel" @click="cancel()" x-text="cancelLabel" type="button"></button>
+                <button class="mj-modal-btn" :class="'mj-modal-btn-ok-' + variant" @click="confirm()" x-text="confirmLabel" x-ref="confirmBtn" type="button"></button>
             </div>
         </div>
     </div>
@@ -113,7 +113,7 @@ document.addEventListener('alpine:init', () => {
 <script>
 {literal}
 document.addEventListener('alpine:init', () => {
-    Alpine.data('hvnConfirmModal', () => ({
+    Alpine.data('mjDnsConfirmModal', () => ({
         open:         false,
         title:        'Xác nhận',
         message:      '',
@@ -124,7 +124,7 @@ document.addEventListener('alpine:init', () => {
 
         init() {
             var self = this;
-            window._hvnConfirm = function(options) {
+            window._mjDnsConfirm = function(options) {
                 if (typeof options === 'string') {
                     options = { message: options };
                 }
@@ -167,45 +167,45 @@ document.addEventListener('alpine:init', () => {
 {/literal}
 </script>
 
-    <div class="hvn-row hvn-g-4">
+    <div class="mj-row mj-g-4">
         <!-- Sidebar Navigation -->
-        <div class="hvn-col-md-3 hvn-col-lg-2">
-            <div class="hvn-list-group hvn-list-group-flush hvn-rounded hvn-shadow-sm hvn-border-0 hvn-mb-4 sticky-top" style="top: 20px;">
-                <div class="hvn-list-group-item hvn-bg-dark hvn-text-white hvn-fw-bold hvn-py-3 hvn-text-center">
-                    <i class="bi bi-hdd-network"></i> HVN DNS Manager
+        <div class="mj-col-md-3 mj-col-lg-2">
+            <div class="mj-list-group mj-list-group-flush mj-rounded mj-shadow-sm mj-border-0 mj-mb-4 sticky-top" style="top: 20px;">
+                <div class="mj-list-group-item mj-bg-dark mj-text-white mj-fw-bold mj-py-3 mj-text-center">
+                    <i class="bi bi-hdd-network"></i> MJ DNS Manager
                 </div>
-                <a href="{$modulelink}&action=dashboard" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'dashboard' || $action == '' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-speedometer2 hvn-me-2"></i> Dashboard
+                <a href="{$modulelink}&action=dashboard" class="mj-list-group-item mj-list-group-item-action {if $action == 'dashboard' || $action == '' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-speedometer2 mj-me-2"></i> Dashboard
                 </a>
-                <a href="{$modulelink}&action=servers" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'servers' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-server hvn-me-2"></i> Servers
+                <a href="{$modulelink}&action=servers" class="mj-list-group-item mj-list-group-item-action {if $action == 'servers' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-server mj-me-2"></i> Servers
                 </a>
-                <a href="{$modulelink}&action=domains" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'domains' || $action == 'dns_editor' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-globe hvn-me-2"></i> Domains
+                <a href="{$modulelink}&action=domains" class="mj-list-group-item mj-list-group-item-action {if $action == 'domains' || $action == 'dns_editor' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-globe mj-me-2"></i> Domains
                 </a>
-                <a href="{$modulelink}&action=sync_logs" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'sync_logs' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-journals hvn-me-2"></i> Sync Logs
+                <a href="{$modulelink}&action=sync_logs" class="mj-list-group-item mj-list-group-item-action {if $action == 'sync_logs' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-journals mj-me-2"></i> Sync Logs
                 </a>
-                <a href="{$modulelink}&action=audit_trail" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'audit_trail' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-shield-lock hvn-me-2"></i> Audit Trail
+                <a href="{$modulelink}&action=audit_trail" class="mj-list-group-item mj-list-group-item-action {if $action == 'audit_trail' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-shield-lock mj-me-2"></i> Audit Trail
                 </a>
-                <a href="{$modulelink}&action=templates" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'templates' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-file-text hvn-me-2"></i> Templates
+                <a href="{$modulelink}&action=templates" class="mj-list-group-item mj-list-group-item-action {if $action == 'templates' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-file-text mj-me-2"></i> Templates
                 </a>
-                <a href="{$modulelink}&action=drift_reports" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'drift_reports' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-arrow-left-right hvn-me-2"></i> Drift Reports
+                <a href="{$modulelink}&action=drift_reports" class="mj-list-group-item mj-list-group-item-action {if $action == 'drift_reports' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-arrow-left-right mj-me-2"></i> Drift Reports
                 </a>
-                <a href="{$modulelink}&action=bulk" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'bulk' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-lightning-charge hvn-me-2"></i> Bulk Operations
+                <a href="{$modulelink}&action=bulk" class="mj-list-group-item mj-list-group-item-action {if $action == 'bulk' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-lightning-charge mj-me-2"></i> Bulk Operations
                 </a>
-                <a href="{$modulelink}&action=settings" class="hvn-list-group-item hvn-list-group-item-action {if $action == 'settings' }active hvn-border-primary hvn-border-start hvn-fw-bold{/if}">
-                    <i class="bi bi-gear hvn-me-2"></i> Settings
+                <a href="{$modulelink}&action=settings" class="mj-list-group-item mj-list-group-item-action {if $action == 'settings' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
+                    <i class="bi bi-gear mj-me-2"></i> Settings
                 </a>
             </div>
         </div>
 
         <!-- Main Content Area -->
-        <div class="hvn-col-md-9 hvn-col-lg-10">
+        <div class="mj-col-md-9 mj-col-lg-10">
 
             <!-- Render The Body Template -->
             {include file="`$template_name`.tpl" }

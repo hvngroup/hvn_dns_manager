@@ -1,6 +1,8 @@
 <?php
 
-namespace HvnGroup\DnsManager\Security;
+namespace MJ\DnsManager\Security;
+
+defined("WHMCS") or die("Access Denied");
 
 class InputSanitizer
 {

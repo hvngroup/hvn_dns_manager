@@ -1,8 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Validators;
+namespace MJ\DnsManager\Validators;
 
-use HvnGroup\DnsManager\Models\Record;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Record;
 
 /**
  * ConflictValidator — Kiểm tra xung đột RFC giữa các DNS record.
@@ -14,7 +16,7 @@ use HvnGroup\DnsManager\Models\Record;
  *
  * Được gọi từ RecordController TRƯỚC khi lưu vào DB và dispatch Queue.
  *
- * @package HvnGroup\DnsManager\Validators
+ * @package MJ\DnsManager\Validators
  * @since   1.0.0
  */
 class ConflictValidator
@@ -25,7 +27,7 @@ class ConflictValidator
      * Trả về null nếu không có xung đột.
      * Trả về string mô tả lỗi nếu có xung đột.
      *
-     * @param  int    $domainId  ID domain trong mod_hvndns_domains.
+     * @param  int    $domainId  ID domain trong tbl_mj_dns_domains.
      * @param  string $type      Loại record mới (A, CNAME, MX, ...).
      * @param  string $name      Name của record mới (@ hoặc subdomain).
      * @param  int    $excludeId ID record cần bỏ qua khi check (dùng khi edit).

@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Client;
+namespace MJ\DnsManager\Controllers\Client;
+
+defined("WHMCS") or die("Access Denied");
 
 use WHMCS\Database\Capsule;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\Redirect;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Services\QueueManager;
-use HvnGroup\DnsManager\Helpers\AuditLogger;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\Redirect;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Services\QueueManager;
+use MJ\DnsManager\Helpers\AuditLogger;
 
 class RedirectController
 {
@@ -117,7 +119,7 @@ class RedirectController
     private function addRedirect(array $input, $userId)
     {
         // Kiểm tra tính năng có được bật không
-        if (!\HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true)) {
+        if (!\MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true)) {
             return $this->errorResponse('DISABLED', 'Tính năng URL Redirect hiện đang bị vô hiệu hóa.');
         }
 
@@ -125,9 +127,9 @@ class RedirectController
         $domain = $this->getDomainOrError($domainId, $userId);
 
         // Kiểm tra quota
-        $redirectLimit = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('url_redirect_limit', 5);
+        $redirectLimit = \MJ\DnsManager\Helpers\SettingsHelper::getInt('url_redirect_limit', 5);
         if ($redirectLimit > 0) {
-            $currentCount = \HvnGroup\DnsManager\Models\Redirect::where('domain_id', $domainId)->count();
+            $currentCount = \MJ\DnsManager\Models\Redirect::where('domain_id', $domainId)->count();
             if ($currentCount >= $redirectLimit) {
                 return $this->errorResponse(
                     'QUOTA_EXCEEDED',

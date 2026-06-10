@@ -1,11 +1,13 @@
 <?php
 
-namespace HvnGroup\DnsManager\Gateway;
+namespace MJ\DnsManager\Gateway;
+
+defined("WHMCS") or die("Access Denied");
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use HvnGroup\DnsManager\Models\Server;
+use MJ\DnsManager\Models\Server;
 
 /**
  * DAGateway — GuzzleHTTP wrapper for DirectAdmin API.
@@ -46,7 +48,7 @@ class DAGateway
         // Đọc từ settings nếu có, fallback về 5s
         $timeout = 5;
         try {
-            $fromSettings = \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('job_timeout', 5);
+            $fromSettings = \MJ\DnsManager\Helpers\SettingsHelper::getInt('job_timeout', 5);
             if ($fromSettings > 0) {
                 $timeout = $fromSettings;
             }
@@ -62,7 +64,7 @@ class DAGateway
             'verify'          => false,
             'http_errors'     => false,
             'headers'         => [
-                'User-Agent' => 'HVN-DNS-Manager/1.0',
+                'User-Agent' => 'MJ-DNS-Manager/1.0',
             ],
         ]);
     }

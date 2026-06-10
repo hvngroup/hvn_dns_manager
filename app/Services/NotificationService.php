@@ -1,10 +1,12 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Helpers\SettingsHelper;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Helpers\SettingsHelper;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
@@ -97,7 +99,7 @@ class NotificationService
 
         $this->send(
             $this->buildTelegramMessage('🔴 DNS Sync Failure Alert', $fields),
-            '[HVN DNS] DNS Sync Failure: ' . $server->hostname,
+            '[MJ DNS] DNS Sync Failure: ' . $server->hostname,
             'DNS Sync Failure Alert',
             self::COLOR_DANGER,
             $fields,
@@ -149,7 +151,7 @@ class NotificationService
 
         $this->send(
             $this->buildTelegramMessage('🔴 Server Unreachable Alert', $fields),
-            '[HVN DNS] Server Unreachable: ' . $server->hostname,
+            '[MJ DNS] Server Unreachable: ' . $server->hostname,
             'Server Unreachable Alert',
             self::COLOR_DANGER,
             $fields,
@@ -207,7 +209,7 @@ class NotificationService
 
         $this->send(
             $this->buildTelegramMessage('🟡 Queue Backlog Warning', $fields),
-            '[HVN DNS] Queue Backlog: ' . $backlogCount . ' jobs',
+            '[MJ DNS] Queue Backlog: ' . $backlogCount . ' jobs',
             'Queue Backlog Warning',
             self::COLOR_WARNING,
             $fields,
@@ -275,7 +277,7 @@ class NotificationService
             $chatId = trim($chatId);
 
             if (empty($token)) {
-                logActivity('HVN DNS Manager [NotificationService]: Telegram token rỗng sau decrypt.');
+                logActivity('MJ DNS Manager [NotificationService]: Telegram token rỗng sau decrypt.');
                 return false;
             }
 
@@ -300,20 +302,20 @@ class NotificationService
             curl_close($ch);
 
             if ($response === false) {
-                logActivity('HVN DNS Manager [NotificationService]: Telegram cURL error — ' . $curlError);
+                logActivity('MJ DNS Manager [NotificationService]: Telegram cURL error — ' . $curlError);
                 return false;
             }
 
             $result = json_decode($response, true);
             if (!$result || empty($result['ok'])) {
                 $desc = isset($result['description']) ? $result['description'] : 'Unknown error';
-                logActivity('HVN DNS Manager [NotificationService]: Telegram API error — ' . $desc);
+                logActivity('MJ DNS Manager [NotificationService]: Telegram API error — ' . $desc);
                 return false;
             }
 
             return true;
         } catch (\Throwable $e) {
-            logActivity('HVN DNS Manager [NotificationService]: Telegram exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [NotificationService]: Telegram exception — ' . $e->getMessage());
             return false;
         }
     }
@@ -378,7 +380,7 @@ class NotificationService
         try {
             $recipients = SettingsHelper::get('alert_email_addresses', '');
             if (empty($recipients)) {
-                logActivity('HVN DNS Manager [NotificationService]: sendEmail skipped — alert_email_addresses not configured.');
+                logActivity('MJ DNS Manager [NotificationService]: sendEmail skipped — alert_email_addresses not configured.');
                 return false;
             }
 
@@ -390,7 +392,7 @@ class NotificationService
             $sent = false;
             foreach ($emails as $email) {
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    logActivity('HVN DNS Manager [NotificationService]: Invalid email skipped — ' . $email);
+                    logActivity('MJ DNS Manager [NotificationService]: Invalid email skipped — ' . $email);
                     continue;
                 }
                 if ($this->sendEmailViaWhmcsMailer($email, $subject, $htmlBody)) {
@@ -400,7 +402,7 @@ class NotificationService
 
             return $sent;
         } catch (\Throwable $e) {
-            logActivity('HVN DNS Manager [NotificationService]: Email exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [NotificationService]: Email exception — ' . $e->getMessage());
             return false;
         }
     }
@@ -424,7 +426,7 @@ class NotificationService
             }
 
             $fromEmail = !empty($base['Email']) ? $base['Email'] : 'noreply@localhost';
-            $fromName  = !empty($base['CompanyName']) ? $base['CompanyName'] : 'HVN DNS Manager';
+            $fromName  = !empty($base['CompanyName']) ? $base['CompanyName'] : 'MJ DNS Manager';
 
             // WHMCS 8+: toàn bộ SMTP config encrypt trong MailConfig dạng JSON
             $config   = array();
@@ -589,10 +591,10 @@ class NotificationService
         $result = @mail($to, $subject, $htmlBody, $headers);
 
         if ($result) {
-            logActivity('HVN DNS Manager [NotificationService]: Email sent to ' . $to . ' via PHP mail().');
+            logActivity('MJ DNS Manager [NotificationService]: Email sent to ' . $to . ' via PHP mail().');
         } else {
             $err = error_get_last();
-            logActivity('HVN DNS Manager [NotificationService]: PHP mail() failed for ' . $to
+            logActivity('MJ DNS Manager [NotificationService]: PHP mail() failed for ' . $to
                 . ' — ' . ($err ? $err['message'] : 'unknown error'));
         }
 
@@ -638,7 +640,7 @@ class NotificationService
         }
 
         $record  = trim($recordType . ' ' . $recordName);
-        $subject = '[HVN DNS] Job #' . $jobId . ' permanently failed — ' . $jobAction . ' on ' . $domainName;
+        $subject = '[MJ DNS] Job #' . $jobId . ' permanently failed — ' . $jobAction . ' on ' . $domainName;
 
         $fields = array(
             'Job ID'   => '#' . $jobId,
@@ -715,13 +717,13 @@ class NotificationService
             ));
 
             if (isset($result['result']) && $result['result'] === 'success') {
-                logActivity('HVN DNS Manager [Email]: Sent to client #' . $clientId . ' — ' . $subject);
+                logActivity('MJ DNS Manager [Email]: Sent to client #' . $clientId . ' — ' . $subject);
             } else {
                 $err = isset($result['message']) ? $result['message'] : json_encode($result);
-                logActivity('HVN DNS Manager [Email]: Failed for client #' . $clientId . ' — ' . $err);
+                logActivity('MJ DNS Manager [Email]: Failed for client #' . $clientId . ' — ' . $err);
             }
         } catch (\Exception $e) {
-            logActivity('HVN DNS Manager [Email]: notifyClientRecordChanged exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [Email]: notifyClientRecordChanged exception — ' . $e->getMessage());
         }
     }
 
@@ -768,13 +770,13 @@ class NotificationService
             ));
 
             if (isset($result['result']) && $result['result'] === 'success') {
-                logActivity('HVN DNS Manager [Email]: Zone created notification sent to client #' . $clientId . ' for ' . $domain);
+                logActivity('MJ DNS Manager [Email]: Zone created notification sent to client #' . $clientId . ' for ' . $domain);
             } else {
                 $err = isset($result['message']) ? $result['message'] : json_encode($result);
-                logActivity('HVN DNS Manager [Email]: Zone created notification failed for client #' . $clientId . ' — ' . $err);
+                logActivity('MJ DNS Manager [Email]: Zone created notification failed for client #' . $clientId . ' — ' . $err);
             }
         } catch (\Exception $e) {
-            logActivity('HVN DNS Manager [Email]: notifyClientZoneCreated exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [Email]: notifyClientZoneCreated exception — ' . $e->getMessage());
         }
     }
 
@@ -822,13 +824,13 @@ class NotificationService
             ));
 
             if (isset($result['result']) && $result['result'] === 'success') {
-                logActivity('HVN DNS Manager [Email]: DDNS token notification sent to client #' . $clientId . ' for ' . $subdomain . '.' . $domain);
+                logActivity('MJ DNS Manager [Email]: DDNS token notification sent to client #' . $clientId . ' for ' . $subdomain . '.' . $domain);
             } else {
                 $err = isset($result['message']) ? $result['message'] : json_encode($result);
-                logActivity('HVN DNS Manager [Email]: DDNS token notification failed for client #' . $clientId . ' — ' . $err);
+                logActivity('MJ DNS Manager [Email]: DDNS token notification failed for client #' . $clientId . ' — ' . $err);
             }
         } catch (\Exception $e) {
-            logActivity('HVN DNS Manager [Email]: notifyClientDdnsTokenCreated exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [Email]: notifyClientDdnsTokenCreated exception — ' . $e->getMessage());
         }
     }
 
@@ -878,13 +880,13 @@ class NotificationService
             ));
 
             if (isset($result['result']) && $result['result'] === 'success') {
-                logActivity('HVN DNS Manager [Email]: Drift alert sent to client #' . $clientId . ' for \'' . $domain . '\'.');
+                logActivity('MJ DNS Manager [Email]: Drift alert sent to client #' . $clientId . ' for \'' . $domain . '\'.');
             } else {
                 $err = isset($result['message']) ? $result['message'] : json_encode($result);
-                logActivity('HVN DNS Manager [Email]: Drift alert failed for \'' . $domain . '\' — ' . $err);
+                logActivity('MJ DNS Manager [Email]: Drift alert failed for \'' . $domain . '\' — ' . $err);
             }
         } catch (\Exception $e) {
-            logActivity('HVN DNS Manager [Email]: notifyDriftDetected exception — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [Email]: notifyDriftDetected exception — ' . $e->getMessage());
         }
     }
 
@@ -923,7 +925,7 @@ class NotificationService
             $outro = 'Please review the domain\'s DNS propagation status and SSL configuration on the DirectAdmin server.';
 
             $htmlBody = $this->buildAdminEmailBody('SSL Certificate Failed', self::COLOR_DANGER, $fields, $intro, $outro);
-            $this->sendEmail('[HVN DNS] SSL certificate failed — ' . $domainName, $htmlBody);
+            $this->sendEmail('[MJ DNS] SSL certificate failed — ' . $domainName, $htmlBody);
         }
     }
 
@@ -951,12 +953,12 @@ class NotificationService
         if (SettingsHelper::getBool('enable_email_alert', false)) {
             $fields = array(
                 'Status' => 'Connection successful!',
-                'Module' => 'HVN DNS Manager',
+                'Module' => 'MJ DNS Manager',
                 'Time'   => date('Y-m-d H:i:s T'),
             );
             $intro    = 'This is a test notification to confirm that email alerts are working correctly.';
             $htmlBody = $this->buildAdminEmailBody('Test Notification', self::COLOR_SUCCESS, $fields, $intro);
-            $results['email'] = (bool) $this->sendEmail('[HVN DNS] Test notification', $htmlBody);
+            $results['email'] = (bool) $this->sendEmail('[MJ DNS] Test notification', $htmlBody);
         }
 
         return $results;
@@ -1024,7 +1026,7 @@ class NotificationService
         return '<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;background:#fff;border:1px solid #ddd;border-radius:4px;overflow:hidden;">'
             . '<div style="background:' . $color . ';padding:18px 20px;">'
             . '<p style="margin:0;font-size:17px;font-weight:bold;color:#fff;">' . htmlspecialchars($title) . '</p>'
-            . '<p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">HVN DNS Manager &mdash; Notification</p>'
+            . '<p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">MJ DNS Manager &mdash; Notification</p>'
             . '</div>'
             . '<div style="padding:18px 20px;">'
             . $introHtml
@@ -1034,13 +1036,13 @@ class NotificationService
             . $outroHtml
             . '</div>'
             . '<div style="background:#f7f7f7;padding:10px 20px;border-top:1px solid #eee;">'
-            . '<p style="margin:0;font-size:11px;color:#999;">Sent at <strong>' . $time . '</strong> &mdash; HVN DNS Manager</p>'
+            . '<p style="margin:0;font-size:11px;color:#999;">Sent at <strong>' . $time . '</strong> &mdash; MJ DNS Manager</p>'
             . '</div>'
             . '</div>';
     }
 
     /**
-     * Build HTML email body cho admin alerts — wrap vào HVN email template.
+     * Build HTML email body cho admin alerts — wrap vào MJ email template.
      * Dùng cho: notifyJobPermanentlyFailed, notifySslFailed, RULE_01/02/03.
      * KHÔNG dùng cho client emails (notifyClientRecordChanged, notifyDriftDetected)
      * vì những email đó đã được WHMCS wrap template tự động qua localAPI.
@@ -1055,7 +1057,7 @@ class NotificationService
     private function buildAdminEmailBody($title, $color, array $fields, $intro = null, $outro = null)
     {
         $innerHtml = $this->buildEmailBody($title, $color, $fields, $intro, $outro);
-        return \HvnGroup\DnsManager\Mail\EmailTemplate::wrap($innerHtml, $title);
+        return \MJ\DnsManager\Mail\EmailTemplate::wrap($innerHtml, $title);
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -1067,7 +1069,7 @@ class NotificationService
         $cooldownSeconds = SettingsHelper::getInt('alert_cooldown', 900);
 
         try {
-            $row = Capsule::table('mod_hvndns_notification_cooldowns')
+            $row = Capsule::table('tbl_mj_dns_notification_cooldowns')
                 ->where('rule_id', $ruleId)
                 ->where('target_id', $target)
                 ->first();
@@ -1086,18 +1088,18 @@ class NotificationService
     {
         try {
             $now = date('Y-m-d H:i:s');
-            $exists = Capsule::table('mod_hvndns_notification_cooldowns')
+            $exists = Capsule::table('tbl_mj_dns_notification_cooldowns')
                 ->where('rule_id', $ruleId)
                 ->where('target_id', $target)
                 ->exists();
 
             if ($exists) {
-                Capsule::table('mod_hvndns_notification_cooldowns')
+                Capsule::table('tbl_mj_dns_notification_cooldowns')
                     ->where('rule_id', $ruleId)
                     ->where('target_id', $target)
                     ->update(['last_sent_at' => $now]);
             } else {
-                Capsule::table('mod_hvndns_notification_cooldowns')->insert([
+                Capsule::table('tbl_mj_dns_notification_cooldowns')->insert([
                     'rule_id' => $ruleId,
                     'target_id' => $target,
                     'last_sent_at' => $now,

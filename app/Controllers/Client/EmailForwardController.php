@@ -1,8 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Client;
+namespace MJ\DnsManager\Controllers\Client;
 
-use HvnGroup\DnsManager\Services\EmailForwardService;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Services\EmailForwardService;
 
 /**
  * EmailForwardController — Nhận Ajax request từ Client Area.

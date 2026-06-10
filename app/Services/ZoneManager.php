@@ -1,11 +1,13 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Gateway\DAGateway;
-use HvnGroup\DnsManager\Models\QueueJob;
-use HvnGroup\DnsManager\Models\Server;
-use HvnGroup\DnsManager\Models\SyncLog;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Gateway\DAGateway;
+use MJ\DnsManager\Models\QueueJob;
+use MJ\DnsManager\Models\Server;
+use MJ\DnsManager\Models\SyncLog;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ZoneManager
@@ -292,17 +294,4 @@ class ZoneManager
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Zone create / delete (giữ lại từ bản gốc, dùng bởi ProvisioningService)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    public function createZone($domainId)
-    {
-        return true;
-    }
-
-    public function deleteZone($domainId)
-    {
-        return true;
-    }
 }

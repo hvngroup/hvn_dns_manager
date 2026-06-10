@@ -1,12 +1,14 @@
 <?php
 
-namespace HvnGroup\DnsManager\Models;
+namespace MJ\DnsManager\Models;
+
+defined("WHMCS") or die("Access Denied");
 
 use Illuminate\Database\Eloquent\Model;
 
 class AuditTrail extends Model
 {
-    protected $table = 'mod_hvndns_audit_trail';
+    protected $table = 'tbl_mj_dns_audit_trail';
     
     protected $fillable = [
         'actor_type', 

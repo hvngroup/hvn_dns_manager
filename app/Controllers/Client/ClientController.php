@@ -1,13 +1,15 @@
 <?php
 
-namespace HvnGroup\DnsManager\Controllers\Client;
+namespace MJ\DnsManager\Controllers\Client;
+
+defined("WHMCS") or die("Access Denied");
 
 use WHMCS\Database\Capsule;
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Services\TemplateService;
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Services\TemplateService;
 
 /**
- * ClientController — Entry point cho Client Area của HVN DNS Manager.
+ * ClientController — Entry point cho Client Area của MJ DNS Manager.
  */
 class ClientController
 {
@@ -17,10 +19,6 @@ class ClientController
     public function dispatch($action, $params)
     {
         $userId = isset($_SESSION['uid']) ? (int) $_SESSION['uid'] : 0;
-
-        if ($action === 'record_edit') {
-            return $this->showRecordEdit($params);
-        }
 
         $domainId = isset($_REQUEST['domain_id']) ? (int) $_REQUEST['domain_id'] : 0;
 
@@ -36,49 +34,7 @@ class ClientController
      */
     private function getModuleLink($params)
     {
-        return isset($params['modulelink']) ? $params['modulelink'] : 'index.php?m=hvn_dns_manager';
-    }
-
-    /**
-     * Màn hình record edit riêng rẽ
-     */
-    private function showRecordEdit($params)
-    {
-        $moduleLink = $this->getModuleLink($params);
-        $domainId   = isset($_REQUEST['domain_id']) ? (int) $_REQUEST['domain_id'] : 1;
-        $recordId   = isset($_REQUEST['record_id']) ? (int) $_REQUEST['record_id'] : 0;
-
-        $domainInfo = array('id' => $domainId, 'domain' => 'example.com');
-        $recordJson = 'null';
-
-        if ($recordId > 0) {
-            $mockRecord = array(
-                'id'       => $recordId,
-                'type'     => 'A',
-                'name'     => '@',
-                'value'    => '103.45.67.89',
-                'ttl'      => 3600,
-                'priority' => 10,
-                'weight'   => 0,
-                'port'     => 443,
-            );
-            $recordJson = json_encode($mockRecord);
-        }
-
-        return array(
-            'pagetitle'    => ($recordId ? 'Sửa' : 'Thêm') . ' Bản ghi DNS',
-            'breadcrumb'   => array(
-                'index.php?m=hvn_dns_manager' => 'Domain Manager',
-                '#'                           => 'Bản ghi',
-            ),
-            'templatefile' => 'templates/client/record_edit',
-            'requirelogin' => true,
-            'vars'         => array(
-                'modulelink' => $moduleLink,
-                'domain'     => $domainInfo,
-                'recordJson' => $recordJson,
-            ),
-        );
+        return isset($params['modulelink']) ? $params['modulelink'] : 'index.php?m=mj_dns_manager';
     }
 
     /**
@@ -90,7 +46,7 @@ class ClientController
         $whmcsDomainId = isset($params['domainid']) ? $params['domainid'] : 0;
 
         $domains = array();
-        if (Capsule::schema()->hasTable('mod_hvndns_domains')) {
+        if (Capsule::schema()->hasTable('tbl_mj_dns_domains')) {
             $query = Domain::query();
             if ($userId > 0) {
                 $query->where('whmcs_user_id', $userId);
@@ -102,13 +58,13 @@ class ClientController
 
         // Lấy nameservers từ Primary server
         $ns = array();
-        if (Capsule::schema()->hasTable('mod_hvndns_servers')) {
-            $primaryServer = \HvnGroup\DnsManager\Models\Server::where('role', 'primary')
+        if (Capsule::schema()->hasTable('tbl_mj_dns_servers')) {
+            $primaryServer = \MJ\DnsManager\Models\Server::where('role', 'primary')
                 ->where('is_active', 1)->first();
             if ($primaryServer && is_array($primaryServer->nameservers) && count($primaryServer->nameservers) > 0) {
                 $ns = $primaryServer->nameservers;
             } else {
-                $firstServer = \HvnGroup\DnsManager\Models\Server::where('is_active', 1)->first();
+                $firstServer = \MJ\DnsManager\Models\Server::where('is_active', 1)->first();
                 if ($firstServer && is_array($firstServer->nameservers) && count($firstServer->nameservers) > 0) {
                     $ns = $firstServer->nameservers;
                 }
@@ -117,11 +73,11 @@ class ClientController
 
         if (empty($ns)) {
             $ns = array(
-                \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', ''),
-                \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', ''),
-                \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', ''),
-                \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', ''),
-                \HvnGroup\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', ''),
+                \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_1', ''),
+                \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_2', ''),
+                \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_3', ''),
+                \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_4', ''),
+                \MJ\DnsManager\Helpers\SettingsHelper::get('default_nameserver_5', ''),
             );
             $ns = array_values(array_filter($ns));
         }
@@ -129,16 +85,13 @@ class ClientController
         return array(
             'pagetitle'    => 'Quản lý DNS',
             'breadcrumb'   => array(
-                'index.php?m=hvn_dns_manager' => 'Domain Manager',
+                'index.php?m=mj_dns_manager' => 'Domain Manager',
                 '#'                           => 'Danh sách',
             ),
             'templatefile' => 'templates/client/domain_list',
             'requirelogin' => true,
             'vars'         => array(
                 'modulelink'  => $moduleLink,
-                'plan_name'   => 'DNS Standard',
-                'service_status' => 'Active',
-                'expiry_date' => '27/02/2027',
                 'domains'     => $domains,
                 'default_ns1' => isset($ns[0]) ? $ns[0] : '',
                 'default_ns2' => isset($ns[1]) ? $ns[1] : '',
@@ -165,30 +118,30 @@ class ClientController
             'id'              => $domainId,
             'domain'          => $domainParams->domain,
             'status'          => $domainParams->status,
-            'dnssec_enabled'  => false,
-            'ssl_status'      => 'active',
+            'dnssec_enabled'  => (bool) ($domainParams->dnssec && $domainParams->dnssec->is_enabled),
+            'ssl_status'      => $domainParams->ssl_status ?: 'unknown',
             'records_count'   => 0,
             'redirects_count' => 0,
             'email_fwds_count' => 0,
-            'has_dnssec_addon' => true,
-            'has_ddns_addon'   => true,
+            'has_dnssec_addon' => \MJ\DnsManager\Services\FeatureGate::canClientUseDnssec($userId),
+            'has_ddns_addon'   => \MJ\DnsManager\Services\FeatureGate::canClientUseDdns($userId),
             'dnssec'           => array(),
         );
 
         $quota = array(
-            'max_records'        => \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50),
-            'dnssec_enabled'     => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('dnssec_mode', false),
-            'ddns_enabled'       => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('ddns_mode', false),
-            'templates_enabled'  => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_templates', true),
-            'redirects_enabled'  => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true),
-            'email_enabled'      => \HvnGroup\DnsManager\Helpers\SettingsHelper::getBool('enable_email_forwarder', true),
-            'max_redirects'      => \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('url_redirect_limit', 5),
-            'max_email_forwards' => \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('email_forwarder_limit', 5),
-            'max_ddns_tokens'    => \HvnGroup\DnsManager\Helpers\SettingsHelper::getInt('ddns_token_limit', 5),
+            'max_records'        => \MJ\DnsManager\Helpers\SettingsHelper::getInt('total_record_limit', 50),
+            'dnssec_enabled'     => \MJ\DnsManager\Services\FeatureGate::canClientUseDnssec($userId),
+            'ddns_enabled'       => \MJ\DnsManager\Services\FeatureGate::canClientUseDdns($userId),
+            'templates_enabled'  => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_dns_templates', true),
+            'redirects_enabled'  => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_url_redirect', true),
+            'email_enabled'      => \MJ\DnsManager\Helpers\SettingsHelper::getBool('enable_email_forwarder', true),
+            'max_redirects'      => \MJ\DnsManager\Helpers\SettingsHelper::getInt('url_redirect_limit', 5),
+            'max_email_forwards' => \MJ\DnsManager\Helpers\SettingsHelper::getInt('email_forwarder_limit', 5),
+            'max_ddns_tokens'    => \MJ\DnsManager\Helpers\SettingsHelper::getInt('ddns_token_limit', 5),
         );
 
         // Records
-        $dbRecords = \HvnGroup\DnsManager\Models\Record::where('domain_id', $domainId)
+        $dbRecords = \MJ\DnsManager\Models\Record::where('domain_id', $domainId)
             ->orderBy('type')
             ->orderBy('name')
             ->get();
@@ -196,7 +149,7 @@ class ClientController
         $domainInfo['records_count'] = count($records);
 
         // Redirects
-        $dbRedirects = \HvnGroup\DnsManager\Models\Redirect::where('domain_id', $domainId)
+        $dbRedirects = \MJ\DnsManager\Models\Redirect::where('domain_id', $domainId)
             ->orderBy('created_at', 'desc')
             ->get();
         $redirects = array();
@@ -215,7 +168,7 @@ class ClientController
         // KHÔNG bọc trong if email_enabled — phải luôn load để truyền vào JS
         $emails = array();
         try {
-            $dbEmails = \HvnGroup\DnsManager\Models\EmailForward::where('domain_id', $domainId)
+            $dbEmails = \MJ\DnsManager\Models\EmailForward::where('domain_id', $domainId)
                 ->orderBy('is_catchall', 'desc')
                 ->orderBy('source_local', 'asc')
                 ->get();
@@ -235,14 +188,14 @@ class ClientController
             }
         } catch (\Throwable $e) {
             $emails = array();
-            logActivity('HVN DNS Manager [ClientController]: Email load error — ' . $e->getMessage());
+            logActivity('MJ DNS Manager [ClientController]: Email load error — ' . $e->getMessage());
         }
         $domainInfo['email_fwds_count'] = count($emails);
 
         // DDNS tokens
         $ddnsTokens = array();
         if ($quota['ddns_enabled']) {
-            $rawTokens = \HvnGroup\DnsManager\Models\DdnsToken::where('domain_id', $domainId)
+            $rawTokens = \MJ\DnsManager\Models\DdnsToken::where('domain_id', $domainId)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -279,7 +232,7 @@ class ClientController
         return array(
             'pagetitle'    => 'Quản lý DNS - ' . $domainInfo['domain'],
             'breadcrumb'   => array(
-                'index.php?m=hvn_dns_manager' => 'Domain Manager',
+                'index.php?m=mj_dns_manager' => 'Domain Manager',
                 '#'                           => $domainInfo['domain'],
             ),
             'templatefile' => 'templates/client/dns_editor',

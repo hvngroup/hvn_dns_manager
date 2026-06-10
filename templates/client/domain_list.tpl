@@ -1,8 +1,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/modules/addons/hvn_dns_manager/assets/css/hvndns_common.css">
-<link rel="stylesheet" href="/modules/addons/hvn_dns_manager/assets/css/hvndns_client.css">
-<div class="hvn-dns-client">
+<link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-common.css">
+<link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-client.css">
+<div class="mj-dns-client">
     <h3 style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:20px;">
         <i class="bi bi-hdd-network" style="color:#ea4544;"></i> DNS Management &mdash; Chọn domain cần quản lý
     </h3>
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="cl-card-footer" style="text-align:right;">
-                    <a href="index.php?m=hvn_dns_manager&domain_id={$domain.id}" class="cl-btn cl-btn-primary" style="height:44px;font-size:13px;padding:0 16px;">
+                    <a href="index.php?m=mj_dns_manager&domain_id={$domain.id}" class="cl-btn cl-btn-primary" style="height:44px;font-size:13px;padding:0 16px;">
                         Quản lý DNS <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>

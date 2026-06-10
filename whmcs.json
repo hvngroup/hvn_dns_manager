@@ -1,0 +1,27 @@
+{
+    "schema": "1.0",
+    "type": "whmcs-addons",
+    "name": "mj-dns-manager",
+    "license": "proprietary",
+    "category": "utilities",
+    "description": {
+        "name": "ModuleJET — DirectAdmin DNS Manager",
+        "tagline": "Quản lý DNS DirectAdmin theo kiến trúc Queue bất đồng bộ.",
+        "long": "Addon WHMCS quản lý DNS trên cụm DirectAdmin: DNS Editor cho client, đồng bộ bất đồng bộ qua hàng đợi, DNSSEC/DDNS/Redirect/Email Forwarding, drift detection và audit trail. Mọi thao tác DNS đi qua Queue + Cron Worker (async-first)."
+    },
+    "logo": {
+        "filename": "logo.png"
+    },
+    "support": {
+        "homepage": "https://modulejet.com",
+        "email": "support@modulejet.com"
+    },
+    "authors": [
+        {
+            "name": "ModuleJET",
+            "homepage": "https://modulejet.com"
+        }
+    ],
+    "min_whmcs_version": "8.0.0",
+    "min_php_version": "7.4.0"
+}

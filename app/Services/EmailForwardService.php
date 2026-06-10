@@ -1,9 +1,11 @@
 <?php
 
-namespace HvnGroup\DnsManager\Services;
+namespace MJ\DnsManager\Services;
 
-use HvnGroup\DnsManager\Models\Domain;
-use HvnGroup\DnsManager\Models\EmailForward;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Models\Domain;
+use MJ\DnsManager\Models\EmailForward;
 
 /**
  * EmailForwardService — Business logic cho Email Forwarding.

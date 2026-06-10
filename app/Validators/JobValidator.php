@@ -1,8 +1,10 @@
 <?php
 
-namespace HvnGroup\DnsManager\Validators;
+namespace MJ\DnsManager\Validators;
 
-use HvnGroup\DnsManager\Contracts\JobInterface;
+defined("WHMCS") or die("Access Denied");
+
+use MJ\DnsManager\Contracts\JobInterface;
 
 class JobValidator
 {
