@@ -1,11 +1,11 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## Database Schema & Column Dictionary
 
 > **Phiên bản**: 1.0  
 > **Ngày tạo**: 25/02/2026  
 > **Database Engine**: MySQL 8.0+ / MariaDB 10.6+  
 > **Character Set**: `utf8mb4` — Collation: `utf8mb4_unicode_ci`  
-> **Tiền tố bảng**: `mod_hvndns_`  
+> **Tiền tố bảng**: `tbl_mj_dns_`  
 > **ORM**: WHMCS Eloquent (Illuminate\Database\Capsule)  
 
 ---
@@ -14,24 +14,24 @@
 
 1. [Tổng quan ERD](#1-tổng-quan-erd)
 2. [Quy ước chung](#2-quy-ước-chung)
-3. [mod_hvndns_schema_version](#3-mod_hvndns_schema_version) — Quản lý phiên bản schema
-3B. [mod_hvndns_settings](#3b-mod_hvndns_settings) — Cấu hình module
-4. [mod_hvndns_servers](#4-mod_hvndns_servers) — Cấu hình DA Node
-5. [mod_hvndns_domains](#5-mod_hvndns_domains) — Tên miền khách hàng
-6. [mod_hvndns_records](#6-mod_hvndns_records) — Bản ghi DNS (Source of Truth)
-7. [mod_hvndns_queue](#7-mod_hvndns_queue) — Hàng đợi tác vụ bất đồng bộ
-8. [mod_hvndns_sync_logs](#8-mod_hvndns_sync_logs) — Nhật ký đồng bộ
-9. [mod_hvndns_audit_trail](#9-mod_hvndns_audit_trail) — Nhật ký kiểm toán
-10. [mod_hvndns_record_history](#10-mod_hvndns_record_history) — Lịch sử thay đổi record
-11. [mod_hvndns_snapshots](#11-mod_hvndns_snapshots) — Bản sao Zone
-12. [mod_hvndns_templates](#12-mod_hvndns_templates) — Mẫu DNS
-13. [mod_hvndns_dnssec](#13-mod_hvndns_dnssec) — Thông số DNSSEC
-14. [mod_hvndns_ddns_tokens](#14-mod_hvndns_ddns_tokens) — Token DDNS
-15. [mod_hvndns_redirects](#15-mod_hvndns_redirects) — Chuyển hướng URL
-16. [mod_hvndns_email_forwards](#16-mod_hvndns_email_forwards) — Chuyển tiếp Email
-17. [mod_hvndns_drift_reports](#17-mod_hvndns_drift_reports) — Báo cáo lệch dữ liệu
-18. [mod_hvndns_ip_blacklist](#18-mod_hvndns_ip_blacklist) — Danh sách IP bị chặn
-19. [mod_hvndns_notification_cooldowns](#19-mod_hvndns_notification_cooldowns) — Kiểm soát tần suất cảnh báo
+3. [tbl_mj_dns_schema_version](#3-tbl_mj_dns_schema_version) — Quản lý phiên bản schema
+3B. [tbl_mj_dns_settings](#3b-tbl_mj_dns_settings) — Cấu hình module
+4. [tbl_mj_dns_servers](#4-tbl_mj_dns_servers) — Cấu hình DA Node
+5. [tbl_mj_dns_domains](#5-tbl_mj_dns_domains) — Tên miền khách hàng
+6. [tbl_mj_dns_records](#6-tbl_mj_dns_records) — Bản ghi DNS (Source of Truth)
+7. [tbl_mj_dns_queue](#7-tbl_mj_dns_queue) — Hàng đợi tác vụ bất đồng bộ
+8. [tbl_mj_dns_sync_logs](#8-tbl_mj_dns_sync_logs) — Nhật ký đồng bộ
+9. [tbl_mj_dns_audit_trail](#9-tbl_mj_dns_audit_trail) — Nhật ký kiểm toán
+10. [tbl_mj_dns_record_history](#10-tbl_mj_dns_record_history) — Lịch sử thay đổi record
+11. [tbl_mj_dns_snapshots](#11-tbl_mj_dns_snapshots) — Bản sao Zone
+12. [tbl_mj_dns_templates](#12-tbl_mj_dns_templates) — Mẫu DNS
+13. [tbl_mj_dns_dnssec](#13-tbl_mj_dns_dnssec) — Thông số DNSSEC
+14. [tbl_mj_dns_ddns_tokens](#14-tbl_mj_dns_ddns_tokens) — Token DDNS
+15. [tbl_mj_dns_redirects](#15-tbl_mj_dns_redirects) — Chuyển hướng URL
+16. [tbl_mj_dns_email_forwards](#16-tbl_mj_dns_email_forwards) — Chuyển tiếp Email
+17. [tbl_mj_dns_drift_reports](#17-tbl_mj_dns_drift_reports) — Báo cáo lệch dữ liệu
+18. [tbl_mj_dns_ip_blacklist](#18-tbl_mj_dns_ip_blacklist) — Danh sách IP bị chặn
+19. [tbl_mj_dns_notification_cooldowns](#19-tbl_mj_dns_notification_cooldowns) — Kiểm soát tần suất cảnh báo
 20. [Phụ lục: Index Strategy](#20-phụ-lục-index-strategy)
 21. [Phụ lục: Data Retention Policy](#21-phụ-lục-data-retention-policy)
 
@@ -41,7 +41,7 @@
 
 ```
                                     ┌──────────────────────┐
-                                    │  mod_hvndns_servers   │
+                                    │  tbl_mj_dns_servers   │
                                     │  (DA Node configs)    │
                                     └──────────┬───────────┘
                                                │ 1:N
@@ -49,14 +49,14 @@
                     │                          │                          │
                     ▼                          ▼                          ▼
           ┌─────────────────┐      ┌─────────────────────┐    ┌──────────────────┐
-          │ mod_hvndns_queue │      │ mod_hvndns_sync_logs │    │ mod_hvndns_drift │
+          │ tbl_mj_dns_queue │      │ tbl_mj_dns_sync_logs │    │ tbl_mj_dns_drift │
           │ (Job Queue)      │─────▶│ (Sync History)       │    │ _reports          │
           └────────┬────────┘  1:N └─────────────────────┘    └──────────────────┘
                    │                                                    ▲
                    │ N:1                                                │ 1:N
                    ▼                                                    │
           ┌─────────────────────┐                                       │
-          │ mod_hvndns_domains   │───────────────────────────────────────┤
+          │ tbl_mj_dns_domains   │───────────────────────────────────────┤
           │ (Domain Registry)    │                                       │
           └────────┬────────────┘                                       │
                    │                                                    │
@@ -64,26 +64,26 @@
        │ 1:N       │ 1:N       │ 1:N          │ 1:N          │ 1:N     │
        ▼           ▼           ▼              ▼              ▼         │
 ┌───────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐ ┌──────────────┐│
-│mod_hvndns_│ │mod_hvndns│ │mod_hvndns│ │mod_hvndns_ │ │mod_hvndns_   ││
+│tbl_mj_dns_│ │tbl_mj_dns│ │tbl_mj_dns│ │tbl_mj_dns_ │ │tbl_mj_dns_   ││
 │_records   │ │_snapshots│ │_dnssec   │ │ddns_tokens │ │redirects     ││
 │(DNS Recs) │ │(Backups) │ │(DNSSEC)  │ │(DDNS Auth) │ │(URL Forward) ││
 └─────┬─────┘ └──────────┘ └──────────┘ └───────────┘ └──────────────┘│
       │ 1:N                                                             │
       ▼                                                                 │
 ┌───────────────┐       ┌────────────────────┐       ┌────────────────┐
-│mod_hvndns_    │       │mod_hvndns_         │       │mod_hvndns_     │
+│tbl_mj_dns_    │       │tbl_mj_dns_         │       │tbl_mj_dns_     │
 │record_history │       │audit_trail         │       │email_forwards  │
 │(Change Log)   │       │(Security Audit)    │       │(Email FWD)     │
 └───────────────┘       └────────────────────┘       └────────────────┘
 
 Standalone tables (không có FK):
 ┌──────────────────────┐  ┌──────────────────────────────┐  ┌─────────────────────┐
-│mod_hvndns_templates  │  │mod_hvndns_notification_      │  │mod_hvndns_          │
+│tbl_mj_dns_templates  │  │tbl_mj_dns_notification_      │  │tbl_mj_dns_          │
 │(DNS Templates)       │  │cooldowns (Alert Throttle)    │  │ip_blacklist         │
 └──────────────────────┘  └──────────────────────────────┘  └─────────────────────┘
 
 ┌──────────────────────┐  ┌──────────────────────────────┐  ┌─────────────────────┐
-│mod_hvndns_quota_plans│  │mod_hvndns_schema_version     │  │mod_hvndns_settings  │
+│tbl_mj_dns_quota_plans│  │tbl_mj_dns_schema_version     │  │tbl_mj_dns_settings  │
 │(Service Limits)      │  │(Migration Tracking)          │  │(Module Config)      │
 └──────────────────────┘  └──────────────────────────────┘  └─────────────────────┘
 ```
@@ -98,7 +98,7 @@ Standalone tables (không có FK):
 
 | Đối tượng | Quy ước | Ví dụ |
 |-----------|---------|-------|
-| Tên bảng | `mod_hvndns_` + `snake_case` | `mod_hvndns_queue` |
+| Tên bảng | `tbl_mj_dns_` + `snake_case` | `tbl_mj_dns_queue` |
 | Tên cột | `snake_case` | `domain_id`, `created_at` |
 | Primary Key | `id` (INT UNSIGNED AUTO_INCREMENT) | `id` |
 | Foreign Key | `{table_singular}_id` | `domain_id`, `server_id` |
@@ -152,7 +152,7 @@ Standalone tables (không có FK):
 
 ---
 
-## 3. mod_hvndns_schema_version
+## 3. tbl_mj_dns_schema_version
 
 > **Mục đích**: Theo dõi phiên bản schema database. Mỗi khi module được upgrade, `MigrationRunner` kiểm tra bảng này để biết cần chạy migration nào.
 
@@ -166,7 +166,7 @@ Standalone tables (không có FK):
 **Dung lượng ước tính**: < 100 rows (số phiên bản module release).
 
 ```sql
-CREATE TABLE mod_hvndns_schema_version (
+CREATE TABLE tbl_mj_dns_schema_version (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     version         VARCHAR(20) NOT NULL,
     description     VARCHAR(255) NULL,
@@ -177,7 +177,7 @@ CREATE TABLE mod_hvndns_schema_version (
 
 ---
 
-## 3B. mod_hvndns_settings
+## 3B. tbl_mj_dns_settings
 
 > **Mục đích**: Lưu trữ cấu hình module dạng key-value. Admin quản lý qua giao diện Settings. Chi tiết toàn bộ 96 settings tại SETTINGS.md.
 
@@ -192,7 +192,7 @@ CREATE TABLE mod_hvndns_schema_version (
 **Dung lượng**: ~96 rows (cố định).
 
 ```sql
-CREATE TABLE mod_hvndns_settings (
+CREATE TABLE tbl_mj_dns_settings (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     setting_key     VARCHAR(100) NOT NULL,
     setting_val     TEXT NULL,
@@ -205,7 +205,7 @@ CREATE TABLE mod_hvndns_settings (
 
 ---
 
-## 4. mod_hvndns_servers
+## 4. tbl_mj_dns_servers
 
 > **Mục đích**: Lưu thông tin kết nối và trạng thái của từng DirectAdmin Node (dns1, dns2, dns3...). Đây là bảng cấu hình — Admin quản lý qua giao diện.
 
@@ -239,7 +239,7 @@ CREATE TABLE mod_hvndns_settings (
 **Dung lượng ước tính**: 3-10 rows (số DA Node trong hạ tầng).
 
 ```sql
-CREATE TABLE mod_hvndns_servers (
+CREATE TABLE tbl_mj_dns_servers (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     hostname        VARCHAR(255) NOT NULL,
     ip_address      VARCHAR(45) NOT NULL,
@@ -268,7 +268,7 @@ CREATE TABLE mod_hvndns_servers (
 
 ---
 
-## 5. mod_hvndns_domains
+## 5. tbl_mj_dns_domains
 
 > **Mục đích**: Registry trung tâm cho tất cả tên miền đang sử dụng dịch vụ DNS. Mapping giữa domain ↔ WHMCS Service ↔ Quota Plan. Đây là bảng pivot quan trọng nhất — hầu hết bảng khác đều FK về đây.
 
@@ -298,7 +298,7 @@ CREATE TABLE mod_hvndns_servers (
 **Dung lượng ước tính**: 100–5,000 rows.
 
 ```sql
-CREATE TABLE mod_hvndns_domains (
+CREATE TABLE tbl_mj_dns_domains (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain          VARCHAR(253) NOT NULL,
     whmcs_service_id INT UNSIGNED NULL,
@@ -323,14 +323,14 @@ CREATE TABLE mod_hvndns_domains (
 
 ---
 
-## 6. mod_hvndns_records
+## 6. tbl_mj_dns_records
 
 > **Mục đích**: Lưu trữ tất cả bản ghi DNS của từng domain. Đây là **Source of Truth** — dữ liệu ở bảng này là chuẩn, DirectAdmin là target execution. Mọi thay đổi DNS đều ghi vào bảng này TRƯỚC, sau đó mới đồng bộ lên DA qua Queue.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID bản ghi nội bộ |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id`. Domain sở hữu record này. CASCADE DELETE — xóa domain thì xóa tất cả records |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id`. Domain sở hữu record này. CASCADE DELETE — xóa domain thì xóa tất cả records |
 | 3 | `type` | ENUM('A', 'AAAA', 'CNAME', 'MX', 'TXT', 'SRV', 'NS', 'CAA', 'PTR') | 📌 REQD | Loại bản ghi DNS theo chuẩn RFC. `A` = IPv4 address; `AAAA` = IPv6 address; `CNAME` = Canonical name (alias); `MX` = Mail exchange; `TXT` = Text (SPF, DKIM, verification); `SRV` = Service locator; `NS` = Nameserver; `CAA` = Certificate Authority Authorization; `PTR` = Pointer (reverse DNS) |
 | 4 | `name` | VARCHAR(255) | 📌 REQD 📋 IDX | Phần subdomain/host của record. `@` = root domain (VD: `example.com`); `mail` = subdomain (VD: `mail.example.com`); `*` = wildcard; `_dmarc` = DMARC record; `_sip._tcp` = SRV service name. KHÔNG bao gồm domain chính — full name = `{name}.{domain}` |
 | 5 | `value` | TEXT | 📌 REQD | Giá trị bản ghi. Nội dung tùy theo `type`: `A` → `103.1.2.3` (IPv4); `AAAA` → `2001:db8::1` (IPv6); `CNAME` → `target.example.com.` (FQDN có dấu chấm cuối); `MX` → `mail.example.com.` (FQDN); `TXT` → `"v=spf1 include:_spf.google.com ~all"` (có thể rất dài — DKIM key); `SRV` → `target.example.com.` (target hostname); `NS` → `dns1.hvn.vn.` (nameserver FQDN); `CAA` → `letsencrypt.org` (CA domain). Dùng TEXT vì TXT record (DKIM) có thể > 255 chars |
@@ -347,12 +347,12 @@ CREATE TABLE mod_hvndns_domains (
 **Indexes**:
 - `idx_domain_type(domain_id, type)` — Lọc records theo domain và type
 - `idx_domain_name(domain_id, name)` — Lookup record theo domain + subdomain
-- FK: `domain_id → mod_hvndns_domains(id) ON DELETE CASCADE`
+- FK: `domain_id → tbl_mj_dns_domains(id) ON DELETE CASCADE`
 
 **Dung lượng ước tính**: 5,000–100,000 rows (trung bình 20 records/domain × 5,000 domains).
 
 ```sql
-CREATE TABLE mod_hvndns_records (
+CREATE TABLE tbl_mj_dns_records (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     type            ENUM('A','AAAA','CNAME','MX','TXT','SRV','NS','CAA','PTR') NOT NULL,
@@ -370,13 +370,13 @@ CREATE TABLE mod_hvndns_records (
     
     INDEX idx_domain_type (domain_id, type),
     INDEX idx_domain_name (domain_id, name),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 7. mod_hvndns_queue
+## 7. tbl_mj_dns_queue
 
 > **Mục đích**: Bảng trung tâm của kiến trúc bất đồng bộ — lưu mọi tác vụ cần đồng bộ lên DirectAdmin. Cron Worker đọc bảng này mỗi phút để thực thi. Đây là bảng có tần suất READ/WRITE cao nhất trong toàn hệ thống.
 
@@ -384,8 +384,8 @@ CREATE TABLE mod_hvndns_records (
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID job nội bộ |
 | 2 | `batch_id` | CHAR(36) | 📌 REQD 📋 IDX | UUID v4 của lệnh dispatch. Với kiến trúc Primary-only, batch thường chỉ gồm 1 job cho Primary Server. Dùng cho Client poll sync status |
-| 3 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id`. Domain mà job này tác động. Dùng để group jobs theo domain |
-| 4 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_servers.id`. Server đích mà job này sẽ gửi API tới (luôn là Primary Server) |
+| 3 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id`. Domain mà job này tác động. Dùng để group jobs theo domain |
+| 4 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_servers.id`. Server đích mà job này sẽ gửi API tới (luôn là Primary Server) |
 | 5 | `action` | ENUM('ADD_RECORD', 'EDIT_RECORD', 'DELETE_RECORD', 'CREATE_ZONE', 'DELETE_ZONE', 'CREATE_REDIRECT', 'EDIT_REDIRECT', 'DELETE_REDIRECT', 'CREATE_EMAIL_FWD', 'DELETE_EMAIL_FWD', 'ENABLE_DNSSEC', 'DISABLE_DNSSEC', 'RESIGN_ZONE', 'REQUEST_SSL', 'RENEW_SSL') | 📌 REQD | Loại tác vụ cần thực thi. Mỗi action tương ứng 1 DA API command. Worker sử dụng `DACommandMap` để map action → API endpoint + parameters |
 | 6 | `payload` | JSON | 📌 REQD | Dữ liệu chi tiết cho tác vụ ở dạng JSON. Cấu trúc khác nhau tùy action — xem SPEC.md Section 4.2 "Payload JSON format". VD ADD_RECORD: `{"record_id":123, "type":"A", "name":"mail", "value":"103.1.2.3", "ttl":3600}`. VD EDIT_RECORD: `{"record_id":123, "old_value":"1.2.3.4", "new_value":"5.6.7.8", ...}` |
 | 7 | `status` | ENUM('PENDING', 'SYNCING', 'COMPLETE', 'FAILED', 'CANCELLED', 'PERMANENTLY_FAILED') | 📌 REQD DEFAULT `'PENDING'` 📋 IDX | Trạng thái job: `PENDING` = chờ Worker xử lý; `SYNCING` = Worker đang xử lý (row locked); `COMPLETE` = DA xác nhận thành công; `FAILED` = lỗi, sẽ retry nếu còn attempts; `CANCELLED` = bị hủy bởi Conflict Resolution hoặc Admin; `PERMANENTLY_FAILED` = hết retry hoặc lỗi non-retryable (auth fail, zone not found) |
@@ -414,7 +414,7 @@ CREATE TABLE mod_hvndns_records (
 **Dung lượng ước tính**: 10,000–500,000 rows (tích lũy theo thời gian, cần purge).
 
 ```sql
-CREATE TABLE mod_hvndns_queue (
+CREATE TABLE tbl_mj_dns_queue (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     batch_id        CHAR(36) NOT NULL,
     domain_id       INT UNSIGNED NOT NULL,
@@ -450,22 +450,22 @@ CREATE TABLE mod_hvndns_queue (
     INDEX idx_domain_status (domain_id, status),
     INDEX idx_server_status (server_id, status),
     INDEX idx_locked (locked_by, locked_at),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id),
-    FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id),
+    FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 8. mod_hvndns_sync_logs
+## 8. tbl_mj_dns_sync_logs
 
 > **Mục đích**: Ghi lại chi tiết từng lần Cron Worker gọi API tới DirectAdmin. Mỗi lần xử lý 1 job tạo ra 1 dòng sync_log. Dùng cho troubleshooting, tính uptime, và dashboard metrics.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | BIGINT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID log. Dùng BIGINT vì bảng này tăng nhanh (~150 rows/phút nếu cron chạy đầy tải) |
-| 2 | `queue_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_queue.id`. Job nào sinh ra log entry này |
-| 3 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_servers.id`. Server nào nhận API call |
+| 2 | `queue_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_queue.id`. Job nào sinh ra log entry này |
+| 3 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_servers.id`. Server nào nhận API call |
 | 4 | `http_method` | VARCHAR(10) | NULL | HTTP method đã dùng: `GET` hoặc `POST`. `NULL` nếu không kết nối được |
 | 5 | `http_url` | VARCHAR(500) | NULL | URL API đã gọi (đã LOẠI BỎ password — chỉ giữ `https://{hostname}:{port}/CMD_API_...`). KHÔNG BAO GIỜ log URL chứa credentials |
 | 6 | `http_status` | SMALLINT UNSIGNED | NULL | HTTP status code trả về: `200` = success; `403` = auth fail; `500` = server error. `NULL` = không nhận được response (timeout, connection refused) |
@@ -484,7 +484,7 @@ CREATE TABLE mod_hvndns_queue (
 **Dung lượng ước tính**: 100,000–5,000,000 rows/năm. **Cần purge > 90 ngày**.
 
 ```sql
-CREATE TABLE mod_hvndns_sync_logs (
+CREATE TABLE tbl_mj_dns_sync_logs (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     queue_id        INT UNSIGNED NOT NULL,
     server_id       INT UNSIGNED NOT NULL,
@@ -501,14 +501,14 @@ CREATE TABLE mod_hvndns_sync_logs (
     INDEX idx_queue (queue_id),
     INDEX idx_server_time (server_id, created_at),
     INDEX idx_success_time (success, created_at),
-    FOREIGN KEY (queue_id) REFERENCES mod_hvndns_queue(id),
-    FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+    FOREIGN KEY (queue_id) REFERENCES tbl_mj_dns_queue(id),
+    FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 9. mod_hvndns_audit_trail
+## 9. tbl_mj_dns_audit_trail
 
 > **Mục đích**: Nhật ký kiểm toán bảo mật — ghi lại MỌI hành động thay đổi dữ liệu trong hệ thống. Bảng này là **APPEND-ONLY**: KHÔNG BAO GIỜ có lệnh UPDATE hoặc DELETE từ application layer. Dùng cho truy vết bảo mật, giải quyết tranh chấp, và compliance audit.
 
@@ -519,7 +519,7 @@ CREATE TABLE mod_hvndns_sync_logs (
 | 3 | `actor_id` | INT UNSIGNED | NULL 🚫 RO | ID người thực hiện. `client` → `tblclients.id`; `admin` → `tbladmins.id`; `system/api` → `NULL` |
 | 4 | `actor_name` | VARCHAR(255) | NULL 🚫 RO | Tên hiển thị TẠI THỜI ĐIỂM GHI LOG. Lưu trực tiếp vì user có thể đổi tên sau — audit trail cần giữ tên lúc thao tác. VD: "Nguyễn Văn A", "Admin Vuong" |
 | 5 | `domain` | VARCHAR(253) | 📌 REQD 📋 IDX 🚫 RO | Tên miền bị tác động. Lưu trực tiếp string (không FK) vì domain có thể bị xóa nhưng audit trail vẫn phải giữ |
-| 6 | `domain_id` | INT UNSIGNED | NULL 🚫 RO | FK tới `mod_hvndns_domains.id` tại thời điểm ghi. Có thể `NULL` nếu domain đã bị xóa khỏi DB |
+| 6 | `domain_id` | INT UNSIGNED | NULL 🚫 RO | FK tới `tbl_mj_dns_domains.id` tại thời điểm ghi. Có thể `NULL` nếu domain đã bị xóa khỏi DB |
 | 7 | `action` | VARCHAR(50) | 📌 REQD 📋 IDX 🚫 RO | Hành động đã thực hiện. Giá trị chuẩn: `add_record`, `edit_record`, `delete_record`, `create_zone`, `delete_zone`, `enable_dnssec`, `disable_dnssec`, `add_redirect`, `edit_redirect`, `delete_redirect`, `add_email_fwd`, `delete_email_fwd`, `load_template`, `zone_rollback`, `change_ssl`, `ddns_update`, `suspend_domain`, `unsuspend_domain`, `terminate_domain`, `override_conflict`, `retry_job`, `bulk_ip_change` |
 | 8 | `target_type` | VARCHAR(50) | NULL 🚫 RO | Loại đối tượng bị tác động: `record`, `zone`, `redirect`, `email_forward`, `dnssec`, `ssl`, `domain`, `server`, `template`, `quota` |
 | 9 | `target_id` | INT UNSIGNED | NULL 🚫 RO | ID đối tượng bị tác động (VD: record ID, redirect ID). `NULL` nếu tác động toàn zone |
@@ -527,7 +527,7 @@ CREATE TABLE mod_hvndns_sync_logs (
 | 11 | `new_value` | JSON | NULL 🚫 RO | Giá trị SAU thay đổi ở dạng JSON. `NULL` nếu là action xóa. VD edit record: `{"type":"A", "name":"mail", "value":"103.1.2.4", "ttl":3600}` |
 | 12 | `context` | VARCHAR(100) | NULL 🚫 RO | Ngữ cảnh thực hiện: `client_editor` = từ Client DNS Editor; `admin_editor` = từ Admin DNS Editor; `admin_global` = từ Admin Global Domain list; `ddns_api` = từ DDNS endpoint; `rest_api` = từ REST API; `cron_provision` = provision tự động; `cron_terminate` = terminate tự động; `cron_drift_fix` = auto-fix drift; `bulk_operation` = thay đổi hàng loạt |
 | 13 | `ip_address` | VARCHAR(45) | 📌 REQD 📋 IDX 🚫 RO | Địa chỉ IP nguồn của request. IPv4 hoặc IPv6. Với cron/system: ghi IP server WHMCS |
-| 14 | `user_agent` | VARCHAR(500) | NULL 🚫 RO | User-Agent header của trình duyệt/client. Dùng xác định thiết bị. VD: `"Mozilla/5.0 (Windows NT 10.0; Win64)..."` hoặc `"MikroTik/7.x DDNS"`. Với cron: `"HVN-DNS-Worker/1.0"` |
+| 14 | `user_agent` | VARCHAR(500) | NULL 🚫 RO | User-Agent header của trình duyệt/client. Dùng xác định thiết bị. VD: `"Mozilla/5.0 (Windows NT 10.0; Win64)..."` hoặc `"MikroTik/7.x DDNS"`. Với cron: `"MJ-DNS-Worker/1.0"` |
 | 15 | `session_id` | VARCHAR(100) | NULL 🚫 RO | WHMCS session ID tại thời điểm thao tác. Dùng liên kết nhiều thao tác trong cùng 1 phiên làm việc. `NULL` cho cron/api |
 | 16 | `notes` | TEXT | NULL 🚫 RO | Ghi chú bổ sung. VD: `"Overridden by Admin #5"`, `"Rollback to snapshot #45 created 2026-02-24"`, `"Bulk IP change: 103.1.2.3 → 103.1.2.4 affecting 15 domains"` |
 | 17 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS 🚫 RO | Thời điểm ghi log. KHÔNG BAO GIỜ thay đổi |
@@ -543,7 +543,7 @@ CREATE TABLE mod_hvndns_sync_logs (
 **Dung lượng ước tính**: 500,000–10,000,000 rows/năm. **Retention tối thiểu 365 ngày**.
 
 ```sql
-CREATE TABLE mod_hvndns_audit_trail (
+CREATE TABLE tbl_mj_dns_audit_trail (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     actor_type      ENUM('client','admin','system','api') NOT NULL,
     actor_id        INT UNSIGNED NULL,
@@ -571,15 +571,15 @@ CREATE TABLE mod_hvndns_audit_trail (
 
 ---
 
-## 10. mod_hvndns_record_history
+## 10. tbl_mj_dns_record_history
 
 > **Mục đích**: Lưu lịch sử thay đổi chi tiết cho từng DNS record. Mỗi lần record bị tạo/sửa/xóa đều ghi 1 dòng. Khác với audit_trail (ghi ở tầng hành động), record_history ghi ở tầng dữ liệu — cho phép "Undo" thay đổi từng record riêng lẻ.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | BIGINT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID history entry |
-| 2 | `record_id` | INT UNSIGNED | 📌 REQD 📋 IDX | FK tới `mod_hvndns_records.id`. Record nào bị thay đổi. Không dùng ON DELETE CASCADE vì muốn giữ history kể cả record đã xóa |
-| 3 | `domain_id` | INT UNSIGNED | 📌 REQD 📋 IDX | FK tới `mod_hvndns_domains.id`. Lưu thừa để query nhanh "lịch sử tất cả records của domain X" mà không cần JOIN |
+| 2 | `record_id` | INT UNSIGNED | 📌 REQD 📋 IDX | FK tới `tbl_mj_dns_records.id`. Record nào bị thay đổi. Không dùng ON DELETE CASCADE vì muốn giữ history kể cả record đã xóa |
+| 3 | `domain_id` | INT UNSIGNED | 📌 REQD 📋 IDX | FK tới `tbl_mj_dns_domains.id`. Lưu thừa để query nhanh "lịch sử tất cả records của domain X" mà không cần JOIN |
 | 4 | `change_type` | ENUM('created', 'updated', 'deleted') | 📌 REQD | Loại thay đổi: `created` = record vừa được tạo mới; `updated` = record bị sửa; `deleted` = record bị xóa |
 | 5 | `old_type` | VARCHAR(10) | NULL | Record type TRƯỚC thay đổi. `NULL` nếu `change_type = 'created'` |
 | 6 | `old_name` | VARCHAR(255) | NULL | Giá trị name TRƯỚC. `NULL` nếu `created` |
@@ -598,7 +598,7 @@ CREATE TABLE mod_hvndns_audit_trail (
 **Dung lượng ước tính**: 100,000–2,000,000 rows/năm. **Purge > 90 ngày**.
 
 ```sql
-CREATE TABLE mod_hvndns_record_history (
+CREATE TABLE tbl_mj_dns_record_history (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     record_id       INT UNSIGNED NOT NULL,
     domain_id       INT UNSIGNED NOT NULL,
@@ -624,14 +624,14 @@ CREATE TABLE mod_hvndns_record_history (
 
 ---
 
-## 11. mod_hvndns_snapshots
+## 11. tbl_mj_dns_snapshots
 
 > **Mục đích**: Lưu bản sao toàn bộ zone DNS tại một thời điểm. Dùng cho Zone Rollback — khi khách cấu hình sai, Admin có thể khôi phục zone về trạng thái trước đó.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID snapshot |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id`. Domain nào |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id`. Domain nào |
 | 3 | `snapshot_type` | ENUM('scheduled', 'pre_bulk', 'pre_template', 'manual') | 📌 REQD DEFAULT `'scheduled'` | Lý do tạo snapshot: `scheduled` = nightly cron tự tạo; `pre_bulk` = tự động trước bulk operation; `pre_template` = tự động trước load template; `manual` = Admin bấm nút tạo thủ công |
 | 4 | `records_data` | JSON | 📌 REQD | Toàn bộ records của zone ở dạng JSON array. VD: `[{"type":"A","name":"@","value":"1.2.3.4","ttl":3600}, ...]`. Đây là full snapshot, đủ để restore hoàn toàn zone |
 | 5 | `record_count` | SMALLINT UNSIGNED | 📌 REQD | Số lượng records trong snapshot. Dùng hiển thị nhanh mà không cần parse JSON |
@@ -643,7 +643,7 @@ CREATE TABLE mod_hvndns_record_history (
 **Rolling retention**: Giữ tối đa 30 snapshots/domain. Cron cleanup xóa cũ nhất khi vượt quá.
 
 ```sql
-CREATE TABLE mod_hvndns_snapshots (
+CREATE TABLE tbl_mj_dns_snapshots (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     snapshot_type   ENUM('scheduled','pre_bulk','pre_template','manual') NOT NULL DEFAULT 'scheduled',
@@ -655,13 +655,13 @@ CREATE TABLE mod_hvndns_snapshots (
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     INDEX idx_domain_time (domain_id, created_at),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 12. mod_hvndns_templates
+## 12. tbl_mj_dns_templates
 
 > **Mục đích**: Lưu các mẫu DNS template do Admin tạo. Áp dụng tự động khi provision domain mới hoặc cho phép Client reset DNS về mẫu.
 
@@ -678,7 +678,7 @@ CREATE TABLE mod_hvndns_snapshots (
 | 9 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
 
 ```sql
-CREATE TABLE mod_hvndns_templates (
+CREATE TABLE tbl_mj_dns_templates (
     id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name                VARCHAR(100) NOT NULL,
     description         TEXT NULL,
@@ -695,14 +695,14 @@ CREATE TABLE mod_hvndns_templates (
 
 ---
 
-## 13. mod_hvndns_dnssec
+## 13. tbl_mj_dns_dnssec
 
 > **Mục đích**: Lưu thông số DNSSEC (DS Records) cho từng domain. Sau khi enable DNSSEC trên DA, thông tin keys được lưu ở đây để hiển thị cho Client mang đi cấu hình tại nhà đăng ký.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID entry |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 🦄 UNIQ | FK tới `mod_hvndns_domains.id`. Mỗi domain chỉ có 1 bản DNSSEC config |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 🦄 UNIQ | FK tới `tbl_mj_dns_domains.id`. Mỗi domain chỉ có 1 bản DNSSEC config |
 | 3 | `is_enabled` | TINYINT(1) | 📌 REQD DEFAULT `0` | DNSSEC hiện đang bật? `1` = enabled trên DA, `0` = disabled |
 | 4 | `key_tag` | INT UNSIGNED | NULL | Key Tag identifier. Số nguyên 16-bit (0–65535). Dùng nhận diện key. Lấy từ DA API sau khi enable |
 | 5 | `algorithm` | SMALLINT UNSIGNED | NULL | Algorithm number theo IANA. Phổ biến: `8` = RSA/SHA-256; `13` = ECDSA P-256 (khuyến nghị); `14` = ECDSA P-384; `15` = Ed25519 |
@@ -715,7 +715,7 @@ CREATE TABLE mod_hvndns_templates (
 | 12 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
 
 ```sql
-CREATE TABLE mod_hvndns_dnssec (
+CREATE TABLE tbl_mj_dns_dnssec (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     is_enabled      TINYINT(1) NOT NULL DEFAULT 0,
@@ -730,20 +730,20 @@ CREATE TABLE mod_hvndns_dnssec (
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     UNIQUE INDEX uniq_domain (domain_id),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 14. mod_hvndns_ddns_tokens
+## 14. tbl_mj_dns_ddns_tokens
 
 > **Mục đích**: Quản lý token xác thực cho DDNS endpoint. Router/Camera dùng token để cập nhật IP tự động mà không cần đăng nhập WHMCS.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID token |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id`. Domain chứa record cần cập nhật |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id`. Domain chứa record cần cập nhật |
 | 3 | `subdomain` | VARCHAR(255) | 📌 REQD DEFAULT `'@'` | Subdomain mà token này quản lý. `@` = root domain; `cam` = cam.example.com; `vpn` = vpn.example.com. Mỗi subdomain cần token riêng |
 | 4 | `token_hash` | CHAR(64) | 📌 REQD 🦄 UNIQ #️⃣ HASH | SHA-256 hash của token gốc. Token gốc chỉ hiển thị 1 lần khi tạo, KHÔNG lưu plaintext. Khi router gửi request, hash token nhận được rồi so sánh với cột này |
 | 5 | `label` | VARCHAR(100) | NULL | Nhãn do Client đặt. VD: "Camera văn phòng", "Router Mikrotik tầng 2". Giúp phân biệt khi có nhiều token |
@@ -755,7 +755,7 @@ CREATE TABLE mod_hvndns_dnssec (
 | 11 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo token |
 
 ```sql
-CREATE TABLE mod_hvndns_ddns_tokens (
+CREATE TABLE tbl_mj_dns_ddns_tokens (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     subdomain       VARCHAR(255) NOT NULL DEFAULT '@',
@@ -770,20 +770,20 @@ CREATE TABLE mod_hvndns_ddns_tokens (
     
     UNIQUE INDEX uniq_token (token_hash),
     INDEX idx_domain_sub (domain_id, subdomain),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 15. mod_hvndns_redirects
+## 15. tbl_mj_dns_redirects
 
 > **Mục đích**: Lưu cấu hình chuyển hướng URL (301/302/Masked). Được quản lý tách biệt khỏi DNS records vì redirect đòi hỏi web server config, không chỉ DNS.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID redirect |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id` |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id` |
 | 3 | `source_path` | VARCHAR(500) | 📌 REQD DEFAULT `'/'` | Đường dẫn nguồn trên domain. `/` = root; `/old-page` = path cụ thể. Không bao gồm domain |
 | 4 | `destination_url` | VARCHAR(2000) | 📌 REQD | URL đích đầy đủ. VD: `https://newsite.com/landing`. Phải bắt đầu bằng `http://` hoặc `https://` |
 | 5 | `redirect_type` | ENUM('301', '302', 'masked') | 📌 REQD DEFAULT `'301'` | Loại redirect: `301` = Permanent (SEO-friendly); `302` = Temporary; `masked` = URL masking (ẩn URL đích, hiển thị domain nguồn trên thanh địa chỉ) |
@@ -794,7 +794,7 @@ CREATE TABLE mod_hvndns_ddns_tokens (
 | 10 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
 
 ```sql
-CREATE TABLE mod_hvndns_redirects (
+CREATE TABLE tbl_mj_dns_redirects (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     source_path     VARCHAR(500) NOT NULL DEFAULT '/',
@@ -808,20 +808,20 @@ CREATE TABLE mod_hvndns_redirects (
     
     INDEX idx_domain (domain_id),
     UNIQUE INDEX uniq_domain_path (domain_id, source_path),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 16. mod_hvndns_email_forwards
+## 16. tbl_mj_dns_email_forwards
 
 > **Mục đích**: Quản lý email forwarding và catch-all. Đồng bộ qua Queue lên DirectAdmin.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID email forward |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id` |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id` |
 | 3 | `source_address` | VARCHAR(255) | 📌 REQD | Phần local của email nguồn. VD: `info` (cho info@domain.com), `support`, `*` (catch-all) |
 | 4 | `destination_email` | VARCHAR(500) | 📌 REQD | Email đích nhận forward. VD: `personal@gmail.com`. Phải là email hợp lệ |
 | 5 | `is_catchall` | TINYINT(1) | 📌 REQD DEFAULT `0` | Có phải catch-all? `1` = mọi email không match forwarder cụ thể sẽ chuyển về `destination_email`. Mỗi domain chỉ có tối đa 1 catch-all |
@@ -830,7 +830,7 @@ CREATE TABLE mod_hvndns_redirects (
 | 8 | `updated_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm cập nhật |
 
 ```sql
-CREATE TABLE mod_hvndns_email_forwards (
+CREATE TABLE tbl_mj_dns_email_forwards (
     id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id           INT UNSIGNED NOT NULL,
     source_address      VARCHAR(255) NOT NULL,
@@ -842,21 +842,21 @@ CREATE TABLE mod_hvndns_email_forwards (
     
     INDEX idx_domain (domain_id),
     UNIQUE INDEX uniq_domain_source (domain_id, source_address),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 17. mod_hvndns_drift_reports
+## 17. tbl_mj_dns_drift_reports
 
 > **Mục đích**: Kết quả scan drift hàng đêm — phát hiện sự khác biệt giữa DNS trên DirectAdmin và DB local WHMCS.
 
 | # | Cột | Kiểu | Ràng buộc | Mô tả |
 |---|-----|------|-----------|-------|
 | 1 | `id` | INT UNSIGNED | 🔑 PK ⚡ AUTO 📌 REQD | ID report |
-| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `mod_hvndns_domains.id` |
-| 3 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK | FK tới `mod_hvndns_servers.id`. Server nào bị drift (thường query Primary server) |
+| 2 | `domain_id` | INT UNSIGNED | 📌 REQD 🔗 FK 📋 IDX | FK tới `tbl_mj_dns_domains.id` |
+| 3 | `server_id` | INT UNSIGNED | 📌 REQD 🔗 FK | FK tới `tbl_mj_dns_servers.id`. Server nào bị drift (thường query Primary server) |
 | 4 | `drift_type` | ENUM('added_on_da', 'deleted_on_da', 'modified', 'missing_on_da') | 📌 REQD | Loại drift: `added_on_da` = record có trên DA nhưng không có trong WHMCS DB; `deleted_on_da` = record đã bị xóa trên DA nhưng WHMCS DB vẫn còn; `modified` = cả hai đều có nhưng giá trị khác nhau; `missing_on_da` = WHMCS DB có nhưng DA không có (đồng nghĩa sync đang lỗi) |
 | 5 | `record_type` | VARCHAR(10) | 📌 REQD | Loại DNS record bị drift (A, CNAME, MX, ...) |
 | 6 | `record_name` | VARCHAR(255) | 📌 REQD | Subdomain/name của record bị drift |
@@ -868,7 +868,7 @@ CREATE TABLE mod_hvndns_email_forwards (
 | 12 | `detected_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm phát hiện drift |
 
 ```sql
-CREATE TABLE mod_hvndns_drift_reports (
+CREATE TABLE tbl_mj_dns_drift_reports (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     server_id       INT UNSIGNED NOT NULL,
@@ -884,14 +884,14 @@ CREATE TABLE mod_hvndns_drift_reports (
     
     INDEX idx_domain_res (domain_id, resolution),
     INDEX idx_resolution (resolution, detected_at),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE,
-    FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE,
+    FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---
 
-## 18. mod_hvndns_ip_blacklist
+## 18. tbl_mj_dns_ip_blacklist
 
 > **Mục đích**: Danh sách IP bị tạm chặn do phát hiện hành vi brute force trên DDNS endpoint. Auto-expire sau thời gian cấu hình.
 
@@ -905,7 +905,7 @@ CREATE TABLE mod_hvndns_drift_reports (
 | 6 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm bắt đầu block |
 
 ```sql
-CREATE TABLE mod_hvndns_ip_blacklist (
+CREATE TABLE tbl_mj_dns_ip_blacklist (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     ip_address      VARCHAR(45) NOT NULL,
     reason          VARCHAR(255) NOT NULL,
@@ -920,7 +920,7 @@ CREATE TABLE mod_hvndns_ip_blacklist (
 
 ---
 
-## 19. mod_hvndns_notification_cooldowns
+## 19. tbl_mj_dns_notification_cooldowns
 
 > **Mục đích**: Kiểm soát tần suất gửi cảnh báo. Tránh spam Admin khi server down kéo dài — cùng 1 loại alert chỉ gửi 1 lần mỗi X phút.
 
@@ -934,7 +934,7 @@ CREATE TABLE mod_hvndns_ip_blacklist (
 | 6 | `created_at` | DATETIME | 📌 REQD 🕐 AUTO-TS | Thời điểm tạo entry (lần gửi đầu tiên) |
 
 ```sql
-CREATE TABLE mod_hvndns_notification_cooldowns (
+CREATE TABLE tbl_mj_dns_notification_cooldowns (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     rule_id         VARCHAR(50) NOT NULL,
     scope_key       VARCHAR(255) NOT NULL,
@@ -985,7 +985,7 @@ CREATE TABLE mod_hvndns_notification_cooldowns (
 Đây là query chạy MỖI PHÚT, quyết định performance toàn hệ thống:
 
 ```sql
-SELECT * FROM mod_hvndns_queue
+SELECT * FROM tbl_mj_dns_queue
 WHERE status = 'PENDING'
   AND (next_retry_at IS NULL OR next_retry_at <= NOW())
   AND server_id IN (/* active, non-backoff server IDs */)

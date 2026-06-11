@@ -1,11 +1,11 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## SETTINGS.md — Admin Configuration Reference
 
 > **Phiên bản**: 1.0  
 > **Ngày tạo**: 25/02/2026  
 > **Dành cho**: Developer, Admin, AI Agent  
 > **Tham chiếu từ**: Cấu hình module DNS Suite v1.25 (legacy) + Thiết kế mới  
-> **Lưu trữ DB**: Bảng `tbladdonsettings` (WHMCS native) hoặc bảng riêng `mod_hvndns_settings`  
+> **Lưu trữ DB**: Bảng `tbladdonsettings` (WHMCS native) hoặc bảng riêng `tbl_mj_dns_settings`  
 
 ---
 
@@ -42,10 +42,10 @@
 
 ### 1.1. Cách lưu trữ
 
-Settings được lưu trong bảng `mod_hvndns_settings` (key-value):
+Settings được lưu trong bảng `tbl_mj_dns_settings` (key-value):
 
 ```sql
-CREATE TABLE mod_hvndns_settings (
+CREATE TABLE tbl_mj_dns_settings (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     setting_key VARCHAR(100) NOT NULL,
     setting_val TEXT NULL,
@@ -98,7 +98,7 @@ Trang Admin Settings chia thành các tab:
 | # | Setting Key | Label | Type | Default | Mô tả |
 |---|------------|-------|------|---------|-------|
 | 1 | `module_enabled` | Kích hoạt Module | Boolean | `1` | Bật/tắt toàn bộ module. Khi tắt: Client Area ẩn, Cron Worker dừng, Admin vẫn truy cập được trang settings |
-| 2 | `license_key` | License Key | String | `""` | Khóa bản quyền module (nếu bán thương mại). Để trống = không kiểm tra license. Format: `hvndns-XXXXXXXX` |
+| 2 | `license_key` | License Key | String | `""` | Khóa bản quyền module (nếu bán thương mại). Để trống = không kiểm tra license. Format: `mj_dns-XXXXXXXX` |
 | 3 | `default_nameserver_1` | Nameserver 1 | String | `"dns1.hvn.vn"` | NS1 mặc định. BẮT BUỘC có giá trị. Dùng khi tạo zone mới + hiển thị hướng dẫn cho client |
 | 4 | `default_nameserver_2` | Nameserver 2 | String | `"dns2.hvn.vn"` | NS2 mặc định. BẮT BUỘC có giá trị |
 | 5 | `default_nameserver_3` | Nameserver 3 | String | `"dns3.hvn.vn"` | NS3 mặc định. Có thể để trống nếu chỉ có 2 server |
@@ -121,10 +121,10 @@ Trang Admin Settings chia thành các tab:
 ## 3. Server DirectAdmin
 
 > **Tab Admin**: Servers  
-> **Lưu trữ**: Bảng `mod_hvndns_servers` (KHÔNG lưu trong settings)  
+> **Lưu trữ**: Bảng `tbl_mj_dns_servers` (KHÔNG lưu trong settings)  
 > **Xem chi tiết**: DB_SCHEMA.md Section 4
 
-Phần này đã được thiết kế đầy đủ trong DB_SCHEMA.md bảng `mod_hvndns_servers` với multi-server support. Không cần thêm settings riêng — mỗi server là 1 row trong bảng.
+Phần này đã được thiết kế đầy đủ trong DB_SCHEMA.md bảng `tbl_mj_dns_servers` với multi-server support. Không cần thêm settings riêng — mỗi server là 1 row trong bảng.
 
 **Khác biệt với module cũ**: Module cũ chỉ hỗ trợ 1 DA server (single fields). Module mới hỗ trợ N servers (bảng riêng).
 
@@ -371,7 +371,7 @@ Nếu `email_verify_template` trống → bỏ qua bước xác minh, tạo forw
 | 57 | `enable_user_custom_templates` | Cho phép User tạo Template riêng | Boolean | `0` | Cho phép client tự tạo DNS template từ zone hiện tại để dùng lại. MẶC ĐỊNH TẮT |
 | 58 | `user_template_limit` | Giới hạn Template/user | Integer | `10` | Số template tối đa mà 1 client được tạo. `0` = unlimited |
 
-**Ghi chú**: Templates do Admin tạo lưu trong `mod_hvndns_templates`. Templates do User tạo cũng lưu cùng bảng nhưng thêm cột `created_by_user_id` để phân biệt.
+**Ghi chú**: Templates do Admin tạo lưu trong `tbl_mj_dns_templates`. Templates do User tạo cũng lưu cùng bảng nhưng thêm cột `created_by_user_id` để phân biệt.
 
 ---
 
@@ -426,7 +426,7 @@ Module mới dùng kiến trúc Queue (WHMCS DB là source of truth). Tuy nhiên
 
 Khi `fetch_from_ns_on_load = false` (mặc định):
 ```
-Client mở DNS Editor → Load từ mod_hvndns_records (< 50ms)
+Client mở DNS Editor → Load từ tbl_mj_dns_records (< 50ms)
                       → Nếu last_fetched > cache_refresh_ttl
                         → Background fetch từ DA → update DB → next load sẽ mới
 ```
@@ -579,7 +579,7 @@ Client mở DNS Editor → Gọi DAGateway::getZone() (500-1500ms)
 
 | Tài liệu | Cần cập nhật |
 |-----------|-------------|
-| **DB_SCHEMA.md** | Thêm bảng `mod_hvndns_settings` (Section 1). Thêm cột `created_by_user_id` vào `mod_hvndns_templates` cho user custom templates |
+| **DB_SCHEMA.md** | Thêm bảng `tbl_mj_dns_settings` (Section 1). Thêm cột `created_by_user_id` vào `tbl_mj_dns_templates` cho user custom templates |
 | **SPEC.md** | Section 14 (Module Settings) → thay bảng settings cũ (17 items) bằng reference tới SETTINGS.md (96 items). Thêm `fetch_from_ns_on_load` vào flow DNS Editor |
 | **WIREFRAME.md** | AD-12 Notification Settings → mở rộng thêm tab cho tất cả nhóm settings. Thêm wireframe trang Settings đầy đủ |
 | **EPICS.md** | Thêm issues cho: Record Permissions UI, Domain Policy hooks (pre-registrar, on-transfer), Client Notification email, NS check logic, Cache strategy |

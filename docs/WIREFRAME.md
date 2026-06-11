@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## WIREFRAME.md — Phác thảo Giao diện
 
 > **Phiên bản**: 1.0  
@@ -522,7 +522,7 @@ $alpine       Alpine.js reactive data
 │  │                                                            │  │
 │  │  URL cập nhật:                                             │  │
 │  │  ┌──────────────────────────────────────────────────────┐ │  │
-│  │  │ https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/ │ │  │
+│  │  │ https://whmcs.hvn.vn/modules/addons/mj_dns_manager/ │ │  │
 │  │  │ ddns.php?token=a1b2c3d4e5f6...                       │ │  │
 │  │  └──────────────────────────────────────────────────────┘ │  │
 │  │  [📋 Copy URL]                                             │  │
@@ -542,7 +542,7 @@ $alpine       Alpine.js reactive data
 │  │  ┌──────────────────────────────────────────────────────┐ │  │
 │  │  │ Dynamic DNS > Custom Provider                         │ │  │
 │  │  │ Server: whmcs.hvn.vn                                  │ │  │
-│  │  │ Path: /modules/addons/hvn_dns_manager/ddns.php       │ │  │
+│  │  │ Path: /modules/addons/mj_dns_manager/ddns.php       │ │  │
 │  │  │ Token: a1b2c3d4e5f6...                               │ │  │
 │  │  └──────────────────────────────────────────────────────┘ │  │
 │  │                                                            │  │
@@ -621,13 +621,13 @@ $alpine       Alpine.js reactive data
 
 ## AD-01: Dashboard
 
-> **URL**: `/admin/addonmodules.php?module=hvn_dns_manager`  
+> **URL**: `/admin/addonmodules.php?module=mj_dns_manager`  
 > **Mục đích**: Tổng quan sức khỏe hệ thống, metrics real-time, cảnh báo nhanh  
 > **Đây là trang đầu tiên Admin thấy khi mở module**
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  WHMCS Admin Sidebar    │  HVN - DirectAdmin DNS Manager                    ║
+║  WHMCS Admin Sidebar    │  MJ - DirectAdmin DNS Manager                    ║
 ║  ─────────────────      │  ═══════════════════════════════                   ║
 ║                         │                                                    ║
 ║  📊 Dashboard          │  ┌─── Alert Banner (chỉ hiện khi có sự cố) ────┐ ║
@@ -694,7 +694,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-02: Server Management
 
-> **URL**: `?module=hvn_dns_manager&action=servers`
+> **URL**: `?module=mj_dns_manager&action=servers`
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -797,7 +797,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-04: Global Domain List
 
-> **URL**: `?module=hvn_dns_manager&action=domains`
+> **URL**: `?module=mj_dns_manager&action=domains`
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -909,7 +909,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-06: Sync Logs
 
-> **URL**: `?module=hvn_dns_manager&action=sync_logs`
+> **URL**: `?module=mj_dns_manager&action=sync_logs`
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -971,7 +971,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-07: Audit Trail
 
-> **URL**: `?module=hvn_dns_manager&action=audit_trail`
+> **URL**: `?module=mj_dns_manager&action=audit_trail`
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -1030,7 +1030,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-08: Template Manager
 
-> **URL**: `?module=hvn_dns_manager&action=templates`
+> **URL**: `?module=mj_dns_manager&action=templates`
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════╗
@@ -1093,7 +1093,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-09: Quota Plans
 
-> **URL**: `?module=hvn_dns_manager&action=quota_plans`
+> **URL**: `?module=mj_dns_manager&action=quota_plans`
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -1122,7 +1122,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-10: Drift Reports
 
-> **URL**: `?module=hvn_dns_manager&action=drift_reports`
+> **URL**: `?module=mj_dns_manager&action=drift_reports`
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -1165,7 +1165,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-11: Bulk Operations
 
-> **URL**: `?module=hvn_dns_manager&action=bulk`
+> **URL**: `?module=mj_dns_manager&action=bulk`
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -1216,7 +1216,7 @@ $alpine       Alpine.js reactive data
 
 ## AD-12: Module Settings (Mở rộng)
 
-> **URL**: `?module=hvn_dns_manager&action=settings`
+> **URL**: `?module=mj_dns_manager&action=settings`
 > **Mục đích**: Trang cấu hình tổng hợp — **111 settings** chia theo 21 tabs
 
 Tab navigation:
@@ -1258,7 +1258,7 @@ Một tab độc lập ở vị trí đầu tiên để khai báo key và trạn
 │  ──────────────────────────                                       │
 │                                                                   │
 │  License Key *                                                   │
-│  [__________HVN-DNS-XXXXXXXXXXXXXXXX__________]                   │
+│  [__________MJ-DNS-XXXXXXXXXXXXXXXX__________]                   │
 │                                                                   │
 │  API Endpoint *                                                  │
 │  [__https://license.hvn.vn/api/v1/check__]                       │

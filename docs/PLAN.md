@@ -4,7 +4,7 @@ Dựa trên việc phân tích cấu trúc của WHMCS DNS Suite (phiên bản c
 
 ## 1. Tên Module Chính Thức
 
-Tên module được thống nhất là: **HVN - DirectAdmin DNS Manager**.
+Tên module được thống nhất là: **MJ - DirectAdmin DNS Manager**.
 (Nhấn mạnh vào thương hiệu HVN Group, tích hợp trình quản lý DNS đồng bộ/bất đồng bộ tốc độ cao với máy chủ DirectAdmin).
 
 ---
@@ -44,7 +44,7 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
    - Đi kèm thuật toán **Anti-Brute Force** chống gọi API rác và Block IP xấu tự động.
 7. **Hỗ trợ Quản lý DNSSEC**:
    - DirectAdmin **hỗ trợ rất tốt DNSSEC** nguyên bản (nếu được Enable trên Server DirectAdmin qua file `directadmin.conf`).
-   - Trong module **HVN - DirectAdmin DNS Manager**, tính năng này sẽ được đồng nhất luồng kiến trúc mạng Bất đồng bộ (Queue):
+   - Trong module **MJ - DirectAdmin DNS Manager**, tính năng này sẽ được đồng nhất luồng kiến trúc mạng Bất đồng bộ (Queue):
        * (1) **Nút Kích Hoạt/Vô Hiệu Hóa (Enable/Disable)**: Giao diện cho phép khách hàng chọn Bật/Tắt chế độ bảo mật DNSSEC trực tiếp từ trang quản lý WHMCS. Lệnh này được đẩy vào **Database Queue** (như tạo Record thông thường) để Cronjob xử lý sau nhằm tránh tải nghẽn thay vì gọi API trực tiếp.
        * (2) Khi Cronjob chạy nền và bắn lệnh Bật DNSSEC tới DirectAdmin thành công, tiến trình này tự động sinh `Generate Keys` tạo chuỗi thông số DS Records cho tên miền.
        * (3) Hiển thị thông số Key Tag, Algorithm, Digest Type, Digest cập nhật ở Giao diện Khách để mang đi cấu hình tại nhà đăng ký.
@@ -98,7 +98,7 @@ Khác với module cũ gọi API trực tiếp, hệ thống mới được quy 
 Để module hoạt động độc lập, nhẹ và bảo mật cao, không vướng vấn đề mã hóa (như bị block bởi IonCube):
 
 *   **Backend Framework**: PHP 7.4 - 8.2 (Tương thích chuẩn WHMCS 8.x Capsule Database).
-*   **Database Management (Tiền tố `mod_hvndns_`)**: Sử dụng WHMCS Hook `AfterModuleActivate` / `AfterModuleUpgrade` để thiết lập hệ thống tự tạo bảng CSDL chuyên nghiệp, quản lý các bản cập nhật qua `version_tracking` schema thay cho cách dump SQL chay. (Thống nhất tiền tố `mod_hvndns_` cho khớp với tên module HVN).
+*   **Database Management (Tiền tố `tbl_mj_dns_`)**: Sử dụng WHMCS Hook `AfterModuleActivate` / `AfterModuleUpgrade` để thiết lập hệ thống tự tạo bảng CSDL chuyên nghiệp, quản lý các bản cập nhật qua `version_tracking` schema thay cho cách dump SQL chay. (Thống nhất tiền tố `tbl_mj_dns_` cho khớp với tên module HVN).
 *   **Hệ thống Logging (WHMCS Monolog)**: Nghiêm cấm tạo file `.txt` tự ghi log. Tận dụng thư viện chuẩn **Monolog** đã có sẵn tích hợp trong lõi WHMCS (`Log\Log`) cho Queue Worker để ghi nhật ký `info`, `warning`, `error`, tiện cho việc xuất file Audit và debug.
 *   **Frontend Template**: Smarty Engine kết hợp **CSS Native (WHMCS) + Pure CSS** (Không dùng CDN Framework ngoài để tránh xung đột). Sử dụng **Vue.js** hoặc **Alpine.js** dạng nhẹ (CDN) để làm các DataTables quản lý trạng thái Syncing/Complete real-time ở UI mà không cần tải lại trang.
 *   **DA Gateway (Giao tiếp)**: Viết lại class `HTTPSocket` của DA bằng **GuzzleHTTP** hoặc **cURL OOP hiện đại** để bắt Timeout chuẩn xác hơn và không rò rỉ bộ nhớ khi chạy Cron hàng nghìn lệnh.
@@ -111,7 +111,7 @@ Dự án có quy mô phân luồng lớn, bắt buộc phải chia nhỏ quá tr
 
 ### Phase 1: MVP (Tính năng Khả thi Tối thiểu)
 * **Mục tiêu**: Thay thế được bản v1.25 cũ với tốc độ Bất đồng bộ.
-* **Hoàn thiện**: Module kết nối 1 DA Node, Client thêm/sửa/xóa record A/MX/TXT. Lưu vào bảng `mod_hvndns_queue` và Cronjob đọc cập nhật thành công lên DirectAdmin. UI hiển thị Log đơn giản. Chưa làm SSL auto, DNSSEC hay Quota Limit.
+* **Hoàn thiện**: Module kết nối 1 DA Node, Client thêm/sửa/xóa record A/MX/TXT. Lưu vào bảng `tbl_mj_dns_queue` và Cronjob đọc cập nhật thành công lên DirectAdmin. UI hiển thị Log đơn giản. Chưa làm SSL auto, DNSSEC hay Quota Limit.
 * **Kế hoạch Test**: Unit Test các class Validator của Queue, thực chạy Load test Cronjob đẩy 200 job liên tục lên một Domain DA Sandbox để bắt Timeout.
 
 ### Phase 2: Enterprise Core (Quản trị tập trung)

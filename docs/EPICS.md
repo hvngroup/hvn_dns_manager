@@ -1,9 +1,9 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## Tài liệu Epics, User Stories & Issues
 
 > **Phiên bản**: 1.0  
 > **Ngày tạo**: 25/02/2026  
-> **Dự án**: HVN - DirectAdmin DNS Manager  
+> **Dự án**: MJ - DirectAdmin DNS Manager  
 > **Phương pháp**: Agile/Scrum — Chia theo 3 Phase  
 
 ---
@@ -38,11 +38,11 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `FOUND-001` | Tạo cấu trúc thư mục module chuẩn: `modules/addons/hvn_dns_manager/` với các thư mục con `controllers/`, `models/`, `views/`, `lib/`, `cron/`, `hooks/` | 1 |
-| `FOUND-002` | Viết file `hvn_dns_manager.php` (entry point) với các hàm bắt buộc: `_config()`, `_activate()`, `_deactivate()`, `_upgrade()` | 2 |
+| `FOUND-001` | Tạo cấu trúc thư mục module chuẩn: `modules/addons/mj_dns_manager/` với các thư mục con `controllers/`, `models/`, `views/`, `lib/`, `cron/`, `hooks/` | 1 |
+| `FOUND-002` | Viết file `mj_dns_manager.php` (entry point) với các hàm bắt buộc: `_config()`, `_activate()`, `_deactivate()`, `_upgrade()` | 2 |
 | `FOUND-003` | Đăng ký hook `AfterModuleActivate` để chạy database migration tự động khi kích hoạt module | 1 |
-| `FOUND-004` | Xây dựng hệ thống `version_tracking` (bảng `mod_hvndns_schema_version`) để quản lý migration schema qua các phiên bản | 2 |
-| `FOUND-005` | Cấu hình Monolog Logger chuyên dụng cho module: channel `hvndns`, output ra WHMCS Activity Log + file rotate | 1 |
+| `FOUND-004` | Xây dựng hệ thống `version_tracking` (bảng `tbl_mj_dns_schema_version`) để quản lý migration schema qua các phiên bản | 2 |
+| `FOUND-005` | Cấu hình Monolog Logger chuyên dụng cho module: channel `mj_dns`, output ra WHMCS Activity Log + file rotate | 1 |
 
 **AC**:
 - Module xuất hiện trong Addons của WHMCS Admin sau khi activate
@@ -57,17 +57,17 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `FOUND-006` | Tạo bảng `mod_hvndns_servers` — Lưu thông tin kết nối các DA Node (chỉ Primary server nhận API từ WHMCS, Secondary tự đồng bộ nhờ DA Cluster) | 2 |
-| `FOUND-007` | Tạo bảng `mod_hvndns_domains` — Mapping domain ↔ WHMCS service_id ↔ server_id, trạng thái active/suspended | 2 |
-| `FOUND-008` | Tạo bảng `mod_hvndns_records` — Bản ghi DNS local (domain_id, type, name, value, ttl, priority) làm source of truth | 2 |
-| `FOUND-009` | Tạo bảng `mod_hvndns_queue` — Hàng đợi tác vụ (domain_id, server_id, action, payload JSON, status ENUM, attempts, scheduled_at, completed_at, error_message) | 3 |
-| `FOUND-010` | Tạo bảng `mod_hvndns_sync_logs` — Lịch sử đồng bộ chi tiết (queue_id, server_id, http_code, response, duration_ms, ip_address) | 2 |
-| `FOUND-011` | Tạo bảng `mod_hvndns_audit_trail` — Nhật ký kiểm toán không thể chỉnh sửa (actor_type, actor_id, domain, action, old_value, new_value, ip_address, user_agent) | 2 |
+| `FOUND-006` | Tạo bảng `tbl_mj_dns_servers` — Lưu thông tin kết nối các DA Node (chỉ Primary server nhận API từ WHMCS, Secondary tự đồng bộ nhờ DA Cluster) | 2 |
+| `FOUND-007` | Tạo bảng `tbl_mj_dns_domains` — Mapping domain ↔ WHMCS service_id ↔ server_id, trạng thái active/suspended | 2 |
+| `FOUND-008` | Tạo bảng `tbl_mj_dns_records` — Bản ghi DNS local (domain_id, type, name, value, ttl, priority) làm source of truth | 2 |
+| `FOUND-009` | Tạo bảng `tbl_mj_dns_queue` — Hàng đợi tác vụ (domain_id, server_id, action, payload JSON, status ENUM, attempts, scheduled_at, completed_at, error_message) | 3 |
+| `FOUND-010` | Tạo bảng `tbl_mj_dns_sync_logs` — Lịch sử đồng bộ chi tiết (queue_id, server_id, http_code, response, duration_ms, ip_address) | 2 |
+| `FOUND-011` | Tạo bảng `tbl_mj_dns_audit_trail` — Nhật ký kiểm toán không thể chỉnh sửa (actor_type, actor_id, domain, action, old_value, new_value, ip_address, user_agent) | 2 |
 | `FOUND-012` | Viết Eloquent Model cho tất cả các bảng trên, kèm relationship (Domain hasMany Records, Queue belongsTo Server, v.v.) | 3 |
 | `FOUND-013` | Tạo indexes tối ưu: composite index trên `queue(status, scheduled_at)`, index trên `records(domain_id, type)`, index trên `audit_trail(domain, created_at)` | 1 |
 
 **AC**:
-- Tất cả bảng sử dụng tiền tố `mod_hvndns_`
+- Tất cả bảng sử dụng tiền tố `tbl_mj_dns_`
 - Password DA server được mã hóa bằng `encrypt()` của WHMCS, không lưu plaintext
 - Bảng `audit_trail` không có route UPDATE/DELETE từ application layer
 - Migration có thể chạy lại (idempotent) mà không lỗi
@@ -101,7 +101,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `QUEUE-001` | Viết class `QueueManager` với method `dispatch($domainId, $action, $payload)`: validate input → tạo 1 row `PENDING` trong `mod_hvndns_queue` → return `job_id` | 2 |
+| `QUEUE-001` | Viết class `QueueManager` với method `dispatch($domainId, $action, $payload)`: validate input → tạo 1 row `PENDING` trong `tbl_mj_dns_queue` → return `job_id` | 2 |
 | `QUEUE-002` | Implement logic **Primary-only Push**: khi dispatch, module chỉ đẩy 1 job vào queue dành cho Primary Server đang `is_active = 1` | 3 |
 | `QUEUE-003` | Method `getStatus($batchId)`: trả về status (complete / failed / pending). Vì chỉ có 1 job/batch nên trạng thái batch chính là trạng thái job. | 2 |
 | `QUEUE-004` | Method `cancelPending($batchId)`: hủy các job chưa xử lý (dùng cho Conflict Resolution khi Admin ghi đè) | 1 |
@@ -123,8 +123,8 @@
 | `QUEUE-007` | Logic chính: query `WHERE status = 'PENDING' AND scheduled_at <= NOW()` → sắp xếp theo `created_at ASC` → xử lý tuần tự theo server (tránh đẩy dồn 1 server) | 3 |
 | `QUEUE-008` | Implement job lifecycle: `PENDING` → set `SYNCING` + lock row → gọi `DAGateway` → thành công set `COMPLETE` / thất bại set `FAILED` + ghi `error_message` | 3 |
 | `QUEUE-009` | Cơ chế **Stale Job Recovery**: nếu job ở `SYNCING` quá 5 phút (cron crash giữa chừng) → tự chuyển về `FAILED` với message "Worker timeout — stale job recovered" | 2 |
-| `QUEUE-010` | Giới hạn `max_concurrent_jobs` per server: không xử lý quá N job/lần cho cùng 1 DA Node (lấy từ config `mod_hvndns_servers`) | 1 |
-| `QUEUE-011` | Ghi `mod_hvndns_sync_logs` sau mỗi job: HTTP status code, response body, thời gian xử lý (ms), server_id | 2 |
+| `QUEUE-010` | Giới hạn `max_concurrent_jobs` per server: không xử lý quá N job/lần cho cùng 1 DA Node (lấy từ config `tbl_mj_dns_servers`) | 1 |
+| `QUEUE-011` | Ghi `tbl_mj_dns_sync_logs` sau mỗi job: HTTP status code, response body, thời gian xử lý (ms), server_id | 2 |
 
 **AC**:
 - Worker không crash nếu 1 job lỗi — tiếp tục xử lý job tiếp theo
@@ -181,7 +181,7 @@
 | `CLIENT-006` | Form **Thêm/Sửa Record**: trang giao diện riêng biệt với các trường Name, Type (dropdown), Value, TTL (mặc định 3600), Priority (hiện khi MX/SRV). Submit qua Ajax | 3 |
 | `CLIENT-007` | **Validation phía server** trước khi lưu queue: kiểm tra format IP (cho A/AAAA), FQDN (cho CNAME/MX/NS), syntax TXT/SPF, giá trị Priority hợp lệ, SRV format (priority weight port target) | 3 |
 | `CLIENT-008` | **Validation chống xung đột**: không cho tạo CNAME trùng name với record A đã có (vi phạm RFC), cảnh báo duplicate MX cùng priority | 2 |
-| `CLIENT-009` | Luồng lưu: Validate OK → Lưu `mod_hvndns_records` → Gọi `QueueManager::dispatch('ADD', $payload)` → Trả JSON success cho UI → UI hiển thị record mới với badge `Pending` | 2 |
+| `CLIENT-009` | Luồng lưu: Validate OK → Lưu `tbl_mj_dns_records` → Gọi `QueueManager::dispatch('ADD', $payload)` → Trả JSON success cho UI → UI hiển thị record mới với badge `Pending` | 2 |
 | `CLIENT-010` | Form **Sửa Record**: pre-fill giá trị hiện tại, submit tạo job `EDIT`. Ghi audit trail (old_value → new_value) | 2 |
 | `CLIENT-011` | Nút **Xóa Record**: confirm dialog → tạo job `DELETE` → UI ẩn record hoặc hiển thị trạng thái "Deleting..." | 2 |
 | `CLIENT-012` | **Rate Limiting client**: tối đa 30 thay đổi/phút/domain. Vượt quá → trả lỗi 429 kèm thông báo thân thiện | 1 |
@@ -219,7 +219,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `ADMIN-001` | Trang danh sách Server: bảng hiển thị tất cả server trong `mod_hvndns_servers` với cột Hostname, IP, Role, Status (🟢/🔴), Pending Jobs | 2 |
+| `ADMIN-001` | Trang danh sách Server: bảng hiển thị tất cả server trong `tbl_mj_dns_servers` với cột Hostname, IP, Role, Status (🟢/🔴), Pending Jobs | 2 |
 | `ADMIN-002` | Form Thêm/Sửa Server: hostname, IP, port, username, password (masked input), SSL toggle, role (Primary/Secondary), max_concurrent_jobs | 2 |
 | `ADMIN-003` | Nút **Test Connection**: gọi `DAGateway::testConnection()` → hiển thị kết quả realtime (success + phiên bản DA / fail + error message) | 1 |
 | `ADMIN-004` | Nút **Disable/Enable Server**: tắt server khỏi fan-out mà không xóa config (dùng khi bảo trì) | 1 |
@@ -253,7 +253,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `ADMIN-010` | Trang Sync Logs: DataTable hiển thị `mod_hvndns_sync_logs` join `queue` — cột: Time, Domain, Action, Server, Status, Duration, Error | 3 |
+| `ADMIN-010` | Trang Sync Logs: DataTable hiển thị `tbl_mj_dns_sync_logs` join `queue` — cột: Time, Domain, Action, Server, Status, Duration, Error | 3 |
 | `ADMIN-011` | Filter nâng cao: theo status (COMPLETE/FAILED), theo server, theo khoảng thời gian, theo domain | 1 |
 | `ADMIN-012` | Nút **Retry** trên từng job FAILED: set lại status = PENDING, reset attempts = 0 | 1 |
 | `ADMIN-013` | Nút **Retry All Failed**: bulk update tất cả job FAILED → PENDING (có confirm dialog cảnh báo số lượng) | 1 |
@@ -272,7 +272,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `ADMIN-015` | Tạo bảng `mod_hvndns_settings` + SettingsHelper class (get/set/getBool/getInt) | 2 |
+| `ADMIN-015` | Tạo bảng `tbl_mj_dns_settings` + SettingsHelper class (get/set/getBool/getInt) | 2 |
 | `ADMIN-016` | Tạo trang Admin Settings với tab navigation (16 tabs) — render form từ settings config | 3 |
 | `ADMIN-017` | Ajax save settings + validation (NS không trống, TTL range, hash key min length...) | 2 |
 | `ADMIN-018` | Implement Record Permissions logic: filter allowed types trong DNS Editor dropdown + server-side enforce | 2 |
@@ -285,7 +285,7 @@
 
 **AC**:
 - Tất cả 96 settings có thể xem và sửa qua giao diện Admin
-- Settings lưu vào `mod_hvndns_settings`, đọc qua SettingsHelper
+- Settings lưu vào `tbl_mj_dns_settings`, đọc qua SettingsHelper
 - Validation chặn giá trị không hợp lệ trước khi lưu
 - Record Permissions ẩn record type bị tắt khỏi dropdown Client + chặn server-side
 - Record Limits enforce đúng thứ tự ưu tiên 3 lớp
@@ -304,8 +304,8 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `PROV-001` | Hook `AfterModuleCreate`: tạo row trong `mod_hvndns_domains`, dispatch job `CREATE_ZONE` cho Primary server | 2 |
-| `PROV-002` | Áp DNS Template mặc định: lấy template từ `mod_hvndns_templates` → tạo các record chuẩn (NS records trỏ dns1/2/3, SOA, default A record) | 2 |
+| `PROV-001` | Hook `AfterModuleCreate`: tạo row trong `tbl_mj_dns_domains`, dispatch job `CREATE_ZONE` cho Primary server | 2 |
+| `PROV-002` | Áp DNS Template mặc định: lấy template từ `tbl_mj_dns_templates` → tạo các record chuẩn (NS records trỏ dns1/2/3, SOA, default A record) | 2 |
 | `PROV-003` | Hook `AfterModuleTerminate`: dispatch job `DELETE_ZONE` → xóa zone trên tất cả DA Node → soft-delete domain trong DB (giữ lại 30 ngày cho rollback) | 2 |
 | `PROV-004` | Hook `AfterModuleSuspend` / `AfterModuleUnsuspend`: đánh dấu domain suspended → Client không thể chỉnh sửa DNS nhưng zone vẫn hoạt động trên server | 1 |
 
@@ -386,7 +386,7 @@
 | Issue | Mô tả | SP |
 |-------|--------|-----|
 | `SSL-001` | Queue job `REQUEST_SSL`: gọi DA API để trigger Let's Encrypt certificate issuance cho domain | 3 |
-| `SSL-002` | Tracking trạng thái SSL: cột `ssl_status` trong `mod_hvndns_domains` (none/pending/active/expired) | 1 |
+| `SSL-002` | Tracking trạng thái SSL: cột `ssl_status` trong `tbl_mj_dns_domains` (none/pending/active/expired) | 1 |
 | `SSL-003` | Auto-renewal hook: cronjob kiểm tra cert sắp hết hạn (< 7 ngày) → tự dispatch job gia hạn | 2 |
 | `SSL-004` | UI hiển thị trạng thái SSL: icon khóa xanh + ngày hết hạn trong Client Area | 1 |
 
@@ -483,7 +483,7 @@
 
 **AC**:
 - Radio fields chuyển đổi mượt mà không cần reload
-- Dữ liệu lưu xuống `mod_hvndns_settings` dạng integer/string chuẩn
+- Dữ liệu lưu xuống `tbl_mj_dns_settings` dạng integer/string chuẩn
 
 ---
 
@@ -502,8 +502,8 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `DDNS-001` | Tạo bảng `mod_hvndns_ddns_tokens` (domain_id, subdomain, token SHA256, last_ip, last_update, is_active) | 1 |
-| `DDNS-002` | Client UI: nút "Tạo DDNS Token" cho 1 subdomain → sinh token ngẫu nhiên → hiển thị URL dạng `https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/ddns.php?token=xxx` | 2 |
+| `DDNS-001` | Tạo bảng `tbl_mj_dns_ddns_tokens` (domain_id, subdomain, token SHA256, last_ip, last_update, is_active) | 1 |
+| `DDNS-002` | Client UI: nút "Tạo DDNS Token" cho 1 subdomain → sinh token ngẫu nhiên → hiển thị URL dạng `https://whmcs.hvn.vn/modules/addons/mj_dns_manager/ddns.php?token=xxx` | 2 |
 | `DDNS-003` | Endpoint `ddns.php`: nhận GET request → validate token → lấy IP từ `$_SERVER['REMOTE_ADDR']` → so sánh với `last_ip` → nếu khác thì dispatch job `EDIT` A record qua Queue | 3 |
 | `DDNS-004` | Response chuẩn: trả `good [new_ip]` hoặc `nochg [current_ip]` (tương thích format DynDNS chuẩn để router hiểu) | 1 |
 | `DDNS-005` | Client UI hiển thị: URL endpoint, hướng dẫn cấu hình cho Mikrotik (`/tool fetch`), DrayTek (DDNS settings), và router phổ thông | 2 |
@@ -522,7 +522,7 @@
 |-------|--------|-----|
 | `DDNS-006` | Rate limit: tối đa 60 request/giờ per token. Vượt quá → trả HTTP 429 + ghi log | 1 |
 | `DDNS-007` | Brute force detection: ≥ 10 request với token sai từ cùng 1 IP trong 5 phút → block IP 1 giờ | 2 |
-| `DDNS-008` | Bảng `mod_hvndns_ip_blacklist` lưu IP bị block + thời gian hết hạn block | 1 |
+| `DDNS-008` | Bảng `tbl_mj_dns_ip_blacklist` lưu IP bị block + thời gian hết hạn block | 1 |
 | `DDNS-009` | Admin UI: xem danh sách IP đang bị block, nút unblock thủ công | 1 |
 
 **AC**:
@@ -542,7 +542,7 @@
 |-------|--------|-----|
 | `DNSSEC-001` | Tab "DNSSEC" trong DNS Editor: hiển thị trạng thái hiện tại (Enabled/Disabled), nút Toggle | 2 |
 | `DNSSEC-002` | Toggle Enable: dispatch job `ENABLE_DNSSEC` vào queue → Cron gọi DA API enable DNSSEC → DA generate keys | 3 |
-| `DNSSEC-003` | Sau khi enable thành công: Cron gọi DA API lấy DS Record info → lưu vào `mod_hvndns_dnssec` (domain_id, key_tag, algorithm, digest_type, digest) | 2 |
+| `DNSSEC-003` | Sau khi enable thành công: Cron gọi DA API lấy DS Record info → lưu vào `tbl_mj_dns_dnssec` (domain_id, key_tag, algorithm, digest_type, digest) | 2 |
 | `DNSSEC-004` | Client UI hiển thị bảng DS Records: Key Tag, Algorithm, Digest Type, Digest — kèm nút Copy và hướng dẫn "Mang thông tin này đến nhà đăng ký tên miền để hoàn tất cấu hình DNSSEC" | 2 |
 | `DNSSEC-005` | Toggle Disable: dispatch job `DISABLE_DNSSEC` → xóa keys trên DA → cảnh báo "Hãy xóa DS Record tại nhà đăng ký trước khi tắt, nếu không domain sẽ bị lỗi phân giải" | 2 |
 | `DNSSEC-006` | Auto re-sign: sau mỗi lần Cron sync thành công 1 batch thay đổi record, tự dispatch thêm job `RESIGN_ZONE` để ký lại zone | 2 |
@@ -562,9 +562,9 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `DRIFT-001` | Cron job chạy hàng đêm (2:00 AM): gọi DA API `getZone()` cho từng domain → so sánh với `mod_hvndns_records` | 3 |
+| `DRIFT-001` | Cron job chạy hàng đêm (2:00 AM): gọi DA API `getZone()` cho từng domain → so sánh với `tbl_mj_dns_records` | 3 |
 | `DRIFT-002` | Thuật toán diff: phát hiện record thêm trên DA mà WHMCS không có, record xóa trên DA mà WHMCS vẫn còn, record sửa giá trị khác nhau | 3 |
-| `DRIFT-003` | Lưu kết quả drift vào `mod_hvndns_drift_reports` (domain_id, drift_type, local_value, remote_value, detected_at) | 1 |
+| `DRIFT-003` | Lưu kết quả drift vào `tbl_mj_dns_drift_reports` (domain_id, drift_type, local_value, remote_value, detected_at) | 1 |
 | `DRIFT-004` | Dashboard alert: hiển thị số domain có drift, link vào trang chi tiết | 1 |
 | `DRIFT-005` | Trang Drift Resolution: cho mỗi domain bị drift, Admin chọn "Pull from DA → WHMCS" hoặc "Push WHMCS → DA" hoặc "Ignore" | 3 |
 | `DRIFT-006` | Option **Auto-fix**: toggle cho phép tự động push WHMCS → DA mỗi đêm mà không cần xác nhận (cho Admin muốn WHMCS là single source of truth) | 1 |
@@ -581,8 +581,8 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `SNAP-001` | Per-record changelog: mỗi khi record bị sửa/xóa qua queue, lưu giá trị cũ vào `mod_hvndns_record_history` (record_id, old_type, old_name, old_value, old_ttl, changed_at, changed_by) | 2 |
-| `SNAP-002` | Full zone snapshot: cron hàng đêm (sau drift check) lưu toàn bộ records của domain vào `mod_hvndns_snapshots` (domain_id, snapshot_data JSON, created_at) — giữ tối đa 30 snapshots | 2 |
+| `SNAP-001` | Per-record changelog: mỗi khi record bị sửa/xóa qua queue, lưu giá trị cũ vào `tbl_mj_dns_record_history` (record_id, old_type, old_name, old_value, old_ttl, changed_at, changed_by) | 2 |
+| `SNAP-002` | Full zone snapshot: cron hàng đêm (sau drift check) lưu toàn bộ records của domain vào `tbl_mj_dns_snapshots` (domain_id, snapshot_data JSON, created_at) — giữ tối đa 30 snapshots | 2 |
 | `SNAP-003` | Admin UI — Record History: xem timeline thay đổi của từng record, nút "Revert to this version" | 2 |
 | `SNAP-004` | Admin UI — Zone Rollback: chọn snapshot theo ngày → preview diff (hiện tại vs snapshot) → confirm → dispatch batch job restore tất cả records | 3 |
 | `SNAP-005` | Auto-cleanup: xóa snapshots cũ hơn 30 ngày, record_history cũ hơn 90 ngày | 1 |
@@ -602,7 +602,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `TMPL-001` | Bảng `mod_hvndns_templates` (template_name, description, is_default, records JSON) | 1 |
+| `TMPL-001` | Bảng `tbl_mj_dns_templates` (template_name, description, is_default, records JSON) | 1 |
 | `TMPL-002` | Admin UI: tạo/sửa/xóa template. Editor cho phép thêm record với placeholder `{{domain}}`, `{{ip}}` | 3 |
 | `TMPL-003` | Đánh dấu 1 template là "Default" — tự động áp dụng khi provision domain mới | 1 |
 | `TMPL-004` | Client "Load Template": dropdown chọn template → confirm "Thao tác này sẽ XÓA toàn bộ record hiện tại và thay bằng template. Tiếp tục?" → dispatch batch DELETE + ADD | 2 |
@@ -623,7 +623,7 @@
 
 | Issue | Mô tả | SP |
 |-------|--------|-----|
-| `AUDIT-001` | Trang Audit Trail: DataTable từ `mod_hvndns_audit_trail` — cột: Time, Actor (Client/Admin/System/API), Domain, Action, Old Value, New Value, IP Address | 3 |
+| `AUDIT-001` | Trang Audit Trail: DataTable từ `tbl_mj_dns_audit_trail` — cột: Time, Actor (Client/Admin/System/API), Domain, Action, Old Value, New Value, IP Address | 3 |
 | `AUDIT-002` | Filter: theo actor type, theo domain, theo action type, theo khoảng thời gian, theo IP address | 2 |
 | `AUDIT-003` | Detail view: click vào 1 dòng → popup hiển thị full detail bao gồm User Agent, Session ID, và context (VD: "Changed via Admin DNS Editor" / "Changed via DDNS API") | 2 |
 | `AUDIT-004` | Export: CSV / PDF cho audit compliance, kèm checksum SHA256 để chứng minh log không bị tamper | 2 |

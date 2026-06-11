@@ -1,5 +1,5 @@
 # Google Antigravity — Rules & Workflows
-## HVN - DirectAdmin DNS Manager
+## MJ - DirectAdmin DNS Manager
 
 > **Mục đích**: Bộ cấu hình Rules và Workflows cho Google Antigravity IDE, điều phối Agent phát triển module HVN DNS Manager đúng theo kiến trúc, convention, và quy trình đã thiết kế.
 >
@@ -10,7 +10,7 @@
 ## Cấu trúc File
 
 ```
-modules/addons/hvn_dns_manager/          ← Workspace root
+modules/addons/mj_dns_manager/          ← Workspace root
 │
 ├── .agent/
 │   ├── rules/
@@ -69,13 +69,13 @@ activation: always
 # HVN DNS Manager — Project Context
 
 ## Thông tin dự án
-- **Tên module**: HVN - DirectAdmin DNS Manager
+- **Tên module**: MJ - DirectAdmin DNS Manager
 - **Nền tảng**: WHMCS 8.x Addon Module
 - **Ngôn ngữ**: PHP 7.4+ (target PHP 8.1)
 - **Database**: MySQL/MariaDB qua WHMCS Eloquent ORM (Capsule)
 - **Frontend**: Smarty Template + Native CSS (WHMCS) + Pure CSS + Alpine.js 3.x
 - **Namespace gốc**: `HvnGroup\DnsManager`
-- **Tiền tố DB**: `mod_hvndns_`
+- **Tiền tố DB**: `tbl_mj_dns_`
 
 ## Tài liệu tham chiếu (theo thứ tự ưu tiên)
 Khi cần thông tin chi tiết, đọc các file trong `docs/`:
@@ -142,7 +142,7 @@ Mọi thao tác thay đổi DNS PHẢI đi qua hàng đợi (Queue). KHÔNG BAO 
 - Không tạo sub-job cho các server phụ
 
 ## WHMCS là Source of Truth
-- Database WHMCS (`mod_hvndns_records`) là nguồn dữ liệu chính thức
+- Database WHMCS (`tbl_mj_dns_records`) là nguồn dữ liệu chính thức
 - DirectAdmin là target execution layer, KHÔNG phải source of truth
 - Khi có xung đột, dữ liệu WHMCS được ưu tiên
 ```
@@ -163,7 +163,7 @@ activation: always
 - Method/Function: `camelCase` (VD: `dispatch()`, `getActiveServers()`)
 - Variable: `camelCase` (VD: `$batchId`, `$domainId`)
 - Constant: `UPPER_SNAKE_CASE` (VD: `MAX_RETRY`, `STATUS_PENDING`)
-- DB table: `mod_hvndns_` + `snake_case` (VD: `mod_hvndns_queue`)
+- DB table: `tbl_mj_dns_` + `snake_case` (VD: `tbl_mj_dns_queue`)
 - DB column: `snake_case` (VD: `domain_id`, `created_at`)
 
 ## Cấu trúc code
@@ -209,9 +209,9 @@ activation: always
 ## Quy tắc tuyệt đối
 - Sử dụng Eloquent ORM cho MỌI database operation
 - KHÔNG BAO GIỜ dùng raw SQL: `DB::raw()`, `mysql_query()`, nối chuỗi SQL
-- Tiền tố TẤT CẢ bảng: `mod_hvndns_`
+- Tiền tố TẤT CẢ bảng: `tbl_mj_dns_`
 - Mã hóa password DA: `WHMCS\Security\Encryption::encode()` / `decode()`
-- Bảng `mod_hvndns_audit_trail` là APPEND-ONLY: CHỈ INSERT, KHÔNG UPDATE/DELETE
+- Bảng `tbl_mj_dns_audit_trail` là APPEND-ONLY: CHỈ INSERT, KHÔNG UPDATE/DELETE
 
 ## 18 bảng trong hệ thống (chi tiết tại docs/DB_SCHEMA.md)
 schema_version, servers, domains, records, queue, sync_logs, audit_trail,
@@ -235,7 +235,7 @@ redirects, email_forwards, drift_reports, ip_blacklist, notification_cooldowns
 ## Migration
 - Dùng WHMCS Hook `AfterModuleActivate` để chạy migration tự động
 - Migration PHẢI idempotent (kiểm tra `hasTable` trước khi create)
-- Quản lý version qua `mod_hvndns_schema_version`
+- Quản lý version qua `tbl_mj_dns_schema_version`
 - KHÔNG dùng `DROP TABLE` trong production migration
 ```
 
@@ -589,7 +589,7 @@ Sinh test cases cho 1 file hoặc 1 issue.
 Tạo 1 Eloquent Model mới theo chuẩn DB_SCHEMA.md.
 
 ## Input
-User chỉ định tên bảng (VD: `mod_hvndns_servers`, hoặc tên ngắn `servers`)
+User chỉ định tên bảng (VD: `tbl_mj_dns_servers`, hoặc tên ngắn `servers`)
 
 ## Steps
 
@@ -855,7 +855,7 @@ Tra cứu nhanh DirectAdmin API command.
 
 ```bash
 # Tạo thư mục
-mkdir -p modules/addons/hvn_dns_manager/.agent/rules
+mkdir -p modules/addons/mj_dns_manager/.agent/rules
 
 # Copy 8 file rules vào
 # 01-project-context.md
@@ -872,7 +872,7 @@ mkdir -p modules/addons/hvn_dns_manager/.agent/rules
 
 ```bash
 # Tạo thư mục
-mkdir -p modules/addons/hvn_dns_manager/.agent/workflows
+mkdir -p modules/addons/mj_dns_manager/.agent/workflows
 
 # Copy 12 file workflows vào
 # implement-issue.md
@@ -891,7 +891,7 @@ mkdir -p modules/addons/hvn_dns_manager/.agent/workflows
 
 ## Verify trong Antigravity
 
-1. Mở workspace `modules/addons/hvn_dns_manager/` trong Antigravity
+1. Mở workspace `modules/addons/mj_dns_manager/` trong Antigravity
 2. Click `...` → `Customizations`
 3. Kiểm tra **Rules**: thấy 8 rules (4 Always On, 4 Glob-based)
 4. Kiểm tra **Workflows**: thấy 12 workflows

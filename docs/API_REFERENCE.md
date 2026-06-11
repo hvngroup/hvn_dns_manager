@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## API_REFERENCE.md — Tài liệu Tham chiếu API
 
 > **Phiên bản**: 1.0  
@@ -53,7 +53,7 @@ https://103.45.67.10:2222
 http://103.45.67.10:2222   (không khuyến nghị)
 ```
 
-Lấy từ `mod_hvndns_servers`: `use_ssl` → `https/http`, `ip_address`, `port`.
+Lấy từ `tbl_mj_dns_servers`: `use_ssl` → `https/http`, `ip_address`, `port`.
 
 ### Timeout Settings
 
@@ -74,7 +74,7 @@ $client = new \GuzzleHttp\Client([
     'verify'          => true,       // SSL certificate verification
     'http_errors'     => false,      // Không throw exception cho 4xx/5xx
     'headers'         => [
-        'User-Agent' => 'HVN-DNS-Manager/1.0',
+        'User-Agent' => 'MJ-DNS-Manager/1.0',
     ],
 ]);
 ```
@@ -713,7 +713,7 @@ GET /CMD_API_DNS_DNSSEC?domain=example.com&json=yes
 }
 ```
 
-**Mapping vào DB** (`mod_hvndns_dnssec`):
+**Mapping vào DB** (`tbl_mj_dns_dnssec`):
 ```php
 $key = $response->data['keys'][0];
 
@@ -899,10 +899,10 @@ domain=example.com
 
 ```
 Client Area:
-/modules/addons/hvn_dns_manager/ajax.php?action={action}
+/modules/addons/mj_dns_manager/ajax.php?action={action}
 
 Admin Area:
-/admin/addonmodules.php?module=hvn_dns_manager&ajax=1&action={action}
+/admin/addonmodules.php?module=mj_dns_manager&ajax=1&action={action}
 ```
 
 ### Authentication
@@ -1173,7 +1173,7 @@ Response 200:
     "data": {
         "token_id": 5,
         "plain_token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6",
-        "url": "https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/ddns.php?token=a1b2c3...",
+        "url": "https://whmcs.hvn.vn/modules/addons/mj_dns_manager/ddns.php?token=a1b2c3...",
         "subdomain": "cam",
         "full_hostname": "cam.example.com"
     },
@@ -1235,7 +1235,7 @@ Tất cả Admin endpoints yêu cầu WHMCS Admin session và quyền addon modu
 ### B3.1. Dashboard Stats
 
 ```
-GET ?module=hvn_dns_manager&ajax=1&action=dashboard_stats
+GET ?module=mj_dns_manager&ajax=1&action=dashboard_stats
 
 Response 200:
 {
@@ -1295,7 +1295,7 @@ Response 200:
 ### B3.2. Server Management
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=test_server
+POST ?module=mj_dns_manager&ajax=1&action=test_server
 
 {
     "server_id": 3
@@ -1328,7 +1328,7 @@ Response 200 (connection failed):
 ```
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=toggle_server
+POST ?module=mj_dns_manager&ajax=1&action=toggle_server
 
 {
     "server_id": 3,
@@ -1352,7 +1352,7 @@ Response 200:
 ### B3.3. Retry Operations
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=retry_job
+POST ?module=mj_dns_manager&ajax=1&action=retry_job
 
 {
     "job_id": 4521
@@ -1371,7 +1371,7 @@ Response 200:
 ```
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=retry_all_failed
+POST ?module=mj_dns_manager&ajax=1&action=retry_all_failed
 
 Response 200:
 {
@@ -1389,7 +1389,7 @@ Response 200:
 ### B3.4. Drift Resolution
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=resolve_drift
+POST ?module=mj_dns_manager&ajax=1&action=resolve_drift
 
 {
     "drift_id": 78,
@@ -1413,7 +1413,7 @@ Response 200:
 ### B3.5. Bulk Operations
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=bulk_preview
+POST ?module=mj_dns_manager&ajax=1&action=bulk_preview
 
 {
     "operation": "change_ip",
@@ -1443,7 +1443,7 @@ Response 200:
 ```
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=bulk_execute
+POST ?module=mj_dns_manager&ajax=1&action=bulk_execute
 
 {
     "operation": "change_ip",
@@ -1472,7 +1472,7 @@ Response 200:
 ### B3.6. Snapshot & Rollback
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=create_snapshot
+POST ?module=mj_dns_manager&ajax=1&action=create_snapshot
 
 {
     "domain_id": 123
@@ -1491,7 +1491,7 @@ Response 200:
 ```
 
 ```
-GET ?module=hvn_dns_manager&ajax=1&action=list_snapshots&domain_id=123
+GET ?module=mj_dns_manager&ajax=1&action=list_snapshots&domain_id=123
 
 Response 200:
 {
@@ -1518,7 +1518,7 @@ Response 200:
 ```
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=rollback_preview
+POST ?module=mj_dns_manager&ajax=1&action=rollback_preview
 
 {
     "domain_id": 123,
@@ -1547,7 +1547,7 @@ Response 200:
 ```
 
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=rollback_execute
+POST ?module=mj_dns_manager&ajax=1&action=rollback_execute
 
 {
     "domain_id": 123,
@@ -1571,7 +1571,7 @@ Response 200:
 
 ### B3.7. Settings Management
 ```
-GET ?module=hvn_dns_manager&ajax=1&action=get_settings&group=core
+GET ?module=mj_dns_manager&ajax=1&action=get_settings&group=core
 
 Response 200:
 {
@@ -1580,7 +1580,7 @@ Response 200:
         "group": "core",
         "settings": {
             "module_enabled": {"value": "1", "type": "boolean", "label": "Kích hoạt Module"},
-            "license_key": {"value": "hvndns-12345", "type": "string", "label": "License Key"},
+            "license_key": {"value": "mj_dns-12345", "type": "string", "label": "License Key"},
             "default_nameserver_1": {"value": "dns1.hvn.vn", "type": "string", "label": "Nameserver 1"},
             "default_ttl": {"value": "3600", "type": "integer", "label": "TTL mặc định"}
         }
@@ -1588,7 +1588,7 @@ Response 200:
 }
 ```
 ```
-POST ?module=hvn_dns_manager&ajax=1&action=save_settings
+POST ?module=mj_dns_manager&ajax=1&action=save_settings
 
 {
     "group": "core",
@@ -1620,14 +1620,14 @@ Response 422 (Validation Error):
 
 ## B4. DDNS External Endpoint
 
-> **URL**: `/modules/addons/hvn_dns_manager/ddns.php`  
+> **URL**: `/modules/addons/mj_dns_manager/ddns.php`  
 > **Auth**: Token-based (không cần WHMCS session)  
 > **Gọi bởi**: Router, Camera, IoT devices
 
 ### B4.1. Update IP
 
 ```
-GET /modules/addons/hvn_dns_manager/ddns.php
+GET /modules/addons/mj_dns_manager/ddns.php
     ?token=a1b2c3d4e5f6...
     &hostname=cam.example.com    (optional — cho tương thích DynDNS)
     &myip=118.70.5.6             (optional — override auto-detect)
@@ -1653,7 +1653,7 @@ GET /modules/addons/hvn_dns_manager/ddns.php
 
 **Ví dụ Router Mikrotik**:
 ```
-/tool fetch url="https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/ddns.php?token=a1b2c3..." mode=http
+/tool fetch url="https://whmcs.hvn.vn/modules/addons/mj_dns_manager/ddns.php?token=a1b2c3..." mode=http
 ```
 
 Router đọc response `good {ip}` hoặc `nochg {ip}` → biết đã thành công.
@@ -1774,7 +1774,7 @@ Tất cả Internal Ajax API (ngoại trừ DDNS endpoint) tuân theo format:
 ### Base URL
 
 ```
-https://whmcs.hvn.vn/modules/addons/hvn_dns_manager/api/v1
+https://whmcs.hvn.vn/modules/addons/mj_dns_manager/api/v1
 ```
 
 ### Authentication
