@@ -55,7 +55,7 @@ function mj_dns_manager_config()
         'description' => 'Quản lý DNS DirectAdmin mạnh mẽ với cơ chế Queue Async',
         'author' => '<a href="https://modulejet.com" target="_blank">ModuleJET</a>',
         'language' => 'english',
-        'version' => '1.5',
+        'version' => '1.6.0',
         'fields' => [
             'licenseKey' => [
                 'FriendlyName' => 'License Key',

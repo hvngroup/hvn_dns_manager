@@ -14,7 +14,7 @@
             </div>
             <div>
                 <button class="mj-btn btn-sm btn-outline-danger mj-me-2"
-                    onclick="location.href='?module=mj_dns_manager&action=sync_logs'">
+                    @click="location.href='?module=mj_dns_manager&action=sync_logs'">
                     Xem chi tiết
                 </button>
                 <button class="mj-btn btn-sm mj-btn-danger" @click="hasCriticalAlert = false">
@@ -131,7 +131,7 @@
                                 </h6>
                                 <template x-if="srv.status === 'offline'">
                                     <button class="mj-btn mj-btn-sm mj-btn-outline-danger"
-                                        onclick="location.href='?module=mj_dns_manager&action=servers'">
+                                        @click="location.href='?module=mj_dns_manager&action=servers'">
                                         Xử lý
                                     </button>
                                 </template>
@@ -233,146 +233,4 @@
 <script>
 var MJDNS_MODULELINK = '{$modulelink|escape:'javascript'}';
 </script>
-<script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('dashboardManager', () => ({
-        // ── State ─────────────────────────────────────────────────────────
-        loading:          true,
-        chartDays:        7,
-        stats:            { complete: '—', pending: '—', failed: '—', domains: '—', records: '—' },
-        chartData:        null,
-        servers:          [],
-        recentActivity:   [],
-        topDomains:       [],
-        hasCriticalAlert: false,
-        alertMessages:    [],
-        generatedAt:      null,
-        chartInstance:    null,
-        refreshTimer:     null,
-
-        // ── Init ──────────────────────────────────────────────────────────
-        init() {
-            this.fetchStats();
-            // Auto-refresh mỗi 30 giây
-            this.refreshTimer = setInterval(() => { this.fetchStats(); }, 30000);
-        },
-
-        // ── Fetch từ API ──────────────────────────────────────────────────
-        async fetchStats() {
-            this.loading = true;
-            try {
-                const url = MJDNS_MODULELINK + '&action=ajax&method=getDashboardStats&days=' + this.chartDays;
-                const res  = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const data = await res.json();
-
-                if (!data.success) return;
-
-                this.stats            = data.stats;
-                this.chartData        = data.chartData;
-                this.servers          = data.servers;
-                this.recentActivity   = data.recentActivity;
-                this.topDomains       = data.topDomains || [];
-                this.hasCriticalAlert = data.hasCriticalAlert;
-                this.alertMessages    = data.alertMessages || [];
-                this.generatedAt      = data.generatedAt;
-
-                // Render chart sau khi có data
-                this.$nextTick(() => { this.renderChart(); });
-
-            } catch (e) {
-                console.error('Dashboard fetch error:', e);
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        // ── Đổi khoảng thời gian chart ────────────────────────────────────
-        setDays(days) {
-            this.chartDays = days;
-            this.fetchStats();
-        },
-
-        // ── Render / Update Chart.js ──────────────────────────────────────
-        renderChart() {
-            const ctx = document.getElementById('syncChart');
-            if (!ctx || !this.chartData || typeof Chart === 'undefined') return;
-
-            const d = this.chartData;
-
-            if (this.chartInstance) {
-                // Update data mà không destroy → không flicker
-                this.chartInstance.data.labels              = d.labels;
-                this.chartInstance.data.datasets[0].data   = d.complete;
-                this.chartInstance.data.datasets[1].data   = d.failed;
-                this.chartInstance.data.datasets[2].data   = d.pending;
-                this.chartInstance.update('none'); // 'none' = không animate khi update
-                return;
-            }
-
-            // Khởi tạo lần đầu
-            this.chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: d.labels,
-                    datasets: [
-                        {
-                            label: 'Complete',
-                            data: d.complete,
-                            borderColor: '#198754',
-                            backgroundColor: 'rgba(25,135,84,0.12)',
-                            borderWidth: 2, fill: true, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        },
-                        {
-                            label: 'Failed',
-                            data: d.failed,
-                            borderColor: '#dc3545',
-                            backgroundColor: 'rgba(220,53,69,0.1)',
-                            borderWidth: 2, fill: false, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        },
-                        {
-                            label: 'Pending',
-                            data: d.pending,
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255,193,7,0.1)',
-                            borderWidth: 2, fill: false, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 400 },
-                    plugins: {
-                        legend: {
-                            display: true, position: 'top',
-                            labels: { boxWidth: 12, font: { size: 11 }, padding: 8 }
-                        },
-                        tooltip: {
-                            mode: 'index', intersect: false,
-                            callbacks: { title: (items) => 'Ngày ' + items[0].label }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            display: true,
-                            grid: { display: false },
-                            ticks: { font: { size: 10 }, maxRotation: 0, maxTicksLimit: 10 }
-                        },
-                        y: {
-                            display: true, min: 0,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { font: { size: 10 }, maxTicksLimit: 5 }
-                        }
-                    },
-                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
-                }
-            });
-        }
-    }));
-});
-{/literal}
-</script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}

@@ -54,11 +54,44 @@ add_hook('AddonActivation', 1, function ($vars) {
 // ─── Client Area Navigation ───────────────────────────────────────────────────
 
 add_hook('ClientAreaPrimaryNavbar', 1, function ($primaryNavbar) {
+    // Gate: module bật + license hợp lệ (fail-open theo chuẩn MJ — lỗi đọc
+    // settings không được làm mất navbar của khách).
+    try {
+        if (\MJ\DnsManager\Helpers\SettingsHelper::get('module_enabled', '1') !== '1') {
+            return;
+        }
+        if (!\MJ\DnsManager\Services\FeatureGate::isModuleLicensed()) {
+            return;
+        }
+    } catch (\Throwable $e) {
+        // fail-open: vẫn hiển thị menu
+    }
+
     $primaryNavbar->addChild('MJ - DirectAdmin DNS Manager', [
         'label' => 'Domain Manager',
         'uri' => 'index.php?m=mj_dns_manager',
         'order' => 20,
     ]);
+});
+
+// ─── Client Area Assets — inline từ disk, page-scoped (hooks.md §7.1/§7.2) ───
+
+/**
+ * ClientAreaHeadOutput — chỉ chạy trên trang của module (m=mj_dns_manager).
+ * Bơm config + tokens/components/mj-dns CSS + mj-dns.js + Alpine inline,
+ * tránh <link>/<script src> vào modules/addons/* (403 trên Nginx/cPanel).
+ */
+add_hook('ClientAreaHeadOutput', 1, function ($vars) {
+    // [WHMCS-REQUIRED] Page scope guard — hook chạy trên MỌI trang client.
+    if (($_GET['m'] ?? '') !== 'mj_dns_manager') {
+        return '';
+    }
+
+    try {
+        return \MJ\DnsManager\Helpers\AssetInliner::clientHtml();
+    } catch (\Throwable $e) {
+        return '';
+    }
 });
 
 // ─── DNS Queue Worker — chạy theo WHMCS Cron (thường mỗi 5 phút) ─────────────

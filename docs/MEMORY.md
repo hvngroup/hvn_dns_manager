@@ -2,6 +2,19 @@
 
 > Theo SOP-HSW-WHMCS-001: cập nhật mỗi khi chạm tài liệu/quyết định kiến trúc.
 
+## 2026-06-11 (đợt 2) — Đồng bộ mj-design + mj-whmcs-dev-standard (v1.6.0)
+- **CSS:** vendor `tokens.css` canonical; `components.css` scope-transform dưới `.mj-dns`
+  (KHÔNG bơm raw — components.css có reset toàn cục sẽ phá UI WHMCS host); hợp nhất
+  `mj-dns-common.css`+`mj-dns-client.css` → `mj-dns.css` với bridge alias legacy→canonical.
+- **JS:** ~3.400 dòng inline từ 22 template → 1 IIFE `assets/js/mj-dns.js`
+  (core Utils/CSRF/toast/confirm + page components); template chỉ giữ config block.
+- **Shell admin:** wrapper.tpl theo templates-layout.md (Header/Nav/Breadcrumb/Content/Footer).
+- **Delivery:** `AssetInliner` inline-từ-disk (§7.2/§7.3); `ClientAreaHeadOutput` page-scoped;
+  navbar gate enabled+license; `assets/.htaccess`; Alpine local-first/CDN-fallback.
+- **Quyết định:** KHÔNG re-skin markup page-body sang class canonical (.btn/.card) và KHÔNG đổi
+  bootstrap-icons trong đợt này — cần đối chiếu trực quan trên staging (xem README §Deviations).
+- Version 1.5 → **1.6.0** (semver).
+
 ## 2026-06-11 — Security & SOP compliance pass
 - **Audit theo MJ WHMCS SOP** (sop + dev-standard + security + dev-skills). Verdict ban đầu: **Cổng ③ TRƯỢT**
   (1 CRITICAL credential trong Git + nhiều HIGH CSRF). Đã xử lý:

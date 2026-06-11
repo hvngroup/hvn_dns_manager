@@ -74,9 +74,32 @@ class AdminController
         $this->smarty->compile_dir  = $templates_compiledir;
         $this->smarty->error_reporting = E_ALL & ~E_NOTICE & ~E_WARNING;
 
+        $pageTitles = [
+            'dashboard'         => 'Dashboard',
+            'servers'           => 'Servers',
+            'server_edit'       => 'Server',
+            'domains'           => 'Domains',
+            'dns_editor'        => 'DNS Editor',
+            'sync_logs'         => 'Sync Logs',
+            'sync_log_detail'   => 'Sync Log',
+            'audit_trail'       => 'Audit Trail',
+            'audit_detail'      => 'Audit Detail',
+            'templates'         => 'Templates',
+            'template_edit'     => 'Template',
+            'drift_reports'     => 'Drift Reports',
+            'drift_settings'    => 'Drift Settings',
+            'bulk'              => 'Bulk Operations',
+            'snapshot_rollback' => 'Snapshot Rollback',
+            'settings'          => 'Settings',
+        ];
+
         $this->smarty->assign('modulelink', $params['modulelink']);
         $this->smarty->assign('action',        $action ?: 'dashboard');
         $this->smarty->assign('template_name', $template);
+        $this->smarty->assign('page_title',    $pageTitles[$template] ?? 'Dashboard');
+        $this->smarty->assign('mj_version',    (string) ($params['version'] ?? ''));
+        // Assets inline từ disk (config + CSS + JS + Alpine) — hooks.md §7.2/§7.3.
+        $this->smarty->assign('mjAssetsHtml',  \MJ\DnsManager\Helpers\AssetInliner::adminHtml($params));
         // Admin self-token (CSRF) — mọi AJAX/form mutation phải gửi kèm token này.
         $this->smarty->assign('token',         Csrf::adminToken());
 

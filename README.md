@@ -76,17 +76,26 @@ guard `defined("WHMCS")`, Capsule binding, **CSRF `hash_equals()` trên mọi mu
 (`app/Security/Csrf.php`), không `$_REQUEST`, không sửa core, secret server DA mã hoá,
 license fail-safe (không làm sập admin).
 
-### Deviations `[MJ-INTERNAL]` (đã ghi nhận, sẽ refactor khi có WHMCS staging)
+### Đã đồng bộ với mj-design + dev-standard (v1.6.0)
 
-Các điểm dưới là house-style `[MJ-INTERNAL]` (chuẩn cho phép lệch nếu ghi nhận lý do) — **không
-phải lỗi bảo mật**. Hoãn refactor vì cần môi trường WHMCS thật để test hồi quy giao diện:
+- **1 file JS IIFE** `assets/js/mj-dns.js` — toàn bộ logic JS rời khỏi template (template chỉ
+  còn config block giá trị Smarty); `Utils.fetchJson` tự đính CSRF; toast/confirm dùng chung.
+- **Design system canonical:** `tokens.css` (mj-design) + `components.css` (scoped `.mj-dns`)
+  + `mj-dns.css` (bridge legacy→canonical); Inter + JetBrains Mono; brand red `#EA4445`.
+- **Admin shell chuẩn MJ:** Header / Nav / Breadcrumb / Content / Footer, icon SVG stroke,
+  ẩn WHMCS content-header (body-class scoped), reset va chạm Bootstrap.
+- **Asset inline từ disk** (`AssetInliner`, hooks.md §7.2/§7.3) + `assets/.htaccess`;
+  client inject qua `ClientAreaHeadOutput` page-scoped; navbar gate theo enabled+license.
 
-| Deviation | Chuẩn mong đợi | Lý do hoãn |
+### Deviations `[MJ-INTERNAL]` còn lại (ghi nhận có lý do)
+
+| Deviation | Chuẩn mong đợi | Lý do |
 |---|---|---|
-| JS nhúng inline trong template (chưa gom về 1 IIFE `assets/js/mj-dns.js`) | 1 file IIFE, không inline `<script>`/`onclick` | Rewrite UI 22 template, rủi ro hồi quy cao khi chưa test E2E |
-| Alpine.js nạp qua CDN (`wrapper.tpl`) | Có local fallback `assets/js/vendor/alpine.min.js` | Cần kèm khi đóng gói ionCube |
-| CSS tự dựng (clone Bootstrap + token `--mj-*`) | Vendor `tokens.css`/`components.css` từ skill `mj-design` | Refactor visual cần đối chiếu trực quan |
+| Icon page-body dùng Bootstrap-icons (CDN) | SVG stroke set `I.*` của mj-design, không icon font | Swap ~30 template là đợt riêng; shell mới đã dùng SVG stroke |
+| Alpine.js + Chart.js chưa vendor sẵn (Alpine: loader ưu tiên local, fallback CDN; Chart.js: CDN ở dashboard) | `assets/js/vendor/` có local copy | Môi trường build chặn network — thả file khi đóng gói (xem `assets/js/vendor/README.md`) |
+| Admin template là Smarty `.tpl` | PHP include templates | Đổi engine render = rewrite toàn bộ admin UI; Smarty vẫn là chuẩn WHMCS cho client, giữ thống nhất |
 | License ở `app/License/` (namespaced, autoload) | `lib/LicenseChecker.php` + `lib/license-config.php` | Di chuyển phá autoloader; giữ chỗ hiện tại có chủ đích |
+| Markup page-body giữ class `.mj-*` bridge (chưa re-skin sang `.btn`/`.card`/`.kpi` canonical) | Class canonical components.css | Re-skin 30 template cần đối chiếu trực quan trên staging; token/màu/font đã canonical |
 
 ## Ghi chú
 

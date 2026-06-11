@@ -38,21 +38,6 @@
 </div>
 
 <script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('driftSettings', () => ({
-        autoFixEnabled: false,
-
-        init() {
-            // Mock load settings
-            this.autoFixEnabled = false;
-        },
-
-        saveAutoFix() {
-            window._mjDnsToast('success', 'Đã lưu', 'Cấu hình Drift Auto-fix đã được lưu!');
-            window.location.href = '{/literal}{$modulelink}&action=drift_reports{literal}';
-        }
-    }));
-});
-{/literal}
+    var MJDNS_DRIFT_SETTINGS_MODULELINK = "{$modulelink|escape:'javascript'}";
 </script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}
