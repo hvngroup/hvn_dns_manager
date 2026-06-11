@@ -110,38 +110,14 @@ body.addon-mj_dns_manager-module #contentarea { padding: 0 !important; }
 
 .mj-module-wrap { display: flex; flex-direction: column; min-height: 70vh; background: var(--mj-page); }
 
-.mj-dns .mj-mark {
-    border-radius: 9px; color: #fff; font-weight: 800; letter-spacing: -1px;
-    display: grid; place-items: center; flex: none;
-    background: linear-gradient(135deg, var(--mj-primary), var(--mj-primary-dark));
-    box-shadow: 0 4px 12px rgba(234, 68, 69, 0.4);
-}
-
-.mj-dns .mj-appbar {
-    background: #252A34;
-    color: #fff;
-    display: flex; align-items: center; gap: 22px;
-    padding: 0 26px; height: 60px;
-    border-bottom: 3px solid var(--mj-primary);
-}
-.mj-dns .mj-appbar-id { display: flex; align-items: center; gap: 12px; }
-.mj-dns .mj-appbar-titles { display: flex; flex-direction: column; line-height: 1.15; }
-.mj-dns .mj-appbar-mark { width: 36px; height: 36px; font-size: 15px; border-radius: 8px; }
-.mj-dns .mj-appbar-title { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; color: #fff; white-space: nowrap; }
-.mj-dns .mj-appbar-title span { color: rgba(255,255,255,0.4); font-weight: 400; margin: 0 2px; }
-.mj-dns .mj-appbar-sub { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-top: 1px; white-space: nowrap; }
-.mj-dns .mj-appbar-menu { display: flex; align-items: stretch; gap: 2px; height: 100%; flex: 1; overflow-x: auto; }
-.mj-dns .mj-appbar-tab {
-    position: relative; border: 0; background: transparent; cursor: pointer;
-    color: rgba(255,255,255,0.66); font-size: 13.5px; font-weight: 600;
-    padding: 0 16px; height: 100%; transition: color 0.1s;
-    display: inline-flex; align-items: center; text-decoration: none; white-space: nowrap;
-}
-.mj-dns .mj-appbar-tab:hover { color: #fff; text-decoration: none; }
-.mj-dns .mj-appbar-tab.is-active { color: #fff; }
-.mj-dns .mj-appbar-tab.is-active::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: var(--mj-primary); }
-.mj-dns .mj-appbar-meta { display: flex; align-items: center; gap: 10px; }
-.mj-dns .mj-appbar-ver { font-family: var(--mj-font-mono); font-size: 12px; color: rgba(255,255,255,0.6); }
+/* Appbar dùng .appbar canonical (components.css). Hai helper Smart-Forms dùng
+   mà components.css chưa có: .appbar-meta (text version trên dark bar) +
+   .appbar-spacer (đẩy phần tử cuối về phải). */
+.mj-dns .appbar-meta { font-size: 12.5px; color: #A8AEB9; white-space: nowrap; }
+.mj-dns .appbar-meta strong { color: #fff; font-weight: 600; }
+.mj-dns .appbar-spacer { flex: 1 1 auto; }
+/* menu item là <a> — chặn gạch chân hover từ rule link chung */
+.mj-dns .appbar-menu-item, .mj-dns .appbar-menu-item:hover { text-decoration: none; }
 
 .mj-content-area { background: var(--mj-page); padding: 24px 26px; min-height: 400px; flex: 1; }
 

@@ -1,8 +1,9 @@
 {* =====================================================================
-   MJ DNS Manager — Admin shell theo archetype Smart Forms (mj-design):
-   MjAppbar 1 hàng full-bleed (mark + title + tab menu + version/license)
-   + breadcrumb .appbar-crumb canonical + content + footer.
-   Assets (tokens → components → mj-dns CSS + mj-dns.js + Alpine) bơm
+   MJ DNS Manager — Admin shell chuẩn mj-design (giống Smart Forms):
+   .appbar canonical 3 tầng — appbar-top (dark: brand · version · license)
+   → appbar-menu (light bar: tab điều hướng) → appbar-crumb (breadcrumb)
+   → content → footer.
+   Assets (tokens → components → mj-dns → mj-icons + mj-dns.js + Alpine) bơm
    INLINE từ disk qua AssetInliner (hooks.md §7.2) — logic JS sống trong
    assets/js/mj-dns.js, template chỉ giữ markup.
    ===================================================================== *}
@@ -15,42 +16,62 @@
 <div class="mj-dns mj-wrapper mj-admin-layout">
 <div class="mj-module-wrap">
 
-    <!-- ── MjAppbar (Smart Forms archetype) ───────────────────────────── -->
-    <div class="mj-appbar">
-        <div class="mj-appbar-id">
-            <div class="mj-mark mj-appbar-mark">MJ</div>
-            <div class="mj-appbar-titles">
-                <div class="mj-appbar-title">MJ <span>·</span> DNS Manager</div>
-                <div class="mj-appbar-sub">ModuleJET · HVN GROUP</div>
+    <!-- ── Appbar (MJ Design System — 3 tầng canonical như Smart Forms):
+         appbar-top (brand · version · license) → appbar-menu (nav) → appbar-crumb -->
+    <header class="appbar">
+        <div class="appbar-top">
+            <div class="appbar-brand">
+                <div class="appbar-brand-mark">MJ</div>
+                <div class="appbar-brand-text">
+                    <div class="appbar-brand-title">DNS <span>·</span> Manager</div>
+                    <div class="appbar-brand-sub">HVN · ModuleJET</div>
+                </div>
             </div>
-        </div>
-        <nav class="mj-appbar-menu">
-            <a href="{$modulelink}&action=dashboard" class="mj-appbar-tab {if $action == 'dashboard' || $action == ''}is-active{/if}">Dashboard</a>
-            <a href="{$modulelink}&action=servers" class="mj-appbar-tab {if $action == 'servers' || $action == 'server_edit'}is-active{/if}">Servers</a>
-            <a href="{$modulelink}&action=domains" class="mj-appbar-tab {if $action == 'domains' || $action == 'dns_editor' || $action == 'admin_dns_editor' || $action == 'snapshot_rollback'}is-active{/if}">Domains</a>
-            <a href="{$modulelink}&action=sync_logs" class="mj-appbar-tab {if $action == 'sync_logs' || $action == 'sync_log_detail'}is-active{/if}">Sync Logs</a>
-            <a href="{$modulelink}&action=audit_trail" class="mj-appbar-tab {if $action == 'audit_trail' || $action == 'audit_detail'}is-active{/if}">Audit Trail</a>
-            <a href="{$modulelink}&action=templates" class="mj-appbar-tab {if $action == 'templates' || $action == 'template_edit'}is-active{/if}">Templates</a>
-            <a href="{$modulelink}&action=drift_reports" class="mj-appbar-tab {if $action == 'drift_reports' || $action == 'drift_settings'}is-active{/if}">Drift</a>
-            <a href="{$modulelink}&action=bulk" class="mj-appbar-tab {if $action == 'bulk'}is-active{/if}">Bulk</a>
-            <a href="{$modulelink}&action=settings" class="mj-appbar-tab {if $action == 'settings'}is-active{/if}">Settings</a>
-        </nav>
-        <div class="mj-appbar-meta">
-            <span class="mj-appbar-ver">v{$mj_version|default:''}</span>
+            <span class="appbar-meta">DirectAdmin DNS Manager · <strong>v{$mj_version|default:''}</strong></span>
+            <div class="appbar-spacer"></div>
             <span class="pill {$mj_license_pill|default:'pill-neutral'}">{$mj_license_label|default:'NO KEY'}</span>
         </div>
-    </div>
 
-    <!-- ── Breadcrumb (.appbar-crumb canonical) ───────────────────────── -->
-    <div class="appbar-crumb">
-        <a class="appbar-crumb-link" href="index.php">Home</a>
-        <span class="appbar-crumb-sep">/</span>
-        <a class="appbar-crumb-link" href="configaddonmods.php">Addons</a>
-        <span class="appbar-crumb-sep">/</span>
-        <a class="appbar-crumb-link" href="{$modulelink}">MJ - DirectAdmin DNS Manager</a>
-        <span class="appbar-crumb-sep">/</span>
-        <span class="appbar-crumb-current">{$page_title|default:'Dashboard'}</span>
-    </div>
+        <nav class="appbar-menu" aria-label="MJ DNS Manager">
+            <div class="appbar-menu-slot {if $action == 'dashboard' || $action == ''}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'servers' || $action == 'server_edit'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=servers"><i class="bi bi-server"></i> Servers</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'domains' || $action == 'dns_editor' || $action == 'admin_dns_editor' || $action == 'snapshot_rollback'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=domains"><i class="bi bi-globe"></i> Domains</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'sync_logs' || $action == 'sync_log_detail'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=sync_logs"><i class="bi bi-arrow-repeat"></i> Sync Logs</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'audit_trail' || $action == 'audit_detail'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=audit_trail"><i class="bi bi-journal-text"></i> Audit Trail</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'templates' || $action == 'template_edit'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=templates"><i class="bi bi-files"></i> Templates</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'drift_reports' || $action == 'drift_settings'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=drift_reports"><i class="bi bi-shield-check"></i> Drift</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'bulk'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=bulk"><i class="bi bi-stack"></i> Bulk</a>
+            </div>
+            <div class="appbar-menu-slot {if $action == 'settings'}active{/if}">
+                <a class="appbar-menu-item" href="{$modulelink}&action=settings"><i class="bi bi-gear"></i> Settings</a>
+            </div>
+        </nav>
+
+        <div class="appbar-crumb">
+            <a class="appbar-crumb-link" href="index.php">Home</a>
+            <span class="appbar-crumb-sep">/</span>
+            <a class="appbar-crumb-link" href="configaddonmods.php">Addons</a>
+            <span class="appbar-crumb-sep">/</span>
+            <a class="appbar-crumb-link" href="{$modulelink}">MJ - DirectAdmin DNS Manager</a>
+            <span class="appbar-crumb-sep">/</span>
+            <span class="appbar-crumb-current">{$page_title|default:'Dashboard'}</span>
+        </div>
+    </header>
 
     <!-- ── Global Toast Container ─────────────────────────────────────── -->
     <div id="mj-toast-root" x-data="mjDnsToastSystem()" class="mj-toast-container">
