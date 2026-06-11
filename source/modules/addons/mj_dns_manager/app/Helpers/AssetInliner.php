@@ -34,7 +34,7 @@ class AssetInliner
         $out = '';
         try {
             $css = '';
-            foreach (['css/tokens.css', 'css/components.css', 'css/mj-dns.css'] as $rel) {
+            foreach (['css/tokens.css', 'css/components.css', 'css/mj-dns.css', 'css/mj-icons.css'] as $rel) {
                 $f = $dir . '/' . $rel;
                 if (!is_readable($f)) {
                     continue;
