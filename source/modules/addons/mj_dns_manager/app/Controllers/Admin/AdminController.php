@@ -98,6 +98,22 @@ class AdminController
         $this->smarty->assign('template_name', $template);
         $this->smarty->assign('page_title',    $pageTitles[$template] ?? 'Dashboard');
         $this->smarty->assign('mj_version',    (string) ($params['version'] ?? ''));
+
+        // Pill trạng thái license trên appbar (đọc cache fail-open — không call-home).
+        try {
+            $licStatus = (string) \MJ\DnsManager\Helpers\SettingsHelper::get('license_status', '');
+        } catch (\Throwable $e) {
+            $licStatus = '';
+        }
+        $licMap = [
+            'Active'    => ['pill-success', 'LICENSED'],
+            'Invalid'   => ['pill-danger',  'INVALID'],
+            'Expired'   => ['pill-warning', 'EXPIRED'],
+            'Suspended' => ['pill-danger',  'SUSPENDED'],
+        ];
+        [$licPill, $licLabel] = $licMap[$licStatus] ?? ['pill-neutral', 'NO KEY'];
+        $this->smarty->assign('mj_license_pill',  $licPill);
+        $this->smarty->assign('mj_license_label', $licLabel);
         // Assets inline từ disk (config + CSS + JS + Alpine) — hooks.md §7.2/§7.3.
         $this->smarty->assign('mjAssetsHtml',  \MJ\DnsManager\Helpers\AssetInliner::adminHtml($params));
         // Admin self-token (CSRF) — mọi AJAX/form mutation phải gửi kèm token này.
