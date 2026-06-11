@@ -144,15 +144,6 @@
 <script>
     var _AUDIT_LOG = {$auditLog};
 </script>
-<script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('auditDetail', () => ({
-        log: _AUDIT_LOG,
-        init() {}
-    }));
-});
-{/literal}
-</script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}
 
 {/if}

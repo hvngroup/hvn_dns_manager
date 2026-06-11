@@ -68,51 +68,6 @@
 </div>
 
 <script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('snapshotRollback', () => ({
-        domainName: '{/literal}{$domain.domain|default:'example.com'}{literal}',
-        snapshots: [
-            { id: 101, date: '25/02/2026 02:00', type: 'Nightly backup', records: 15 },
-            { id: 100, date: '24/02/2026 02:00', type: 'Nightly backup', records: 14 },
-            { id: 99, date: '23/02/2026 15:30', type: 'Before template load', records: 12 }
-        ],
-        selectedSnapshot: 101,
-        submitting: false,
-
-        get previewData() {
-            // Mock preview data based on selection
-            if (this.selectedSnapshot == 101) {
-                return {
-                    unchanged: 13, deleted: 2, changed: 0, added: 0,
-                    diffs: [
-                        { class: 'mj-text-danger', text: '[-] A &nbsp;&nbsp;&nbsp;test &nbsp;&rarr; 1.2.3.4' },
-                        { class: 'mj-text-danger', text: '[-] TXT _verify &rarr; google-site-verification=...' }
-                    ]
-                };
-            }
-            return { unchanged: 12, deleted: 0, changed: 0, added: 0, diffs: [] };
-        },
-
-        async confirmRollback() {
-            var ok = await window._mjDnsConfirm({
-                title:        'Xác nhận Rollback',
-                message:      'Rollback sẽ ghi đè hệ thống bằng Snapshot này.\nMột snapshot backup nội bộ sẽ được tự động tạo trước khi ghi đè.',
-                variant:      'warning',
-                confirmLabel: 'Xác nhận Rollback',
-                cancelLabel:  'Hủy'
-            });
-            if (!ok) return;
-
-            this.submitting = true;
-            setTimeout(() => {
-                window._mjDnsToast('success', 'Job Khôi Phục', 'Đã tạo Job khôi phục. Dữ liệu đang đồng bộ xuống các Server DA.');
-                setTimeout(() => {
-                     window.location.href = '?module=mj_dns_manager&action=dns_editor&domain=' + this.domainName;
-                }, 1500);
-            }, 1000);
-        }
-    }));
-});
-{/literal}
+    var MJDNS_SNAP_DOMAIN = '{$domain.domain|default:'example.com'|escape:'javascript'}';
 </script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}

@@ -28,8 +28,10 @@ SSL checker + drift checker + force-run flags), `ClientAreaPrimaryNavbar`.
 | `app/Models/` | Eloquent models (18 bảng `tbl_mj_dns_*`) |
 | `app/Security/` | `InputSanitizer`, `Csrf` |
 | `app/License/` | `LicenseChecker` + `license-config.php` (⚠ deviation: chuẩn đặt ở `lib/` — xem README §Deviations) |
-| `templates/{admin,client}/` | Smarty `.tpl` (admin render qua `wrapper.tpl`) |
-| `assets/css/` | `mj-dns-common.css` (admin) + `mj-dns-client.css` (client) |
+| `templates/{admin,client}/` | Smarty `.tpl` — CHỈ markup + config block; logic JS ở `assets/js/mj-dns.js` |
+| `app/Helpers/AssetInliner.php` | Bơm asset inline từ disk (config→CSS→JS→Alpine, hooks.md §7.2/§7.3) |
+| `assets/css/` | `tokens.css` (canonical mj-design) → `components.css` (scoped `.mj-dns`) → `mj-dns.css` (bridge + shell + module rules) |
+| `assets/js/` | `mj-dns.js` (single IIFE: Utils/CSRF/toast/confirm + page components) · `vendor/` (Alpine local — xem README trong đó) |
 | `lang/` | `english.php`, `vietnamese.php` |
 
 ## 4. Bảo mật (bắt buộc — Cổng ③)

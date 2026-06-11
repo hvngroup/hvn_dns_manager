@@ -1,0 +1,14 @@
+# MJ DNS Manager — Apache static safeguard (secondary; primary delivery is
+# inline-from-disk via AssetInliner, see hooks.md §7.2). Cho phép serve các
+# asset tĩnh nếu host chặn mặc định modules/addons/*.
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(css|js|png|svg|woff2?)$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(css|js|png|svg|woff2?)$">
+        Order allow,deny
+        Allow from all
+    </FilesMatch>
+</IfModule>

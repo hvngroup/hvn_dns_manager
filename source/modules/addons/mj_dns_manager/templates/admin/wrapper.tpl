@@ -1,244 +1,135 @@
-<!-- Include Custom Pure CSS Utilities, Google Fonts & Icons -->
-<link rel="stylesheet" href="../modules/addons/mj_dns_manager/assets/css/mj-dns-common.css?v={$smarty.now}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{* =====================================================================
+   MJ DNS Manager — Admin shell (templates-layout.md: Header / Nav /
+   Breadcrumb / Content / Footer). Assets (tokens → components → mj-dns
+   CSS + mj-dns.js + Alpine) bơm INLINE từ disk qua AssetInliner —
+   không <link>/<script src> vào modules/addons/* (hooks.md §7.2).
+   Logic JS sống trong assets/js/mj-dns.js — template chỉ giữ markup.
+   ===================================================================== *}
+{$mjAssetsHtml nofilter}
+
+{* Bootstrap-icons cho icon trong page body (deviation [MJ-INTERNAL] đã ghi
+   nhận trong README — sẽ thay dần bằng SVG stroke theo mj-design). *}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<style>
-{literal}
-    .mj-admin-layout, .mj-admin-layout *:not([class*="bi-"]):not([class*="fa-"]) {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-    }
-    .mj-admin-layout {
-        font-size: 15px !important;
-    }
-    .mj-admin-layout .small, .mj-admin-layout small {
-        font-size: 0.875em !important;
-    }
-    .mj-admin-layout h1, .mj-admin-layout h2, .mj-admin-layout h3, .mj-admin-layout h4, .mj-admin-layout h5, .mj-admin-layout h6 {
-        font-weight: 600;
-    }
-{/literal}
-</style>
 
-<!-- Alpine JS -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{* .mj-dns = scope design-system · .mj-wrapper/.mj-admin-layout = scope rule legacy *}
+<div class="mj-dns mj-wrapper mj-admin-layout">
+<div class="mj-module-wrap">
 
-<!-- ── CSRF bootstrap [WHMCS-REQUIRED] ──────────────────────────────────
-     Đính admin self-token vào MỌI fetch() mutation tới module (ajax.php và
-     addonmodules.php?action=ajax) qua header X-CSRF-Token. Tập trung tại đây
-     nên không template con nào phải tự lo token. Backend verify bằng
-     hash_equals() — xem app/Security/Csrf.php. -->
-<script>window.MJ_DNS_CSRF = "{$token|escape:'javascript'}";</script>
-<script>
-{literal}
-(function () {
-    if (window.__mjDnsFetchPatched) { return; }
-    window.__mjDnsFetchPatched = true;
-    var origFetch = window.fetch;
-    if (typeof origFetch !== 'function') { return; }
-    window.fetch = function (input, init) {
-        try {
-            var url = (typeof input === 'string') ? input : (input && input.url) || '';
-            var method = ((init && init.method) || (typeof input === 'object' && input && input.method) || 'GET').toUpperCase();
-            if (url.indexOf('mj_dns_manager') !== -1 && method !== 'GET' && method !== 'HEAD') {
-                init = init || {};
-                var h = new Headers(init.headers || (typeof input === 'object' && input ? input.headers : undefined) || {});
-                if (!h.has('X-CSRF-Token')) { h.set('X-CSRF-Token', window.MJ_DNS_CSRF || ''); }
-                init.headers = h;
-            }
-        } catch (e) { /* fail-open vào fetch gốc — backend vẫn chặn nếu thiếu token */ }
-        return origFetch.call(this, input, init);
-    };
-})();
-{/literal}
-</script>
-
-<div class="mj-wrapper mj-admin-layout mj-container-fluid mj-px-0">
-
-<!-- ── Global Toast Container ─────────────────────────────────────────── -->
-<div id="mj-toast-root" x-data="mjDnsToastSystem()" class="mj-toast-container">
-    <template x-for="t in toasts" :key="t.id">
-        <div class="mj-toast" :class="['mj-toast-' + t.type, t.leaving ? 'mj-toast-leaving' : '']" role="alert" style="position:relative;overflow:hidden;">
-            <div class="mj-toast-icon" x-html="t.icon"></div>
-            <div class="mj-toast-body">
-                <div class="mj-toast-title" x-text="t.title"></div>
-                <div class="mj-toast-message" x-show="t.message" x-text="t.message"></div>
-            </div>
-            <button class="mj-toast-close" @click="dismiss(t.id)" aria-label="Đóng">×</button>
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <div class="mj-header">
+        <div class="mj-header__left">
+            <div class="mj-header__icon">MJ</div>
+            <span class="mj-header__title">DirectAdmin DNS Manager</span>
         </div>
-    </template>
-</div>
-<script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('mjDnsToastSystem', () => ({
-        toasts: [],
-        _nextId: 1,
+        <div class="mj-header__right">
+            <a href="https://modulejet.com" target="_blank" rel="noopener">
+                <span class="mj-header__brand-text">ModuleJET</span>
+                <span class="mj-header__brand-arrow">↗</span>
+            </a>
+        </div>
+    </div>
 
-        add(type, title, message, duration) {
-            duration = duration || 4000;
-            var id = this._nextId++;
-            var icons = {
-                success: '✓',
-                error:   '✕',
-                warning: '⚠',
-                info:    'ℹ',
-            };
-            this.toasts.push({ id: id, type: type, title: title, message: message || '', icon: icons[type] || icons.info, leaving: false });
+    <!-- ── Navigation ─────────────────────────────────────────────────── -->
+    <nav class="mj-nav">
+        <a href="{$modulelink}&action=dashboard" class="mj-nav__item {if $action == 'dashboard' || $action == ''}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+            Dashboard
+        </a>
+        <a href="{$modulelink}&action=servers" class="mj-nav__item {if $action == 'servers' || $action == 'server_edit'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></span>
+            Servers
+        </a>
+        <a href="{$modulelink}&action=domains" class="mj-nav__item {if $action == 'domains' || $action == 'dns_editor' || $action == 'admin_dns_editor' || $action == 'snapshot_rollback'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+            Domains
+        </a>
+        <a href="{$modulelink}&action=sync_logs" class="mj-nav__item {if $action == 'sync_logs' || $action == 'sync_log_detail'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>
+            Sync Logs
+        </a>
+        <a href="{$modulelink}&action=audit_trail" class="mj-nav__item {if $action == 'audit_trail' || $action == 'audit_detail'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            Audit Trail
+        </a>
+        <a href="{$modulelink}&action=templates" class="mj-nav__item {if $action == 'templates' || $action == 'template_edit'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+            Templates
+        </a>
+        <a href="{$modulelink}&action=drift_reports" class="mj-nav__item {if $action == 'drift_reports' || $action == 'drift_settings'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+            Drift Reports
+        </a>
+        <a href="{$modulelink}&action=bulk" class="mj-nav__item {if $action == 'bulk'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+            Bulk Operations
+        </a>
+        <a href="{$modulelink}&action=settings" class="mj-nav__item {if $action == 'settings'}mj-nav__item--active{/if}">
+            <span class="mj-nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            Settings
+        </a>
+    </nav>
 
-            setTimeout(() => { this.dismiss(id); }, duration);
-        },
+    <!-- ── Breadcrumb ─────────────────────────────────────────────────── -->
+    <div class="mj-breadcrumb">
+        <a href="index.php">Home</a>
+        <span class="mj-breadcrumb__sep">/</span>
+        <a href="configaddonmods.php">Addons</a>
+        <span class="mj-breadcrumb__sep">/</span>
+        <a href="{$modulelink}">MJ - DirectAdmin DNS Manager</a>
+        <span class="mj-breadcrumb__sep">/</span>
+        <span class="mj-breadcrumb__current">{$page_title|default:'Dashboard'}</span>
+    </div>
 
-        dismiss(id) {
-            var t = this.toasts.find(function(x) { return x.id === id; });
-            if (!t || t.leaving) return;
-            t.leaving = true;
-            setTimeout(() => {
-                this.toasts = this.toasts.filter(function(x) { return x.id !== id; });
-            }, 270);
-        },
+    <!-- ── Global Toast Container ─────────────────────────────────────── -->
+    <div id="mj-toast-root" x-data="mjDnsToastSystem()" class="mj-toast-container">
+        <template x-for="t in toasts" :key="t.id">
+            <div class="mj-toast" :class="['mj-toast-' + t.type, t.leaving ? 'mj-toast-leaving' : '']" role="alert" style="position:relative;overflow:hidden;">
+                <div class="mj-toast-icon" x-html="t.icon"></div>
+                <div class="mj-toast-body">
+                    <div class="mj-toast-title" x-text="t.title"></div>
+                    <div class="mj-toast-message" x-show="t.message" x-text="t.message"></div>
+                </div>
+                <button class="mj-toast-close" @click="dismiss(t.id)" aria-label="Đóng">×</button>
+            </div>
+        </template>
+    </div>
 
-        init() {
-            var self = this;
-            // Expose global API
-            window._mjDnsToast = function(type, title, message, duration) {
-                self.add(type, title, message, duration);
-            };
-
-            // Listen to custom event (for cross-Alpine-component usage)
-            window.addEventListener('mjdns:toast', function(e) {
-                var d = e.detail || {};
-                self.add(d.type || 'info', d.title || d.message || '', d.message || '', d.duration);
-            });
-        }
-    }));
-});
-{/literal}
-</script>
-
-<!-- ── Global Confirm Modal ───────────────────────────────────────────── -->
-<div id="mj-confirm-root" x-data="mjDnsConfirmModal()">
-    <div class="mj-modal-backdrop" x-show="open" x-transition.opacity style="display:none;" @keydown.escape.window="cancel()" @click.self="cancel()">
-        <div class="mj-modal-box" @click.stop>
-            <div class="mj-modal-header">
-                <div class="mj-modal-header-left">
-                    <div class="mj-modal-icon" :class="'mj-modal-icon-' + variant">
-                        <i class="bi" :class="variant === 'danger' ? 'bi-trash3-fill' : (variant === 'success' ? 'bi-check-circle-fill' : (variant === 'info' ? 'bi-info-circle-fill' : 'bi-exclamation-triangle-fill'))"></i>
+    <!-- ── Global Confirm Modal ───────────────────────────────────────── -->
+    <div id="mj-confirm-root" x-data="mjDnsConfirmModal()">
+        <div class="mj-modal-backdrop" x-show="open" x-transition.opacity style="display:none;" @keydown.escape.window="cancel()" @click.self="cancel()">
+            <div class="mj-modal-box" @click.stop>
+                <div class="mj-modal-header">
+                    <div class="mj-modal-header-left">
+                        <div class="mj-modal-icon" :class="'mj-modal-icon-' + variant">
+                            <i class="bi" :class="variant === 'danger' ? 'bi-trash3-fill' : (variant === 'success' ? 'bi-check-circle-fill' : (variant === 'info' ? 'bi-info-circle-fill' : 'bi-exclamation-triangle-fill'))"></i>
+                        </div>
+                        <h5 class="mj-modal-title" x-text="title" style="margin:0;align-self:center;"></h5>
                     </div>
-                    <h5 class="mj-modal-title" x-text="title" style="margin:0;align-self:center;"></h5>
+                    <button class="mj-modal-close" @click="cancel()" type="button" title="Đóng">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-                <button class="mj-modal-close" @click="cancel()" type="button" title="Đóng">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <div class="mj-modal-body">
-                <p class="mj-modal-message" x-text="message"></p>
-            </div>
-            <div class="mj-modal-footer">
-                <button class="mj-modal-btn mj-modal-btn-cancel" @click="cancel()" x-text="cancelLabel" type="button"></button>
-                <button class="mj-modal-btn" :class="'mj-modal-btn-ok-' + variant" @click="confirm()" x-text="confirmLabel" x-ref="confirmBtn" type="button"></button>
+                <div class="mj-modal-body">
+                    <p class="mj-modal-message" x-text="message"></p>
+                </div>
+                <div class="mj-modal-footer">
+                    <button class="mj-modal-btn mj-modal-btn-cancel" @click="cancel()" x-text="cancelLabel" type="button"></button>
+                    <button class="mj-modal-btn" :class="'mj-modal-btn-ok-' + variant" @click="confirm()" x-text="confirmLabel" x-ref="confirmBtn" type="button"></button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- ── Content ────────────────────────────────────────────────────── -->
+    <div class="mj-content-area">
+        {include file="`$template_name`.tpl"}
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────────────────── -->
+    <div class="mj-footer">
+        <span class="mj-footer__title">ModuleJET — DirectAdmin DNS Manager v{$mj_version|default:''}</span>
+        <span class="mj-footer__copyright">Copyright &copy; {$smarty.now|date_format:'%Y'} ModuleJET (HVN GROUP). All rights reserved.</span>
+    </div>
+
 </div>
-<script>
-{literal}
-document.addEventListener('alpine:init', () => {
-    Alpine.data('mjDnsConfirmModal', () => ({
-        open:         false,
-        title:        'Xác nhận',
-        message:      '',
-        variant:      'warning',   // 'danger' | 'warning' | 'info' | 'success'
-        confirmLabel: 'Xác nhận',
-        cancelLabel:  'Hủy',
-        _resolve:     null,
-
-        init() {
-            var self = this;
-            window._mjDnsConfirm = function(options) {
-                if (typeof options === 'string') {
-                    options = { message: options };
-                }
-                return new Promise(function(resolve) {
-                    self.title        = options.title        || 'Xác nhận';
-                    self.message      = options.message      || '';
-                    self.variant      = options.variant      || 'warning';
-                    self.confirmLabel = options.confirmLabel || 'Xác nhận';
-                    self.cancelLabel  = options.cancelLabel  || 'Hủy';
-                    self._resolve     = resolve;
-                    self.open         = true;
-                    // Focus confirm button after paint
-                    setTimeout(function() {
-                        if (self.$refs && self.$refs.confirmBtn) {
-                            self.$refs.confirmBtn.focus();
-                        }
-                    }, 50);
-                });
-            };
-        },
-
-        get iconHtml() {
-            if (this.variant === 'danger') return '🗑';
-            if (this.variant === 'success') return '✅';
-            if (this.variant === 'info') return 'ℹ️';
-            return '⚠️';
-        },
-
-        confirm() {
-            this.open = false;
-            if (this._resolve) { this._resolve(true); this._resolve = null; }
-        },
-
-        cancel() {
-            this.open = false;
-            if (this._resolve) { this._resolve(false); this._resolve = null; }
-        }
-    }));
-});
-{/literal}
-</script>
-
-    <div class="mj-row mj-g-4">
-        <!-- Sidebar Navigation -->
-        <div class="mj-col-md-3 mj-col-lg-2">
-            <div class="mj-list-group mj-list-group-flush mj-rounded mj-shadow-sm mj-border-0 mj-mb-4 sticky-top" style="top: 20px;">
-                <div class="mj-list-group-item mj-bg-dark mj-text-white mj-fw-bold mj-py-3 mj-text-center">
-                    <i class="bi bi-hdd-network"></i> MJ DNS Manager
-                </div>
-                <a href="{$modulelink}&action=dashboard" class="mj-list-group-item mj-list-group-item-action {if $action == 'dashboard' || $action == '' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-speedometer2 mj-me-2"></i> Dashboard
-                </a>
-                <a href="{$modulelink}&action=servers" class="mj-list-group-item mj-list-group-item-action {if $action == 'servers' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-server mj-me-2"></i> Servers
-                </a>
-                <a href="{$modulelink}&action=domains" class="mj-list-group-item mj-list-group-item-action {if $action == 'domains' || $action == 'dns_editor' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-globe mj-me-2"></i> Domains
-                </a>
-                <a href="{$modulelink}&action=sync_logs" class="mj-list-group-item mj-list-group-item-action {if $action == 'sync_logs' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-journals mj-me-2"></i> Sync Logs
-                </a>
-                <a href="{$modulelink}&action=audit_trail" class="mj-list-group-item mj-list-group-item-action {if $action == 'audit_trail' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-shield-lock mj-me-2"></i> Audit Trail
-                </a>
-                <a href="{$modulelink}&action=templates" class="mj-list-group-item mj-list-group-item-action {if $action == 'templates' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-file-text mj-me-2"></i> Templates
-                </a>
-                <a href="{$modulelink}&action=drift_reports" class="mj-list-group-item mj-list-group-item-action {if $action == 'drift_reports' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-arrow-left-right mj-me-2"></i> Drift Reports
-                </a>
-                <a href="{$modulelink}&action=bulk" class="mj-list-group-item mj-list-group-item-action {if $action == 'bulk' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-lightning-charge mj-me-2"></i> Bulk Operations
-                </a>
-                <a href="{$modulelink}&action=settings" class="mj-list-group-item mj-list-group-item-action {if $action == 'settings' }active mj-border-primary mj-border-start mj-fw-bold{/if}">
-                    <i class="bi bi-gear mj-me-2"></i> Settings
-                </a>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="mj-col-md-9 mj-col-lg-10">
-
-            <!-- Render The Body Template -->
-            {include file="`$template_name`.tpl" }
-        </div>
-    </div>
 </div>
