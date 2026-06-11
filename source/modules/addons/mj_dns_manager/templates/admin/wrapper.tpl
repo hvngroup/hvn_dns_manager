@@ -8,9 +8,8 @@
    ===================================================================== *}
 {$mjAssetsHtml nofilter}
 
-{* Bootstrap-icons cho icon trong page body (deviation [MJ-INTERNAL] đã ghi
-   nhận trong README — sẽ thay dần bằng SVG stroke theo mj-design). *}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{* Icon: SVG stroke inline theo mj-design (assets/css/mj-icons.css, bơm qua
+   AssetInliner). KHÔNG còn icon-font/CDN ngoài — class `bi bi-*` giữ nguyên. *}
 
 {* .mj-dns = scope design-system · .mj-wrapper/.mj-admin-layout = scope rule legacy *}
 <div class="mj-dns mj-wrapper mj-admin-layout">

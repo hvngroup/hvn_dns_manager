@@ -232,7 +232,6 @@ document.addEventListener('alpine:init', () => {
         hasCriticalAlert: false,
         alertMessages:    [],
         generatedAt:      null,
-        chartInstance:    null,
         refreshTimer:     null,
 
         // ── Init ──────────────────────────────────────────────────────────
@@ -277,84 +276,65 @@ document.addEventListener('alpine:init', () => {
             this.fetchStats();
         },
 
-        // ── Render / Update Chart.js ──────────────────────────────────────
+        // ── Render Sync Pipeline chart — inline SVG (mj-design, zero CDN) ──
+        // Vẽ 3 đường (complete/failed/pending) từ chartData, màu token MJ.
         renderChart() {
-            const ctx = document.getElementById('syncChart');
-            if (!ctx || !this.chartData || typeof Chart === 'undefined') return;
+            const el = document.getElementById('syncChart');
+            if (!el || !this.chartData) return;
 
-            const d = this.chartData;
+            const d      = this.chartData;
+            const labels = d.labels || [];
+            const series = [
+                { name: 'Complete', data: d.complete || [], color: '#28A745', fill: true },
+                { name: 'Failed',   data: d.failed   || [], color: '#EA4445', fill: false },
+                { name: 'Pending',  data: d.pending  || [], color: '#FFC107', fill: false }
+            ];
 
-            if (this.chartInstance) {
-                // Update data mà không destroy → không flicker
-                this.chartInstance.data.labels              = d.labels;
-                this.chartInstance.data.datasets[0].data   = d.complete;
-                this.chartInstance.data.datasets[1].data   = d.failed;
-                this.chartInstance.data.datasets[2].data   = d.pending;
-                this.chartInstance.update('none'); // 'none' = không animate khi update
-                return;
+            const n = labels.length;
+            const W = 600, H = 140, padT = 10, padB = 22, padX = 8;
+            const plotH = H - padT - padB, plotW = W - padX * 2, baseY = padT + plotH;
+
+            let max = 0;
+            series.forEach(s => s.data.forEach(v => { if (+v > max) max = +v; }));
+            if (max <= 0) max = 1;
+
+            const xAt = i => (n <= 1) ? (padX + plotW / 2) : (padX + (i / (n - 1)) * plotW);
+            const yAt = v => padT + plotH - (Math.max(0, +v) / max) * plotH;
+
+            const esc = t => String(t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+            let paths = '';
+            series.forEach(s => {
+                if (!s.data.length) return;
+                const pts = s.data.map((v, i) => xAt(i).toFixed(1) + ',' + yAt(v).toFixed(1)).join(' ');
+                if (s.fill) {
+                    paths += '<polygon points="' + pts + ' ' + xAt(n - 1).toFixed(1) + ',' + baseY + ' ' + xAt(0).toFixed(1) + ',' + baseY +
+                             '" fill="' + s.color + '" fill-opacity="0.10"/>';
+                }
+                paths += '<polyline points="' + pts + '" fill="none" stroke="' + s.color +
+                         '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+            });
+
+            const baseline = '<line x1="' + padX + '" y1="' + baseY + '" x2="' + (W - padX) + '" y2="' + baseY +
+                             '" stroke="#E5E7EB" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+
+            let xlabels = '';
+            if (n) {
+                const idxs = n <= 3 ? labels.map((_, i) => i) : [0, Math.floor((n - 1) / 2), n - 1];
+                xlabels = idxs.map(i => '<text x="' + xAt(i).toFixed(1) + '" y="' + (H - 6) +
+                    '" text-anchor="middle" font-size="9" fill="#9CA3AF">' + esc(labels[i] || '') + '</text>').join('');
             }
 
-            // Khởi tạo lần đầu
-            this.chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: d.labels,
-                    datasets: [
-                        {
-                            label: 'Complete',
-                            data: d.complete,
-                            borderColor: '#198754',
-                            backgroundColor: 'rgba(25,135,84,0.12)',
-                            borderWidth: 2, fill: true, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        },
-                        {
-                            label: 'Failed',
-                            data: d.failed,
-                            borderColor: '#dc3545',
-                            backgroundColor: 'rgba(220,53,69,0.1)',
-                            borderWidth: 2, fill: false, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        },
-                        {
-                            label: 'Pending',
-                            data: d.pending,
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255,193,7,0.1)',
-                            borderWidth: 2, fill: false, tension: 0.4,
-                            pointRadius: 2, pointHoverRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 400 },
-                    plugins: {
-                        legend: {
-                            display: true, position: 'top',
-                            labels: { boxWidth: 12, font: { size: 11 }, padding: 8 }
-                        },
-                        tooltip: {
-                            mode: 'index', intersect: false,
-                            callbacks: { title: (items) => 'Ngày ' + items[0].label }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            display: true,
-                            grid: { display: false },
-                            ticks: { font: { size: 10 }, maxRotation: 0, maxTicksLimit: 10 }
-                        },
-                        y: {
-                            display: true, min: 0,
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { font: { size: 10 }, maxTicksLimit: 5 }
-                        }
-                    },
-                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
-                }
-            });
+            const legend = series.map(s =>
+                '<span style="display:inline-flex;align-items:center;gap:5px;margin-left:14px;font-size:11px;color:#6B7280;">' +
+                '<span style="width:9px;height:9px;border-radius:50%;background:' + s.color + ';"></span>' + s.name + '</span>'
+            ).join('');
+
+            el.innerHTML =
+                '<div style="display:flex;justify-content:flex-end;margin-bottom:4px;">' + legend + '</div>' +
+                '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" ' +
+                'style="width:100%;height:calc(100% - 22px);overflow:visible;">' +
+                baseline + paths + xlabels + '</svg>';
         }
     }));
 });

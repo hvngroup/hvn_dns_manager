@@ -1,7 +1,5 @@
 <div class="mj-dns-admin" x-data="dashboardManager()" x-init="init()">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
     <!-- ── Alert Banner (dynamic) ─────────────────────────────────────── -->
     <template x-if="hasCriticalAlert">
         <div class="alert alert-danger mj-d-flex mj-justify-content-between mj-align-items-center mj-mb-4">
@@ -59,10 +57,8 @@
                             <div class="mj-text-muted text-uppercase small">Failed</div>
                         </div>
                     </div>
-                    <!-- Chart -->
-                    <div style="height: 140px;">
-                        <canvas id="syncChart"></canvas>
-                    </div>
+                    <!-- Chart (inline SVG — zero CDN, render bởi mj-dns.js) -->
+                    <div id="syncChart" class="mj-sync-chart" style="height: 160px;"></div>
                 </div>
             </div>
         </div>

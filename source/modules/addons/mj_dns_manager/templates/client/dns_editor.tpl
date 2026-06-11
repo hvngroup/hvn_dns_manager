@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    {* Icon: SVG stroke inline (mj-icons.css) bơm qua ClientAreaHeadOutput — zero CDN. *}
 
     {* ── Smarty variables → JS config ── *}
     <script>

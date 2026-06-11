@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <div class="mj-dns mj-dns-client">
     <h3 style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:20px;">
         <i class="bi bi-hdd-network" style="color:#ea4544;"></i> DNS Management &mdash; Chọn domain cần quản lý
