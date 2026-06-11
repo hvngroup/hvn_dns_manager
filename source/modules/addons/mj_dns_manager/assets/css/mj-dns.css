@@ -103,23 +103,25 @@ body.addon-mj_dns_manager-module .content-header { display: none !important; }
 .mj-header__left { display: flex; align-items: center; gap: 10px; }
 .mj-header__icon { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--mj-primary), var(--mj-primary-dark)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 2px 8px rgba(234, 68, 69, 0.35); }
 .mj-header__title { font-size: 15px; font-weight: 600; color: var(--mj-ink); letter-spacing: -0.2px; }
-.mj-header__right a { display: flex; align-items: center; gap: 6px; text-decoration: none; padding: 6px 12px; border-radius: var(--mj-radius); border: 1px solid var(--mj-border); transition: all 0.15s; }
-.mj-header__right a:hover { border-color: var(--mj-primary); background: var(--mj-primary-tint); text-decoration: none; }
+.mj-dns .mj-header__right a,
+.mj-dns .mj-header__brand-link { display: flex; align-items: center; gap: 6px; text-decoration: none; padding: 6px 12px; border-radius: var(--mj-radius); border: 1px solid var(--mj-border); transition: all 0.15s; }
+.mj-dns .mj-header__right a:hover,
+.mj-dns .mj-header__brand-link:hover { border-color: var(--mj-primary); background: var(--mj-primary-tint); text-decoration: none; }
 .mj-header__brand-text { font-size: 12px; font-weight: 500; color: var(--mj-text-2); }
 .mj-header__brand-arrow { font-size: 10px; color: var(--mj-text-3); }
 
 .mj-nav { display: flex; gap: 0; padding: 0 12px; background: #252A34; overflow-x: auto; }
-.mj-nav__item { position: relative; display: flex; align-items: center; gap: 6px; padding: 11px 14px; font-size: 13px; color: #B7BDC9; text-decoration: none; border-bottom: 2.5px solid transparent; cursor: pointer; transition: all 0.15s; user-select: none; white-space: nowrap; }
-.mj-nav__item:hover { color: #fff; background: rgba(255, 255, 255, 0.05); text-decoration: none; }
-.mj-nav__item--active { color: #fff; border-bottom-color: var(--mj-primary); font-weight: 500; background: rgba(255, 255, 255, 0.04); }
+.mj-dns .mj-nav__item { position: relative; display: flex; align-items: center; gap: 6px; padding: 11px 14px; font-size: 13px; color: #B7BDC9; text-decoration: none; border-bottom: 2.5px solid transparent; cursor: pointer; transition: all 0.15s; user-select: none; white-space: nowrap; }
+.mj-dns .mj-nav__item:hover { color: #fff; background: rgba(255, 255, 255, 0.05); text-decoration: none; }
+.mj-dns .mj-nav__item--active { color: #fff; border-bottom-color: var(--mj-primary); font-weight: 500; background: rgba(255, 255, 255, 0.04); }
 .mj-nav__icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s; display: inline-flex; }
 .mj-nav__icon svg { width: 15px; height: 15px; }
-.mj-nav__item:hover .mj-nav__icon,
-.mj-nav__item--active .mj-nav__icon { opacity: 1; }
+.mj-dns .mj-nav__item:hover .mj-nav__icon,
+.mj-dns .mj-nav__item--active .mj-nav__icon { opacity: 1; }
 
 .mj-breadcrumb { padding: 8px 20px; font-size: 11px; color: var(--mj-text-3); background: var(--mj-surface); border-bottom: 1px solid var(--mj-border); }
-.mj-breadcrumb a { color: var(--mj-text-2); text-decoration: none; }
-.mj-breadcrumb a:hover { color: var(--mj-primary); }
+.mj-dns .mj-breadcrumb__link { color: var(--mj-text-2); text-decoration: none; }
+.mj-dns .mj-breadcrumb__link:hover { color: var(--mj-primary); }
 .mj-breadcrumb__sep { margin: 0 4px; opacity: 0.4; }
 .mj-breadcrumb__current { color: var(--mj-text); font-weight: 500; }
 
@@ -988,11 +990,11 @@ body.addon-mj_dns_manager-module .content-header { display: none !important; }
 }
 
 /* --- 20e. Links — primary color with underline on hover --- */
-.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item) {
+.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-nav__item):not(.mj-breadcrumb__link):not(.mj-header__brand-link) {
     color: var(--mj-primary);
     text-decoration: none;
 }
-.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):hover {
+.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-nav__item):not(.mj-breadcrumb__link):not(.mj-header__brand-link):hover {
     color: var(--mj-primary-hover);
     text-decoration: underline;
 }
@@ -3124,3 +3126,49 @@ table.mj-align-middle > :not(caption) > * > * { vertical-align: middle; }
 .mj-dns-client .mj-badge-srv  { background: #dc2626 !important; }
 .mj-dns-client .mj-badge-ns   { background: #475569 !important; }
 .mj-dns-client .mj-badge-caa  { background: #1e293b !important; }
+
+/* ── [F] Canonical parity skin — re-skin CSS-level (đối chiếu screenshot) ──
+   Markup 30 template giữ class legacy; lớp này ép các primitive lệch nhiều
+   render đúng VISUAL canonical của mj-design (pill/table). Specificity dùng
+   prefix .mj-dns để thắng phần [D]/[E] legacy phía trên. */
+
+/* Badge legacy → pill canonical (nền nhạt + chữ màu đậm + uppercase + 4px) */
+.mj-dns .mj-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+.mj-dns .mj-badge.mj-bg-success { background: var(--mj-success-light) !important; color: #166534 !important; }
+.mj-dns .mj-badge.mj-bg-warning { background: var(--mj-warning-light) !important; color: #92400E !important; }
+.mj-dns .mj-badge.mj-bg-danger  { background: var(--mj-primary-light) !important; color: var(--mj-primary-dark) !important; }
+.mj-dns .mj-badge.mj-bg-primary { background: var(--mj-primary-light) !important; color: var(--mj-primary-dark) !important; }
+.mj-dns .mj-badge.mj-bg-info    { background: var(--mj-info-light) !important; color: #075985 !important; }
+.mj-dns .mj-badge.mj-bg-secondary,
+.mj-dns .mj-badge.mj-bg-light   { background: var(--mj-surface-3) !important; color: #4B5563 !important; }
+.mj-dns .mj-badge.mj-bg-dark    { background: var(--mj-ink) !important; color: #fff !important; }
+/* text-dark đi kèm bg màu nhạt cũ — màu chữ đã do biến thể ở trên quyết định */
+.mj-dns .mj-badge.mj-text-dark  { color: inherit; }
+/* Counter dạng số giữ bo tròn đầy (canonical .badge) */
+.mj-dns .mj-badge.mj-rounded-pill { border-radius: 999px; }
+
+/* Table legacy → tbl canonical (header uppercase 11px, hover wash) */
+.mj-dns .mj-table { font-size: 13px; }
+.mj-dns .mj-table thead th,
+.mj-dns .mj-table > :not(caption) > * > th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--mj-text-2);
+    font-weight: 600;
+    background: var(--mj-surface-2);
+    border-bottom: 1px solid var(--mj-border);
+    white-space: nowrap;
+}
+.mj-dns .mj-table-hover tbody tr:hover { background: var(--mj-surface-2); }

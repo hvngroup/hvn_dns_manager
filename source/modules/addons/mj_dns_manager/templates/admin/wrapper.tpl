@@ -22,7 +22,7 @@
             <span class="mj-header__title">DirectAdmin DNS Manager</span>
         </div>
         <div class="mj-header__right">
-            <a href="https://modulejet.com" target="_blank" rel="noopener">
+            <a class="mj-header__brand-link" href="https://modulejet.com" target="_blank" rel="noopener">
                 <span class="mj-header__brand-text">ModuleJET</span>
                 <span class="mj-header__brand-arrow">↗</span>
             </a>
@@ -71,11 +71,11 @@
 
     <!-- ── Breadcrumb ─────────────────────────────────────────────────── -->
     <div class="mj-breadcrumb">
-        <a href="index.php">Home</a>
+        <a class="mj-breadcrumb__link" href="index.php">Home</a>
         <span class="mj-breadcrumb__sep">/</span>
-        <a href="configaddonmods.php">Addons</a>
+        <a class="mj-breadcrumb__link" href="configaddonmods.php">Addons</a>
         <span class="mj-breadcrumb__sep">/</span>
-        <a href="{$modulelink}">MJ - DirectAdmin DNS Manager</a>
+        <a class="mj-breadcrumb__link" href="{$modulelink}">MJ - DirectAdmin DNS Manager</a>
         <span class="mj-breadcrumb__sep">/</span>
         <span class="mj-breadcrumb__current">{$page_title|default:'Dashboard'}</span>
     </div>
