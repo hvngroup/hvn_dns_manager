@@ -96,36 +96,53 @@ body.addon-mj_dns_manager-module .content-header { display: none !important; }
 .mj-dns .row::before,
 .mj-dns .row::after { content: none; display: none; }
 
-/* ── [C] MJ admin shell (canonical tokens) ─────────────────────────────── */
-.mj-module-wrap { display: flex; flex-direction: column; min-height: 70vh; background: var(--mj-surface); border: 1px solid var(--mj-border); border-radius: var(--mj-radius-lg); overflow: hidden; }
+/* ── [C] MJ addon appbar — archetype Smart Forms (mj-design ui_kits) ─────
+   MjAppbar 1 hàng full-bleed: [mark MJ] [MJ · Title / MODULEJET · HVN GROUP]
+   [tab menu] [version + license pill]. Breadcrumb dùng .appbar-crumb
+   canonical (components.css). Token accent = --mj-primary. */
 
-.mj-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; background: var(--mj-surface); border-bottom: 1px solid var(--mj-border); }
-.mj-header__left { display: flex; align-items: center; gap: 10px; }
-.mj-header__icon { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--mj-primary), var(--mj-primary-dark)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 2px 8px rgba(234, 68, 69, 0.35); }
-.mj-header__title { font-size: 15px; font-weight: 600; color: var(--mj-ink); letter-spacing: -0.2px; }
-.mj-dns .mj-header__right a,
-.mj-dns .mj-header__brand-link { display: flex; align-items: center; gap: 6px; text-decoration: none; padding: 6px 12px; border-radius: var(--mj-radius); border: 1px solid var(--mj-border); transition: all 0.15s; }
-.mj-dns .mj-header__right a:hover,
-.mj-dns .mj-header__brand-link:hover { border-color: var(--mj-primary); background: var(--mj-primary-tint); text-decoration: none; }
-.mj-header__brand-text { font-size: 12px; font-weight: 500; color: var(--mj-text-2); }
-.mj-header__brand-arrow { font-size: 10px; color: var(--mj-text-3); }
+/* Full-bleed [WHMCS-REQUIRED: body-class scoped] — appbar tràn mép vùng
+   content WHMCS trên TRANG MODULE; re-assert padding cho vùng nội dung. */
+body.mj-dns-app-page .content,
+body.addon-mj_dns_manager-module .content,
+body.mj-dns-app-page #contentarea,
+body.addon-mj_dns_manager-module #contentarea { padding: 0 !important; }
 
-.mj-nav { display: flex; gap: 0; padding: 0 12px; background: #252A34; overflow-x: auto; }
-.mj-dns .mj-nav__item { position: relative; display: flex; align-items: center; gap: 6px; padding: 11px 14px; font-size: 13px; color: #B7BDC9; text-decoration: none; border-bottom: 2.5px solid transparent; cursor: pointer; transition: all 0.15s; user-select: none; white-space: nowrap; }
-.mj-dns .mj-nav__item:hover { color: #fff; background: rgba(255, 255, 255, 0.05); text-decoration: none; }
-.mj-dns .mj-nav__item--active { color: #fff; border-bottom-color: var(--mj-primary); font-weight: 500; background: rgba(255, 255, 255, 0.04); }
-.mj-nav__icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; transition: opacity 0.15s; display: inline-flex; }
-.mj-nav__icon svg { width: 15px; height: 15px; }
-.mj-dns .mj-nav__item:hover .mj-nav__icon,
-.mj-dns .mj-nav__item--active .mj-nav__icon { opacity: 1; }
+.mj-module-wrap { display: flex; flex-direction: column; min-height: 70vh; background: var(--mj-page); }
 
-.mj-breadcrumb { padding: 8px 20px; font-size: 11px; color: var(--mj-text-3); background: var(--mj-surface); border-bottom: 1px solid var(--mj-border); }
-.mj-dns .mj-breadcrumb__link { color: var(--mj-text-2); text-decoration: none; }
-.mj-dns .mj-breadcrumb__link:hover { color: var(--mj-primary); }
-.mj-breadcrumb__sep { margin: 0 4px; opacity: 0.4; }
-.mj-breadcrumb__current { color: var(--mj-text); font-weight: 500; }
+.mj-dns .mj-mark {
+    border-radius: 9px; color: #fff; font-weight: 800; letter-spacing: -1px;
+    display: grid; place-items: center; flex: none;
+    background: linear-gradient(135deg, var(--mj-primary), var(--mj-primary-dark));
+    box-shadow: 0 4px 12px rgba(234, 68, 69, 0.4);
+}
 
-.mj-content-area { background: var(--mj-page); padding: 20px; min-height: 400px; flex: 1; }
+.mj-dns .mj-appbar {
+    background: #252A34;
+    color: #fff;
+    display: flex; align-items: center; gap: 22px;
+    padding: 0 26px; height: 60px;
+    border-bottom: 3px solid var(--mj-primary);
+}
+.mj-dns .mj-appbar-id { display: flex; align-items: center; gap: 12px; }
+.mj-dns .mj-appbar-mark { width: 36px; height: 36px; font-size: 15px; border-radius: 8px; }
+.mj-dns .mj-appbar-title { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; color: #fff; white-space: nowrap; }
+.mj-dns .mj-appbar-title span { color: rgba(255,255,255,0.4); font-weight: 400; margin: 0 2px; }
+.mj-dns .mj-appbar-sub { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-top: 1px; white-space: nowrap; }
+.mj-dns .mj-appbar-menu { display: flex; align-items: stretch; gap: 2px; height: 100%; flex: 1; overflow-x: auto; }
+.mj-dns .mj-appbar-tab {
+    position: relative; border: 0; background: transparent; cursor: pointer;
+    color: rgba(255,255,255,0.66); font-size: 13.5px; font-weight: 600;
+    padding: 0 16px; height: 100%; transition: color 0.1s;
+    display: inline-flex; align-items: center; text-decoration: none; white-space: nowrap;
+}
+.mj-dns .mj-appbar-tab:hover { color: #fff; text-decoration: none; }
+.mj-dns .mj-appbar-tab.is-active { color: #fff; }
+.mj-dns .mj-appbar-tab.is-active::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: var(--mj-primary); }
+.mj-dns .mj-appbar-meta { display: flex; align-items: center; gap: 10px; }
+.mj-dns .mj-appbar-ver { font-family: var(--mj-font-mono); font-size: 12px; color: rgba(255,255,255,0.6); }
+
+.mj-content-area { background: var(--mj-page); padding: 24px 26px; min-height: 400px; flex: 1; }
 
 .mj-footer { text-align: center; padding: 14px 20px; background: var(--mj-surface); border-top: 1px solid var(--mj-border); }
 .mj-footer__title { display: block; font-size: 11px; color: var(--mj-text-2); }
@@ -990,11 +1007,11 @@ body.addon-mj_dns_manager-module .content-header { display: none !important; }
 }
 
 /* --- 20e. Links — primary color with underline on hover --- */
-.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-nav__item):not(.mj-breadcrumb__link):not(.mj-header__brand-link) {
+.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-appbar-tab):not(.appbar-crumb-link) {
     color: var(--mj-primary);
     text-decoration: none;
 }
-.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-nav__item):not(.mj-breadcrumb__link):not(.mj-header__brand-link):hover {
+.mj-admin-layout a:not(.mj-btn):not(.btn):not(.mj-list-group-item):not(.page-link):not(.dropdown-item):not(.mj-appbar-tab):not(.appbar-crumb-link):hover {
     color: var(--mj-primary-hover);
     text-decoration: underline;
 }
