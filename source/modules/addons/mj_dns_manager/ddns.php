@@ -89,7 +89,8 @@ try {
 }
 
 // ── 2. Lấy token từ request ───────────────────────────────────────────────────
-$rawToken = trim($_REQUEST['token'] ?? '');
+// DDNS dùng giao thức No-IP/DynDNS (GET) nhưng chấp nhận cả POST cho thiết bị lạ.
+$rawToken = trim($_GET['token'] ?? $_POST['token'] ?? '');
 if (empty($rawToken)) {
     ddns_respond('badauth');
 }
@@ -98,7 +99,7 @@ if (empty($rawToken)) {
 // Nếu thiết bị tự override IP (một số router gửi kèm), dùng giá trị đó
 // Ngược lại dùng IP nguồn của request
 $clientIp = ddns_get_client_ip();
-$overrideIp = trim($_REQUEST['ip'] ?? $_REQUEST['myip'] ?? '');
+$overrideIp = trim($_GET['ip'] ?? $_GET['myip'] ?? $_POST['ip'] ?? $_POST['myip'] ?? '');
 
 if (!empty($overrideIp) && filter_var($overrideIp, FILTER_VALIDATE_IP)) {
     $newIp = $overrideIp;

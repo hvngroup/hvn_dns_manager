@@ -17,7 +17,11 @@ node_modules/
 
 # Local config / secrets — KHÔNG commit license-config thật
 lib/license-config.local.php
+app/License/license-config.local.php
 *.local.php
+
+# Credentials thật — chỉ commit bản template CREDENTIALS.example.md
+docs/CREDENTIALS.md
 
 # Logs / tmp
 *.log

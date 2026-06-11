@@ -1,6 +1,6 @@
 # AGENT.md — HVN DirectAdmin DNS Manager
 
-> **Mục đích**: Tệp này là bộ quy tắc điều phối cho AI Agent (Claude, Cursor, Copilot, hoặc bất kỳ AI coding assistant nào) khi hỗ trợ xây dựng module **HVN - DirectAdmin DNS Manager**. Mọi code được sinh ra PHẢI tuân thủ tài liệu này.
+> **Mục đích**: Tệp này là bộ quy tắc điều phối cho AI Agent (Claude, Cursor, Copilot, hoặc bất kỳ AI coding assistant nào) khi hỗ trợ xây dựng module **MJ - DirectAdmin DNS Manager**. Mọi code được sinh ra PHẢI tuân thủ tài liệu này.
 
 ---
 
@@ -8,13 +8,13 @@
 
 ### 1.1. Tổng quan
 
-- **Tên module**: HVN - DirectAdmin DNS Manager
+- **Tên module**: MJ - DirectAdmin DNS Manager
 - **Nền tảng**: WHMCS 8.x Addon Module
 - **Ngôn ngữ**: PHP 7.4+ (target PHP 8.1)
 - **Database**: MySQL/MariaDB qua WHMCS Eloquent ORM (Capsule)
 - **Frontend**: Smarty Template + Native CSS (WHMCS) + Pure CSS + Alpine.js 3.x
 - **Kiến trúc cốt lõi**: Queue-based Async (Bất đồng bộ qua hàng đợi)
-- **Tiền tố DB**: `mod_hvndns_`
+- **Tiền tố DB**: `tbl_mj_dns_`
 - **Namespace gốc**: `HvnGroup\DnsManager`
 
 ### 1.2. Tài liệu tham chiếu
@@ -49,8 +49,8 @@ Nếu có mâu thuẫn giữa các tài liệu, thứ tự ưu tiên là: AGENT.
 ### 1.3. Cấu trúc thư mục bắt buộc
 
 ```
-modules/addons/hvn_dns_manager/
-├── hvn_dns_manager.php          # WHMCS entry point
+modules/addons/mj_dns_manager/
+├── mj_dns_manager.php          # WHMCS entry point
 ├── hooks.php                     # Hook registrations
 ├── cron/
 │   ├── queue_worker.php
@@ -87,24 +87,24 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 
 | # | Bảng | Model | Mục đích | Đặc biệt |
 |---|------|-------|----------|-----------|
-| 1 | `mod_hvndns_schema_version` | SchemaVersion | Migration tracking | — |
-| 2 | `mod_hvndns_servers` | Server | DA Node configs | `password_enc` 🔒 |
-| 3 | `mod_hvndns_domains` | Domain | Domain registry | Bảng pivot trung tâm |
-| 4 | `mod_hvndns_records` | DnsRecord | DNS records (Source of Truth) | `is_system`, `is_locked` |
-| 5 | `mod_hvndns_queue` | QueueJob | Job queue bất đồng bộ | Bảng critical nhất |
-| 6 | `mod_hvndns_sync_logs` | SyncLog | Nhật ký đồng bộ | BIGINT PK, tăng nhanh |
-| 7 | `mod_hvndns_audit_trail` | AuditTrail | Nhật ký kiểm toán | 🚫 APPEND-ONLY |
-| 8 | `mod_hvndns_record_history` | RecordHistory | Lịch sử thay đổi record | BIGINT PK |
-| 9 | `mod_hvndns_snapshots` | Snapshot | Bản sao zone | Rolling 30/domain |
-| 10 | `mod_hvndns_templates` | Template | Mẫu DNS | `{{placeholder}}` |
-| 11 | `mod_hvndns_dnssec` | DnssecKey | Thông số DNSSEC | 1:1 với domain |
-| 12 | `mod_hvndns_ddns_tokens` | DdnsToken | Token DDNS | `token_hash` #️⃣ |
-| 13 | `mod_hvndns_redirects` | Redirect | URL forwarding | 301/302/masked |
-| 14 | `mod_hvndns_email_forwards` | EmailForward | Email forwarding | catch-all support |
-| 15 | `mod_hvndns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
-| 16 | `mod_hvndns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
-| 17 | `mod_hvndns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
-| 18 | `mod_hvndns_settings` | Setting | Module config key-value | 111 settings |
+| 1 | `tbl_mj_dns_schema_version` | SchemaVersion | Migration tracking | — |
+| 2 | `tbl_mj_dns_servers` | Server | DA Node configs | `password_enc` 🔒 |
+| 3 | `tbl_mj_dns_domains` | Domain | Domain registry | Bảng pivot trung tâm |
+| 4 | `tbl_mj_dns_records` | DnsRecord | DNS records (Source of Truth) | `is_system`, `is_locked` |
+| 5 | `tbl_mj_dns_queue` | QueueJob | Job queue bất đồng bộ | Bảng critical nhất |
+| 6 | `tbl_mj_dns_sync_logs` | SyncLog | Nhật ký đồng bộ | BIGINT PK, tăng nhanh |
+| 7 | `tbl_mj_dns_audit_trail` | AuditTrail | Nhật ký kiểm toán | 🚫 APPEND-ONLY |
+| 8 | `tbl_mj_dns_record_history` | RecordHistory | Lịch sử thay đổi record | BIGINT PK |
+| 9 | `tbl_mj_dns_snapshots` | Snapshot | Bản sao zone | Rolling 30/domain |
+| 10 | `tbl_mj_dns_templates` | Template | Mẫu DNS | `{{placeholder}}` |
+| 11 | `tbl_mj_dns_dnssec` | DnssecKey | Thông số DNSSEC | 1:1 với domain |
+| 12 | `tbl_mj_dns_ddns_tokens` | DdnsToken | Token DDNS | `token_hash` #️⃣ |
+| 13 | `tbl_mj_dns_redirects` | Redirect | URL forwarding | 301/302/masked |
+| 14 | `tbl_mj_dns_email_forwards` | EmailForward | Email forwarding | catch-all support |
+| 15 | `tbl_mj_dns_drift_reports` | DriftReport | Báo cáo lệch dữ liệu | Nightly scan |
+| 16 | `tbl_mj_dns_ip_blacklist` | IpBlacklist | IP bị chặn (DDNS) | Auto-expire |
+| 17 | `tbl_mj_dns_notification_cooldowns` | NotificationCooldown | Throttle cảnh báo | Chống spam alert |
+| 18 | `tbl_mj_dns_settings` | Setting | Module config key-value | 111 settings |
 
 *Lưu ý: Bổ sung 2 helper services chính phục vụ feature flags: `ClientFeatureResolver` và `UpsellHelper`.*
 
@@ -136,14 +136,14 @@ Tham chiếu chi tiết tại DB_SCHEMA.md. Dưới đây là danh sách nhanh:
 ❌ CẤM:
 - Raw SQL queries (DB::raw(), mysql_query(), mysqli_*)
 - Nối chuỗi SQL: "SELECT * FROM x WHERE id = " . $id
-- Tạo bảng không có tiền tố mod_hvndns_
-- UPDATE hoặc DELETE trên bảng mod_hvndns_audit_trail
+- Tạo bảng không có tiền tố tbl_mj_dns_
+- UPDATE hoặc DELETE trên bảng tbl_mj_dns_audit_trail
 - Lưu password DA dạng plaintext
 - Sử dụng DROP TABLE trong migration (chỉ dùng khi deactivate)
 
 ✅ BẮT BUỘC:
 - Sử dụng Eloquent ORM (WHMCS Capsule) cho mọi database operation
-- Tiền tố tất cả bảng: mod_hvndns_
+- Tiền tố tất cả bảng: tbl_mj_dns_
 - Mã hóa password: WHMCS\Security\Encryption::encode() / decode()
 - Audit trail là APPEND-ONLY (chỉ INSERT, không bao giờ UPDATE/DELETE)
 - Foreign keys cho referential integrity
@@ -233,7 +233,7 @@ class QueueManager {}          // PascalCase cho class
 public function dispatch() {}  // camelCase cho methods
 $batchId = '';                 // camelCase cho variables
 CONST MAX_RETRY = 5;          // UPPER_SNAKE cho constants
-mod_hvndns_queue               // snake_case cho DB tables/columns
+tbl_mj_dns_queue               // snake_case cho DB tables/columns
 
 // Visibility luôn phải explicit
 public function doSomething(): void {}
@@ -259,7 +259,7 @@ use Illuminate\Database\Eloquent\Model;
 class DnsRecord extends Model
 {
     /** @var string */
-    protected $table = 'mod_hvndns_records';
+    protected $table = 'tbl_mj_dns_records';
 
     /** @var bool */
     public $timestamps = true;
@@ -734,7 +734,7 @@ Khi cần truyền Smarty variable vào JavaScript, KHÔNG đặt Smarty variabl
 
 {* ── Cách 2: Script variable trước {literal} block ── *}
 <script>
-    var HVNDNS_CONFIG = {
+    var MJDNS_CONFIG = {
         domainId: {$domain.id},
         domainName: '{$domain.name|escape:'javascript'}',
         baseUrl: '{$moduleUrl}',
@@ -743,8 +743,8 @@ Khi cần truyền Smarty variable vào JavaScript, KHÔNG đặt Smarty variabl
 </script>
 <script>
 {literal}
-    // Sử dụng HVNDNS_CONFIG.domainId trong code
-    console.log(HVNDNS_CONFIG.domainId);
+    // Sử dụng MJDNS_CONFIG.domainId trong code
+    console.log(MJDNS_CONFIG.domainId);
 {/literal}
 </script>
 
@@ -794,7 +794,7 @@ var name = '{$domain.name|escape:'javascript'}';
  *}
 
 {* ── 1. Include CSS module (không cần {literal} vì file external) ── *}
-<link rel="stylesheet" href="{$moduleUrl}/assets/css/hvndns.css">
+<link rel="stylesheet" href="{$moduleUrl}/assets/css/mj_dns.css">
 
 {* ── 2. HTML markup với Smarty variables ── *}
 <div x-data="dnsEditor()">
@@ -815,7 +815,7 @@ var name = '{$domain.name|escape:'javascript'}';
 
 {* ── 3. Truyền data cho JS qua config object ── *}
 <script>
-    var HVNDNS = {
+    var MJDNS = {
         domainId: {$domain.id|intval},
         baseUrl: '{$moduleUrl|escape:'javascript'}',
         token: '{$token|escape:'javascript'}',
@@ -828,16 +828,16 @@ var name = '{$domain.name|escape:'javascript'}';
 {literal}
     function dnsEditor() {
         return {
-            records: HVNDNS.records,
+            records: MJDNS.records,
             loading: false,
             
             async addRecord(formData) {
                 this.loading = true;
-                const res = await fetch(HVNDNS.baseUrl + '&action=add_record', {
+                const res = await fetch(MJDNS.baseUrl + '&action=add_record', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-Token': HVNDNS.token
+                        'X-CSRF-Token': MJDNS.token
                     },
                     body: JSON.stringify(formData)
                 });
@@ -1015,8 +1015,8 @@ class v1_0_0
     {
         $schema = Capsule::schema();
 
-        if (!$schema->hasTable('mod_hvndns_servers')) {
-            $schema->create('mod_hvndns_servers', function ($table) {
+        if (!$schema->hasTable('tbl_mj_dns_servers')) {
+            $schema->create('tbl_mj_dns_servers', function ($table) {
                 $table->increments('id');
                 $table->string('hostname', 255);
                 $table->string('ip_address', 45);
@@ -1057,7 +1057,7 @@ class v1_0_0
  *}
 
 {* ── LUÔN include module CSS/JS ── *}
-<link rel="stylesheet" href="{$moduleUrl}/assets/css/hvndns.css">
+<link rel="stylesheet" href="{$moduleUrl}/assets/css/mj_dns.css">
 
 {* ── Alpine.js cho reactivity ── *}
 <div x-data="dnsEditor()" x-init="init()">
@@ -1353,7 +1353,7 @@ Ví dụ Agent thực hiện:
 #### Lưu ý
 
 - **TỰ ĐỘNG chạy** `git add` + `git commit` qua `run_command` — KHÔNG chỉ đề xuất cho user copy
-- Cwd của `run_command` PHẢI là thư mục gốc của project (VD: `/Users/nguyenvuong/Desktop/Project/hvn_dns_manager`)
+- Cwd của `run_command` PHẢI là thư mục gốc của project (VD: `/Users/nguyenvuong/Desktop/Project/mj_dns_manager`)
 - Nếu task sửa nhiều concerns khác nhau → tách thành nhiều commit nhỏ, chạy lần lượt
 - Luôn đề cập Issue ID liên quan trong commit message nếu có (VD: `Closes QUEUE-001`)
 - Commit message PHẢI ngắn gọn, rõ ràng, không quá 72 ký tự trên dòng đầu
@@ -1462,13 +1462,13 @@ Cần quyết định từ bạn trước khi tiếp tục.
 
 ```php
 // Hooks thường dùng trong module này
-add_hook('AfterModuleCreate', 1, 'hvndns_provision_zone');
-add_hook('AfterModuleTerminate', 1, 'hvndns_terminate_zone');
-add_hook('AfterModuleSuspend', 1, 'hvndns_suspend_domain');
-add_hook('AfterModuleUnsuspend', 1, 'hvndns_unsuspend_domain');
-add_hook('DailyCronJob', 1, 'hvndns_daily_maintenance');
-add_hook('AdminAreaPage', 1, 'hvndns_admin_page_hook');
-add_hook('ClientAreaPage', 1, 'hvndns_client_page_hook');
+add_hook('AfterModuleCreate', 1, 'mj_dns_provision_zone');
+add_hook('AfterModuleTerminate', 1, 'mj_dns_terminate_zone');
+add_hook('AfterModuleSuspend', 1, 'mj_dns_suspend_domain');
+add_hook('AfterModuleUnsuspend', 1, 'mj_dns_unsuspend_domain');
+add_hook('DailyCronJob', 1, 'mj_dns_daily_maintenance');
+add_hook('AdminAreaPage', 1, 'mj_dns_admin_page_hook');
+add_hook('ClientAreaPage', 1, 'mj_dns_client_page_hook');
 ```
 
 ### 9.2. DirectAdmin API Quick Reference (Chi tiết tại API_REFERENCE.md)
@@ -1508,9 +1508,9 @@ Error Handling:
 ### 9.3. Internal Ajax API Quick Reference (Chi tiết tại API_REFERENCE.md Phần B)
 
 ```
-Client Base:  /modules/addons/hvn_dns_manager/ajax.php?action={action}
-Admin Base:   /admin/addonmodules.php?module=hvn_dns_manager&ajax=1&action={action}
-DDNS:         /modules/addons/hvn_dns_manager/ddns.php?token={token}
+Client Base:  /modules/addons/mj_dns_manager/ajax.php?action={action}
+Admin Base:   /admin/addonmodules.php?module=mj_dns_manager&ajax=1&action={action}
+DDNS:         /modules/addons/mj_dns_manager/ddns.php?token={token}
 
 Client Endpoints:
   GET  get_records         → Danh sách records + sync status + quota
@@ -1604,7 +1604,7 @@ Regression Suite (PHẢI pass 100% trước deploy):
 ### 9.3. Bảng Status Reference (Đồng bộ với DB_SCHEMA.md)
 
 ```
-Queue Job Status (mod_hvndns_queue.status):
+Queue Job Status (tbl_mj_dns_queue.status):
   PENDING            → Chờ xử lý (Worker sẽ pick up)
   SYNCING            → Đang được Worker xử lý (row locked)
   COMPLETE           → DA đã confirm thành công
@@ -1612,7 +1612,7 @@ Queue Job Status (mod_hvndns_queue.status):
   CANCELLED          → Bị hủy (conflict resolution hoặc server disabled)
   PERMANENTLY_FAILED → Hết retry hoặc lỗi non-retryable (auth_fail, zone_not_found)
 
-Queue Job Error Types (mod_hvndns_queue.error_type):
+Queue Job Error Types (tbl_mj_dns_queue.error_type):
   timeout            → DA không phản hồi trong thời gian cho phép → Retryable
   auth_fail          → Sai username/password DA → Non-retryable, alert Admin
   dns_conflict       → Record đã tồn tại hoặc xung đột → Non-retryable
@@ -1623,38 +1623,38 @@ Queue Job Error Types (mod_hvndns_queue.error_type):
   network_error      → Không kết nối được → Retryable
   unknown            → Lỗi không xác định → Retryable 1 lần, sau đó non-retryable
 
-Domain Status (mod_hvndns_domains.status):
+Domain Status (tbl_mj_dns_domains.status):
   active         → Đang hoạt động, Client có thể CRUD
   suspended      → Tạm ngưng (nợ phí), Client readonly, zone vẫn live trên DA
   terminated     → Đã hủy, chuyển sang pending_delete
   pending_delete → Đang trong grace period 30 ngày trước khi xóa zone khỏi DA
 
-SSL Status (mod_hvndns_domains.ssl_status):
+SSL Status (tbl_mj_dns_domains.ssl_status):
   none     → Chưa yêu cầu SSL
   pending  → Đang chờ Let's Encrypt cấp phát
   active   → Đang hoạt động (auto-renew khi < 7 ngày)
   expired  → Đã hết hạn
   failed   → Cấp phát thất bại
 
-Drift Resolution (mod_hvndns_drift_reports.resolution):
+Drift Resolution (tbl_mj_dns_drift_reports.resolution):
   pending    → Chờ Admin quyết định
   pull_da    → Lấy giá trị từ DA ghi đè WHMCS DB
   push_whmcs → Đẩy giá trị WHMCS DB ghi đè lên DA
   ignored    → Admin chọn bỏ qua
   auto_fixed → Module tự sửa (khi drift_auto_fix = true)
 
-Redirect Types (mod_hvndns_redirects.redirect_type):
+Redirect Types (tbl_mj_dns_redirects.redirect_type):
   301        → Permanent redirect (SEO-friendly, browser cache vĩnh viễn)
   302        → Temporary redirect (browser không cache)
   masked     → URL masking (ẩn URL đích, hiển thị domain nguồn)
 
-Snapshot Types (mod_hvndns_snapshots.snapshot_type):
+Snapshot Types (tbl_mj_dns_snapshots.snapshot_type):
   scheduled     → Nightly cron tự tạo (2:00 AM)
   pre_bulk      → Tự động trước bulk operation
   pre_template  → Tự động trước load template
   manual        → Admin bấm nút tạo thủ công
 
-Server Roles (mod_hvndns_servers.role):
+Server Roles (tbl_mj_dns_servers.role):
   primary    → Server chính (dùng cho Drift Detection query)
   secondary  → Bản sao, được đồng bộ tự động, không nhận job trực tiếp từ WHMCS
 
@@ -1664,7 +1664,7 @@ Actor Types (dùng chung cho queue, audit_trail, record_history):
   system  → Tự động (cron, provisioning, auto-resign, auto-renew)
   api     → DDNS endpoint hoặc REST API
 
-Notification Rules (mod_hvndns_notification_cooldowns.rule_id):
+Notification Rules (tbl_mj_dns_notification_cooldowns.rule_id):
   RULE_01  → ≥5 FAILED liên tiếp trên 1 server     → Cooldown 15 phút
   RULE_02  → Server unreachable ≥3 lần liên tiếp    → Cooldown 15 phút
   RULE_03  → Queue backlog >100 pending >10 phút     → Cooldown 30 phút

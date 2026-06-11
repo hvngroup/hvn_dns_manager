@@ -22,6 +22,36 @@
 <!-- Alpine JS -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+<!-- ── CSRF bootstrap [WHMCS-REQUIRED] ──────────────────────────────────
+     Đính admin self-token vào MỌI fetch() mutation tới module (ajax.php và
+     addonmodules.php?action=ajax) qua header X-CSRF-Token. Tập trung tại đây
+     nên không template con nào phải tự lo token. Backend verify bằng
+     hash_equals() — xem app/Security/Csrf.php. -->
+<script>window.MJ_DNS_CSRF = "{$token|escape:'javascript'}";</script>
+<script>
+{literal}
+(function () {
+    if (window.__mjDnsFetchPatched) { return; }
+    window.__mjDnsFetchPatched = true;
+    var origFetch = window.fetch;
+    if (typeof origFetch !== 'function') { return; }
+    window.fetch = function (input, init) {
+        try {
+            var url = (typeof input === 'string') ? input : (input && input.url) || '';
+            var method = ((init && init.method) || (typeof input === 'object' && input && input.method) || 'GET').toUpperCase();
+            if (url.indexOf('mj_dns_manager') !== -1 && method !== 'GET' && method !== 'HEAD') {
+                init = init || {};
+                var h = new Headers(init.headers || (typeof input === 'object' && input ? input.headers : undefined) || {});
+                if (!h.has('X-CSRF-Token')) { h.set('X-CSRF-Token', window.MJ_DNS_CSRF || ''); }
+                init.headers = h;
+            }
+        } catch (e) { /* fail-open vào fetch gốc — backend vẫn chặn nếu thiếu token */ }
+        return origFetch.call(this, input, init);
+    };
+})();
+{/literal}
+</script>
+
 <div class="mj-wrapper mj-admin-layout mj-container-fluid mj-px-0">
 
 <!-- ── Global Toast Container ─────────────────────────────────────────── -->

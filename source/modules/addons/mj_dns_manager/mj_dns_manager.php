@@ -278,7 +278,7 @@ function mj_dns_manager_upgrade($vars)
  */
 function mj_dns_manager_clientarea($vars)
 {
-    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+    $action = isset($_GET['action']) ? $_GET['action'] : '';
 
     $controller = new ClientController();
     return $controller->dispatch($action, $vars);
@@ -289,7 +289,7 @@ function mj_dns_manager_clientarea($vars)
  */
 function mj_dns_manager_output($vars)
 {
-    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+    $action = isset($_GET['action']) ? $_GET['action'] : '';
 
     // Instantiate mock controller for testing Admin UI
     $controller = new AdminController();

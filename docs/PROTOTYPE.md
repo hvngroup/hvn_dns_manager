@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## PROTOTYPE.md — Mock Data & UI Prototyping Plan
 
 > **Phiên bản**: 1.0  
@@ -44,7 +44,7 @@ UI-First: Giao diện chạy THẬT trong WHMCS, data GIẢ từ mock
        ▼
   WHMCS Theme thật (Twenty-One / Six)
   URL thật (clientarea.php, admin/addonmodules.php)
-  CSS riêng (hvndns.css — không phụ thuộc theme)
+  CSS riêng (mj_dns.css — không phụ thuộc theme)
 ```
 
 **Giao diện thật**: Smarty templates render trong WHMCS, đúng URL routing, đúng theme.
@@ -101,7 +101,7 @@ Tổng: ~23 giờ làm việc (4–5 ngày)
 | Component | Library | Ghi chú |
 |-----------|---------|---------|
 | Template Engine | Smarty (WHMCS built-in) | Templates viết lần này GIỮ NGUYÊN cho production |
-| CSS | Custom `hvndns.css` (Pure CSS) | CSS riêng, KHÔNG phụ thuộc WHMCS theme, KHÔNG dùng Bootstrap |
+| CSS | Custom `mj_dns.css` (Pure CSS) | CSS riêng, KHÔNG phụ thuộc WHMCS theme, KHÔNG dùng Bootstrap |
 | JS Reactivity | Alpine.js 3.x CDN | Interactions, polling simulation, state management |
 | DataTables | DataTables.net 1.13.x CDN | Admin tables (Sync Logs, Audit Trail, Domains) |
 | Charts | Chart.js 4.x CDN | Admin Dashboard metrics |
@@ -154,7 +154,7 @@ Chạy migration tạo toàn bộ 19 bảng từ DB_SCHEMA.md. Đây là code PR
 
 ### 3.2. Mock Data Specification
 
-#### `mod_hvndns_settings` — 111 default settings
+#### `tbl_mj_dns_settings` — 111 default settings
 
 ```php
 // Seed toàn bộ 111 settings từ SETTINGS.md (gồm cả License, Upsell tabs)
@@ -166,7 +166,7 @@ Chạy migration tạo toàn bộ 19 bảng từ DB_SCHEMA.md. Đây là code PR
 // - upsell_ddns_addon_id = 15
 ```
 
-#### `mod_hvndns_servers` — 3 servers
+#### `tbl_mj_dns_servers` — 3 servers
 
 ```
 ┌────┬───────────────┬──────────────┬──────┬─────────┬────────┬─────────────┐
@@ -182,7 +182,7 @@ last_error_msg = "Connection timed out after 15000ms"
 → Demo trạng thái server có vấn đề trên Dashboard
 ```
 
-#### `mod_hvndns_domains` — 8 domains (phủ tất cả status & addons)
+#### `tbl_mj_dns_domains` — 8 domains (phủ tất cả status & addons)
 
 Bảng này giả lập query join với `tblhostingaddons` để quyết định Premium Features:
 
@@ -207,7 +207,7 @@ Domain 8:ặc biệt mock setting global `ddns_mode = "free"` → DDNS Tab mở 
 Domain 7, 8 có mục đích là Mock dynamic Setting đổi chiều on-the-fly.
 ```
 
-#### `mod_hvndns_records` — ~120 records (đa dạng types + statuses)
+#### `tbl_mj_dns_records` — ~120 records (đa dạng types + statuses)
 
 ```
 Phân bố theo domain:
@@ -225,7 +225,7 @@ Phân bố theo domain:
 - Một số records có pending_delete = true → demo "Deleting..." state
 ```
 
-#### `mod_hvndns_queue` — 50 jobs (phủ tất cả statuses)
+#### `tbl_mj_dns_queue` — 50 jobs (phủ tất cả statuses)
 
 ```
 Phân bố status:
@@ -246,7 +246,7 @@ Phân bố thời gian:
 - Jobs spread đều theo giờ (cho sparkline chart)
 ```
 
-#### `mod_hvndns_sync_logs` — 200 rows
+#### `tbl_mj_dns_sync_logs` — 200 rows
 
 ```
 - Mỗi queue job có 1 sync_log
@@ -255,7 +255,7 @@ Phân bố thời gian:
 - Spread trong 7 ngày qua (cho Dashboard metrics)
 ```
 
-#### `mod_hvndns_audit_trail` — 100 rows
+#### `tbl_mj_dns_audit_trail` — 100 rows
 
 ```
 Actor types: client (60%), admin (25%), system (10%), api (5%)
@@ -266,14 +266,14 @@ Contexts: client_editor, admin_editor, cron_provision, ddns_api
 Timespan: 30 ngày qua
 ```
 
-#### `mod_hvndns_record_history` — 60 rows
+#### `tbl_mj_dns_record_history` — 60 rows
 
 ```
 change_types: created (40%), updated (40%), deleted (20%)
 Có old_value và new_value cho updated entries
 ```
 
-#### `mod_hvndns_snapshots` — 10 snapshots
+#### `tbl_mj_dns_snapshots` — 10 snapshots
 
 ```
 - 6 scheduled (nightly)
@@ -283,7 +283,7 @@ Có old_value và new_value cho updated entries
 Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 ```
 
-#### `mod_hvndns_templates` — 4 templates
+#### `tbl_mj_dns_templates` — 4 templates
 
 ```
 1. "Basic DNS" (default) — NS×3 + A @ → 6 records
@@ -292,7 +292,7 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 4. "Internal Only" (is_visible_client=false) — Test template → 4 records
 ```
 
-#### `mod_hvndns_quota_plans` — 3 plans
+#### `tbl_mj_dns_quota_plans` — 3 plans
 
 ```
 1. "DNS Basic"      — 20 records, 10 subdomains, 2 redirects, 5 email, DDNS off
@@ -300,14 +300,14 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 3. "DNS Enterprise" — unlimited (0), DDNS on, DNSSEC on, SSL on
 ```
 
-#### `mod_hvndns_dnssec` — 2 domains
+#### `tbl_mj_dns_dnssec` — 2 domains
 
 ```
 - hvngroup.vn: enabled, có DS records đầy đủ
 - myblog.net: disabled
 ```
 
-#### `mod_hvndns_ddns_tokens` — 3 tokens
+#### `tbl_mj_dns_ddns_tokens` — 3 tokens
 
 ```
 - ddns-test.hvn.vn: "cam" (active, last_ip = 118.70.5.6, updated 2h ago)
@@ -315,7 +315,7 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 - hvngroup.vn: "office" (revoked — is_active=false)
 ```
 
-#### `mod_hvndns_redirects` — 5 redirects
+#### `tbl_mj_dns_redirects` — 5 redirects
 
 ```
 - hvngroup.vn / → https://www.hvngroup.vn (301)
@@ -325,7 +325,7 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 - myblog.net /old → https://myblog.net/new (301)
 ```
 
-#### `mod_hvndns_email_forwards` — 6 forwarders
+#### `tbl_mj_dns_email_forwards` — 6 forwarders
 
 ```
 - hvngroup.vn: info → admin@gmail.com, support → team@hvngroup.vn
@@ -334,7 +334,7 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 - myblog.net: contact → blogger@gmail.com
 ```
 
-#### `mod_hvndns_drift_reports` — 4 drifts
+#### `tbl_mj_dns_drift_reports` — 4 drifts
 
 ```
 - example.com: added_on_da (A test2 → 5.6.7.8) — pending
@@ -343,14 +343,14 @@ Cho 3 domains khác nhau (hvngroup.vn, example.com, myblog.net)
 - hvngroup.vn: modified (A www IP khác) — auto_fixed (resolved)
 ```
 
-#### `mod_hvndns_ip_blacklist` — 2 IPs
+#### `tbl_mj_dns_ip_blacklist` — 2 IPs
 
 ```
 - 192.168.1.100: blocked (expires in 30 min) — brute force DDNS
 - 10.0.0.50: expired (blocked_until < now) — đã hết hạn
 ```
 
-#### `mod_hvndns_notification_cooldowns` — 3 entries
+#### `tbl_mj_dns_notification_cooldowns` — 3 entries
 
 ```
 - RULE_01 + server:3 → last_sent 10 min ago
@@ -430,7 +430,7 @@ templates/client/
 │
 assets/
 ├── css/
-│   └── hvndns.css           ← CSS riêng toàn module (KHÔNG phụ thuộc theme)
+│   └── mj_dns.css           ← CSS riêng toàn module (KHÔNG phụ thuộc theme)
 ├── js/
 │   ├── dns-editor.js        ← Alpine.js: DNS Editor logic
 │   ├── sync-tracker.js      ← Alpine.js: Polling simulation
@@ -913,7 +913,7 @@ const API = RealAPI; // Gọi Ajax endpoint thật
 ```
 ✅ GIỮ NGUYÊN (production-ready):
 - Tất cả Smarty templates (.tpl)
-- CSS (hvndns.css)
+- CSS (mj_dns.css)
 - Alpine.js components (dns-editor.js, sync-tracker.js, ...)
 - Chart.js configurations
 - DataTable configurations
@@ -1066,7 +1066,7 @@ AD-12 Settings:
 ### 9.3. Cross-cutting
 
 ```
-□ CSS riêng (hvndns.css) hoạt động với WHMCS Twenty-One theme
+□ CSS riêng (mj_dns.css) hoạt động với WHMCS Twenty-One theme
 □ CSS riêng hoạt động với WHMCS Six theme
 □ Không conflict với CSS WHMCS native
 □ Alpine.js không conflict với WHMCS jQuery

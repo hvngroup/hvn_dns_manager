@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## LICENSING.md — License & Monetization Strategy
 
 > **Phiên bản**: 2.0  
@@ -139,7 +139,7 @@ Tab Pricing:
   
 Tab Module Settings:
   Module Name:       Software Licensing
-  Key Prefix:        hvndns-
+  Key Prefix:        mj_dns-
   Key Length:         16
   Allow Reissue:     ✅ (cho phép Reseller đổi domain/IP khi migrate server)
   Allow Domain Conflict:  ❌ (1 license = 1 domain WHMCS duy nhất)
@@ -163,7 +163,7 @@ Module cài trên WHMCS Reseller "call home" mỗi 24h:
 │  WHMCS Reseller A        │         │  WHMCS HVN (License Server)  │
 │                           │         │                               │
 │  Module HVN DNS Manager   │  HTTPS  │  Software Licensing Addon     │
-│  license_key: hvndns-XXX │────────▶│                               │
+│  license_key: mj_dns-XXX │────────▶│                               │
 │  domain: reseller-a.com  │         │  Verify:                      │
 │  ip: 103.xx.xx.xx        │         │  ├─ Key exists? ✅             │
 │                           │◀────────│  ├─ Status Active? ✅          │
@@ -873,7 +873,7 @@ Reseller                    WHMCS HVN (License Server)
     │─────────────────────────────▶│
     │                              │
     │                              │  2. Thanh toán OK
-    │                              │     → Generate key: hvndns-XXXXXXXX
+    │                              │     → Generate key: mj_dns-XXXXXXXX
     │                              │     → Email key + download link
     │                              │
     │  3. Download module files    │
@@ -1069,7 +1069,7 @@ Khi dnssec_mode = "free":
 ┌────────────────────────────────────────────┐
 │  📋 License                                 │
 │                                             │
-│  Key:          hvndns-A12B••••D89F          │
+│  Key:          mj_dns-A12B••••D89F          │
 │  Status:       🟢 Active                    │
 │  Registered:   billing.reseller-a.com       │
 │  Valid Until:  2027-02-26                   │
@@ -1151,7 +1151,7 @@ Tab [DNSSEC] trong trang Settings (AD-12):
 
 | # | Setting Key | Type | Default | Mô tả |
 |---|------------|------|---------|-------|
-| 97 | `license_key` | String | `""` | License key module (hvndns-XXXXXXXX) |
+| 97 | `license_key` | String | `""` | License key module (mj_dns-XXXXXXXX) |
 | 98 | `license_local_key` | Text | `""` | Cached encrypted local key. Auto-update mỗi remote check |
 | 99 | `license_last_check` | DateTime | `""` | Thời điểm remote check gần nhất |
 | 100 | `license_status` | String | `""` | Cached: Active/Suspended/Expired |
@@ -1212,7 +1212,7 @@ templates/admin/partials/
 |-----------|-------------|
 | **AGENT.md** | Thêm LICENSING.md vào tham chiếu. Thêm rule: "DNSSEC/DDNS code PHẢI check FeatureGate 3 lớp". Thêm: ClientFeatureResolver vào danh sách Services |
 | **SETTINGS.md** | Thêm 15 settings mới (#97-111). Tổng: 96 → 111 settings. Thêm nhóm "License" và nhóm "Upsell & Billing" |
-| **DB_SCHEMA.md** | Không cần bảng mới (dùng `mod_hvndns_settings`). Ghi chú: FeatureGate query `tblhostingaddons` và `tblhostingconfigoptions` (bảng WHMCS native) |
+| **DB_SCHEMA.md** | Không cần bảng mới (dùng `tbl_mj_dns_settings`). Ghi chú: FeatureGate query `tblhostingaddons` và `tblhostingconfigoptions` (bảng WHMCS native) |
 | **SPEC.md** | Thêm Tầng 0 "License Check" trước Tầng 1 Presentation trong kiến trúc. Thêm flow: License check + Feature gating |
 | **EPICS.md** | Thêm EPIC: License Integration (LicenseChecker, FeatureGate). Thêm Story: Upsell UI + ClientFeatureResolver |
 | **WIREFRAME.md** | Thêm: Upsell cards (CL-06, CL-07 khi locked). Admin License Widget. License Invalid page |

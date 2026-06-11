@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## TEST_PLAN.md — Kế hoạch Kiểm thử
 
 > **Phiên bản**: 1.0  
@@ -89,7 +89,7 @@ DNSSEC:    Enabled
 SSL:       Self-signed (verify=false cho test)
 
 Quy tắc:
-- Chỉ dùng domain dạng: test-*.hvndns.local
+- Chỉ dùng domain dạng: test-*.mj_dns.local
 - Xóa sạch test zones mỗi đêm (cron cleanup)
 - KHÔNG dùng domain thật
 ```
@@ -102,16 +102,16 @@ Quy tắc:
 class TestData
 {
     // Domain fixtures
-    const DOMAIN_ACTIVE     = 'test-active.hvndns.local';
-    const DOMAIN_SUSPENDED  = 'test-suspended.hvndns.local';
-    const DOMAIN_TERMINATED = 'test-terminated.hvndns.local';
-    const DOMAIN_BULK       = 'test-bulk-{n}.hvndns.local'; // n = 1..100
+    const DOMAIN_ACTIVE     = 'test-active.mj_dns.local';
+    const DOMAIN_SUSPENDED  = 'test-suspended.mj_dns.local';
+    const DOMAIN_TERMINATED = 'test-terminated.mj_dns.local';
+    const DOMAIN_BULK       = 'test-bulk-{n}.mj_dns.local'; // n = 1..100
     
     // Record fixtures
     const RECORD_A     = ['type' => 'A',     'name' => 'www',   'value' => '10.0.0.100', 'ttl' => 3600];
     const RECORD_AAAA  = ['type' => 'AAAA',  'name' => 'ipv6',  'value' => '2001:db8::1', 'ttl' => 3600];
-    const RECORD_CNAME = ['type' => 'CNAME', 'name' => 'ftp',   'value' => 'test-active.hvndns.local', 'ttl' => 3600];
-    const RECORD_MX    = ['type' => 'MX',    'name' => '@',     'value' => 'mail.test-active.hvndns.local', 'ttl' => 3600, 'priority' => 10];
+    const RECORD_CNAME = ['type' => 'CNAME', 'name' => 'ftp',   'value' => 'test-active.mj_dns.local', 'ttl' => 3600];
+    const RECORD_MX    = ['type' => 'MX',    'name' => '@',     'value' => 'mail.test-active.mj_dns.local', 'ttl' => 3600, 'priority' => 10];
     const RECORD_TXT   = ['type' => 'TXT',   'name' => '@',     'value' => 'v=spf1 include:_spf.google.com ~all', 'ttl' => 3600];
     const RECORD_SRV   = ['type' => 'SRV',   'name' => '_sip._tcp', 'value' => 'sip.test.local', 'ttl' => 3600, 'priority' => 10, 'weight' => 0, 'port' => 5060];
     const RECORD_CAA   = ['type' => 'CAA',   'name' => '@',     'value' => '0 issue "letsencrypt.org"', 'ttl' => 3600];
@@ -589,7 +589,7 @@ tests/Integration/DnsRecordServiceTest.php
 
 TEST: test_create_record_full_flow
     1. Gọi DnsRecordService::createRecord(A, mail, 1.2.3.4)
-    2. Assert: record in mod_hvndns_records
+    2. Assert: record in tbl_mj_dns_records
     3. Assert: queue job created for Primary server
     4. Assert: audit_trail entry exists
     5. Assert: record_history entry with change_type='created'
@@ -623,7 +623,7 @@ tests/Integration/ProvisioningTest.php
 
 TEST: test_provision_creates_zone_and_applies_template
     1. Simulate WHMCS hook AfterModuleCreate
-    2. Assert: domain created in mod_hvndns_domains
+    2. Assert: domain created in tbl_mj_dns_domains
     3. Assert: NS records (3x) + default A record created
     4. Assert: CREATE_ZONE jobs dispatched for all servers
     5. Assert: audit_trail "Zone created via auto-provision"
@@ -878,7 +878,7 @@ TEST: test_load_drift_detection_500_domains
 TEST: test_query_performance_worker_pickup
     Seed: 100,000 queue rows (mixed statuses)
     Run EXPLAIN on worker pickup query:
-      SELECT * FROM mod_hvndns_queue
+      SELECT * FROM tbl_mj_dns_queue
       WHERE status='PENDING' AND (next_retry_at IS NULL OR next_retry_at<=NOW())
       ORDER BY priority ASC, scheduled_at ASC
       LIMIT 150

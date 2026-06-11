@@ -12,8 +12,8 @@
    ======================================================================= */
 .mj-dns-client {
     /* Brand colors */
-    --cl-primary:        #ea4544;
-    --cl-primary-hover:  #d32f2f;
+    --cl-primary:        #EA4445;
+    --cl-primary-hover:  #C93939;
     --cl-primary-light:  rgba(234, 69, 68, 0.08);
     --cl-primary-ring:   rgba(234, 69, 68, 0.20);
 
@@ -25,7 +25,7 @@
 
     /* Border */
     --cl-border:         #e2e8f0;
-    --cl-border-focus:   #ea4544;
+    --cl-border-focus:   #EA4445;
 
     /* Text */
     --cl-text:           #1e293b;

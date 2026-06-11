@@ -1,4 +1,4 @@
-# HVN - DirectAdmin DNS Manager
+# MJ - DirectAdmin DNS Manager
 ## Technical Specification Document (SPEC)
 
 > **Phiên bản**: 1.0  
@@ -31,7 +31,7 @@
 
 ### 1.1. Định nghĩa
 
-**HVN - DirectAdmin DNS Manager** là một WHMCS Addon Module cho phép khách hàng và quản trị viên quản lý bản ghi DNS thông qua giao diện WHMCS, đồng bộ bất đồng bộ (Queue-based) tới cụm máy chủ DirectAdmin (multi-node).
+**MJ - DirectAdmin DNS Manager** là một WHMCS Addon Module cho phép khách hàng và quản trị viên quản lý bản ghi DNS thông qua giao diện WHMCS, đồng bộ bất đồng bộ (Queue-based) tới cụm máy chủ DirectAdmin (multi-node).
 
 ### 1.2. Nguyên tắc thiết kế cốt lõi
 
@@ -48,7 +48,7 @@
 │                   WHMCS Server                   │
 │                                                  │
 │  ┌──────────────┐    ┌───────────────────────┐  │
-│  │ Client Area  │───▶│   mod_hvndns_*        │  │
+│  │ Client Area  │───▶│   tbl_mj_dns_*        │  │
 │  │ (Browser)    │    │   MySQL Tables         │  │
 │  └──────────────┘    │   (Source of Truth)     │  │
 │  ┌──────────────┐    └──────────┬────────────┘  │
@@ -180,7 +180,7 @@
 ├─────────────────────────────────────────────────────────────┤
 │                  TẦNG 4: QUEUE & WORKER LAYER                │
 │                                                              │
-│   Queue Storage: mod_hvndns_queue (MySQL)                    │
+│   Queue Storage: tbl_mj_dns_queue (MySQL)                    │
 │   ├── Status: PENDING → SYNCING → COMPLETE / FAILED         │
 │   ├── Batch grouping via batch_id (UUID)                     │
 │   └── Exponential Backoff tracking per server                │
@@ -208,9 +208,9 @@
 ### 3.2. Cấu trúc Thư mục Module
 
 ```
-modules/addons/hvn_dns_manager/
+modules/addons/mj_dns_manager/
 │
-├── hvn_dns_manager.php              # Entry point (WHMCS addon functions)
+├── mj_dns_manager.php              # Entry point (WHMCS addon functions)
 ├── hooks.php                         # WHMCS Hook registrations
 ├── cron/
 │   └── queue_worker.php              # Cron worker entry point
@@ -232,19 +232,19 @@ modules/addons/hvn_dns_manager/
 │   │   └── NotificationService.php
 │   │
 │   ├── Models/
-│   │   ├── Server.php                # Eloquent: mod_hvndns_servers
-│   │   ├── Domain.php                # Eloquent: mod_hvndns_domains
-│   │   ├── DnsRecord.php             # Eloquent: mod_hvndns_records
-│   │   ├── QueueJob.php              # Eloquent: mod_hvndns_queue
-│   │   ├── SyncLog.php               # Eloquent: mod_hvndns_sync_logs
-│   │   ├── AuditTrail.php            # Eloquent: mod_hvndns_audit_trail
-│   │   ├── DnssecKey.php             # Eloquent: mod_hvndns_dnssec
-│   │   ├── DdnsToken.php             # Eloquent: mod_hvndns_ddns_tokens
-│   │   ├── Snapshot.php              # Eloquent: mod_hvndns_snapshots
-│   │   ├── RecordHistory.php         # Eloquent: mod_hvndns_record_history
-│   │   ├── Template.php              # Eloquent: mod_hvndns_templates
-│   │   ├── DriftReport.php           # Eloquent: mod_hvndns_drift_reports
-│   │   └── IpBlacklist.php           # Eloquent: mod_hvndns_ip_blacklist
+│   │   ├── Server.php                # Eloquent: tbl_mj_dns_servers
+│   │   ├── Domain.php                # Eloquent: tbl_mj_dns_domains
+│   │   ├── DnsRecord.php             # Eloquent: tbl_mj_dns_records
+│   │   ├── QueueJob.php              # Eloquent: tbl_mj_dns_queue
+│   │   ├── SyncLog.php               # Eloquent: tbl_mj_dns_sync_logs
+│   │   ├── AuditTrail.php            # Eloquent: tbl_mj_dns_audit_trail
+│   │   ├── DnssecKey.php             # Eloquent: tbl_mj_dns_dnssec
+│   │   ├── DdnsToken.php             # Eloquent: tbl_mj_dns_ddns_tokens
+│   │   ├── Snapshot.php              # Eloquent: tbl_mj_dns_snapshots
+│   │   ├── RecordHistory.php         # Eloquent: tbl_mj_dns_record_history
+│   │   ├── Template.php              # Eloquent: tbl_mj_dns_templates
+│   │   ├── DriftReport.php           # Eloquent: tbl_mj_dns_drift_reports
+│   │   └── IpBlacklist.php           # Eloquent: tbl_mj_dns_ip_blacklist
 │   │
 │   ├── Gateway/
 │   │   ├── DAGateway.php             # GuzzleHTTP wrapper cho DA API
@@ -262,7 +262,7 @@ modules/addons/hvn_dns_manager/
 │   │   │   ├── v1_0_0.php            # Initial schema
 │   │   │   ├── v1_1_0.php            # Phase 2 additions
 │   │   │   └── v1_2_0.php            # Phase 3 additions
-│   │   └── SchemaVersion.php         # Eloquent: mod_hvndns_schema_version
+│   │   └── SchemaVersion.php         # Eloquent: tbl_mj_dns_schema_version
 │   │
 │   └── Helpers/
 │       ├── CryptoHelper.php          # Encrypt/decrypt DA passwords
@@ -289,7 +289,7 @@ modules/addons/hvn_dns_manager/
 │
 ├── assets/
 │   ├── css/
-│   │   └── hvndns.css
+│   │   └── mj_dns.css
 │   ├── js/
 │   │   ├── alpine.min.js             # Alpine.js (CDN fallback)
 │   │   ├── dns-editor.js
@@ -311,31 +311,31 @@ modules/addons/hvn_dns_manager/
 ### 4.1. Entity Relationship Diagram (ERD)
 
 ```
-mod_hvndns_servers (1)────────(N) mod_hvndns_queue
+tbl_mj_dns_servers (1)────────(N) tbl_mj_dns_queue
         │                              │
         │                              │ batch_id
         │                              │
-mod_hvndns_domains (1)───────(N) mod_hvndns_records
+tbl_mj_dns_domains (1)───────(N) tbl_mj_dns_records
         │         │                    │
         │         │                    │
-        │         ├──(N) mod_hvndns_queue
-        │         ├──(N) mod_hvndns_snapshots
-        │         ├──(N) mod_hvndns_dnssec
-        │         ├──(N) mod_hvndns_ddns_tokens
-        │         └──(N) mod_hvndns_drift_reports
+        │         ├──(N) tbl_mj_dns_queue
+        │         ├──(N) tbl_mj_dns_snapshots
+        │         ├──(N) tbl_mj_dns_dnssec
+        │         ├──(N) tbl_mj_dns_ddns_tokens
+        │         └──(N) tbl_mj_dns_drift_reports
         │
-        └──────────(N) mod_hvndns_audit_trail
+        └──────────(N) tbl_mj_dns_audit_trail
 
-mod_hvndns_queue (1)─────────(N) mod_hvndns_sync_logs
-mod_hvndns_records (1)───────(N) mod_hvndns_record_history
+tbl_mj_dns_queue (1)─────────(N) tbl_mj_dns_sync_logs
+tbl_mj_dns_records (1)───────(N) tbl_mj_dns_record_history
 ```
 
 ### 4.2. Định nghĩa Bảng Chi tiết
 
-#### `mod_hvndns_servers` — Cấu hình DA Node
+#### `tbl_mj_dns_servers` — Cấu hình DA Node
 
 ```sql
-CREATE TABLE mod_hvndns_servers (
+CREATE TABLE tbl_mj_dns_servers (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     hostname        VARCHAR(255) NOT NULL,          -- dns1.hvn.vn
     ip_address      VARCHAR(45) NOT NULL,            -- IPv4 hoặc IPv6
@@ -366,10 +366,10 @@ CREATE TABLE mod_hvndns_servers (
 
 ---
 
-#### `mod_hvndns_domains` — Mapping Domain ↔ WHMCS Service
+#### `tbl_mj_dns_domains` — Mapping Domain ↔ WHMCS Service
 
 ```sql
-CREATE TABLE mod_hvndns_domains (
+CREATE TABLE tbl_mj_dns_domains (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain          VARCHAR(253) NOT NULL,           -- RFC 1035: max 253 chars
     whmcs_service_id INT UNSIGNED NULL,              -- FK tới tblhosting.id
@@ -398,10 +398,10 @@ CREATE TABLE mod_hvndns_domains (
 
 ---
 
-#### `mod_hvndns_records` — Bản ghi DNS (Source of Truth)
+#### `tbl_mj_dns_records` — Bản ghi DNS (Source of Truth)
 
 ```sql
-CREATE TABLE mod_hvndns_records (
+CREATE TABLE tbl_mj_dns_records (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     type            ENUM('A','AAAA','CNAME','MX','TXT','SRV','NS','CAA','PTR') NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE mod_hvndns_records (
     
     INDEX idx_domain_type (domain_id, type),
     INDEX idx_domain_name (domain_id, name),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
@@ -431,10 +431,10 @@ CREATE TABLE mod_hvndns_records (
 
 ---
 
-#### `mod_hvndns_queue` — Hàng đợi Tác vụ (Heart of the System)
+#### `tbl_mj_dns_queue` — Hàng đợi Tác vụ (Heart of the System)
 
 ```sql
-CREATE TABLE mod_hvndns_queue (
+CREATE TABLE tbl_mj_dns_queue (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     batch_id        CHAR(36) NOT NULL,               -- UUID v4 nhóm các sub-jobs
     domain_id       INT UNSIGNED NOT NULL,
@@ -469,8 +469,8 @@ CREATE TABLE mod_hvndns_queue (
     INDEX idx_domain_status (domain_id, status),
     INDEX idx_server_status (server_id, status),
     INDEX idx_locked (locked_by, locked_at),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id),
-    FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id),
+    FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
@@ -534,10 +534,10 @@ CREATE TABLE mod_hvndns_queue (
 
 ---
 
-#### `mod_hvndns_sync_logs` — Nhật ký Đồng bộ
+#### `tbl_mj_dns_sync_logs` — Nhật ký Đồng bộ
 
 ```sql
-CREATE TABLE mod_hvndns_sync_logs (
+CREATE TABLE tbl_mj_dns_sync_logs (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     queue_id        INT UNSIGNED NOT NULL,
     server_id       INT UNSIGNED NOT NULL,
@@ -554,17 +554,17 @@ CREATE TABLE mod_hvndns_sync_logs (
     INDEX idx_queue (queue_id),
     INDEX idx_server_time (server_id, created_at),
     INDEX idx_success (success, created_at),
-    FOREIGN KEY (queue_id) REFERENCES mod_hvndns_queue(id),
-    FOREIGN KEY (server_id) REFERENCES mod_hvndns_servers(id)
+    FOREIGN KEY (queue_id) REFERENCES tbl_mj_dns_queue(id),
+    FOREIGN KEY (server_id) REFERENCES tbl_mj_dns_servers(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
 ---
 
-#### `mod_hvndns_audit_trail` — Nhật ký Kiểm toán (Append-Only)
+#### `tbl_mj_dns_audit_trail` — Nhật ký Kiểm toán (Append-Only)
 
 ```sql
-CREATE TABLE mod_hvndns_audit_trail (
+CREATE TABLE tbl_mj_dns_audit_trail (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     actor_type      ENUM('client','admin','system','api') NOT NULL,
     actor_id        INT UNSIGNED NULL,               -- WHMCS user/admin ID
@@ -600,8 +600,8 @@ CREATE TABLE mod_hvndns_audit_trail (
 #### Các bảng bổ trợ (Phase 2 & 3)
 
 ```sql
--- mod_hvndns_dnssec
-CREATE TABLE mod_hvndns_dnssec (
+-- tbl_mj_dns_dnssec
+CREATE TABLE tbl_mj_dns_dnssec (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL UNIQUE,
     is_enabled      TINYINT(1) DEFAULT 0,
@@ -613,11 +613,11 @@ CREATE TABLE mod_hvndns_dnssec (
     last_signed_at  DATETIME NULL,
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_ddns_tokens
-CREATE TABLE mod_hvndns_ddns_tokens (
+-- tbl_mj_dns_ddns_tokens
+CREATE TABLE tbl_mj_dns_ddns_tokens (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     subdomain       VARCHAR(255) NOT NULL DEFAULT '@',
@@ -629,11 +629,11 @@ CREATE TABLE mod_hvndns_ddns_tokens (
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE INDEX idx_token (token_hash),
     INDEX idx_domain_sub (domain_id, subdomain),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_snapshots
-CREATE TABLE mod_hvndns_snapshots (
+-- tbl_mj_dns_snapshots
+CREATE TABLE tbl_mj_dns_snapshots (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     snapshot_type   ENUM('scheduled','pre_bulk','pre_template','manual') DEFAULT 'scheduled',
@@ -642,11 +642,11 @@ CREATE TABLE mod_hvndns_snapshots (
     trigger_info    VARCHAR(255) NULL,               -- "Nightly backup" / "Before bulk IP change"
     created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_domain_time (domain_id, created_at),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_record_history
-CREATE TABLE mod_hvndns_record_history (
+-- tbl_mj_dns_record_history
+CREATE TABLE tbl_mj_dns_record_history (
     id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     record_id       INT UNSIGNED NOT NULL,
     domain_id       INT UNSIGNED NOT NULL,
@@ -666,8 +666,8 @@ CREATE TABLE mod_hvndns_record_history (
     INDEX idx_domain (domain_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_templates
-CREATE TABLE mod_hvndns_templates (
+-- tbl_mj_dns_templates
+CREATE TABLE tbl_mj_dns_templates (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100) NOT NULL,
     description     TEXT NULL,
@@ -677,8 +677,8 @@ CREATE TABLE mod_hvndns_templates (
     updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_drift_reports
-CREATE TABLE mod_hvndns_drift_reports (
+-- tbl_mj_dns_drift_reports
+CREATE TABLE tbl_mj_dns_drift_reports (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     domain_id       INT UNSIGNED NOT NULL,
     server_id       INT UNSIGNED NOT NULL,
@@ -692,11 +692,11 @@ CREATE TABLE mod_hvndns_drift_reports (
     resolved_at     DATETIME NULL,
     detected_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_domain_status (domain_id, resolution),
-    FOREIGN KEY (domain_id) REFERENCES mod_hvndns_domains(id) ON DELETE CASCADE
+    FOREIGN KEY (domain_id) REFERENCES tbl_mj_dns_domains(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_ip_blacklist
-CREATE TABLE mod_hvndns_ip_blacklist (
+-- tbl_mj_dns_ip_blacklist
+CREATE TABLE tbl_mj_dns_ip_blacklist (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     ip_address      VARCHAR(45) NOT NULL,
     reason          VARCHAR(255) NOT NULL,
@@ -706,8 +706,8 @@ CREATE TABLE mod_hvndns_ip_blacklist (
     INDEX idx_expiry (blocked_until)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- mod_hvndns_schema_version
-CREATE TABLE mod_hvndns_schema_version (
+-- tbl_mj_dns_schema_version
+CREATE TABLE tbl_mj_dns_schema_version (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     version         VARCHAR(20) NOT NULL,
     description     VARCHAR(255) NULL,
@@ -726,7 +726,7 @@ CREATE TABLE mod_hvndns_schema_version (
 
 **Ghi chú Cache Strategy (tham chiếu SETTINGS.md #68-70)**:
 Khi Client mở DNS Editor, hệ thống load records theo setting `fetch_from_ns_on_load`:
-- `false` (mặc định): Load từ `mod_hvndns_records` (< 50ms). Background refresh nếu cache > `cache_refresh_ttl`
+- `false` (mặc định): Load từ `tbl_mj_dns_records` (< 50ms). Background refresh nếu cache > `cache_refresh_ttl`
 - `true`: Gọi DA API getZone() realtime (500-1500ms), so sánh + update DB, rồi render
 
 ```
@@ -751,7 +751,7 @@ CLIENT BROWSER                  WHMCS SERVER                           DATABASE 
      │                               │  5. ConflictResolver::check()       │                               │                               │
      │                               │     └─ Có job PENDING trùng record? │                               │                               │
      │                               │                                     │                               │                               │
-     │                               │  6. INSERT mod_hvndns_records       │                               │                               │
+     │                               │  6. INSERT tbl_mj_dns_records       │                               │                               │
      │                               │─────────────────────────────────────▶│  record_id = 456              │                               │
      │                               │                                     │                               │                               │
      │                               │  7. QueueManager::dispatch(         │                               │                               │
@@ -762,11 +762,11 @@ CLIENT BROWSER                  WHMCS SERVER                           DATABASE 
      │                               │     ServerRegistry::getPrimary()    │                               │
      │                               │     └─ Returns [dns1 (primary)]     │                               │
      │                               │                                     │                               │
-     │                               │  8. INSERT 1x mod_hvndns_queue      │                               │
+     │                               │  8. INSERT 1x tbl_mj_dns_queue      │                               │
      │                               │     batch_id = "abc-123-def"        │                               │
      │                               │─────────────────────────────────────▶│  job #1 → dns1 PENDING        │                               │
      │                               │                                     │                               │                               │
-     │                               │  9. INSERT mod_hvndns_audit_trail   │                               │                               │
+     │                               │  9. INSERT tbl_mj_dns_audit_trail   │                               │                               │
      │                               │─────────────────────────────────────▶│  actor=client, action=add     │                               │
      │                               │                                     │                               │                               │
      │  10. JSON {success: true,     │                                     │                               │                               │
@@ -843,7 +843,7 @@ queue_worker.php khởi chạy
         │
         ▼
 ┌─────────────────────────────────┐
-│ 1. Acquire process lock         │ ── Kiểm tra file /tmp/hvndns_worker.lock
+│ 1. Acquire process lock         │ ── Kiểm tra file /tmp/mj_dns_worker.lock
 │    (flock hoặc DB lock)         │    Nếu lock tồn tại & process còn sống → EXIT
 │    Timeout: 55 giây             │    Tạo lock với PID hiện tại
 └────────────┬────────────────────┘
@@ -1066,7 +1066,7 @@ WHMCS gọi Module::Create()
 ┌──────────────────────────────────────────────────────────────┐
 │ Hook: AfterModuleCreate                                       │
 │                                                               │
-│ 1. Tạo mod_hvndns_domains:                                   │
+│ 1. Tạo tbl_mj_dns_domains:                                   │
 │    domain = "example.com"                                     │
 │    whmcs_service_id = 789                                     │
 │    whmcs_user_id = 456                                        │
@@ -1082,7 +1082,7 @@ WHMCS gọi Module::Create()
 │    {{ip}} → (từ Product custom field hoặc default)           │
 │                                                               │
 │ 4. INSERT records (từ template)                               │
-│    → mod_hvndns_records (is_system=1 cho NS/SOA)             │
+│    → tbl_mj_dns_records (is_system=1 cho NS/SOA)             │
 │                                                               │
 │ 5. QueueManager::dispatch(CREATE_ZONE, {                      │
 │       template_records: [...],                                │
@@ -1123,7 +1123,7 @@ CRON (2:00 AM daily)
 │   │     (chỉ cần query 1 server Primary) │
 │   │                                       │
 │   ├─ 3. Local records:                    │
-│   │     SELECT FROM mod_hvndns_records    │
+│   │     SELECT FROM tbl_mj_dns_records    │
 │   │     WHERE domain_id = X              │
 │   │                                       │
 │   ├─ 4. DIFF algorithm:                  │
@@ -1145,7 +1145,7 @@ CRON (2:00 AM daily)
 │   │     └───────────────────────────────┘│
 │   │                                       │
 │   ├─ 5. IF drift found:                  │
-│   │     INSERT mod_hvndns_drift_reports   │
+│   │     INSERT tbl_mj_dns_drift_reports   │
 │   │                                       │
 │   └─ 6. IF auto_fix enabled:             │
 │         Push WHMCS → DA cho mỗi drift    │
@@ -1189,7 +1189,7 @@ class DAGateway
     /**
      * Constructor - khởi tạo kết nối tới 1 DA server
      * 
-     * @param Server $server  Eloquent model từ mod_hvndns_servers
+     * @param Server $server  Eloquent model từ tbl_mj_dns_servers
      */
     public function __construct(Server $server);
 
@@ -1310,7 +1310,7 @@ class QueueManager
     /**
      * Dispatch job mới vào queue cho Primary Server
      * 
-     * @param int    $domainId   ID domain trong mod_hvndns_domains
+     * @param int    $domainId   ID domain trong tbl_mj_dns_domains
      * @param string $action     Action enum (ADD_RECORD, EDIT_RECORD, ...)
      * @param array  $payload    Dữ liệu chi tiết cho action
      * @param string $actorType  'client' | 'admin' | 'system' | 'api'
@@ -1401,11 +1401,11 @@ Khi QueueManager::dispatch() được gọi:
 |-----------|---------|---------|
 | Interval | 1 phút | Qua WHMCS cron hoặc system crontab |
 | Max Runtime | 55 giây | Tự kill trước khi cron tiếp theo chạy |
-| Lock Mechanism | File lock (`flock`) | `/tmp/hvndns_worker.lock` |
+| Lock Mechanism | File lock (`flock`) | `/tmp/mj_dns_worker.lock` |
 | Stale Lock Timeout | 5 phút | Lock cũ hơn 5 phút → force release |
 | Max Jobs Per Cycle | `SUM(server.max_concurrent)` | Ví dụ: 3 server × 50 = 150 jobs max |
 | Job Timeout | 30 giây/job | GuzzleHTTP request timeout |
-| Logging | Monolog channel `hvndns_worker` | Level: info (summary), debug (per-job) |
+| Logging | Monolog channel `mj_dns_worker` | Level: info (summary), debug (per-job) |
 
 ### 8.2. Exponential Backoff Formula
 
@@ -1460,10 +1460,10 @@ vào 1 server đang down → lãng phí thời gian cron cycle.
 
 | Data | Encryption | Storage |
 |------|-----------|---------|
-| DA Server password | WHMCS `Encryption::encode()` (AES-256) | `mod_hvndns_servers.password_enc` |
-| DDNS Token | SHA-256 hash (one-way) | `mod_hvndns_ddns_tokens.token_hash` |
+| DA Server password | WHMCS `Encryption::encode()` (AES-256) | `tbl_mj_dns_servers.password_enc` |
+| DDNS Token | SHA-256 hash (one-way) | `tbl_mj_dns_ddns_tokens.token_hash` |
 | Telegram Bot Token | WHMCS `Encryption::encode()` | Module settings |
-| Audit Trail | Plaintext (append-only, integrity > encryption) | `mod_hvndns_audit_trail` |
+| Audit Trail | Plaintext (append-only, integrity > encryption) | `tbl_mj_dns_audit_trail` |
 
 ### 9.3. Input Validation Rules
 
@@ -1733,31 +1733,31 @@ class NotificationService
 
 ```bash
 # 1. Upload module files
-cp -r hvn_dns_manager/ /path/to/whmcs/modules/addons/
+cp -r mj_dns_manager/ /path/to/whmcs/modules/addons/
 
 # 2. Set permissions
-chown -R www-data:www-data /path/to/whmcs/modules/addons/hvn_dns_manager/
-chmod -R 755 /path/to/whmcs/modules/addons/hvn_dns_manager/
+chown -R www-data:www-data /path/to/whmcs/modules/addons/mj_dns_manager/
+chmod -R 755 /path/to/whmcs/modules/addons/mj_dns_manager/
 
 # 3. Activate trong WHMCS Admin
-# → Setup → Addon Modules → HVN - DirectAdmin DNS Manager → Activate
+# → Setup → Addon Modules → MJ - DirectAdmin DNS Manager → Activate
 # → Database tables tự động được tạo
 
 # 4. Cấu hình Cron (nếu dùng system crontab)
-echo "* * * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/queue_worker.php" >> /etc/crontab
+echo "* * * * * php /path/to/whmcs/modules/addons/mj_dns_manager/cron/queue_worker.php" >> /etc/crontab
 
 # 5. Cấu hình nightly jobs
-echo "0 2 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/drift_detector.php" >> /etc/crontab
-echo "5 2 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/snapshot_creator.php" >> /etc/crontab
-echo "0 3 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/ssl_checker.php" >> /etc/crontab
-echo "0 4 * * * php /path/to/whmcs/modules/addons/hvn_dns_manager/cron/cleanup.php" >> /etc/crontab
+echo "0 2 * * * php /path/to/whmcs/modules/addons/mj_dns_manager/cron/drift_detector.php" >> /etc/crontab
+echo "5 2 * * * php /path/to/whmcs/modules/addons/mj_dns_manager/cron/snapshot_creator.php" >> /etc/crontab
+echo "0 3 * * * php /path/to/whmcs/modules/addons/mj_dns_manager/cron/ssl_checker.php" >> /etc/crontab
+echo "0 4 * * * php /path/to/whmcs/modules/addons/mj_dns_manager/cron/cleanup.php" >> /etc/crontab
 ```
 
 ### 14.2. Post-install Checklist
 
 ```
 □ Module activated trong WHMCS Admin
-□ Database tables đã được tạo (kiểm tra mod_hvndns_schema_version)
+□ Database tables đã được tạo (kiểm tra tbl_mj_dns_schema_version)
 □ Thêm ít nhất 1 DA Server → Test Connection thành công
 □ Tạo Default DNS Template
 □ Tạo ít nhất 1 Quota Plan → Map vào WHMCS Product
