@@ -9,6 +9,7 @@ use MJ\DnsManager\Services\ZoneManager;
 use MJ\DnsManager\Services\RecordManager;
 use MJ\DnsManager\Services\ReportService;
 use MJ\DnsManager\Services\SettingsService;
+use MJ\DnsManager\Security\Csrf;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 class AdminController
@@ -76,7 +77,8 @@ class AdminController
         $this->smarty->assign('modulelink', $params['modulelink']);
         $this->smarty->assign('action',        $action ?: 'dashboard');
         $this->smarty->assign('template_name', $template);
-        $this->smarty->assign('token',         $_SESSION['whmcs']['token'] ?? '');
+        // Admin self-token (CSRF) — mọi AJAX/form mutation phải gửi kèm token này.
+        $this->smarty->assign('token',         Csrf::adminToken());
 
         switch ($template) {
             case 'dashboard':
@@ -148,13 +150,21 @@ class AdminController
             if ($raw) {
                 $decoded = json_decode($raw, true);
                 if (is_array($decoded)) {
-                    $_REQUEST = array_merge($_REQUEST, $decoded);
-                    $_POST    = array_merge($_POST,    $decoded);
+                    $_POST = array_merge($_POST, $decoded);
                 }
             }
         }
 
-        $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : '';
+        // CSRF [WHMCS-REQUIRED]: mọi mutation (non-GET) phải có admin self-token hợp lệ.
+        // GET chỉ-đọc không áp CSRF (không gây side-effect). So sánh bằng hash_equals().
+        $requestMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($requestMethod !== 'GET' && !Csrf::validateAdmin(Csrf::tokenFromRequest())) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => ['code' => 'CSRF_FAILED', 'message' => 'CSRF Token không hợp lệ.']]);
+            exit;
+        }
+
+        $method = isset($_POST['method']) ? $_POST['method'] : (isset($_GET['method']) ? $_GET['method'] : '');
 
         $methodMap = [
             // Dashboard
@@ -230,6 +240,12 @@ class AdminController
         $this->smarty->assign('flash', $flash);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // CSRF [WHMCS-REQUIRED]: form lưu server gửi kèm hidden input "token".
+            if (!Csrf::validateAdmin((string) ($_POST['token'] ?? ''))) {
+                $this->redirectToServerEdit((int) ($_GET['id'] ?? 0), 'error', 'CSRF Token không hợp lệ. Vui lòng tải lại trang và thử lại.');
+                return;
+            }
+
             $result = (new ZoneManager())->saveServer($_POST);
             if ($result['success']) {
                 $this->redirectToServers($result['message']);
@@ -501,7 +517,7 @@ class AdminController
     // ghi force-flag; AfterCronJob (cron context, được phép gọi DA) sẽ thực thi.
     private function ajaxRunSslCheck(): void
     {
-        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        $id = (int) ($_POST['domain_id'] ?? 0);
         \MJ\DnsManager\Helpers\SettingsHelper::set('force_ssl_check', $id > 0 ? (string) $id : 'all');
         echo json_encode([
             'success' => true,
@@ -512,7 +528,7 @@ class AdminController
 
     private function ajaxRunDriftCheck(): void
     {
-        $id = (int) ($_REQUEST['domain_id'] ?? 0);
+        $id = (int) ($_POST['domain_id'] ?? 0);
         \MJ\DnsManager\Helpers\SettingsHelper::set('force_drift_check', $id > 0 ? ('id:' . $id) : 'all');
         echo json_encode([
             'success' => true,
@@ -523,7 +539,7 @@ class AdminController
 
     private function ajaxRunDriftScanByName(): void
     {
-        $name = trim($_REQUEST['domain'] ?? '');
+        $name = trim($_POST['domain'] ?? '');
         if ($name === '') {
             echo json_encode(['success' => false, 'error' => 'Thiếu tên domain.']);
             return;

@@ -20,7 +20,7 @@ class ClientController
     {
         $userId = isset($_SESSION['uid']) ? (int) $_SESSION['uid'] : 0;
 
-        $domainId = isset($_REQUEST['domain_id']) ? (int) $_REQUEST['domain_id'] : 0;
+        $domainId = isset($_GET['domain_id']) ? (int) $_GET['domain_id'] : 0;
 
         if ($domainId > 0) {
             return $this->showDnsEditor($params, $domainId, $userId);

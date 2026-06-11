@@ -2,6 +2,7 @@
 
 use WHMCS\Database\Capsule;
 use MJ\DnsManager\Controllers\Client\RecordController;
+use MJ\DnsManager\Security\Csrf;
 
 // Bắt đầu kiểm soát đầu ra (Output Buffering)
 ob_start();
@@ -34,7 +35,13 @@ $jsonInput = is_array($jsonInput) ? $jsonInput : array();
 // ── Xác định action ─────────────────────────────────────────────────────────
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
+// Form/query fallback (KHÔNG dùng $_REQUEST — gộp GET + POST, POST ưu tiên).
+// Controllers tự đọc JSON body từ php://input; đây chỉ là fallback cho form-data.
+$requestData = array_merge($_GET, $_POST);
+
 // ── CSRF & Auth ─────────────────────────────────────────────────────────────
+// CSRF bắt buộc trên mọi nhánh, so sánh hằng-thời-gian bằng hash_equals()
+// (xem app/Security/Csrf.php). Không bao giờ bỏ qua kiểm tra khi token rỗng.
 if ($action === 'admin_record' || $action === 'admin_template') {
 
     // Kiểm tra admin session
@@ -45,27 +52,8 @@ if ($action === 'admin_record' || $action === 'admin_template') {
         exit;
     }
 
-    // WHMCS admin token
-    $adminToken = '';
-    if (!empty($_SESSION['whmcs']['token'])) {
-        $adminToken = $_SESSION['whmcs']['token'];
-    } elseif (!empty($_SESSION['token'])) {
-        $adminToken = $_SESSION['token'];
-    }
-
-    // Token từ request: ưu tiên header → POST → GET → JSON body
-    $requestToken = '';
-    if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
-        $requestToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
-    } elseif (!empty($_POST['token'])) {
-        $requestToken = $_POST['token'];
-    } elseif (!empty($_GET['token'])) {
-        $requestToken = $_GET['token'];
-    } elseif (!empty($jsonInput['token'])) {
-        $requestToken = $jsonInput['token'];
-    }
-
-    if (!empty($adminToken) && (empty($requestToken) || $requestToken !== $adminToken)) {
+    // Admin self-token + hash_equals (header → POST → JSON body → GET).
+    if (!Csrf::validateAdmin(Csrf::tokenFromRequest($jsonInput))) {
         ob_clean();
         echo json_encode(array('success' => false, 'error' => array('code' => 'CSRF_FAILED', 'message' => 'CSRF Token không hợp lệ.')));
         exit;
@@ -75,18 +63,8 @@ if ($action === 'admin_record' || $action === 'admin_template') {
 
 } else {
 
-    // Client actions
-    $token = '';
-    if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
-        $token = $_SERVER['HTTP_X_CSRF_TOKEN'];
-    } elseif (!empty($_REQUEST['token'])) {
-        $token = $_REQUEST['token'];
-    }
-
-    $sessionToken = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
-    $csrfValid    = (!empty($token) && !empty($sessionToken) && $token === $sessionToken);
-
-    if (!$csrfValid) {
+    // Client actions — token client-area của WHMCS ($_SESSION['tkval']) + hash_equals.
+    if (!Csrf::validateClient(Csrf::tokenFromRequest($jsonInput))) {
         ob_clean();
         echo json_encode(array('success' => false, 'error' => array('code' => 'CSRF_FAILED', 'message' => 'CSRF Token is invalid or missing.')));
         exit;
@@ -112,7 +90,7 @@ try {
         case 'sync_zone':
         case 'get_all_records':
             $controller = new RecordController();
-            $response   = $controller->dispatch($action, $_REQUEST, $userId);
+            $response   = $controller->dispatch($action, $requestData, $userId);
             $newToken   = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
             if (!empty($newToken)) {
                 $response['_token'] = $newToken;
@@ -125,7 +103,7 @@ try {
         case 'add_redirect':
         case 'delete_redirect':
             $controller = new \MJ\DnsManager\Controllers\Client\RedirectController();
-            $response   = $controller->dispatch($action, $_REQUEST, $userId);
+            $response   = $controller->dispatch($action, $requestData, $userId);
             $newToken   = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
             if (!empty($newToken)) {
                 $response['_token'] = $newToken;
@@ -136,8 +114,8 @@ try {
 
         // ── Admin DNS record actions ──────────────────────────────────────
         case 'admin_record':
-            // admin_record vẫn có thể dùng $_REQUEST vì JS gửi form-data hoặc JSON
-            $method          = !empty($jsonInput['method']) ? $jsonInput['method'] : (isset($_REQUEST['method']) ? $_REQUEST['method'] : '');
+            // admin_record: method lấy từ JSON body hoặc form-data (qua $requestData)
+            $method          = !empty($jsonInput['method']) ? $jsonInput['method'] : (isset($requestData["method"]) ? $requestData["method"] : "");
             $adminController = new \MJ\DnsManager\Controllers\Admin\AdminController();
             $adminController->handleAdminRecordAjax($method);
             break;
@@ -147,13 +125,13 @@ try {
             // $jsonInput đã được parse ở trên — lấy method từ JSON body
             $method = isset($jsonInput['method']) ? $jsonInput['method'] : '';
 
-            // Fallback: nếu không có trong JSON thì thử $_REQUEST (form-data)
+            // Fallback: nếu không có trong JSON thì thử form-data ($requestData)
             if ($method === '') {
-                $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : '';
+                $method = isset($requestData["method"]) ? $requestData["method"] : "";
             }
 
-            // $jsonInput là input đầy đủ; nếu rỗng fallback về $_REQUEST
-            $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
+            // $jsonInput là input đầy đủ; nếu rỗng fallback về $requestData
+            $input = !empty($jsonInput) ? $jsonInput : $requestData;
 
             $templateController = new \MJ\DnsManager\Controllers\Admin\TemplateController();
             $response           = $templateController->dispatch($method, $input);
@@ -163,7 +141,7 @@ try {
 
         // ── Client Apply Template ─────────────────────────────────────────
         case 'apply_template':
-            $input           = !empty($jsonInput) ? $jsonInput : $_REQUEST;
+            $input           = !empty($jsonInput) ? $jsonInput : $requestData;
             $templateService = new \MJ\DnsManager\Services\TemplateService();
             $response        = $templateService->applyTemplate($input, $userId);
             $newToken        = isset($_SESSION['tkval']) ? $_SESSION['tkval'] : '';
@@ -181,7 +159,7 @@ try {
         case 'ddns_delete':
         case 'ddns_regenerate':
             $svc   = new \MJ\DnsManager\Services\DdnsService();
-            $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
+            $input = !empty($jsonInput) ? $jsonInput : $requestData;
 
             if ($action === 'ddns_list') {
                 $response = $svc->getTokens((int) ($input['domain_id'] ?? 0), $userId);
@@ -207,7 +185,7 @@ try {
         case 'email_fwd_list':
         case 'email_fwd_create':
         case 'email_fwd_delete':
-            $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
+            $input = !empty($jsonInput) ? $jsonInput : $requestData;
 
             $emailAction = substr($action, strlen('email_fwd_')); // list / create / delete
             $ctrl        = new \MJ\DnsManager\Controllers\Client\EmailForwardController();
@@ -226,7 +204,7 @@ try {
         case 'dnssec_toggle':
 
             $svc   = new \MJ\DnsManager\Services\DnssecService();
-            $input = !empty($jsonInput) ? $jsonInput : $_REQUEST;
+            $input = !empty($jsonInput) ? $jsonInput : $requestData;
 
             if ($action === 'dnssec_status') {
                 $response = $svc->getStatus((int) ($input['domain_id'] ?? 0), $userId);
