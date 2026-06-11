@@ -92,7 +92,7 @@ license fail-safe (không làm sập admin).
 | Deviation | Chuẩn mong đợi | Lý do |
 |---|---|---|
 | Icon page-body dùng Bootstrap-icons (CDN) | SVG stroke set `I.*` của mj-design, không icon font | Swap ~30 template là đợt riêng; shell mới đã dùng SVG stroke |
-| Alpine.js chưa vendor sẵn (loader ưu tiên local, fallback CDN) | `assets/js/vendor/alpine.min.js` 3.14.8 | Môi trường build chặn network — thả file khi đóng gói (xem `assets/js/vendor/README.md`) |
+| Alpine.js + Chart.js chưa vendor sẵn (Alpine: loader ưu tiên local, fallback CDN; Chart.js: CDN ở dashboard) | `assets/js/vendor/` có local copy | Môi trường build chặn network — thả file khi đóng gói (xem `assets/js/vendor/README.md`) |
 | Admin template là Smarty `.tpl` | PHP include templates | Đổi engine render = rewrite toàn bộ admin UI; Smarty vẫn là chuẩn WHMCS cho client, giữ thống nhất |
 | License ở `app/License/` (namespaced, autoload) | `lib/LicenseChecker.php` + `lib/license-config.php` | Di chuyển phá autoloader; giữ chỗ hiện tại có chủ đích |
 | Markup page-body giữ class `.mj-*` bridge (chưa re-skin sang `.btn`/`.card`/`.kpi` canonical) | Class canonical components.css | Re-skin 30 template cần đối chiếu trực quan trên staging; token/màu/font đã canonical |

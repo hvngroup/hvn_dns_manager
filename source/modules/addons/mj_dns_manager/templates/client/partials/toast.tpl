@@ -84,10 +84,5 @@
     </div>
 </div>
 
-<script>
-    function showToast(title, msg, type) {
-        type = type || 'success';
-        window.dispatchEvent(new CustomEvent('show-toast', { detail: { title: title, msg: msg, type: type } }));
-    }
-</script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}
 {/literal}

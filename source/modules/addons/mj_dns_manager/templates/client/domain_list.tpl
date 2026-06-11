@@ -1,8 +1,5 @@
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-common.css">
-<link rel="stylesheet" href="/modules/addons/mj_dns_manager/assets/css/mj-dns-client.css">
-<div class="mj-dns-client">
+<div class="mj-dns mj-dns-client">
     <h3 style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:20px;">
         <i class="bi bi-hdd-network" style="color:#ea4544;"></i> DNS Management &mdash; Chọn domain cần quản lý
     </h3>
@@ -59,28 +56,13 @@
                 {if $default_ns3}{$default_ns3|escape:'htmlall'}{/if}
             </div>
         </div>
-        <button class="cl-btn cl-btn-secondary" style="height:44px;font-size:13px;padding:0 16px;" onclick="copyToClipboard('#ns-list', this)">
+        <button class="cl-btn cl-btn-secondary" style="height:44px;font-size:13px;padding:0 16px;" data-mj-copy-ns="#ns-list">
             <i class="bi bi-clipboard"></i> Copy
         </button>
     </div>
 </div>
 
-<script>
-{literal}
-function copyToClipboard(selector, btn) {
-    const text = document.querySelector(selector).innerText.replace(/\s+/g, ' ').trim();
-    navigator.clipboard.writeText(text).then(() => {
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-check2"></i> Đã copy';
-        btn.classList.replace('btn-outline-secondary', 'btn-success');
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.classList.replace('btn-success', 'btn-outline-secondary');
-        }, 2000);
-    });
-}
-{/literal}
-</script>
+{* JS logic moved to assets/js/mj-dns.js (MJ standard §8) *}
 
 <style>
 {literal}
