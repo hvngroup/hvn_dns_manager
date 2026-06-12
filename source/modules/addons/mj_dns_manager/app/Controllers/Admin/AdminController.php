@@ -119,6 +119,9 @@ class AdminController
         // Admin self-token (CSRF) — mọi AJAX/form mutation phải gửi kèm token này.
         $this->smarty->assign('token',         Csrf::adminToken());
 
+        // Bọc toàn bộ action + render: lỗi service/template KHÔNG được phép trả
+        // HTTP 500 trắng trang — log vào Activity Log + hiện thông báo MJ có chi tiết.
+        try {
         switch ($template) {
             case 'dashboard':
                 $this->actionDashboard();
@@ -163,11 +166,16 @@ class AdminController
                 break;
         }
 
-        try {
             $this->smarty->display('wrapper.tpl');
-        } catch (\Exception $e) {
-            echo "<div class='alert alert-danger'>Lỗi render template: "
-                . htmlspecialchars($e->getMessage()) . "</div>";
+        } catch (\Throwable $e) {
+            logActivity('MJ DNS Manager [Admin/' . $template . ']: ' . $e->getMessage()
+                . ' @ ' . basename($e->getFile()) . ':' . $e->getLine());
+            echo '<div style="margin:24px;padding:16px 20px;background:#FDECEC;border:1px solid #F5BDBD;'
+                . 'border-radius:10px;font-family:Inter,system-ui,sans-serif;color:#A52828;line-height:1.6;">'
+                . '<strong>MJ DNS Manager — Không tải được trang &ldquo;' . htmlspecialchars($template) . '&rdquo;.</strong><br>'
+                . 'Lỗi đã ghi vào <em>Utilities &rsaquo; Logs &rsaquo; Activity Log</em>. Chi tiết: '
+                . '<code style="background:#fff;padding:2px 6px;border-radius:4px;">' . htmlspecialchars($e->getMessage()) . '</code>'
+                . '</div>';
         }
     }
 

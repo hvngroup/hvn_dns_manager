@@ -183,3 +183,18 @@ add_hook('AfterCronJob', 1, function ($vars) {
 add_hook('AcceptOrder', 1, function ($params) {
     AcceptOrderHook::handle($params);
 });
+
+/**
+ * AfterRegistrarRegistration / AfterRegistrarTransfer — Fires khi domain được
+ * đăng ký / transfer thành công qua registrar (kể cả khi KHÔNG đi qua AcceptOrder,
+ * ví dụ order auto-accept hoặc đăng ký trực tiếp). Provision idempotent nên không
+ * tạo trùng nếu AcceptOrder đã chạy trước. Bù đắp lỗ hổng "tạo order domain nhưng
+ * không thấy trong Domains".
+ */
+add_hook('AfterRegistrarRegistration', 1, function ($params) {
+    AcceptOrderHook::handleRegistrar($params);
+});
+
+add_hook('AfterRegistrarTransfer', 1, function ($params) {
+    AcceptOrderHook::handleRegistrar($params);
+});
